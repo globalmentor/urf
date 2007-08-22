@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Uniform Resource Framework (URF)</title>
+  </head>
+
+  <body>
+    <h1>Uniform Resource Framework (URF)</h1>
+
+    <p>Version 2007-07-22</p>
+
+    <p>The Uniform Resource Framework (URF) provides a consistent way for
+    representing resources and their relationships. URF and its interchange
+    formats are useful for data storage, data interchange, data querying, and
+    logical inferences. URF together with its interchange formats provides a
+    more powerful yet simpler replacement for data-oriented XML, RDF, and
+    JSON.</p>
+
+    <p>This document defines the Uniform Resource Framework (URF) as an
+    abstract model, and also defines a text-based representation format, Text
+    URF (TURF). This document does not yet provide a description of the binary
+    representation format Serial URF (SURF), or the XML-based format XML URF
+    (XMURF).</p>
+
+    <h2>Conventions</h2>
+
+    <p>When this document refers to "URF", it indicates the URF model abstract
+    from any representation format. When this document refers to "TURF", it
+    indicates the textual representation of URF. Because abstract concepts
+    must be textualized to be communicated in a text-based specification, at
+    times a description of URF will use TURF for clarification of the
+    model.</p>
+
+    <h2>Resources</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>Everything that can be described by URF is referred to as a
+      <dfn>resource</dfn>. Every resource is an instance of the class
+      <code>(&lt;urf#Resource&gt;)</code>.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>A resource is indicated by parentheses. The following example
+      refers to an anonymous resource:</p><blockquote>
+          <p><code>()</code></p>
+        </blockquote></dd>
+    </dl>
+
+    <h2>Resource Identification</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>A resource may be <dfn>anonymous</dfn> or may be identified by a
+      URI.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>A URI is indicated by angle brackets. The following example
+      indicates the URI
+      <code>http://urf.name/urf</code>#Resource:</p><blockquote>
+          <p><code>&lt;http://urf.name/urf#Resource&gt;</code></p>
+        </blockquote><p>A resource may be identified placing its URI within
+      parentheses. The following example refers to a resource identified by
+      the URI
+      <code>&lt;http://urf.name/urf#Resource&gt;</code>.</p><blockquote>
+          <p><code>(&lt;http://urf.name/urf#Resource&gt;)</code></p>
+        </blockquote></dd>
+    </dl>
+
+    <h2>Namespaces</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>A set of resources (those part of a particular
+      <dfn>ontology</dfn>, for example) may be grouped together for
+      identification purposes by using a common <dfn>namespace</dfn>. A
+      namespace is a URI that serves as a base for the formation of URIs
+      within that namespace. A namespace URI may not have a fragment
+      identifier. A URI within a namespace is formed by appending a pound sign
+      followed by a local identifier to the namespace URI. For example, the
+      URI <code>&lt;http://urf.name/urf#Resource&gt;</code> is within the
+      namespace <code>&lt;http://urf.name/urf&gt;</code>.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>A namespace may be given a <dfn>prefix</dfn> to use as a shortcut
+      for indicating URIs within that namespace. A namespace prefix must
+      consist only of name characters. (TODO define) A namespace prefix may be
+      used within angle brackets as a shortcut form of indicating a URI. The
+      URI <code>&lt;http://urf.name/urf#Resource&gt;</code> can be represented
+      using the prefix urf in place of the namespace URI
+      <code>&lt;http://urf.name/urf&gt;</code> as in the following
+      example:</p><blockquote>
+          <p><code>&lt;urf#Resource&gt;</code></p>
+        </blockquote></dd>
+    </dl>
+
+    <h2>Properties</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>A resource may be related to another resource by the use of a
+      <dfn>property</dfn>. Every property is itself a resource and is an
+      instance of the class (&lt;urf#Property&gt;). A resource
+      <dfn>subject</dfn>, a property <dfn>predicate</dfn>, and the related
+      resource <dfn>object</dfn> together make an <dfn>assertion</dfn> about
+      the universe being described.</p><p>An infinite number of assertions may
+      be made about a single subject resource. An infinite number of these
+      assertions may use the same predicate property and/or the same object
+      resource. Within a particular context, the relative order of assertions
+      about any particular resource subject is maintained.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>Assertions about a particular subject resource are presented, in
+      order, within angle brackets and separated by commas. Each predicate
+      propertie and object resource of an assertion are separated by a colon
+      character. In the following example, the resource
+      <code>(&lt;http://example.org/example#resource&gt;)</code> has a single
+      property <code>(&lt;http://example.org/example#property&gt;)</code>,
+      which has as its value another resource,
+      <code>(&lt;http://example.org/example#value&gt;)</code>:</p><blockquote>
+          <pre><code>(&lt;http://example.org/example#resource&gt;)
+{
+  (&lt;http://example.org/example#property&gt;):(&lt;http://example.org/example#value&gt;)
+}</code></pre>
+        </blockquote><p>Were the prefix <code>example</code> defined to
+      represent the namespace <code>&lt;http://example.org/example&gt;</code>,
+      the above example could be represented in the following shorthand
+      representation:</p><blockquote>
+          <pre><code>(&lt;example#resource&gt;)
+{
+  (&lt;example#property&gt;):(&lt;example#value&gt;)
+}</code></pre>
+        </blockquote></dd>
+    </dl>
+
+    <h2>Classes</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>Some resources represent classes or sets of resources containing
+      instances of other resources. As stated earlier, for example, all
+      resources are implicitly instances of the class
+      <code>(&lt;urf#Resource&gt;)</code>, and all property resources are also
+      implicitly instances of the class <code>(&lt;urf#Property&gt;)</code>.
+      Any resource may be explicitly asserted to be an instance of a class by
+      identifying that class as a value of the <code>(&lt;urf#type&gt;)</code>
+      property.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>It can be asserted that a resource is an instance of a class by
+      normal representation of the <code>(&lt;urf#type&gt;)</code> property.
+      In the following example, the resource
+      <code>(&lt;example#resource&gt;)</code> is asserted to be an instance of
+      the class <code>(&lt;example#Class&gt;)</code>:</p><blockquote>
+          <pre><code>(&lt;example#resource&gt;)
+{
+  (&lt;urf#type&gt;):(&lt;example#Class&gt;)
+}</code></pre>
+        </blockquote><p>As a shorthand representation, a single type may be
+      indicated by </p></dd>
+    </dl>
+
+    <p></p>
+
+    <p></p>
+  </body>
+</html>
