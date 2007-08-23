@@ -9,14 +9,14 @@
   <body>
     <h1>Uniform Resource Framework (URF)</h1>
 
-    <p>Version 2007-07-22</p>
+    <p>Version 2007-07-23</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
     formats are useful for data storage, data interchange, data querying, and
     logical inferences. URF together with its interchange formats provides a
-    more powerful yet simpler replacement for data-oriented XML, RDF, and
-    JSON.</p>
+    more powerful yet in many ways simpler replacement for data-oriented XML,
+    RDF, and JSON.</p>
 
     <p>This document defines the Uniform Resource Framework (URF) as an
     abstract model, and also defines a text-based representation format, Text
@@ -30,8 +30,8 @@
     from any representation format. When this document refers to "TURF", it
     indicates the textual representation of URF. Because abstract concepts
     must be textualized to be communicated in a text-based specification, at
-    times a description of URF will use TURF for clarification of the
-    model.</p>
+    times a description of the URF abstract model will use TURF notation for
+    clarification of the model.</p>
 
     <h2>Resources</h2>
 
@@ -62,13 +62,13 @@
 
       <dd><p>A URI is indicated by angle brackets. The following example
       indicates the URI
-      <code>http://urf.name/urf</code>#Resource:</p><blockquote>
-          <p><code>&lt;http://urf.name/urf#Resource&gt;</code></p>
+      <code>http://example.org/example#resource</code>:</p><blockquote>
+          <p><code>&lt;http://example.org/example#resource&gt;</code></p>
         </blockquote><p>A resource may be identified placing its URI within
-      parentheses. The following example refers to a resource identified by
-      the URI
+      the resource parentheses. The following example refers to a resource
+      identified by the URI
       <code>&lt;http://urf.name/urf#Resource&gt;</code>.</p><blockquote>
-          <p><code>(&lt;http://urf.name/urf#Resource&gt;)</code></p>
+          <p><code>(&lt;http://example.org/example#resource&gt;)</code></p>
         </blockquote></dd>
     </dl>
 
@@ -81,22 +81,27 @@
       <dfn>ontology</dfn>, for example) may be grouped together for
       identification purposes by using a common <dfn>namespace</dfn>. A
       namespace is a URI that serves as a base for the formation of URIs
-      within that namespace. A namespace URI may not have a fragment
-      identifier. A URI within a namespace is formed by appending a pound sign
-      followed by a local identifier to the namespace URI. For example, the
-      URI <code>&lt;http://urf.name/urf#Resource&gt;</code> is within the
-      namespace <code>&lt;http://urf.name/urf&gt;</code>.</p></dd>
+      within that namespace. If a resource lies within a namespace, the
+      resource's <var>local name</var> is the part appearing after the poind
+      sign in the URI fragment identifier. A namespace URI therefore may not
+      have a fragment identifier. A URI within a namespace is formed by
+      appending a pound sign followed by the resource's local name to the
+      namespace URI. For example, the URI
+      <code>&lt;http://urf.name/urf#Resource&gt;</code> is within the
+      namespace <code>&lt;http://urf.name/urf&gt;</code>. Not all resource
+      URIs are part of some namespace.</p></dd>
 
       <dt>TURF</dt>
 
       <dd><p>A namespace may be given a <dfn>prefix</dfn> to use as a shortcut
       for indicating URIs within that namespace. A namespace prefix must
-      consist only of name characters. (TODO define) A namespace prefix may be
-      used within angle brackets as a shortcut form of indicating a URI. The
-      URI <code>&lt;http://urf.name/urf#Resource&gt;</code> can be represented
-      using the prefix urf in place of the namespace URI
-      <code>&lt;http://urf.name/urf&gt;</code> as in the following
-      example:</p><blockquote>
+      consist only of name characters. (TODO define name character) A
+      namespace prefix may be used within angle brackets as a shortcut form of
+      indicating a URI. The URI
+      <code>&lt;http://urf.name/urf#Resource&gt;</code> can be represented
+      using the prefix <code>urf</code> in place of the namespace
+      <code>&lt;http://urf.name/urf&gt;</code> part of the URI as in the
+      following example:</p><blockquote>
           <p><code>&lt;urf#Resource&gt;</code></p>
         </blockquote></dd>
     </dl>
@@ -121,15 +126,15 @@
 
       <dd><p>Assertions about a particular subject resource are presented, in
       order, within angle brackets and separated by commas. Each predicate
-      propertie and object resource of an assertion are separated by a colon
-      character. In the following example, the resource
+      property and object resource pair of an assertion are separated by an
+      equals character. In the following example, the resource
       <code>(&lt;http://example.org/example#resource&gt;)</code> has a single
       property <code>(&lt;http://example.org/example#property&gt;)</code>,
       which has as its value another resource,
       <code>(&lt;http://example.org/example#value&gt;)</code>:</p><blockquote>
           <pre><code>(&lt;http://example.org/example#resource&gt;)
 {
-  (&lt;http://example.org/example#property&gt;):(&lt;http://example.org/example#value&gt;)
+  (&lt;http://example.org/example#property&gt;)=(&lt;http://example.org/example#value&gt;)
 }</code></pre>
         </blockquote><p>Were the prefix <code>example</code> defined to
       represent the namespace <code>&lt;http://example.org/example&gt;</code>,
@@ -137,7 +142,7 @@
       representation:</p><blockquote>
           <pre><code>(&lt;example#resource&gt;)
 {
-  (&lt;example#property&gt;):(&lt;example#value&gt;)
+  (&lt;example#property&gt;)=(&lt;example#value&gt;)
 }</code></pre>
         </blockquote></dd>
     </dl>
@@ -147,14 +152,14 @@
     <dl>
       <dt>URF</dt>
 
-      <dd><p>Some resources represent classes or sets of resources containing
-      instances of other resources. As stated earlier, for example, all
-      resources are implicitly instances of the class
+      <dd><p>A resource may represent a <dfn>class</dfn> or set of resources
+      containing instances of other resources. As stated earlier, for example,
+      all resources are implicitly instances of the class
       <code>(&lt;urf#Resource&gt;)</code>, and all property resources are also
       implicitly instances of the class <code>(&lt;urf#Property&gt;)</code>.
-      Any resource may be explicitly asserted to be an instance of a class by
-      identifying that class as a value of the <code>(&lt;urf#type&gt;)</code>
-      property.</p></dd>
+      Any resource may be explicitly asserted to be an instance of some class
+      by identifying the class resource as a value of the
+      <code>(&lt;urf#type&gt;)</code> property.</p></dd>
 
       <dt>TURF</dt>
 
@@ -165,11 +170,248 @@
       the class <code>(&lt;example#Class&gt;)</code>:</p><blockquote>
           <pre><code>(&lt;example#resource&gt;)
 {
-  (&lt;urf#type&gt;):(&lt;example#Class&gt;)
+  (&lt;urf#type&gt;)=(&lt;example#Class&gt;),
+  (&lt;example#property&gt;)=(&lt;example#value&gt;)
 }</code></pre>
-        </blockquote><p>As a shorthand representation, a single type may be
-      indicated by </p></dd>
+        </blockquote><p>As a shorthand representation, that a resource is an
+      instance of one or more classes may be represented by placing a colon
+      character after the resource parentheses and listing the class
+      resources, separated by commas. The following example is semantically
+      identical to the preceding example:</p><blockquote>
+          <pre><code>(&lt;example#resource&gt;):(&lt;example#Class&gt;)
+{
+  (&lt;example#property&gt;)=(&lt;example#value&gt;)
+}</code></pre>
+        </blockquote></dd>
     </dl>
+
+    <h2>URF Types</h2>
+
+    <p>URF comes with several built-in types:</p>
+
+    <dl>
+      <dt><code>(&lt;urf#Boolean&gt;)</code></dt>
+
+      <dd>There are two boolean resources, the values <code>true</code> and
+      <code>false</code>. Boolean resources are identified by lexical
+      namespace URIs with lexical representations of <code>"true"</code> and
+      <code>"false"</code>, respectively. (TODO refer to
+      http://www.w3.org/TR/xmlschema-2/#boolean)</dd>
+
+      <dt><code>(&lt;urf#Character&gt;)</code></dt>
+
+      <dd>Character resources are the Unicode code points, and their lexical
+      forms are the Unicode characters represented by those code points.</dd>
+
+      <dt><code>(&lt;urf#Float&gt;)</code></dt>
+
+      <dd>Float resources are floating point numbers, represented by lexical
+      forms containing a period as a decimal separator and an optional
+      exponent. (TODO further define format, including case of "e") (TODO
+      refer to http://www.w3.org/TR/xmlschema-2/#float and
+      http://www.w3.org/TR/xmlschema-2/#double)</dd>
+
+      <dt><code>(&lt;urf#Property&gt;)</code></dt>
+
+      <dd>Every property is implicitly an instance of the class
+      <code>urf:Property</code>.</dd>
+
+      <dt><code>(&lt;urf#Resource&gt;)</code></dt>
+
+      <dd>Every resource is implicitly an instance of the class
+      <code>urf:Resource</code>. The resources <code>urf:Property</code> and
+      <code>urf:Resource</code> are both instances of the class
+      <code>urf:Resource</code>.</dd>
+    </dl>
+
+    <h2>Lexical Namespaces</h2>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>Some resource types contain an infinite number of resources that
+      in day-to-day life have customarily been identified by character strings
+      or <dfn>lexical representations</dfn>. For example, the integer
+      <code>123</code> has historically been represented by the string
+      <code>"123"</code>, although the number itself is an abstract concept,
+      not a series of characters. Similarly, the two boolean values are
+      usually represented as the character sequences <code>"true"</code> and
+      <code>"false"</code>. URF provides for a series of namespaces to
+      identify resources that are typically identified by lexical
+      representations. Each lexical namespace is a URN (TODO cite RFC 2141)
+      with an NSS of <code>urf</code>, and have the following
+      format,</p><blockquote>
+          <pre><code>urn:urf:lex:<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
+        </blockquote><p>where <var>encodedTypeURI</var> is the URI-encoded
+      form of the full type URI of the resource, and
+      <var>encodedLexicalForm</var> is the URI-encoded canonical lexical form
+      of the resource as defined by the indicated type. For example, the
+      integer 123, which is of the type
+      <code>(&lt;http://urf.name/urf#Integer&gt;)</code>, is represented in
+      URF using the following URI:</p><blockquote>
+          <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+        </blockquote><p>A resource in a lexical namespace is implicitly an
+      instance of the type indicated in the <var>encodedTypeURI</var> section
+      of the URI. In all other aspects resources in lexical namespaces are no
+      different from resources not in a lexical namespace, and not implicitly
+      instances of a special type solely because their namespaces are lexical
+      namespaces. Lexical namespaces provide a framework for easily and
+      consistently formulating identifying URIs for resources that are
+      traditionally identified in lexical form; lexical namespaces imply no
+      additional semantics.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>A resource in a lexical namespace can be identified by its URI as
+      with any other resource. For example, the integer 123 can be identified
+      by its URI urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123 as in
+      the following example:</p><blockquote>
+          <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+        </blockquote><p>A resource in a lexical namespace can also be
+      identified by indicating the resource type as well as placing a string
+      containing the canonical lexical form of the resource inside the
+      resource parentheses in place of the identifying URI. The integer 123
+      may therefore be represented in the following short form:</p><blockquote>
+          <pre><code>("123"):(&lt;urf#Integer&gt;)</code></pre>
+        </blockquote><p>The lexical namespaces for several types have
+      additional short representations.</p><dl>
+          <dt><code>(&lt;urf#Boolean&gt;)</code></dt>
+
+          <dd><p>An boolean resource may be identified by its lexical form
+          without surrounding quotes. For example, the following short
+          representation,</p><blockquote>
+              <pre><code>true</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Boolean#true</code></pre>
+            </blockquote><p>which is also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>("true"):(&lt;urf#Boolean&gt;)</code></pre>
+            </blockquote></dd>
+
+          <dt><code>(&lt;urf#Character&gt;)</code></dt>
+
+          <dd><p>A character resource may be identified by its string-escaped
+          (TODO define string escaping) lexical form with surrounding single
+          quotes. For example, the following short
+          representation,</p><blockquote>
+              <pre><code>'x'</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Character#x</code></pre>
+            </blockquote><p>which is also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>("x"):(&lt;urf#Character&gt;)</code></pre>
+            </blockquote></dd>
+
+          <dt><code>(&lt;urf#Float&gt;)</code></dt>
+
+          <dd><p>A float resource may be identified by its lexical form
+          without surrounding quotes. For example, the following short
+          representation,</p><blockquote>
+              <pre><code>123.0</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Float#123.0</code></pre>
+            </blockquote><p>which is also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>("123.0"):(&lt;urf#Float&gt;)</code></pre>
+            </blockquote></dd>
+
+          <dt><code>(&lt;urf#Integer&gt;)</code></dt>
+
+          <dd><p>An integer resource may be identified by its lexical form
+          without surrounding quotes. For example, the following short
+          representation,</p><blockquote>
+              <pre><code>123</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+            </blockquote><p>which is also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>("123"):(&lt;urf#Integer&gt;)</code></pre>
+            </blockquote></dd>
+
+          <dt><code>(&lt;urf#String&gt;)</code></dt>
+
+          <dd><p>A string resource may be identified by its string-escaped
+          (TODO define string escaping) lexical form with surrounding quotes.
+          For example, the following short representation,</p><blockquote>
+              <pre><code>"apple"</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23String#apple</code></pre>
+            </blockquote><p>which is also equivalent to the general short
+          representation for resources in a lexical namespace:</p><blockquote>
+              <pre><code>("apple"):(&lt;urf#String&gt;)</code></pre>
+            </blockquote></dd>
+        </dl></dd>
+    </dl>
+
+    <h2>Comparisons</h2>
+
+    <h3>Differences between URF and JSON</h3>
+
+    <p></p>
+
+    <ul>
+      <li>Any URF resource may be identified by a URI. JSON makes no provision
+      for identifying resources.</li>
+
+      <li>URF allows globally consistent semantic properties by identifying
+      resources with URIs. JSON properties names are local and may clash with
+      semantically distinct property names among resources.</li>
+
+      <li>URF provides a system for grouping resources within a common
+      namespace, with the management of control for those namespaces
+      facilitated by the Internet domain name system. JSON properties cannot
+      be so aportioned, making name clashes more likely.</li>
+
+      <li>URF distinguishes between the number types
+      <code>(&lt;http://urf.name/urf#Integer&gt;)</code> and
+      <code>(&lt;http://urf.name/urf#Float&gt;)</code>. JSON only has one
+      number type.</li>
+
+      <li>URF has a character type, (&lt;http://urf.name/urf#Character&gt;).
+      JSON has no character type.</li>
+    </ul>
+
+    <h3>Differences between URF and RDF</h3>
+
+    <p></p>
+
+    <ul>
+      <li>URF considers all resources equal, providing for consistent
+      identification and property designation of every resource. RDF considers
+      certain resources, such as numbers and strings, to be of special
+      <dfn>literal</dfn> resource types which are not identified by URIs (in
+      contrast to all other non-literal resources) and to which properties
+      cannot be given.</li>
+
+      <li>The URF abstract model maintains the relative order of repeated
+      properties for a particular resource within a particular context. RDF
+      properties are unordered.</li>
+
+      <li>URF has a character type, (&lt;http://urf.name/urf#Character&gt;).
+      RDF, which uses XML Schema data types (TODO cite), has no character
+      type.</li>
+    </ul>
+
+    <h3>Differences between RDF and XML</h3>
+
+    <p></p>
+
+    <h2>TODO</h2>
+
+    <p></p>
+
+    <ul>
+      <li>Add date type.</li>
+    </ul>
 
     <p></p>
 
