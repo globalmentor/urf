@@ -38,6 +38,73 @@
     times a description of the URF abstract model will use TURF notation for
     clarification of the model.</p>
 
+    <h2>TURF Quick Start</h2>
+
+    <p>The following is the URI <code>http://urf.name/urf#janedoe</code>:</p>
+
+    <blockquote>
+      <pre><code>&lt;http://example.com/example#janedoe&gt;</code></pre>
+    </blockquote>
+
+    <p>The following is the resource identified by the URI
+    <code>http://urf.name/urf#janedoe</code>:</p>
+
+    <blockquote>
+      <pre><code>«http://example.com/example#resource»</code></pre>
+    </blockquote>
+
+    <p>The following is the same resource with a label:</p>
+
+    <blockquote>
+      <pre><code>:jd:«http://example.com/example#janedoe»</code></pre>
+    </blockquote>
+
+    <p>The following is the same resource with the example namespace used in
+    short form. The result is that two resources are identified: the namespace
+    URI, and the resource that uses the namespace in its URI.</p>
+
+    <blockquote>
+      <pre><code>:example:&lt;http://example.com/example&gt;,
+:jd:«:example:#jde»</code></pre>
+    </blockquote>
+
+    <p>The following is the same resource with a type of
+    <code>«:foaf:#Person»</code> and with other properties declared. Strings
+    and numbers are resources and can themselves be described. The salary
+    value resource is given a contextual property indicating the currency. The
+    currency resource is identified using a lexical namespace for the
+    <code>«:example:#Currency»</code> type.</p>
+
+    <blockquote>
+      <pre><code>:example:&lt;http://example.com/example&gt;,
+:foaf:&lt;http://xmlns.com/foaf/0.1/&gt;
+:jd:«:example:#resource»(«:foaf:Person»)
+{
+  «:example:#name»="Jane Doe",
+  «:example:#birthday»=@1980-01-01@,
+  «:example:#salary»=1000000
+  {
+    «:example:#currency»~«"usd":example:#Currency»
+  }
+}</code></pre>
+    </blockquote>
+
+    <p>The following is semantically equivalent to the preceding example but
+    uses longer TURF forms:</p>
+
+    <blockquote>
+      <pre><code>:jd:«http://example.com/example#resource»
+{
+  «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
+  «http://example.com/example#name»=«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
+  «http://example.com/example#birthday»=«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
+  «http://example.com/example#salary»=«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#1000000»
+  {
+    «http://example.com/example#currency»~«urn:urf:lex:http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
+  }
+}</code></pre>
+    </blockquote>
+
     <h2>Primer</h2>
 
     <h3>Resources</h3>
@@ -77,14 +144,14 @@
 
       <dd><p>A URI is indicated by angle brackets. The following example
       indicates the URI represented by the characters
-      <code>http://example.org/example#resource</code>:</p><blockquote>
-          <pre><code>&lt;http://example.org/example#resource&gt;</code></pre>
+      <code>http://example.com/example#resource</code>:</p><blockquote>
+          <pre><code>&lt;http://example.com/example#resource&gt;</code></pre>
         </blockquote><p>A resource may be identified by placing its URI
       characters within angle quotes, in which the curly brackets are options
       if the resource has no properties. The following example refers to the
       resource identified by the URI
       <code>&lt;http://urf.name/urf#resource&gt;</code>.</p><blockquote>
-          <pre><code>«http://example.org/example#resource»</code></pre>
+          <pre><code>«http://example.com/example#resource»</code></pre>
         </blockquote><p>All URIs may be relative references, which are
       resolved to the base URI of the interchange document. URIs that have
       been given a label may also be used as a base reference against which
@@ -93,7 +160,7 @@
       uses a labeled URI, defined in the first line, as a base URI in the
       second line to resolve into the same resource identified
       above:</p><blockquote>
-          <pre><code>:example:&lt;http://example.org/example&gt;,
+          <pre><code>:example:&lt;http://example.com/example&gt;,
 «:example:#resource»</code></pre>
         </blockquote></dd>
     </dl>
@@ -122,18 +189,18 @@
 
       <dd><p>TURF facilitates identification of a resource within a namespace
       using the URI resolution process described above. If
-      <code>&lt;http://example.org/example&gt;</code> identifies a namespace
+      <code>&lt;http://example.com/example&gt;</code> identifies a namespace
       and is given the label <code>example</code>, for example, the reference
       <code>(&lt;:example:#resource»</code> would indicate the same resource
       as would the reference
-      <code>(&lt;http://example.org/example#resource»</code>.</p></dd>
+      <code>(&lt;http://example.com/example#resource»</code>.</p></dd>
     </dl>
 
     <p>This specification uses resources in the following namespaces, with
     corresponding labels:</p>
 
     <dl>
-      <dt><code>:example:&lt;http://example.org/example&gt;</code></dt>
+      <dt><code>:example:&lt;http://example.com/example&gt;</code></dt>
 
       <dd>An example namespace; used for hypothetical situations.</dd>
 
@@ -170,19 +237,19 @@
       and object resource pair of an assertion are separated by an equals
       character. Object resources, like resources in other contexts, can serve
       as the subject of other property assertions. In the following example,
-      the resource <code>«http://example.org/example#resource»</code> has a
-      single property <code>(&lt;http://example.org/example#property»</code>,
+      the resource <code>«http://example.com/example#resource»</code> has a
+      single property <code>(&lt;http://example.com/example#property»</code>,
       which has as its value another resource,
-      <code>(&lt;http://example.org/example#value»</code>:</p><blockquote>
-          <pre><code>«http://example.org/example#resource»
+      <code>(&lt;http://example.com/example#value»</code>:</p><blockquote>
+          <pre><code>«http://example.com/example#resource»
 {
-  «http://example.org/example#property»=«http://example.org/example#value»
+  «http://example.com/example#property»=«http://example.com/example#value»
 }</code></pre>
         </blockquote><p>Were the label <code>example</code> defined to
-      indicate the namespace <code>&lt;http://example.org/example&gt;</code>,
+      indicate the namespace <code>&lt;http://example.com/example&gt;</code>,
       the above example could be represented in the following shorthand
       representation:</p><blockquote>
-          <pre><code>:example:&lt;http://example.org/example&gt;,
+          <pre><code>:example:&lt;http://example.com/example&gt;,
 «:example:#resource»
 {
   «:example:#property»=«:example:#value»
@@ -212,7 +279,7 @@
       asserted to be an instance of the class
       <code>«:example:#Class»</code>:</p><blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.org/example&gt;,
+:example:&lt;http://example.com/example&gt;,
 «:example:#resource»
 {
   «:urf:#type»=«:example:#Class»,
@@ -223,7 +290,7 @@
       resource after resource ference, surrounded by parentheses. Multiple
       classes may be separated by commas. The following example is
       semantically identical to the preceding example:</p><blockquote>
-          <pre><code>:example:&lt;http://example.org/example&gt;,
+          <pre><code>:example:&lt;http://example.com/example&gt;,
 «:example:#resource»(«:example:#Class»)
 {
   «:example:#property»=«:example:#value»
@@ -498,7 +565,7 @@
       the color purple without asserting that the sky actually has that
       color:</p><blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.org/example&gt;,
+:example:&lt;http://example.com/example&gt;,
 «:example:#john»
 {
   «:example:#believes»=(«:urf:#Proposition»)
@@ -508,69 +575,124 @@
     «:urf:#object»=«:example:#purple»
   }
 }</code></pre>
+        </blockquote><p>Any proposition that is asserted can be reified by
+      placing a label before the equals sign in a property definition. The
+      label will then identify a proposition that is the reification of the
+      property assertion. For example, the label <code>proposition</code>
+      identifies the asserted proposition with subject
+      <code>«:example:#juan»</code>, predicate <code>«:example:#name»</code>,
+      and object <code>"John"</code>. This labeled resource can then be used
+      in any other situation in which a resource is expected.</p><blockquote>
+          <pre><code>:example:&lt;http://example.com/example&gt;,
+«:example:#juan»
+{
+  «:example:#name»:proposition:="John"
+}</code></pre>
         </blockquote></dd>
     </dl>
 
-    <h3>Contextual Properties</h3>
+    <h3>Contextual Propositions and Assertions</h3>
 
     <dl>
       <dt>URF</dt>
 
       <dd><p>Some propositions should only be considered to be asserted in
-      some context. For example, John may assert that the sky is purple, but
-      only when the weather is stormy. The URF property «:urf:#context» allows
-      any resource to be used to restrict a proposition to some context.
-      Normally this context is itself a proposition. That is, John may assert
-      the <dfn>contextual proposition</dfn> "the sky is purple", which has as
-      its context the proposition, "the weather is stormy".</p><p>Some
-      contextual properties have as a context another proposition asserted
-      about the asserting subject; this is referred to as a <dfn>proper
-      contextual proposition</dfn>. These propositions use the URF property
-      <code>«:urf:#assert»</code> to indicate that the subject is asserting
-      the proper contextual proposition. For example, if Juan has an English
-      name of <code>"John"</code>, Juan could specify a
+      some context. For example, John may believe that the sky is purple, but
+      only when the weather is stormy. The URF property
+      <code>«:urf:#context»</code> allows any resource to be used to restrict
+      a proposition to some context. Normally this context is itself a
+      proposition. That is, John may assert the <dfn>contextual
+      proposition</dfn> "the sky is purple", which has as its context the
+      proposition, "the weather is stormy".</p><p>An assertion may also be
+      restricted to some context. One common use case is to restrict a
+      particular property assignment to the context of the subject serving as
+      the value of some other resource's property. For example, if Juan has an
+      English name of <code>"John"</code>, Juan could specify a
       <code>«:example:#name»</code> of <code>"John"</code> with an
-      <code>«:example:#lang»</code> of
-      <code>("en")^«:example:#Language»^</code>. Because the string
-      <code>"John"</code> may not represent an English string in all contexts,
-      its property <code>«:example:#lang»</code> should be considered
-      contextual to the relationship between Juan and the
-      <code>«:example:#name»</code> "John". The proposition Juan is asserting,
-      "the string 'John' is in English", is contextual to the string "John"
-      being the name of Juan.</p></dd>
+      <code>«:example:#lang»</code> of <code>«:example:#english»</code>.
+      Because the string <code>"John"</code> may not represent an English
+      string in all contexts, its property <code>«:example:#lang»</code>
+      should be considered contextual to the relationship between Juan and the
+      <code>«:example:#name»</code> <code>"John"</code>. The assertion, "the
+      string 'John' is in English", is contextual to the string "John" being
+      the name of Juan. Similarly, Juan could specify a
+      <code>«:example:#weight»</code> of <code>72</code> with an
+      <code>«:example:#unit»</code> of <code>«:example:#kilograms»</code>.
+      Because the integer <code>72</code> may not represent a unit of
+      kilograms in all contexts, its property <code>«:example:#unit»</code>
+      should be considered contextual to the relationship between Juan and the
+      <code>«:example:#weight»</code> <code>72</code>. The assertion, "the
+      integer 72 is in in kilograms", is contextual to the integer 72 being
+      the weight of Juan.</p></dd>
 
       <dt>TURF</dt>
 
-      <dd><p>The following example indicates that Juan has an English name of
-      John:</p><blockquote>
+      <dd><p>Contextual propositions that are not being asserted may be made
+      contextual by use of the <code>«:urf:#context»</code> property.The
+      following example asserts that John believes the sky to have the color
+      purple, but only when the weather is stormy:</p><blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.org/example&gt;,
-«:example:#juan»
+:example:&lt;http://example.com/example&gt;,
+«:example:#john»
 {
-  «:example:#name»="John",
-  «:example:#assert»=(«:urf:#Proposition»)
+  «:example:#believes»=(«:urf:#Proposition»)
   {
-    «:urf:#subject»="John",
-    «:urf:#predicate»=«:example:#lang»,
-    «:urf:#object»=("en")^«:example:#Language»^
+    «:urf:#subject»=«:example:#sky»
+    «:urf:#predicate»=«:example:#color»
+    «:urf:#object»=«:example:#purple»
     «:urf:#context»=(«:urf:#Proposition»)
     {
-      «:urf:#subject»=«:example:#juan»,
-      «:urf:#predicate»=«:example:#name»,
-      «:urf:#object»="John"
+      «:urf:#subject»=«:example:#weather»,
+      «:urf:#predicate»=«:example:#condition»,
+      «:urf:#object»=«:example:#stormy»
     }
   }
 }</code></pre>
-        </blockquote><p>Proper contextual propositions may be presented in
-      short form my using the character <code>'~'</code> in place of the
-      character <code>'='</code> in a property definition. The following
-      example illustrates the exact semantics as in the previous example: Juan
-      indicates that "John" is English when used as his name.</p><blockquote>
-          <pre><code>:example:&lt;http://example.org/example&gt;,
+        </blockquote><p>Assertions may be made contextual by adding a question
+      mark and the contextual resource after a property definition. The
+      following example indicates that Juan's name of John is in
+      English:</p><blockquote>
+          <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
+:example:&lt;http://example.com/example&gt;,
+«:example:#juan»
 {
   «:example:#name»="John"
   {
-    «:example:#lang»~«"en":example:#Language»
+    «:example:#lang»=«:example:#english»
+      ?  («:urf:#Proposition»)
+         {
+           «:urf:#subject»=«:example:#juan»,
+           «:urf:#predicate»=«:example:#name»,
+           «:urf:#object»="John"
+         }
+  }
+}</code></pre>
+        </blockquote><p>Because the contextual proposition is the reification
+      of the assertion involving the subject's role in as the value of another
+      resource's property, a label could be used to refer to that reified
+      proposition rather than writing it in full form, as in the following
+      example, which is semantically equivalent to the former:</p><blockquote>
+          <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
+:example:&lt;http://example.com/example&gt;,
+«:example:#juan»
+{
+  «:example:#name»:juannamejohn:="John"
+  {
+    «:example:#lang»=«:example:#english» ? :juannamejohn:
+  }
+}</code></pre>
+        </blockquote><p>Because this use of contextual properties so useful,
+      TURF allows a shorthand notation to restrict a particular property
+      assignment to the context of the subject serving as the value of some
+      other resource's property. This short form involves using the '~'
+      character instead of the '=' character in the property declaration, as
+      in the following example which is semantically equivalent to the
+      former:</p><blockquote>
+          <pre><code>:example:&lt;http://example.com/example&gt;,
+{
+  «:example:#name»="John"
+  {
+    «:example:#lang»~«:example:#english»
   }
 }</code></pre>
         </blockquote></dd>
@@ -603,7 +725,7 @@
       name comes before the other if used simultaneously, or perhaps one name
       has a higher priority or is considered the "default" name.) <blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.org/example&gt;,
+:example:&lt;http://example.com/example&gt;,
 {
   «:example:#name»="William"
   {
@@ -624,7 +746,7 @@
       represents information semantically identical to the previous
       example:<blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.org/example&gt;,
+:example:&lt;http://example.com/example&gt;,
 {
   «:example:#name»=|"William",  "Bill"|
 }</code></pre>
@@ -767,8 +889,8 @@
     to the base URI of the interchange document. A URI short form is
     equivalent to a resource of type <code>^«:urf:#URI»^</code> using the
     corresponding lexical namespace. The URI short form
-    <code>&lt;http://example.org&gt;</code> is the equivalent of the URI
-    resource <code>("http://example.org")^&lt;:urf:#URI»^</code>.</p>
+    <code>&lt;http://example.com&gt;</code> is the equivalent of the URI
+    resource <code>("http://example.com")^&lt;:urf:#URI»^</code>.</p>
 
     <blockquote>
       <p><code><var>urishort</var> ⇒
@@ -1021,5 +1143,22 @@
     <h2>History</h2>
 
     <p></p>
+
+    <dl>
+      <dt>2007-09-??</dt>
+
+      <dd><ul>
+          <li>Modified and simplified syntax for resource URI references and
+          type declarations.</li>
+
+          <li>Expanded upon and generalized URF contextual properties.</li>
+        </ul></dd>
+
+      <dt>2007-09-02</dt>
+
+      <dd><ul>
+          <li>First public release of URF.</li>
+        </ul></dd>
+    </dl>
   </body>
 </html>
