@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-07</p>
+    <p>Version 2007-09-08</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -591,108 +591,47 @@
         </blockquote></dd>
     </dl>
 
-    <h3>Contextual Propositions and Assertions</h3>
+    <h3>Proposition Scope</h3>
 
     <dl>
       <dt>URF</dt>
 
-      <dd><p>Some propositions should only be considered to be asserted in
-      some context. For example, John may believe that the sky is purple, but
-      only when the weather is stormy. The URF property
-      <code>«:urf:#context»</code> allows any resource to be used to restrict
-      a proposition to some context. Normally this context is itself a
-      proposition. That is, John may assert the <dfn>contextual
-      proposition</dfn> "the sky is purple", which has as its context the
-      proposition, "the weather is stormy".</p><p>An assertion may also be
-      restricted to some context. One common use case is to restrict a
-      particular property assignment to the context of the subject serving as
-      the value of some other resource's property. For example, if Juan has an
-      English name of <code>"John"</code>, Juan could specify a
-      <code>«:example:#name»</code> of <code>"John"</code> with an
-      <code>«:example:#lang»</code> of <code>«:example:#english»</code>.
-      Because the string <code>"John"</code> may not represent an English
-      string in all contexts, its property <code>«:example:#lang»</code>
-      should be considered contextual to the relationship between Juan and the
-      <code>«:example:#name»</code> <code>"John"</code>. The assertion, "the
-      string 'John' is in English", is contextual to the string "John" being
-      the name of Juan. Similarly, Juan could specify a
-      <code>«:example:#weight»</code> of <code>72</code> with an
-      <code>«:example:#unit»</code> of <code>«:example:#kilograms»</code>.
-      Because the integer <code>72</code> may not represent a unit of
-      kilograms in all contexts, its property <code>«:example:#unit»</code>
-      should be considered contextual to the relationship between Juan and the
-      <code>«:example:#weight»</code> <code>72</code>. The assertion, "the
-      integer 72 is in in kilograms", is contextual to the integer 72 being
-      the weight of Juan.</p></dd>
+      <dd><p>Some assertions are only valid within a certain scope; they
+      cannot be "seen", or rather, they are not considered asserted outside
+      the context of the subject serving as the value of some other resource's
+      property. For example, if Juan has an English name of
+      <code>"John"</code>, Juan could specify a <code>«:example:#name»</code>
+      of <code>"John"</code> with an <code>«:example:#lang»</code> of
+      <code>«:example:#english»</code>. Because the string <code>"John"</code>
+      may not represent an English string in all contexts, its property
+      <code>«:example:#lang»</code> should be considered to be in the scope of
+      the relationship between Juan and the <code>«:example:#name»</code>
+      <code>"John"</code>. The assertion, "the string 'John' is in English",
+      is contextual to the string "John" being the name of Juan. Similarly,
+      Juan could specify a <code>«:example:#weight»</code> of <code>72</code>
+      with an <code>«:example:#unit»</code> of
+      <code>«:example:#kilogram»</code>. Because the integer <code>72</code>
+      may not represent a unit of kilograms in all contexts, its property
+      <code>«:example:#unit»</code> should be considered to be in the scope of
+      the relationship between Juan and the <code>«:example:#weight»</code>
+      <code>72</code>. The assertion, "the integer 72 is in kilograms", is
+      contextual to the integer 72 being the weight of Juan.</p></dd>
 
       <dt>TURF</dt>
 
-      <dd><p>Contextual propositions that are not being asserted may be made
-      contextual by use of the <code>«:urf:#context»</code> property.The
-      following example asserts that John believes the sky to have the color
-      purple, but only when the weather is stormy:</p><blockquote>
-          <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.com/example&gt;,
-«:example:#john»
-{
-  «:example:#believes»=(«:urf:#Proposition»)
-  {
-    «:urf:#subject»=«:example:#sky»
-    «:urf:#predicate»=«:example:#color»
-    «:urf:#object»=«:example:#purple»
-    «:urf:#context»=(«:urf:#Proposition»)
-    {
-      «:urf:#subject»=«:example:#weather»,
-      «:urf:#predicate»=«:example:#condition»,
-      «:urf:#object»=«:example:#stormy»
-    }
-  }
-}</code></pre>
-        </blockquote><p>Assertions may be made contextual by adding a question
-      mark and the contextual resource after a property definition. The
-      following example indicates that Juan's name of John is in
-      English:</p><blockquote>
-          <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.com/example&gt;,
-«:example:#juan»
-{
-  «:example:#name»="John"
-  {
-    «:example:#lang»=«:example:#english»
-      ?  («:urf:#Proposition»)
-         {
-           «:urf:#subject»=«:example:#juan»,
-           «:urf:#predicate»=«:example:#name»,
-           «:urf:#object»="John"
-         }
-  }
-}</code></pre>
-        </blockquote><p>Because the contextual proposition is the reification
-      of the assertion involving the subject's role in as the value of another
-      resource's property, a label could be used to refer to that reified
-      proposition rather than writing it in full form, as in the following
-      example, which is semantically equivalent to the former:</p><blockquote>
-          <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
-:example:&lt;http://example.com/example&gt;,
-«:example:#juan»
-{
-  «:example:#name»:juannamejohn:="John"
-  {
-    «:example:#lang»=«:example:#english» ? :juannamejohn:
-  }
-}</code></pre>
-        </blockquote><p>Because this use of contextual properties so useful,
-      TURF allows a shorthand notation to restrict a particular property
-      assignment to the context of the subject serving as the value of some
-      other resource's property. This short form involves using the '~'
-      character instead of the '=' character in the property declaration, as
-      in the following example which is semantically equivalent to the
-      former:</p><blockquote>
+      <dd><p>To restrict a particular property assignment to the scope of the
+      subject serving as the value of some other resource's property, the '~'
+      character is used instead of the '=' character in the property
+      declaration:</p><blockquote>
           <pre><code>:example:&lt;http://example.com/example&gt;,
 {
   «:example:#name»="John"
   {
     «:example:#lang»~«:example:#english»
+  }
+  «:example:#weight»=72
+  {
+    «:example:#unit»~«:example:#kilogram»
   }
 }</code></pre>
         </blockquote></dd>
@@ -703,17 +642,16 @@
     <dl>
       <dt>URF</dt>
 
-      <dd>Although all subject resource property assertions have no inherent
-      order, URF provides a facility for declaring property order using
-      contextual properties. Each property that should be considered to have
-      an order relative to other assertions of the same property is given a
-      proper contextual property <code>«:urf:#order»</code> with a value of
-      type <code>«:urf:#Integer»</code>, representing the relative order in
-      which the property should be interpreted. The interpretation of the
-      property's order is specific to the property in question. Although many
-      uses cases will prefer a continuous, unduplicated sequence of order
-      property values beginning with <code>0</code>, this is not an URF
-      requirement.</dd>
+      <dd>Although all resource property assertions of a particular subject
+      have no inherent order, URF provides a facility for declaring property
+      order using scoped properties. Each property that should be considered
+      to have an order relative to other assertions of the same property is
+      given a scoped property <code>«:urf:#order»</code> with a value of type
+      <code>«:urf:#Integer»</code>, representing the relative order in which
+      the property should be interpreted. The interpretation of the property's
+      order is specific to the property in question. Although many uses cases
+      will prefer a continuous, unduplicated sequence of order property values
+      beginning with <code>0</code>, this is not an URF requirement.</dd>
 
       <dt>TURF</dt>
 
@@ -740,11 +678,10 @@
       representation in the form of a <dfn>sequence</dfn> by placing the
       ordered values within matching bar characters. A sequence does not
       result in a new type of value, but rather indicates that the given
-      predicat should be asserted for each value, each with a contextual
-      property of <code>«:urf:#order»</code> with values starting at
-      <code>0</code> and continuing sequentially. The following example
-      represents information semantically identical to the previous
-      example:<blockquote>
+      predicate should be asserted for each value, each with a scoped property
+      of <code>«:urf:#order»</code> with values starting at <code>0</code> and
+      continuing sequentially. The following example represents information
+      semantically identical to the previous example:<blockquote>
           <pre><code>:urf:&lt;http://www.urf.name/urf&gt;,
 :example:&lt;http://example.com/example&gt;,
 {
@@ -914,7 +851,7 @@
 
     <blockquote>
       <p><code><var>integershort</var> ⇒
-      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>*</strong></code></p>
+      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code></p>
     </blockquote>
 
     <p>A float short form consists of roman digits with a decimal with an
@@ -924,7 +861,7 @@
 
     <blockquote>
       <p><code><var>floatshort</var> ⇒
-      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>*[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>|</strong>E<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
+      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
     </blockquote>
 
     <p>A regular expression short form is a sequence of Unicode characters,
@@ -1151,7 +1088,8 @@
           <li>Modified and simplified syntax for resource URI references and
           type declarations.</li>
 
-          <li>Expanded upon and generalized URF contextual properties.</li>
+          <li>Changed <dfn>contextual properties</dfn> to <dfn>scoped
+          properties</dfn>.</li>
         </ul></dd>
 
       <dt>2007-09-02</dt>
