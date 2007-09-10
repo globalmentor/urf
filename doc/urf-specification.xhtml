@@ -82,7 +82,7 @@
 {
   «:example:#name»="Jane Doe",
   «:example:#birthday»=@1980-01-01@,
-  «:example:#salary»=1000000
+  «:example:#salary»=#1000000#
   {
     «:example:#currency»~«"usd":example:#Currency»
   }
@@ -203,6 +203,11 @@
       <dt><code>:example:&lt;http://example.com/example&gt;</code></dt>
 
       <dd>An example namespace; used for hypothetical situations.</dd>
+
+      <dt><code>:id:&lt;http://www.urf.name/id&gt;</code></dt>
+
+      <dd>The URF namespace for general identifiers that may have different
+      semantics depending on the context.</dd>
 
       <dt><code>:index:&lt;urn:urf:index&gt;</code></dt>
 
@@ -328,18 +333,14 @@
       <dd>Character resources are the Unicode code points, and their lexical
       forms are the Unicode characters represented by those code points.</dd>
 
-      <dt><code>«:urf:#Float»</code></dt>
+      <dt><code>«:urf:#Number»</code></dt>
 
-      <dd>Float resources are floating point numbers, represented by lexical
+      <dd>Number resources are representations of quanities. Currently URF
+      only supports integer and floating point numbers, represented by lexical
       forms containing a period as a decimal separator and an optional
       exponent. (TODO further define format, including case of "e") (TODO
       refer to http://www.w3.org/TR/xmlschema-2/#float and
       http://www.w3.org/TR/xmlschema-2/#double)</dd>
-
-      <dt><code>«:urf:#Integer»</code></dt>
-
-      <dd>Integer resources are integer numbers, represented by roman digits
-      with no decimal. (TODO refer to XMLSchema)</dd>
 
       <dt><code>«:urf:#Property»</code></dt>
 
@@ -425,9 +426,9 @@
           <dt><code>«:urf:#Boolean»</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          without surrounding quotes. For example, the following short
-          representation,</p><blockquote>
-              <pre><code>true</code></pre>
+          surrounded by the circumflex accent sign. For example, the following
+          short representation,</p><blockquote>
+              <pre><code>^true^</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
@@ -468,34 +469,19 @@
               <pre><code>«"1996-12-19T16:39:57-08:00":urf:#Timestamp»</code></pre>
             </blockquote></dd>
 
-          <dt><code>«:urf:#Float»</code></dt>
+          <dt><code>«:urf:#Number»</code></dt>
 
-          <dd><p>A float resource may be identified by its lexical form
-          without surrounding quotes. For example, the following short
+          <dd><p>A number resource may be identified by its lexical form
+          sounded by the number sign. For example, the following short
           representation,</p><blockquote>
-              <pre><code>123.0</code></pre>
+              <pre><code>#123.45#</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Float#123.0»</code></pre>
+              <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Number#123.45»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«"123.0":urf:#Float»</code></pre>
-            </blockquote></dd>
-
-          <dt><code>«:urf:#Integer»</code></dt>
-
-          <dd><p>An integer resource may be identified by its lexical form
-          without surrounding quotes. For example, the following short
-          representation,</p><blockquote>
-              <pre><code>123</code></pre>
-            </blockquote><p>is equivalent to the following long
-          representation,</p><blockquote>
-              <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
-            </blockquote><p>which is also equivalent to the following general
-          short representation for resources in a lexical
-          namespace:</p><blockquote>
-              <pre><code>«"123":urf:#Integer»»</code></pre>
+              <pre><code>«"123.45:urf:#Number»</code></pre>
             </blockquote></dd>
 
           <dt><code>«:urf:#RegularExpression»</code></dt>
@@ -543,6 +529,53 @@
               <pre><code>«"http://urf.name/urf#type":urf:#URI»</code></pre>
             </blockquote></dd>
         </dl></dd>
+    </dl>
+
+    <h3>ID Namespace</h3>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>URF provides a namespace,
+      <code>&lt;http://www.urf.name/id&gt;</code>, for identifiers that have
+      no strong semantics, or that may have different semantics depending on
+      the context. One use case is to use URF as a general format for storing
+      data structures from frameworks, such as JSON, that do not have globally
+      defined semantics for certain identifiers. In such as situation, a URI
+      can be constructed from the given identifier using the URF ID
+      namespace.</p><p>Consider the following example JSON data
+      structure:</p><blockquote>
+          <pre><code>{
+  "flag":true,
+  "count":23
+}</code></pre>
+        </blockquote><p>The JSON properties <code>"flag"</code> and
+      <code>"count"</code> could be exported to URF by creating property URIs
+      in the ID namespace, yielding the properties
+      <code>«http://www.urf.name/id#flag»</code> and
+      <code>«http://www.urf.name/id#count»</code>, respectively.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>URIs in the ID namespace may be represented as any other URI in
+      TURF. The following example presents the TURF version of the above JSON
+      example data structure:</p><blockquote>
+          <pre><code>:id:&lt;http://www.urf.name/id&gt;,
+{
+  «:id:#flag»=^true^,
+  «:id:#count»=#23#
+}</code></pre>
+        </blockquote><p>TURF provides a shorthand representation of resources,
+      including properties, the URIs of which appear in the ID namespace. If
+      the ID consists only of <a href="#namechar">name characters</a>, it may
+      appear with no delimiters. The following example, which uses the short
+      form of ID namespace resource references, is semantically equivalent to
+      the preceding example:</p><blockquote>
+          <pre><code>{
+  flag=^true^,
+  count=#23#
+}</code></pre>
+        </blockquote></dd>
     </dl>
 
     <h3>Reification</h3>
@@ -725,7 +758,7 @@
 
     <blockquote>
       <p><code><var>resource</var> ⇒
-      <strong>[</strong>:<var>label</var>:<strong>][</strong><var>reference</var><strong>][</strong>^<var>type</var>^<strong>][</strong>{<var>properties</var>}<strong>]</strong></code></p>
+      <strong>[</strong>:<var>label</var>:<strong>][</strong><var>reference</var><strong>][</strong>(<var>type</var>)<strong>][</strong>{<var>properties</var>}<strong>]</strong></code></p>
     </blockquote>
 
     <p>A label consists of one or more name characters.</p>
@@ -751,11 +784,11 @@
       <p><code><var>reference</var> ⇒ <var>urireference</var>
       <strong>|</strong> <var>urishort</var> <strong>|</strong>
       <var>stringshort</var> <strong>|</strong> <var>booleanshort</var>
-      <strong>|</strong> <var>integershort</var> <strong>|</strong>
-      <var>floatshort</var> <strong>|</strong> <var>charactershort</var>
-      <strong>|</strong> <var>arrayshort</var> <strong>|</strong>
-      <var>sequenceshort</var> <strong>|</strong> <var>regexshort</var>
-      <strong>|</strong> <var>timestampshort</var></code></p>
+      <strong>|</strong> <var>numbershort</var> <strong>|</strong>
+      <var>charactershort</var> <strong>|</strong> <var>arrayshort</var>
+      <strong>|</strong> <var>sequenceshort</var> <strong>|</strong>
+      <var>regexshort</var> <strong>|</strong>
+      <var>timestampshort</var></code></p>
     </blockquote>
 
     <p>A resource URI reference is enclosed in angle quotes. The contents is
@@ -776,14 +809,13 @@
     backslash as an escape character, enclosed in double quotes. The double
     quotation mark (<code>'"'</code>), backslash (<code>'\\'</code>), and
     every Unicode control character must be escaped. Any Unicode code point
-    may be represented by four uppercase or lowercase hexadecimal
-    representation following the character sequence <code>"\u"</code>, or if
-    the code point is not in the Basic Multilingual Plane, two such sequences
-    representing UTF-16 surrogate pair. A string short form is equivalent to a
-    resource of type <code>^«:urf:#String»^</code> using the corresponding
-    lexical namespace. The string short form <code>"example"</code> is the
-    equivalent of the string resource
-    <code>("example")^«:urf:#String»^</code>.</p>
+    may be represented by the four lowercase hexadecimal representation
+    following the character sequence <code>"\u"</code>, or if the code point
+    is not in the Basic Multilingual Plane, two such sequences representing
+    UTF-16 surrogate pair. A string short form is equivalent to a resource of
+    type <code>«:urf:#String»</code> using the corresponding lexical
+    namespace. The string short form <code>"example"</code> is the equivalent
+    of the string resource <code>«"example":urf:#String»</code>.</p>
 
     <blockquote id="stringshort">
       <p><code><var>stringshort</var> ⇒ "<strong>[</strong><var>Unicode
@@ -791,20 +823,20 @@
       <strong>|</strong> \" <strong>|</strong> \\ <strong>|</strong> \b
       <strong>|</strong> \t <strong>|</strong> \r <strong>|</strong> \n
       <strong>|</strong> \f <strong>|</strong>
-      \u<var>XXXX</var><strong>]*</strong>"</code></p>
+      \u<var>xxxx</var><strong>]*</strong>"</code></p>
     </blockquote>
 
     <p>A character short form is a single Unicode characters, using the
     backslash as an escape character, enclosed in a single quote. The single
     quote (<code>'\''</code>), backslash (<code>'\\'</code>), and every
     Unicode control character must be escaped. Any Unicode code point may be
-    represented by four uppercase or lowercase hexadecimal representation
-    following the character sequence <code>"\u"</code>, or if the code point
-    is not in the Basic Multilingual Plane, two such sequences representing
-    UTF-16 surrogate pair. A string short form is equivalent to a resource of
-    type <code>^«:urf:#Character»^</code> using the corresponding lexical
-    namespace. The character short form <code>'x'</code> is the equivalent of
-    the character resource <code>("x")^«:urf:#Character»^</code>.</p>
+    represented by the four lowercase hexadecimal representation following the
+    character sequence <code>"\u"</code>, or if the code point is not in the
+    Basic Multilingual Plane, two such sequences representing UTF-16 surrogate
+    pair. A string short form is equivalent to a resource of type
+    <code>«:urf:#Character»</code> using the corresponding lexical namespace.
+    The character short form <code>'x'</code> is the equivalent of the
+    character resource <code>«"x":urf:#Character»</code>.</p>
 
     <blockquote id="charactershort">
       <p><code><var>charactershort</var> ⇒ '<strong>[</strong><var>Unicode
@@ -812,7 +844,7 @@
       <strong>|</strong> \' <strong>|</strong> \\ <strong>|</strong> \b
       <strong>|</strong> \t <strong>|</strong> \r <strong>|</strong> \n
       <strong>|</strong> \f <strong>|</strong>
-      \u<var>XXXX</var><strong>]*</strong>'</code></p>
+      \u<var>xxxx</var><strong>]*</strong>'</code></p>
     </blockquote>
 
     <p>A URI short form is a sequence of character constituting a
@@ -824,10 +856,10 @@
     characters are interpreted as a relative reference and resolved against
     the URI to which the label refers. A single relative reference is resolved
     to the base URI of the interchange document. A URI short form is
-    equivalent to a resource of type <code>^«:urf:#URI»^</code> using the
+    equivalent to a resource of type <code>«:urf:#URI»</code> using the
     corresponding lexical namespace. The URI short form
     <code>&lt;http://example.com&gt;</code> is the equivalent of the URI
-    resource <code>("http://example.com")^&lt;:urf:#URI»^</code>.</p>
+    resource <code>«"http://example.com":urf:#URI»</code>.</p>
 
     <blockquote>
       <p><code><var>urishort</var> ⇒
@@ -836,31 +868,24 @@
 
     <p>A boolean short form is the character sequence <code>true</code> or
     <code>false</code>. A boolean short form is equivalent to a resource of
-    type <code>^«:urf:#Boolean»^</code> using the corresponding lexical
+    type <code>«:urf:#Boolean»</code> using the corresponding lexical
     namespace. The boolean short form <code>true</code> is the equivalent of
-    the boolean resource <code>("true")^&lt;:urf:#Boolean»^</code>.</p>
+    the boolean resource <code>«"true":urf:#Boolean»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
       true<strong>|</strong>false</code></p>
     </blockquote>
 
-    <p>An integer short form consists of roman digits with no decimal. The
-    integer short form <code>123</code> is the equivalent of the integer
-    resource <code>("123")^«:urf:#Integer»^</code>.</p>
+    <p>A number short form consists of roman digits with an optional decimal
+    with an optional exponent, all surrounded by the number sign
+    <code>'#'</code>. A number short form is equivalent to a resource of type
+    <code>«:urf:#Number»</code> using the corresponding lexical namespace. The
+    number short form <code>123.45</code> is the equivalent of the number
+    resource <code>«"123.45":urf:#Float»</code>.</p>
 
     <blockquote>
-      <p><code><var>integershort</var> ⇒
-      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code></p>
-    </blockquote>
-
-    <p>A float short form consists of roman digits with a decimal with an
-    optional exponent. The integer short form <code>123.50</code> is the
-    equivalent of the integer resource
-    <code>("123.50")^«:urf:#Float»^</code>.</p>
-
-    <blockquote>
-      <p><code><var>floatshort</var> ⇒
+      <p><code><var>numbershort</var> ⇒
       <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
     </blockquote>
 
@@ -868,22 +893,22 @@
     using the backslash as an escape character, enclosed in forward slash
     (<code>'/'</code>) characters. The clash character (<code>'/'</code>),
     backslash (<code>'\\'</code>), and every Unicode control character must be
-    escaped. Any Unicode code point may be represented by four uppercase or
-    lowercase hexadecimal representation following the character sequence
+    escaped. Any Unicode code point may be represented by the four lowercase
+    hexadecimal representation following the character sequence
     <code>"\u"</code>, or if the code point is not in the Basic Multilingual
     Plane, two such sequences representing UTF-16 surrogate pair. A regular
     expression short form is equivalent to a resource of type
-    <code>^«:urf:#RegularExpression»^</code> using the corresponding lexical
-    namespace. The regular expression short form <code>"a?b+c*"</code> is the
+    <code>«:urf:#RegularExpression»</code> using the corresponding lexical
+    namespace. The regular expression short form <code>/a?b+c*/</code> is the
     equivalent of the string resource
-    <code>("a?b+c*")^«:urf:#RegularExpression»^</code>.</p>
+    <code>«"a?b+c*":urf:#RegularExpression»</code>.</p>
 
     <blockquote id="regexshort">
       <p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode
       character except slash, backslash, and control</var> <strong>|</strong>
       \/ <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
       <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
-      <strong>|</strong> \u<var>XXXX</var><strong>]*</strong>/</code></p>
+      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>/</code></p>
     </blockquote>
 
     <p>An array short form consists of a bracketed sequence of element
@@ -908,14 +933,15 @@
       |<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>|</code></p>
     </blockquote>
 
-    <p>Type consists of zero or more resource specifications between matching
-    <code>'^'</code> characters, each indicating a type of the resource.
-    Indicating a type in this manner is equivalent to indicating the type as
-    the value of a <code>«:urf:#type»</code> property.</p>
+    <p>Type consists of zero or more resource specifications between parenthes
+    characters <code>'('</code> and <code>')'</code>, each resource indicating
+    a type of the resource being described. Indicating a type in this manner
+    is equivalent to indicating the type as the value of a
+    <code>«:urf:#type»</code> property.</p>
 
     <blockquote>
       <p><code><var>type</var> ⇒
-      ^<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>^</code></p>
+      (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
     </blockquote>
 
     <p>Properties consist of a comma-separated list of predicate resource and
@@ -980,11 +1006,6 @@
       namespace, with the management of control for those namespaces
       facilitated by the Internet domain name system. JSON properties cannot
       be so aportioned, making name clashes more likely.</li>
-
-      <li>URF distinguishes between the number types
-      <code>«http://urf.name/urf#Integer»</code> and
-      <code>«http://urf.name/urf#Float»</code>. JSON only has one number
-      type.</li>
 
       <li>URF has a character type,
       <code>«http://urf.name/urf#Character»</code>. JSON has no character
@@ -1082,6 +1103,16 @@
     <p></p>
 
     <dl>
+      <dt>2007-09-??</dt>
+
+      <dd><ul>
+          <li>Conflated number types.</li>
+
+          <li>Added delimiters to boolean and number types.</li>
+
+          <li>Added the ID namespace.</li>
+        </ul></dd>
+
       <dt>2007-09-08</dt>
 
       <dd><ul>
