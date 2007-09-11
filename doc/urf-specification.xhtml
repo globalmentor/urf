@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-08</p>
+    <p>Version 2007-09-10</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -305,7 +305,7 @@
 
     <h3>URF Types</h3>
 
-    <p>URF comes with several built-in types:</p>
+    <p>URF comes with several built-in types, including:</p>
 
     <dl>
       <dt><code>«:urf:#Array»</code></dt>
@@ -333,14 +333,23 @@
       <dd>Character resources are the Unicode code points, and their lexical
       forms are the Unicode characters represented by those code points.</dd>
 
-      <dt><code>«:urf:#Number»</code></dt>
+      <dt><code>«:urf:#Integer»</code></dt>
 
-      <dd>Number resources are representations of quanities. Currently URF
-      only supports integer and floating point numbers, represented by lexical
-      forms containing a period as a decimal separator and an optional
-      exponent. (TODO further define format, including case of "e") (TODO
-      refer to http://www.w3.org/TR/xmlschema-2/#float and
-      http://www.w3.org/TR/xmlschema-2/#double)</dd>
+      <dd>Integer resources are the positive whole numbers, the negative whole
+      numbers, and zero. They are identified by lexical namesapce URIs with a
+      lexical representation in the form
+      <code><strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code>.
+      The integer class is a subclass of the class
+      <code>«:urf:#Number»</code>.</dd>
+
+      <dt><code>«:urf:#Real»</code></dt>
+
+      <dd>Real number are all of the measuring numbers and may include decimal
+      fractional parts. They are identified by lexical namesapce URIs with a
+      lexical representation in the form
+      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>.
+      The integer class is a subclass of the class
+      <code>«:urf:#Number»</code>.</dd>
 
       <dt><code>«:urf:#Property»</code></dt>
 
@@ -454,6 +463,26 @@
               <pre><code>«"x":urf:#Character»</code></pre>
             </blockquote></dd>
 
+          <dt><code>«:urf:#Number»</code></dt>
+
+          <dd><p>Number resources, including integer and real number
+          resources, may be identified by its lexical form sounded by number
+          signs. The specific type of number resource yielded depends on the
+          lexical form used. For example, the following short
+          representations,</p><blockquote>
+              <pre><code>#123#
+#123.45#</code></pre>
+            </blockquote><p>are equivalent to the following long
+          representations,</p><blockquote>
+              <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Integer#123»
+«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
+            </blockquote><p>which are also equivalent to the following general
+          short representations for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>«"123":urf:#Integer»
+«"123.45":urf:#Real»</code></pre>
+            </blockquote></dd>
+
           <dt><code>«:urf:#Timestamp»</code></dt>
 
           <dd><p>A timestamp resource may be identified by its [<a
@@ -467,21 +496,6 @@
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"1996-12-19T16:39:57-08:00":urf:#Timestamp»</code></pre>
-            </blockquote></dd>
-
-          <dt><code>«:urf:#Number»</code></dt>
-
-          <dd><p>A number resource may be identified by its lexical form
-          sounded by the number sign. For example, the following short
-          representation,</p><blockquote>
-              <pre><code>#123.45#</code></pre>
-            </blockquote><p>is equivalent to the following long
-          representation,</p><blockquote>
-              <pre><code>«urn:urf:lex:http%3A%2F%2Furf.name%2Furf%23Number#123.45»</code></pre>
-            </blockquote><p>which is also equivalent to the following general
-          short representation for resources in a lexical
-          namespace:</p><blockquote>
-              <pre><code>«"123.45:urf:#Number»</code></pre>
             </blockquote></dd>
 
           <dt><code>«:urf:#RegularExpression»</code></dt>
@@ -867,22 +881,26 @@
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code>. A boolean short form is equivalent to a resource of
-    type <code>«:urf:#Boolean»</code> using the corresponding lexical
-    namespace. The boolean short form <code>true</code> is the equivalent of
-    the boolean resource <code>«"true":urf:#Boolean»</code>.</p>
+    <code>false</code> surrounded by the <code>'^'</code> character. A boolean
+    short form is equivalent to a resource of type
+    <code>«:urf:#Boolean»</code> using the corresponding lexical namespace.
+    The boolean short form <code>^true^</code> is the equivalent of the
+    boolean resource <code>«"true":urf:#Boolean»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      true<strong>|</strong>false</code></p>
+      ^true^<strong>|</strong>^false^</code></p>
     </blockquote>
 
     <p>A number short form consists of roman digits with an optional decimal
     with an optional exponent, all surrounded by the number sign
     <code>'#'</code>. A number short form is equivalent to a resource of type
-    <code>«:urf:#Number»</code> using the corresponding lexical namespace. The
-    number short form <code>123.45</code> is the equivalent of the number
-    resource <code>«"123.45":urf:#Float»</code>.</p>
+    <code>«:urf:#Integer»</code> or <code>«:urf:#Real»</code>, depending on
+    the lexical form used, using the corresponding lexical namespace. The
+    number short form <code>#123#</code> is the equivalent of the number
+    resource <code>«"123":urf:#Integer»</code>, and the number short form
+    <code>#123.45#</code> is the equivalent of the number resource
+    <code>«"123.45":urf:#Real»</code>.</p>
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
@@ -947,9 +965,10 @@
     <p>Properties consist of a comma-separated list of predicate resource and
     object resource pairs. Within each of these pairs, the separator
     <code>'='</code> is used to denote normal properties, and the separator
-    <code>'~'</code> is used to denote contextual properties in the context of
-    the property's subject resource and its respective predicate resource and
-    subject resource.</p>
+    <code>'~'</code> is used to denote scoped properties in the scope of the
+    property's subject resource and its respective predicate resource and
+    subject resource. If a label is provided, it identifies the proposition
+    represented by the reification of the assertion.</p>
 
     <blockquote>
       <p><code><var>properties</var> ⇒
@@ -958,7 +977,7 @@
 
     <blockquote>
       <p><code><var>property</var> ⇒
-      <var>resource</var><strong>(</strong>=<strong>|</strong>~<strong>)</strong><var>resource</var></code></p>
+      <var>resource</var><strong>[</strong>:<var>label</var>:<strong>]</strong><strong>(</strong>=<strong>|</strong>~<strong>)</strong><var>resource</var></code></p>
     </blockquote>
 
     <h2>Examples</h2>
@@ -1006,6 +1025,11 @@
       namespace, with the management of control for those namespaces
       facilitated by the Internet domain name system. JSON properties cannot
       be so aportioned, making name clashes more likely.</li>
+
+      <li>URF has two concrete number types,
+      <code>«http://urf.name/urf#Integer»</code> and
+      <code>«http://urf.name/urf#Real»</code>. JSON has only a single number
+      type.</li>
 
       <li>URF has a character type,
       <code>«http://urf.name/urf#Character»</code>. JSON has no character
@@ -1106,7 +1130,7 @@
       <dt>2007-09-??</dt>
 
       <dd><ul>
-          <li>Conflated number types.</li>
+          <li>Clarified number types.</li>
 
           <li>Added delimiters to boolean and number types.</li>
 
