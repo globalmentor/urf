@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-12</p>
+    <p>Version 2007-09-14</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -105,11 +105,11 @@ example:resource(foaf:Person)
       <pre><code>«http://example.com/example#resource»
 {
   «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
-  «http://example.com/example#name»=«data:lexis/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
-  «http://example.com/example#birthday»=«data:lexis/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
-  «http://example.com/example#salary»=«data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»
+  «http://example.com/example#name»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
+  «http://example.com/example#birthday»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
+  «http://example.com/example#salary»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»
   {
-    «http://example.com/example#currency»~«data:lexis/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
+    «http://example.com/example#currency»~«info:lexis/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
   }
 }</code></pre>
     </blockquote>
@@ -220,16 +220,11 @@ example:resource(foaf:Person)
     corresponding labels:</p>
 
     <dl>
-      <dt><code>:example:&lt;http://example.com/example&gt;</code></dt>
+      <dt><code>|example|&lt;http://example.com/example&gt;</code></dt>
 
       <dd>An example namespace; used for hypothetical situations.</dd>
 
-      <dt><code>:id:&lt;http://www.urf.name/id&gt;</code></dt>
-
-      <dd>The URF namespace for general identifiers that may have different
-      semantics depending on the context.</dd>
-
-      <dt><code>:urf:&lt;http://www.urf.name/urf&gt;</code></dt>
+      <dt><code>|urf|&lt;http://www.urf.name/urf&gt;</code></dt>
 
       <dd>The URF namespace for resource and properties related to the
       framework abstract model itself.</dd>
@@ -333,11 +328,11 @@ example:resource(example:Class)
       resources at certain <dfn>indexes</dfn> of the array. An array, like
       normal resources, may have any property, but the properties representing
       the contents of the array lie in the integer namespace
-      <code>&lt;data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer&gt;</code>,
+      <code>&lt;info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer&gt;</code>,
       each representing the integer index of the element. That is, if an array
       contains an element at index 5, the element resource will appear as a
       value of the property
-      <code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#5»</code> (that
+      <code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#5»</code> (that
       is, the property <code>«"5"|urf|#Integer»</code>, or simply
       <code>#5#</code>). Although many uses cases will prefer a continuous,
       unduplicated sequence of index properties beginning with
@@ -386,7 +381,7 @@ example:resource(example:Class)
       rules for the content of strings. These are lexical namespace
       resources.</dd>
 
-      <dt><code>urf:Resource»</code></dt>
+      <dt><code>urf:Resource</code></dt>
 
       <dd>Every resource is implicitly an instance of the class
       <code>urf:Resource</code>. The resources <code>urf:Property</code> and
@@ -405,7 +400,7 @@ example:resource(example:Class)
       href="#rfc3339">RFC 3339</a>].</dd>
     </dl>
 
-    <h3>Lexical Namespaces</h3>
+    <h3 id="lexis">Lexical Namespaces</h3>
 
     <dl>
       <dt>URF</dt>
@@ -419,18 +414,18 @@ example:resource(example:Class)
       are usually represented as the character sequences <code>"true"</code>
       and <code>"false"</code>. URF provides for a series of namespaces to
       identify resources that are typically identified by lexical
-      representations. Each lexical namespace is a URN [<a href="#rfc2141">RFC
-      2141</a>] with an NSS of <code>urf</code>, and have the following
-      format,</p><blockquote>
-          <pre><code>data:lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
-        </blockquote><p>where <var>encodedTypeURI</var> is the URI-encoded
-      form of the full type URI of the resource, and
-      <var>encodedLexicalForm</var> is the URI-encoded canonical lexical form
-      of the resource as defined by the indicated type. For example, the
-      integer 123, which is of the type
+      representations. Each lexical namespace is an <code>info</code> [<a
+      href="#rfc4452">RFC 4452</a>] URI with an info-identifier namespace of
+      <code>lexis</code>, and have the following format,</p><blockquote>
+          <pre><code>info:lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
+        </blockquote><p>where <var>encodedTypeURI</var> is the URI path
+      segment-encoded form of the full type URI of the resource, and
+      <var>encodedLexicalForm</var> is the URI path segment-encoded canonical
+      lexical form of the resource as defined by the indicated type. For
+      example, the integer 123, which is of the type
       <code>«http://urf.name/urf#Integer»</code>, is represented in URF using
       the following URI:</p><blockquote>
-          <pre><code>data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+          <pre><code>info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
         </blockquote><p>A resource in a lexical namespace is implicitly an
       instance of the type indicated in the <var>encodedTypeURI</var> section
       of the URI. In all other aspects resources in lexical namespaces are no
@@ -447,9 +442,9 @@ example:resource(example:Class)
       implicitly asserts the type of the resource. A resource in a lexical
       namespace can be identified by its URI as with any other resource.For
       example, the integer 123 can be identified by its URI
-      <code>&lt;data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
+      <code>&lt;info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
       as in the following example:</p><blockquote>
-          <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
+          <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
         </blockquote><p>Rather than indicating directly the URI of a resource
       in a lexical namespace, the resource may be identified by indicating the
       canonical lexical form of the resource, followed by the contents of the
@@ -467,7 +462,7 @@ example:resource(example:Class)
               <pre><code>!true!</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -483,7 +478,7 @@ example:resource(example:Class)
               <pre><code>'x'</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -501,8 +496,8 @@ example:resource(example:Class)
 #123.45#</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»
-«data:lexis/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»
+«info:lexis/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
             </blockquote><p>which are also equivalent to the following general
           short representations for resources in a lexical namespace,
           respectively:</p><blockquote>
@@ -519,7 +514,7 @@ example:resource(example:Class)
               <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"1996-12-19T16:39:57-08:00"|urf|#Timestamp»</code></pre>
@@ -534,7 +529,7 @@ example:resource(example:Class)
               <pre><code>/a?b+c*/</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"a?b+c*"|urf|#RegularExpression»</code></pre>
@@ -549,7 +544,7 @@ example:resource(example:Class)
               <pre><code>"apple"</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"apple"|urf|#String»</code></pre>
@@ -564,59 +559,12 @@ example:resource(example:Class)
               <pre><code>&lt;http://urf.name/urf#type&gt;</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«data:lexis/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
+              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"http://urf.name/urf#type"|urf|#URI»</code></pre>
             </blockquote></dd>
         </dl></dd>
-    </dl>
-
-    <h3>ID Namespace</h3>
-
-    <dl>
-      <dt>URF</dt>
-
-      <dd><p>URF provides a namespace,
-      <code>&lt;http://www.urf.name/id&gt;</code>, for identifiers that have
-      no strong semantics, or that may have different semantics depending on
-      the context. One use case is to use URF as a general format for storing
-      data structures from frameworks, such as JSON, that do not have globally
-      defined semantics for certain identifiers. In such as situation, a URI
-      can be constructed from the given identifier using the URF ID
-      namespace.</p><p>Consider the following example JSON data
-      structure:</p><blockquote>
-          <pre><code>{
-  "flag":true,
-  "count":23
-}</code></pre>
-        </blockquote><p>The JSON properties <code>"flag"</code> and
-      <code>"count"</code> could be exported to URF by creating property URIs
-      in the ID namespace, yielding the properties
-      <code>«http://www.urf.name/id#flag»</code> and
-      <code>«http://www.urf.name/id#count»</code>, respectively.</p></dd>
-
-      <dt>TURF</dt>
-
-      <dd><p>URIs in the ID namespace may be represented as any other URI in
-      TURF. The following example presents the TURF version of the above JSON
-      example data structure:</p><blockquote>
-          <pre><code>:id:&lt;http://www.urf.name/id&gt;,
-{
-  «:id:#flag»=^true^,
-  «:id:#count»=#23#
-}</code></pre>
-        </blockquote><p>TURF provides a shorthand representation of resources,
-      including properties, the URIs of which appear in the ID namespace. If
-      the ID consists only of <a href="#namechar">name characters</a>, it may
-      appear with no delimiters. The following example, which uses the short
-      form of ID namespace resource references, is semantically equivalent to
-      the preceding example:</p><blockquote>
-          <pre><code>{
-  flag=^true^,
-  count=#23#
-}</code></pre>
-        </blockquote></dd>
     </dl>
 
     <h3>Reification</h3>
@@ -764,12 +712,71 @@ example:juan
         </blockquote></dd>
     </dl>
 
+    <h2>URF</h2>
+
+    <p>Everything that is described in URF is referred to as a
+    <dfn>resource</dfn>. For purposes of describing within URF, each resource
+    may be described using a URI.</p>
+
+    <h3>Grammar</h3>
+
+    <p>The following grammar indicates variables in emphasized text and
+    grammar symbols in strong text.</p>
+
+    <p>The URF abstract model can be conceptualized as a series of assertions.
+    Each assertion consists of a particular scope, for which is asserted an
+    object resource for a particular predicate resource.</p>
+
+    <blockquote>
+      <p><code><var>URF</var> ⇒
+      <var>assertion</var><strong>*</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>assertion</var> ⇒ <var>scope</var><strong>,</strong>
+      <var>predicate</var><strong>,</strong> <var>object</var></code></p>
+    </blockquote>
+
+    <p>A scope consists of a base resource and a series of subject-predicate
+    combinations, or <dfn>scope chain</dfn>. The subject of each assertion is
+    the last object in the scope chain, or the base resource if there is no
+    scope chain; but the assertion is only visible and is only considered to
+    exist within the context of its scope. The simplest scope is a resource
+    itself.</p>
+
+    <blockquote>
+      <p><code><var>scope</var> ⇒ <var>base</var><strong>,</strong>
+      <strong>(</strong><var>predicate</var><strong>,</strong>
+      <var>object</var><strong>)</strong><strong>*</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>base</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>predicate</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>object</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
     <h2>TURF</h2>
 
     <p>TURF is the text interchange format for URF. TURF emphasizes terseness
     and consistency while maintaining human readability, with a preference for
     using symbols from existing interchange formats such as JSON and
     programming languages such as Java and C#.</p>
+
+    <p>TURF may use any encoding in a closed environment in which all relevant
+    parties are aware of the encoding being used. In situations where the
+    encoding may not be readily known to a processor, such as in a general
+    file stored in a file system, TURF must use the UTF-8 character encoding.
+    TURF interchange document files should use a UTF-8 U+FEFF signature (the
+    so-called UTF-8 Byte Order Mark or BOM) at their beginning to notify
+    general text processing agents that may not be aware of TURF that UTF-8
+    encoding is being used.</p>
 
     <h3>Grammar</h3>
 
@@ -794,12 +801,12 @@ example:juan
     </blockquote>
 
     <p>Each resource description must have at least one of the following
-    optional components: a label, a reference, a type, and a set of property
-    definitions</p>
+    optional components: a label, a reference, a type, a list of array
+    elements, and a list of property definitions.</p>
 
     <blockquote>
       <p><code><var>resource</var> ⇒
-      <strong>[</strong>|<var>label</var>|<strong>][</strong><var>reference</var><strong>][</strong>(<var>type</var>)<strong>][</strong>{<var>properties</var>}<strong>]</strong></code></p>
+      <strong>[</strong>|<var>label</var>|<strong>]</strong><strong>[</strong><var>reference</var><strong>]</strong><strong>[</strong>(<var>type</var>)<strong>]</strong><strong>[</strong><var>arrayshort</var><strong>]</strong><strong>[</strong>{<var>properties</var>}<strong>]</strong></code></p>
     </blockquote>
 
     <p>A label consists of one or more name characters.</p>
@@ -826,9 +833,8 @@ example:juan
       <var>urishort</var> <strong>|</strong> <var>stringshort</var>
       <strong>|</strong> <var>booleanshort</var> <strong>|</strong>
       <var>numbershort</var> <strong>|</strong> <var>charactershort</var>
-      <strong>|</strong> <var>arrayshort</var> <strong>|</strong>
-      <var>sequenceshort</var> <strong>|</strong> <var>regexshort</var>
-      <strong>|</strong> <var>timestampshort</var></code></p>
+      <strong>|</strong> <var>regexshort</var> <strong>|</strong>
+      <var>timestampshort</var></code></p>
     </blockquote>
 
     <p>A resource URI reference is enclosed in angle quotes. The contents is
@@ -838,7 +844,7 @@ example:juan
     by the text of the URI of the type of the resource. Any URI reference that
     includes a lexical representation is equivalent to a URI reference in the
     form
-    <code>«data:/lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
+    <code>«info:lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
 
     <blockquote>
       <p><code><var>urireference</var> ⇒
@@ -855,7 +861,18 @@ example:juan
     form of the fragment to be appended to the namespace URI.</p>
 
     <blockquote>
-      <p><code><var>nameshort</var> ⇒ [prefix:]localName</code></p>
+      <p><code><var>nameshort</var> ⇒
+      <strong>[</strong>prefix:<strong>]</strong>localName</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>prefix</var> ⇒
+      <var>namechar</var><strong>+</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>localName</var> ⇒
+      <var>namechar</var><strong>+</strong></code></p>
     </blockquote>
 
     <p>A string short form is a sequence of Unicode characters, using the
@@ -968,28 +985,6 @@ example:juan
       <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>/</code></p>
     </blockquote>
 
-    <p>An array short form consists of a bracketed sequence of element
-    resources separated by commas. Each listed element resource represents the
-    value of an index property, in sequence beginning with the integer
-    property <code>#0#</code>.</p>
-
-    <blockquote>
-      <p><code><var>arrayshort</var> ⇒
-      [<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>]</code></p>
-    </blockquote>
-
-    <p>A sequence short form consists of a sequence of element resources
-    separated by commas and surrounded by the backslash character
-    <code>'\\'</code>. Each listed element resource indicates another
-    assertion of the given predicate with the given element resource as the
-    value, each with a contextual property of <code>urf:order</code> with
-    values starting at <code>#0#</code> and continuing sequentially.</p>
-
-    <blockquote>
-      <p><code><var>sequenceshort</var> ⇒
-      |<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>|</code></p>
-    </blockquote>
-
     <p>Type consists of zero or more resource specifications between parenthes
     characters <code>'('</code> and <code>')'</code>, each resource indicating
     a type of the resource being described. Indicating a type in this manner
@@ -999,6 +994,16 @@ example:juan
     <blockquote>
       <p><code><var>type</var> ⇒
       (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
+    </blockquote>
+
+    <p>An array short form consists of a bracketed sequence of element
+    resources separated by commas. Each listed element resource represents the
+    value of an index property, in sequence beginning with the integer
+    property <code><code>#0#</code></code>.</p>
+
+    <blockquote>
+      <p><code><var>arrayshort</var> ⇒
+      [<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>]</code></p>
     </blockquote>
 
     <p>Properties consist of a comma-separated list of predicate resource and
@@ -1016,20 +1021,67 @@ example:juan
 
     <blockquote>
       <p><code><var>property</var> ⇒
-      <var>resource</var><strong>[</strong>|<var>label</var>|<strong>]</strong><strong>(</strong>=<strong>|</strong>~<strong>)</strong><var>resource</var></code></p>
+      <var>resource</var><strong>[</strong>|<var>label</var>|<strong>]</strong><strong>(</strong>=<strong>|</strong>~<strong>)</strong><strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
+    </blockquote>
+
+    <p>A sequence short form consists of a sequence of element resources
+    separated by commas and surrounded by the backslash character
+    <code>'\\'</code>. Each listed element resource indicates another
+    assertion of the given predicate with the given element resource as the
+    value, each with a contextual property of <code>urf:order</code> with
+    values starting at <code>#0#</code> and continuing sequentially.</p>
+
+    <blockquote>
+      <p><code><var>sequenceshort</var> ⇒
+      \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
     </blockquote>
 
     <h2>Examples</h2>
 
+    <h3>JSON</h3>
+
+    <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
+    4627</a>], every object besides strings, numbers, and booleans are
+    associative arrays using string keys. The following is a complex JSON
+    object, using every JSON data type available:</p>
+
+    <blockquote>
+      <pre><code>{
+  "length":1234,
+  "valid":true,
+  "status":"processing",
+  "results":[false, 5, "dog", {"code":9.8}]
+}</code></pre>
+    </blockquote>
+
+    <p>While this representation has some undesirable traits (e.g. strings are
+    not recommended as general property identifiers), the following URF
+    representation is semantically identical to the JSON example above:</p>
+
+    <blockquote>
+      <pre><code>{
+  "length"=#1234,
+  "valid"=!true!,
+  "status"="processing",
+  "results"=[!false!, #5#, "dog", {"code":#9.8#}]
+}</code></pre>
+    </blockquote>
+
+    <p>There is one slight semantic descrepancy between these two examples:
+    for arrays URF adds each element as the value of a property that is a true
+    integer; JSON adds each array element as the value of a string containing
+    the lexical form of an integer.</p>
+
     <h3>VCard</h3>
 
-    <p>The VCard [<a href="#rfc2426">RFC 2426</a>] example,</p>
+    <p>The VCard [<a href="#rfc2426">RFC 2426</a>] name example,</p>
 
     <blockquote>
       <pre><code>N:Stevenson;John;Philip,Paul;Dr.;Jr.,M.D.,A.C.P.</code></pre>
     </blockquote>
 
-    <p>can be represented in the following URF formulation:</p>
+    <p>can be represented in the following URF formulation, with added type
+    and subproperty information:</p>
 
     <blockquote>
       <pre><code>|urf|&lt;http://urf.name/urf&gt;,
@@ -1141,11 +1193,6 @@ example:juan
     <p></p>
 
     <dl>
-      <dt id="rfc2141">IETF RFC 2141</dt>
-
-      <dd>R. Moats. <a href="http://www.ietf.org/rfc/rfc2141.txt"><cite>RFC
-      2141: URN Syntax</cite></a>. Internet Engineering Task Force, 1997.</dd>
-
       <dt id="rfc2426">IETF RFC 2426</dt>
 
       <dd>F. Dawson and T. Howes. <a
@@ -1159,6 +1206,20 @@ example:juan
       href="http://www.ietf.org/rfc/rfc3339.txt"><cite>RFC 3339: Date and Time
       on the Internet: Timestamps</cite></a>. Internet Engineering Task Force,
       2002.</dd>
+
+      <dt id="rfc4452">IETF RFC 4452</dt>
+
+      <dd>H. Van de Sompel, T. Hammond, E. Neylon, and S. Weibel. <a
+      href="http://www.ietf.org/rfc/rfc4452.txt"><cite>RFC 4452: The "info"
+      URI Scheme for Information Assets with Identifiers in Public
+      Namespaces</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rfc4627">IETF RFC 4627</dt>
+
+      <dd>D. Crockford. <a
+      href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
+      application/json Media Type for JavaScript Object Notation
+      (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
     </dl>
 
     <h2>History</h2>
@@ -1166,14 +1227,14 @@ example:juan
     <p></p>
 
     <dl>
-      <dt>2007-09-??</dt>
+      <dt>2007-09-14</dt>
 
       <dd><ul>
           <li>Added name reference short form.</li>
 
           <li>Modified syntax for sequences.</li>
 
-          <li>Switched to <code>data:lexis</code> lexical namespaces.</li>
+          <li>Switched to <code>info:lexis</code> lexical namespaces.</li>
 
           <li>Changed property type for array indexes.</li>
 
@@ -1182,6 +1243,12 @@ example:juan
           <li>Added delimiters to boolean and number types.</li>
 
           <li>Added the ID namespace.</li>
+
+          <li>Clarified array grammar.</li>
+
+          <li>Added URF abstract model grammar.</li>
+
+          <li>Added JSON example.</li>
         </ul></dd>
 
       <dt>2007-09-08</dt>
