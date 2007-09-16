@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-14</p>
+    <p>Version 2007-09-15</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -105,11 +105,11 @@ example:resource(foaf:Person)
       <pre><code>«http://example.com/example#resource»
 {
   «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
-  «http://example.com/example#name»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
-  «http://example.com/example#birthday»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
-  «http://example.com/example#salary»=«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»
+  «http://example.com/example#name»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
+  «http://example.com/example#birthday»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
+  «http://example.com/example#salary»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»
   {
-    «http://example.com/example#currency»~«info:lexis/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
+    «http://example.com/example#currency»~«info:lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
   }
 }</code></pre>
     </blockquote>
@@ -328,12 +328,12 @@ example:resource(example:Class)
       resources at certain <dfn>indexes</dfn> of the array. An array, like
       normal resources, may have any property, but the properties representing
       the contents of the array lie in the integer namespace
-      <code>&lt;info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer&gt;</code>,
+      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer&gt;</code>,
       each representing the integer index of the element. That is, if an array
       contains an element at index 5, the element resource will appear as a
       value of the property
-      <code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#5»</code> (that
-      is, the property <code>«"5"|urf|#Integer»</code>, or simply
+      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#5»</code>
+      (that is, the property <code>«"5"|urf|#Integer»</code>, or simply
       <code>#5#</code>). Although many uses cases will prefer a continuous,
       unduplicated sequence of index properties beginning with
       <code>#5#</code>, this is not an URF requirement.</dd>
@@ -400,7 +400,7 @@ example:resource(example:Class)
       href="#rfc3339">RFC 3339</a>].</dd>
     </dl>
 
-    <h3 id="lexis">Lexical Namespaces</h3>
+    <h3 id="lexical">Lexical Namespaces</h3>
 
     <dl>
       <dt>URF</dt>
@@ -417,7 +417,7 @@ example:resource(example:Class)
       representations. Each lexical namespace is an <code>info</code> [<a
       href="#rfc4452">RFC 4452</a>] URI with an info-identifier namespace of
       <code>lexis</code>, and have the following format,</p><blockquote>
-          <pre><code>info:lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
+          <pre><code>info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
         </blockquote><p>where <var>encodedTypeURI</var> is the URI path
       segment-encoded form of the full type URI of the resource, and
       <var>encodedLexicalForm</var> is the URI path segment-encoded canonical
@@ -425,7 +425,7 @@ example:resource(example:Class)
       example, the integer 123, which is of the type
       <code>«http://urf.name/urf#Integer»</code>, is represented in URF using
       the following URI:</p><blockquote>
-          <pre><code>info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+          <pre><code>info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
         </blockquote><p>A resource in a lexical namespace is implicitly an
       instance of the type indicated in the <var>encodedTypeURI</var> section
       of the URI. In all other aspects resources in lexical namespaces are no
@@ -442,9 +442,9 @@ example:resource(example:Class)
       implicitly asserts the type of the resource. A resource in a lexical
       namespace can be identified by its URI as with any other resource.For
       example, the integer 123 can be identified by its URI
-      <code>&lt;info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
+      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
       as in the following example:</p><blockquote>
-          <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
+          <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
         </blockquote><p>Rather than indicating directly the URI of a resource
       in a lexical namespace, the resource may be identified by indicating the
       canonical lexical form of the resource, followed by the contents of the
@@ -462,7 +462,7 @@ example:resource(example:Class)
               <pre><code>!true!</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -478,7 +478,7 @@ example:resource(example:Class)
               <pre><code>'x'</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -496,8 +496,8 @@ example:resource(example:Class)
 #123.45#</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23Integer#123»
-«info:lexis/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
+«info:lexical/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
             </blockquote><p>which are also equivalent to the following general
           short representations for resources in a lexical namespace,
           respectively:</p><blockquote>
@@ -514,7 +514,7 @@ example:resource(example:Class)
               <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"1996-12-19T16:39:57-08:00"|urf|#Timestamp»</code></pre>
@@ -529,7 +529,7 @@ example:resource(example:Class)
               <pre><code>/a?b+c*/</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"a?b+c*"|urf|#RegularExpression»</code></pre>
@@ -544,7 +544,7 @@ example:resource(example:Class)
               <pre><code>"apple"</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"apple"|urf|#String»</code></pre>
@@ -559,7 +559,7 @@ example:resource(example:Class)
               <pre><code>&lt;http://urf.name/urf#type&gt;</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexis/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"http://urf.name/urf#type"|urf|#URI»</code></pre>
@@ -715,8 +715,8 @@ example:juan
     <h2>URF</h2>
 
     <p>Everything that is described in URF is referred to as a
-    <dfn>resource</dfn>. For purposes of describing within URF, each resource
-    may be described using a URI.</p>
+    <dfn>resource</dfn>. For purposes of description within URF, each resource
+    may be identified using a URI.</p>
 
     <h3>Grammar</h3>
 
@@ -844,7 +844,7 @@ example:juan
     by the text of the URI of the type of the resource. Any URI reference that
     includes a lexical representation is equivalent to a URI reference in the
     form
-    <code>«info:lexis/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
+    <code>«info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
 
     <blockquote>
       <p><code><var>urireference</var> ⇒
@@ -1227,6 +1227,12 @@ example:juan
     <p></p>
 
     <dl>
+      <dt>2007-09-15</dt>
+
+      <dd><ul>
+          <li>Switched to <code>info:lexical</code> lexical namespaces.</li>
+        </ul></dd>
+
       <dt>2007-09-14</dt>
 
       <dd><ul>
