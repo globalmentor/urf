@@ -904,41 +904,80 @@ example:juan
     <p>A string short form is a sequence of Unicode characters, using the
     backslash as an escape character, enclosed in double quotes. The double
     quotation mark (<code>'"'</code>) and backslash (<code>'\\'</code>)
-    characters must be escaped. Any Unicode code point may be represented by
-    the four lowercase hexadecimal representation following the character
-    sequence <code>"\u"</code>, or if the code point is not in the Basic
-    Multilingual Plane, two such sequences representing UTF-16 surrogate pair.
-    A string short form is equivalent to a resource of type
-    <code>urf:String</code> using the corresponding lexical namespace. The
-    string short form <code>"example"</code> is the equivalent of the string
-    resource <code>«"example"|urf|#String»</code>.</p>
+    characters must be escaped. A string short form is equivalent to a
+    resource of type <code>urf:String</code> using the corresponding lexical
+    namespace. The string short form <code>"example"</code> is the equivalent
+    of the string resource <code>«"example"|urf|#String»</code>.</p>
 
     <blockquote id="stringshort">
       <p><code><var>stringshort</var> ⇒ "<strong>[</strong><var>Unicode
       character except double quote and backslash</var> <strong>|</strong> \"
-      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
-      <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
-      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>"</code></p>
+      <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var>
+      <strong>|</strong>
+      <var>escapedcontrol</var><strong>]*</strong>"</code></p>
+    </blockquote>
+
+    <p>Any Unicode code point may be represented in string and other short
+    representations where indicated by the four lowercase hexadecimal
+    representation following the character sequence <code>"\u"</code>, or if
+    the code point is not in the Basic Multilingual Plane, two such sequences
+    representing UTF-16 surrogate pair.</p>
+
+    <blockquote id="escapedunicode">
+      <p><code><var>escapedunicode</var> ⇒ \u<var>xxxx</var></code></p>
+    </blockquote>
+
+    <p>Several control characters have escaped forms which can be used in
+    string and other short representations where indicated.</p>
+
+    <blockquote id="escapedcontrol">
+      <p><code><var>escapedcontrol</var> ⇒ \b <strong>|</strong> \t
+      <strong>|</strong> \n <strong>|</strong> \f <strong>|</strong> \r
+      <strong>|</strong> \“ <strong>|</strong> \”</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\b *\\\u0062* ⇒ \u0008 *backspace*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\t *\\\u0074* ⇒ \u0009 *character tabulation*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\n *\\\u006e* ⇒ \u000a *line feed (LF)*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\f *\\\u0066* ⇒ \u000c *form feed (FF)*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\r *\\\u0072* ⇒ \u000d *carriage return (CR)*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\“ *\\\u201c* ⇒ \u0098 *start of string (SOS)*</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code>\” *\\\u201d* ⇒ \u009c *string terminator (ST)*</code></p>
     </blockquote>
 
     <p>A character short form is a single Unicode characters, using the
     backslash as an escape character, enclosed in a single quote. The single
     quote (<code>'\''</code>) and backslash (<code>'\\'</code>) characters
-    must be escaped. Any Unicode code point may be represented by the four
-    lowercase hexadecimal representation following the character sequence
-    <code>"\u"</code>, or if the code point is not in the Basic Multilingual
-    Plane, two such sequences representing UTF-16 surrogate pair. A string
-    short form is equivalent to a resource of type <code>urf:Character</code>
-    using the corresponding lexical namespace. The character short form
-    <code>'x'</code> is the equivalent of the character resource
-    <code>«"x"|urf|#Character»</code>.</p>
+    must be escaped. A character short form is equivalent to a resource of
+    type <code>urf:Character</code> using the corresponding lexical namespace.
+    The character short form <code>'x'</code> is the equivalent of the
+    character resource <code>«"x"|urf|#Character»</code>.</p>
 
     <blockquote id="charactershort">
       <p><code><var>charactershort</var> ⇒ '<strong>[</strong><var>Unicode
       character except single quote and backslash</var> <strong>|</strong> \'
-      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
-      <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
-      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>'</code></p>
+      <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var>
+      <strong>|</strong>
+      <var>escapedcontrol</var><strong>]*</strong>'</code></p>
     </blockquote>
 
     <p>A URI short form is a sequence of character constituting a
@@ -991,22 +1030,19 @@ example:juan
     <p>A regular expression short form is a sequence of Unicode characters,
     using the backslash as an escape character, enclosed in forward slash
     (<code>'/'</code>) characters. The slash (<code>'/'</code>) and backslash
-    (<code>'\\'</code>) characters must be escaped. Any Unicode code point may
-    be represented by the four lowercase hexadecimal representation following
-    the character sequence <code>"\u"</code>, or if the code point is not in
-    the Basic Multilingual Plane, two such sequences representing UTF-16
-    surrogate pair. A regular expression short form is equivalent to a
-    resource of type <code>urf:RegularExpression</code> using the
-    corresponding lexical namespace. The regular expression short form
-    <code>/a?b+c*/</code> is the equivalent of the string resource
+    (<code>'\\'</code>) characters must be escaped. A regular expression short
+    form is equivalent to a resource of type
+    <code>urf:RegularExpression</code> using the corresponding lexical
+    namespace. The regular expression short form <code>/a?b+c*/</code> is the
+    equivalent of the string resource
     <code>«"a?b+c*"|urf|#RegularExpression»</code>.</p>
 
     <blockquote id="regexshort">
       <p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode
       character except slash and backslash</var> <strong>|</strong> \/
-      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
-      <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
-      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>/</code></p>
+      <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var>
+      <strong>|</strong>
+      <var>escapedcontrol</var><strong>]*</strong>/</code></p>
     </blockquote>
 
     <p>Type consists of zero or more resource specifications between parenthes
@@ -1079,15 +1115,16 @@ example:juan
     </blockquote>
 
     <p>While this representation has some undesirable traits (e.g. strings are
-    not recommended as general property identifiers), the following URF
-    representation is semantically identical to the JSON example above:</p>
+    not recommended as general property identifiers except in the case of
+    resources used as maps), the following URF representation is semantically
+    identical to the JSON example above:</p>
 
     <blockquote>
       <pre><code>{
-  "length"=#1234,
+  "length"=#1234#,
   "valid"=!true!,
   "status"="processing",
-  "results"=[!false!, #5#, "dog", {"code":#9.8#}]
+  "results"=[!false!, #5#, "dog", {"code"=#9.8#}]
 }</code></pre>
     </blockquote>
 
@@ -1095,6 +1132,23 @@ example:juan
     for arrays URF adds each element as the value of a property that is a true
     integer; JSON adds each array element as the value of a string containing
     the lexical form of an integer.</p>
+
+    <p>Although the above TURF representation replicates the simple semantics
+    of the given JSON example, a better formulation that takes advantage of
+    URF semantics would most importantly use actual properties rather than
+    associative array string key pseudo-properties. An improved formulation
+    would also indicate the type of the resource. Such improvements are
+    illustrated in the following reformulation:</p>
+
+    <blockquote>
+      <pre><code>(«http://example.com/example#Class»)
+{
+  length=#1234#,
+  valid=!true!,
+  status="processing",
+  results=[!false!, #5#, "dog", {"code"=#9.8#}]
+}</code></pre>
+    </blockquote>
 
     <h3>VCard</h3>
 
@@ -1269,6 +1323,9 @@ example:juan
           <li>Added period to set of name characters.</li>
 
           <li>Added comments to TURF.</li>
+
+          <li>Clarified and expanded TURF Unicode control escape
+          sequences.</li>
         </ul></dd>
 
       <dt>2007-09-15</dt>
