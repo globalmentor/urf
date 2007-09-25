@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-15</p>
+    <p>Version 2007-09-25</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -82,12 +82,16 @@
     numbers are resources and can themselves be described. The salary value
     resource is given a scoped property indicating the currency. The currency
     resource is identified using a lexical namespace for the
-    <code>example:Currency</code> type.</p>
+    <code>example:Currency</code> type. Comments are surrounded by
+    asterisks.</p>
 
     <blockquote>
-      <pre><code>|example|&lt;http://example.com/example&gt;,
-|foaf|&lt;http://xmlns.com/foaf/0.1/&gt;
-example:resource(foaf:Person)
+      <pre><code>*declare and label the example and foaf namespaces*
+|example|&lt;http://example.com/example&gt;,
+|foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
+
+*describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;*
+example:janedoe(foaf:Person)
 {
   example:name="Jane Doe",
   example:birthday=@1980-01-01@,
@@ -99,10 +103,10 @@ example:resource(foaf:Person)
     </blockquote>
 
     <p>The following is semantically equivalent to the preceding example but
-    uses longer TURF forms:</p>
+    uses longer TURF forms (and no comments):</p>
 
     <blockquote>
-      <pre><code>«http://example.com/example#resource»
+      <pre><code>«http://example.com/example#janedoe»
 {
   «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
   «http://example.com/example#name»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
@@ -146,8 +150,8 @@ example:resource(foaf:Person)
     <dl>
       <dt>URF</dt>
 
-      <dd><p>A resource may be <dfn>anonymous</dfn> or may be identified by
-      one or more URIs.</p></dd>
+      <dd><p>A resource may be <dfn>anonymous</dfn> or may be identified by a
+      URI.</p></dd>
 
       <dt>TURF</dt>
 
@@ -156,7 +160,7 @@ example:resource(foaf:Person)
       <code>http://example.com/example#resource</code>:</p><blockquote>
           <pre><code>&lt;http://example.com/example#resource&gt;</code></pre>
         </blockquote><p>A resource may be identified by placing its URI
-      characters within angle quotes, in which the curly brackets are options
+      characters within angle quotes, in which the curly brackets are optional
       if the resource has no properties. The following example refers to the
       resource identified by the URI
       <code>&lt;http://urf.name/urf#resource&gt;</code>.</p><blockquote>
@@ -630,14 +634,14 @@ example:juan
       relationship between Juan and the <code>example:name</code>
       <code>"John"</code>. The assertion, "the string 'John' is in English",
       is contextual to the string "John" being the name of Juan. Similarly,
-      Juan could specify a <code>example:weight</code> of <code>72</code> with
-      an <code>example:unit</code> of <code>example:kilogram</code>. Because
-      the integer <code>72</code> may not represent a unit of kilograms in all
-      contexts, its property <code>example:unit</code> should be considered to
-      be in the scope of the relationship between Juan and the
-      <code>example:weight</code> <code>72</code>. The assertion, "the integer
-      72 is in kilograms", is contextual to the integer 72 being the weight of
-      Juan.</p></dd>
+      Juan could specify a <code>example:weight</code> of <code>#72#</code>
+      with an <code>example:unit</code> of <code>example:kilogram</code>.
+      Because the integer <code>#72#</code> may not represent a unit of
+      kilograms in all contexts, its property <code>example:unit</code> should
+      be considered to be in the scope of the relationship between Juan and
+      the <code>example:weight</code> <code>#72#</code>. The assertion, "the
+      integer 72 is in kilograms", is contextual to the integer 72 being the
+      weight of Juan.</p></dd>
 
       <dt>TURF</dt>
 
@@ -651,7 +655,7 @@ example:juan
   {
     example:lang~example:english
   }
-  example:weight=72
+  example:weight=#72#
   {
     example:unit~example:kilogram
   }
@@ -689,11 +693,11 @@ example:juan
 {
   example:name="William"
   {
-    urf:order~0
+    urf:order~#0#
   },
   example:name="Bill"
   {
-    urf:order~1
+    urf:order~#1#
   }
 }</code></pre>
         </blockquote>The same information may be presented in short
@@ -701,7 +705,7 @@ example:juan
       ordered values within matching backslash characters. A sequence does not
       result in a new type of value, but rather indicates that the given
       predicate should be asserted for each value, each with a scoped property
-      of <code>urf:order</code> with values starting at <code>0</code> and
+      of <code>urf:order</code> with values starting at <code>#0#</code> and
       continuing sequentially. The following example represents information
       semantically identical to the previous example:<blockquote>
           <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
@@ -769,6 +773,23 @@ example:juan
     using symbols from existing interchange formats such as JSON and
     programming languages such as Java and C#.</p>
 
+    <h3>Internet Media Type</h3>
+
+    <p>The Internet media type general URF information encoded as TURF is:</p>
+
+    <blockquote>
+      <p><code>application/turf</code></p>
+    </blockquote>
+
+    <p>For any application-specific URF data encoded as TURF should be
+    represented as <code>application/<var>applicationName</var>+turf</code> to
+    allow the data to be recognized as such, where <var>applicationName</var>
+    is the application-specific identifier for the URF information. <em>Note:
+    These Internet media types have yet to be registered with the
+    IANA.</em></p>
+
+    <h3>Encoding</h3>
+
     <p>TURF may use any encoding in a closed environment in which all relevant
     parties are aware of the encoding being used. In situations where the
     encoding may not be readily known to a processor, such as in a general
@@ -783,13 +804,18 @@ example:juan
     <p>The following grammar indicates literals in normal style, variables in
     emphasized text, and grammar symbols in strong text.</p>
 
-    <p>Any two TURF tokens may be separated by break, whitespace, and
-    separator Unicode characters.</p>
+    <p>Any two TURF tokens may be separated by separator or whitespace Unicode
+    characters, or a TURF comment.</p>
 
     <blockquote>
       <p><code><var>SEPARATOR</var> ⇒ Unicode Paragraph Separator
       <strong>|</strong> Unicode Segment Separator <strong>|</strong> Unicode
-      Whitespace</code></p>
+      Whitespace <strong>|</strong> <var>comment</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>comment</var> ⇒ *<strong>[</strong><var>Unicode character
+      except '*'</var><strong>]*</strong>*</code></p>
     </blockquote>
 
     <p>A TURF interchange document is encoded in UTF-8, and is composed of one
@@ -816,12 +842,12 @@ example:juan
       <var>namechar</var><strong>+</strong></code></p>
     </blockquote>
 
-    <p>A name character is any letter, digit, or underscore.</p>
+    <p>A name character is any letter, digit, underscore, or period.</p>
 
     <blockquote id="namechar">
       <p><code><var>namechar</var> ⇒ <var>Unicode Letter</var>
       <strong>|</strong> <var>Unicode Decimal Digit Number</var>
-      <strong>|</strong> _</code></p>
+      <strong>|</strong> _ <strong>|</strong> .</code></p>
     </blockquote>
 
     <p>A resource reference is a URI reference or one of several short
@@ -877,63 +903,62 @@ example:juan
 
     <p>A string short form is a sequence of Unicode characters, using the
     backslash as an escape character, enclosed in double quotes. The double
-    quotation mark (<code>'"'</code>), backslash (<code>'\\'</code>), and
-    every Unicode control character must be escaped. Any Unicode code point
-    may be represented by the four lowercase hexadecimal representation
-    following the character sequence <code>"\u"</code>, or if the code point
-    is not in the Basic Multilingual Plane, two such sequences representing
-    UTF-16 surrogate pair. A string short form is equivalent to a resource of
-    type <code>urf:String</code> using the corresponding lexical namespace.
-    The string short form <code>"example"</code> is the equivalent of the
-    string resource <code>«"example"|urf|#String»</code>.</p>
+    quotation mark (<code>'"'</code>) and backslash (<code>'\\'</code>)
+    characters must be escaped. Any Unicode code point may be represented by
+    the four lowercase hexadecimal representation following the character
+    sequence <code>"\u"</code>, or if the code point is not in the Basic
+    Multilingual Plane, two such sequences representing UTF-16 surrogate pair.
+    A string short form is equivalent to a resource of type
+    <code>urf:String</code> using the corresponding lexical namespace. The
+    string short form <code>"example"</code> is the equivalent of the string
+    resource <code>«"example"|urf|#String»</code>.</p>
 
     <blockquote id="stringshort">
       <p><code><var>stringshort</var> ⇒ "<strong>[</strong><var>Unicode
-      character except double quote, backslash, and control</var>
-      <strong>|</strong> \" <strong>|</strong> \\ <strong>|</strong> \b
-      <strong>|</strong> \t <strong>|</strong> \r <strong>|</strong> \n
-      <strong>|</strong> \f <strong>|</strong>
-      \u<var>xxxx</var><strong>]*</strong>"</code></p>
+      character except double quote and backslash</var> <strong>|</strong> \"
+      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
+      <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
+      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>"</code></p>
     </blockquote>
 
     <p>A character short form is a single Unicode characters, using the
     backslash as an escape character, enclosed in a single quote. The single
-    quote (<code>'\''</code>), backslash (<code>'\\'</code>), and every
-    Unicode control character must be escaped. Any Unicode code point may be
-    represented by the four lowercase hexadecimal representation following the
-    character sequence <code>"\u"</code>, or if the code point is not in the
-    Basic Multilingual Plane, two such sequences representing UTF-16 surrogate
-    pair. A string short form is equivalent to a resource of type
-    <code>urf:Character</code> using the corresponding lexical namespace. The
-    character short form <code>'x'</code> is the equivalent of the character
-    resource <code>«"x"|urf|#Character»</code>.</p>
+    quote (<code>'\''</code>) and backslash (<code>'\\'</code>) characters
+    must be escaped. Any Unicode code point may be represented by the four
+    lowercase hexadecimal representation following the character sequence
+    <code>"\u"</code>, or if the code point is not in the Basic Multilingual
+    Plane, two such sequences representing UTF-16 surrogate pair. A string
+    short form is equivalent to a resource of type <code>urf:Character</code>
+    using the corresponding lexical namespace. The character short form
+    <code>'x'</code> is the equivalent of the character resource
+    <code>«"x"|urf|#Character»</code>.</p>
 
     <blockquote id="charactershort">
       <p><code><var>charactershort</var> ⇒ '<strong>[</strong><var>Unicode
-      character except single quote, backslash, and control</var>
-      <strong>|</strong> \' <strong>|</strong> \\ <strong>|</strong> \b
-      <strong>|</strong> \t <strong>|</strong> \r <strong>|</strong> \n
-      <strong>|</strong> \f <strong>|</strong>
-      \u<var>xxxx</var><strong>]*</strong>'</code></p>
+      character except single quote and backslash</var> <strong>|</strong> \'
+      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
+      <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
+      <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>'</code></p>
     </blockquote>
 
     <p>A URI short form is a sequence of character constituting a
     syntactically correct URI or a relative reference, surrounded by the angle
     brackets <code>'&lt;'</code> and <code>'&gt;'</code>. If a relative
-    reference is provided, it is resolved against the base URi of the TURF
-    document. If a label appears at the beginning of the URI characters and
-    that label refers to a previously defined URI resource, the remaining
-    characters are interpreted as a relative reference and resolved against
-    the URI to which the label refers. A single relative reference is resolved
-    to the base URI of the interchange document. A URI short form is
-    equivalent to a resource of type <code>urf:URI</code> using the
-    corresponding lexical namespace. The URI short form
-    <code>&lt;http://example.com&gt;</code> is the equivalent of the URI
-    resource <code>«"http://example.com"|urf|#URI»</code>.</p>
+    reference is provided, it is resolved against the base URI of the TURF
+    document according to the rules specified in [<a
+    href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. If a label
+    appears at the beginning of the URI characters and that label refers to a
+    previously defined URI resource, the remaining characters are interpreted
+    as a relative reference and resolved against the URI to which the label
+    refers. A single relative reference is resolved to the base URI of the
+    interchange document. A URI short form is equivalent to a resource of type
+    <code>urf:URI</code> using the corresponding lexical namespace. The URI
+    short form <code>&lt;http://example.com&gt;</code> is the equivalent of
+    the URI resource <code>«"http://example.com"|urf|#URI»</code>.</p>
 
     <blockquote>
       <p><code><var>urishort</var> ⇒
-      &lt;<strong>[</strong>:<var>label</var>:<strong>]</strong><var>urichar</var><strong>+</strong>&gt;</code></p>
+      &lt;<strong>[</strong>|<var>label</var>|<strong>]</strong><var>urichar</var><strong>+</strong>&gt;</code></p>
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
@@ -965,22 +990,21 @@ example:juan
 
     <p>A regular expression short form is a sequence of Unicode characters,
     using the backslash as an escape character, enclosed in forward slash
-    (<code>'/'</code>) characters. The clash character (<code>'/'</code>),
-    backslash (<code>'\\'</code>), and every Unicode control character must be
-    escaped. Any Unicode code point may be represented by the four lowercase
-    hexadecimal representation following the character sequence
-    <code>"\u"</code>, or if the code point is not in the Basic Multilingual
-    Plane, two such sequences representing UTF-16 surrogate pair. A regular
-    expression short form is equivalent to a resource of type
-    <code>urf:RegularExpression</code> using the corresponding lexical
-    namespace. The regular expression short form <code>/a?b+c*/</code> is the
-    equivalent of the string resource
+    (<code>'/'</code>) characters. The slash (<code>'/'</code>) and backslash
+    (<code>'\\'</code>) characters must be escaped. Any Unicode code point may
+    be represented by the four lowercase hexadecimal representation following
+    the character sequence <code>"\u"</code>, or if the code point is not in
+    the Basic Multilingual Plane, two such sequences representing UTF-16
+    surrogate pair. A regular expression short form is equivalent to a
+    resource of type <code>urf:RegularExpression</code> using the
+    corresponding lexical namespace. The regular expression short form
+    <code>/a?b+c*/</code> is the equivalent of the string resource
     <code>«"a?b+c*"|urf|#RegularExpression»</code>.</p>
 
     <blockquote id="regexshort">
       <p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode
-      character except slash, backslash, and control</var> <strong>|</strong>
-      \/ <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
+      character except slash and backslash</var> <strong>|</strong> \/
+      <strong>|</strong> \\ <strong>|</strong> \b <strong>|</strong> \t
       <strong>|</strong> \r <strong>|</strong> \n <strong>|</strong> \f
       <strong>|</strong> \u<var>xxxx</var><strong>]*</strong>/</code></p>
     </blockquote>
@@ -1220,6 +1244,13 @@ example:juan
       href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
       application/json Media Type for JavaScript Object Notation
       (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rdfxml">RDF/XML</dt>
+
+      <dd>Dave Beckett. <a
+      href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax
+      Specification (Revised)</cite></a>. World Wide Web Consortium, 10
+      February 2006.</dd>
     </dl>
 
     <h2>History</h2>
@@ -1227,6 +1258,19 @@ example:juan
     <p></p>
 
     <dl>
+      <dt>2007-09-??</dt>
+
+      <dd><ul>
+          <li>Added TURF Internet media type.</li>
+
+          <li>Removed requirement that TURF strings must escape control
+          characters.</li>
+
+          <li>Added period to set of name characters.</li>
+
+          <li>Added comments to TURF.</li>
+        </ul></dd>
+
       <dt>2007-09-15</dt>
 
       <dd><ul>
