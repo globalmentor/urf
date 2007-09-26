@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-25</p>
+    <p>Version 2007-09-26</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -185,18 +185,32 @@ example:janedoe(foaf:Person)
 
       <dd><p>A set of resources (those part of a particular
       <dfn>ontology</dfn>, for example) may be grouped together for
-      identification purposes by using a common <dfn>namespace</dfn>. A
-      namespace is a URI that serves as a base for the formation of URIs
-      within that namespace. If a resource lies within a namespace, the
-      resource's <var>local name</var> is the part appearing after the pound
-      sign in the URI fragment identifier. A namespace URI therefore may not
-      have a fragment identifier. A URI within a namespace is formed by
-      appending a pound sign followed by the resource's local name to the
-      namespace URI. This allows the namespace and local name to be
-      unambiguously determined given any URI within a namespace. For example,
-      the URI <code>&lt;http://urf.name/urf#Resource&gt;</code> is within the
-      namespace <code>&lt;http://urf.name/urf&gt;</code>. Not all resource
-      URIs are part of some namespace.</p></dd>
+      identification purposes by using a common <dfn>namespace</dfn>. An URF
+      namespace URI is a URI that serves as a base for the formation of URIs
+      within that namespace. A resource within a namespace has a <dfn>local
+      name</dfn> which is combined with the namespace URI to form the resource
+      URI. Not all resource URIs are part of some namespace URI. URF allows
+      two type of namespaces:</p><ul>
+          <li>If the path of the namespace URI does not end with the slash
+          character <code>'/'</code> and does not have a fragment, the URI is
+          formed by URI-encoding all non-<var>pchar</var> characters of the
+          local name according to [<a href="#rfc3986">RFC3986</a>] and adding
+          the result to the namespace URI as a fragment. For example, a
+          namespace URI of <code>&lt;http://urf.name/name&gt;</code> and a
+          local name of <code>"type"</code> yield a namespace URI of
+          <code>&lt;http://urf.name/name#type&gt;</code>.</li>
+
+          <li>If the path of the namespace URI ends with the slash character
+          <code>'/'</code> and does not have a fragment, the URI is formed by
+          URI-encoding all non-<var>pchar</var> characters of the local name
+          according to [<a href="#rfc3986">RFC3986</a>] and appending the
+          result to the namespace URI. For example, a namespace URI of
+          <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> and a local
+          name of <code>"title"</code> yield a resource URI of
+          <code>&lt;http://purl.org/dc/elements/1.1/title&gt;</code>.</li>
+        </ul><p>A namespace URI therefore may never have a fragment
+      identifier. These rules allow the namespace and local name to be
+      unambiguously determined given any URI within a namespace.</p></dd>
 
       <dt>TURF</dt>
 
@@ -224,6 +238,11 @@ example:janedoe(foaf:Person)
     corresponding labels:</p>
 
     <dl>
+      <dt><code>|dc|&lt;http://purl.org/dc/elements/1.1/&gt;</code></dt>
+
+      <dd>The Dublin Core Metadata Initiative namespace [<a
+      href="#dcns">DCNS</a>].</dd>
+
       <dt><code>|example|&lt;http://example.com/example&gt;</code></dt>
 
       <dd>An example namespace; used for hypothetical situations.</dd>
@@ -342,10 +361,18 @@ example:resource(example:Class)
       unduplicated sequence of index properties beginning with
       <code>#5#</code>, this is not an URF requirement.</dd>
 
+      <dt><code>urf:Binary</code></dt>
+
+      <dd>Binary resources represent arbitrarily long sequences of bytes.
+      Binary resources use the appropriate lexical namespace for their type,
+      with a lexical form of the <dfn>base64url</dfn> encoding of the binary
+      data without line breaks according to [<a
+      href="#rfc4648">RFC4648</a>].</dd>
+
       <dt><code>urf:Boolean</code></dt>
 
-      <dd>There are two boolean resources, the binary values <code>true</code>
-      and <code>false</code>. Boolean resources are identified by lexical
+      <dd>There are two boolean resources, the values <code>true</code> and
+      <code>false</code>. Boolean resources are identified by lexical
       namespace URIs with lexical representations of <code>"true"</code> and
       <code>"false"</code>, respectively.</dd>
 
@@ -401,7 +428,7 @@ example:resource(example:Class)
 
       <dd>Timestamp resources, which use a lexical namespace, are particular
       points in time and have a lexical form defined in [<a
-      href="#rfc3339">RFC 3339</a>].</dd>
+      href="#rfc3339">RFC3339</a>].</dd>
     </dl>
 
     <h3 id="lexical">Lexical Namespaces</h3>
@@ -419,7 +446,7 @@ example:resource(example:Class)
       and <code>"false"</code>. URF provides for a series of namespaces to
       identify resources that are typically identified by lexical
       representations. Each lexical namespace is an <code>info</code> [<a
-      href="#rfc4452">RFC 4452</a>] URI with an info-identifier namespace of
+      href="#rfc4452">RFC4452</a>] URI with an info-identifier namespace of
       <code>lexical</code>, and have the following format,</p><blockquote>
           <pre><code>info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
         </blockquote><p>where <var>encodedTypeURI</var> is the URI path
@@ -458,6 +485,24 @@ example:resource(example:Class)
         </blockquote><p>The lexical namespaces for several types have
       additional short representations. The examples below assume that the
       label <code>urf</code> has been assigned to the URF namespace.</p><dl>
+          <dt><code>urf:Binary</code></dt>
+
+          <dd><p>An binary resource may be identified by its [<a
+          href="#rfc4648">RFC4648</a>] base64url lexical form surrounded by
+          percent signs. For example, the series of bytes <code>64</code>,
+          <code>63</code>, <code>62</code>, <code>61</code> produce the
+          lexical form, <code>"QD8-PQ=="</code>; the corresponding short
+          representation,</p><blockquote>
+              <pre><code>%QD8-PQ==%</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Binary#QD8-PQ%3D%3D»</code></pre>
+            </blockquote><p>which is also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>«"QD8-PQ=="|urf|#Binary»</code></pre>
+            </blockquote></dd>
+
           <dt><code>urf:Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
@@ -512,7 +557,7 @@ example:resource(example:Class)
           <dt><code>urf:Timestamp</code></dt>
 
           <dd><p>A timestamp resource may be identified by its [<a
-          href="#rfc3339">RFC 3339</a>] lexical form with surrounding at signs
+          href="#rfc3339">RFC3339</a>] lexical form with surrounding at signs
           (<code>'@'</code>). For example, the following short
           representation,</p><blockquote>
               <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
@@ -720,7 +765,7 @@ example:juan
 
     <p>Everything that is described in URF is referred to as a
     <dfn>resource</dfn>. For purposes of description within URF, each resource
-    may be identified using a URI.</p>
+    may be identified using a URI [<a href="#rfc3986">RFC3986</a>].</p>
 
     <h3>Grammar</h3>
 
@@ -775,7 +820,8 @@ example:juan
 
     <h3>Internet Media Type</h3>
 
-    <p>The Internet media type general URF information encoded as TURF is:</p>
+    <p>The Internet media type of general URF information encoded as TURF
+    is:</p>
 
     <blockquote>
       <p><code>application/turf</code></p>
@@ -1100,10 +1146,10 @@ example:juan
 
     <h3>JSON</h3>
 
-    <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
-    4627</a>], every object besides strings, numbers, and booleans are
-    associative arrays using string keys. The following is a complex JSON
-    object, using every JSON data type available:</p>
+    <p>In the JavaScript Object Notation (JSON) [<a
+    href="#rfc4627">RFC4627</a>], every object besides strings, numbers, and
+    booleans are associative arrays using string keys. The following is a
+    complex JSON object, using every JSON data type available:</p>
 
     <blockquote>
       <pre><code>{
@@ -1152,7 +1198,7 @@ example:juan
 
     <h3>VCard</h3>
 
-    <p>The VCard [<a href="#rfc2426">RFC 2426</a>] name example,</p>
+    <p>The VCard [<a href="#rfc2426">RFC2426</a>] name example,</p>
 
     <blockquote>
       <pre><code>N:Stevenson;John;Philip,Paul;Dr.;Jr.,M.D.,A.C.P.</code></pre>
@@ -1271,6 +1317,13 @@ example:juan
     <p></p>
 
     <dl>
+      <dt id="dcns">DCNS</dt>
+
+      <dd>Andy Powell and Harry Wagner. <a
+      href="http://dublincore.org/documents/dcmi-namespace/"><cite>Namespace
+      Policy for the Dublin Core Metadata Initiative (DCMI)</cite></a>. Dublin
+      Core Namespace Initiative, 2007.</dd>
+
       <dt id="rfc2426">IETF RFC 2426</dt>
 
       <dd>F. Dawson and T. Howes. <a
@@ -1285,6 +1338,13 @@ example:juan
       on the Internet: Timestamps</cite></a>. Internet Engineering Task Force,
       2002.</dd>
 
+      <dt id="rfc3986">IETF RFC 3986</dt>
+
+      <dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a
+      href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform
+      Resource Identifier (URI): Generic Syntax</cite></a>. Internet
+      Engineering Task Force, 2005.</dd>
+
       <dt id="rfc4452">IETF RFC 4452</dt>
 
       <dd>H. Van de Sompel, T. Hammond, E. Neylon, and S. Weibel. <a
@@ -1298,6 +1358,13 @@ example:juan
       href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
       application/json Media Type for JavaScript Object Notation
       (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rfc4648">IETF RFC 4648</dt>
+
+      <dd>S. Josefsson. <a
+      href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,
+      Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task
+      Force, 2006.</dd>
 
       <dt id="rdfxml">RDF/XML</dt>
 
@@ -1326,6 +1393,10 @@ example:juan
 
           <li>Clarified and expanded TURF Unicode control escape
           sequences.</li>
+
+          <li>Clarified and expanded namespace rules.</li>
+
+          <li>Added <code>urf:Binary</code> type.</li>
         </ul></dd>
 
       <dt>2007-09-15</dt>
