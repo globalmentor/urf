@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-09-26</p>
+    <p>Version 2007-09-27</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -37,6 +37,22 @@
     must be textualized to be communicated in a text-based specification, at
     times a description of the URF abstract model will use TURF notation for
     clarification of the model.</p>
+
+    <h2>Ontologies</h2>
+
+    <p>The following are official URF ontologies sanctioned by this
+    specification, with links to their formal definitions in TURF:</p>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd>The core URF ontology that specifies the framework itself.</dd>
+
+      <dt>Content</dt>
+
+      <dd>Describes the content of a resource, such as content type, size, and
+      actual content bytes.</dd>
+    </dl>
 
     <h2>TURF Quick Start</h2>
 
@@ -95,7 +111,7 @@ example:janedoe(foaf:Person)
 {
   example:name="Jane Doe",
   example:birthday=@1980-01-01@,
-  example:salary=#1000000#
+  example:salary=#1000000
   {
     example:currency~«"usd"|example|#Currency»
   }
@@ -194,7 +210,7 @@ example:janedoe(foaf:Person)
           <li>If the path of the namespace URI does not end with the slash
           character <code>'/'</code> and does not have a fragment, the URI is
           formed by URI-encoding all non-<var>pchar</var> characters of the
-          local name according to [<a href="#rfc3986">RFC3986</a>] and adding
+          local name according to [<a href="#rfc3986">RFC 3986</a>] and adding
           the result to the namespace URI as a fragment. For example, a
           namespace URI of <code>&lt;http://urf.name/name&gt;</code> and a
           local name of <code>"type"</code> yield a namespace URI of
@@ -203,7 +219,7 @@ example:janedoe(foaf:Person)
           <li>If the path of the namespace URI ends with the slash character
           <code>'/'</code> and does not have a fragment, the URI is formed by
           URI-encoding all non-<var>pchar</var> characters of the local name
-          according to [<a href="#rfc3986">RFC3986</a>] and appending the
+          according to [<a href="#rfc3986">RFC 3986</a>] and appending the
           result to the namespace URI. For example, a namespace URI of
           <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> and a local
           name of <code>"title"</code> yield a resource URI of
@@ -241,7 +257,7 @@ example:janedoe(foaf:Person)
       <dt><code>|dc|&lt;http://purl.org/dc/elements/1.1/&gt;</code></dt>
 
       <dd>The Dublin Core Metadata Initiative namespace [<a
-      href="#dcns">DCNS</a>].</dd>
+      href="#dcmiNamespace">DCMI Namespace</a>].</dd>
 
       <dt><code>|example|&lt;http://example.com/example&gt;</code></dt>
 
@@ -350,24 +366,24 @@ example:resource(example:Class)
       <dd>Array resources are resources that contain other <dfn>element</dfn>
       resources at certain <dfn>indexes</dfn> of the array. An array, like
       normal resources, may have any property, but the properties representing
-      the contents of the array lie in the integer namespace
-      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer&gt;</code>,
-      each representing the integer index of the element. That is, if an array
+      the contents of the array lie in the ordinal namespace
+      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>,
+      each representing the ordinal index of the element. That is, if an array
       contains an element at index 5, the element resource will appear as a
       value of the property
-      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#5»</code>
-      (that is, the property <code>«"5"|urf|#Integer»</code>, or simply
-      <code>#5#</code>). Although many uses cases will prefer a continuous,
+      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
+      (that is, the property <code>«"5"|urf|#Ordinal»</code>, or simply
+      <code>º5</code>). Although many uses cases will prefer a continuous,
       unduplicated sequence of index properties beginning with
-      <code>#5#</code>, this is not an URF requirement.</dd>
+      <code>º5</code>, this is not an URF requirement.</dd>
 
       <dt><code>urf:Binary</code></dt>
 
       <dd>Binary resources represent arbitrarily long sequences of bytes.
       Binary resources use the appropriate lexical namespace for their type,
       with a lexical form of the <dfn>base64url</dfn> encoding of the binary
-      data without line breaks according to [<a
-      href="#rfc4648">RFC4648</a>].</dd>
+      data without line breaks according to [<a href="#rfc4648">RFC
+      4648</a>].</dd>
 
       <dt><code>urf:Boolean</code></dt>
 
@@ -381,10 +397,18 @@ example:resource(example:Class)
       <dd>Character resources are the Unicode code points, and their lexical
       forms are the Unicode characters represented by those code points.</dd>
 
-      <dt><code>urf:Integer»</code></dt>
+      <dt><code>urf:Class</code></dt>
+
+      <dd>Not every resource used as a class is an instance of the class
+      <code>urf:Class</code>, but a resource may be declared to be of the
+      class type to further specify its semantics. The class
+      <code>urf:Class</code> is a subclass of the class
+      <code>urf:Resource</code>.</dd>
+
+      <dt><code>urf:Integer</code></dt>
 
       <dd>Integer resources are the positive whole numbers, the negative whole
-      numbers, and zero. They are identified by lexical namesapce URIs with a
+      numbers, and zero. They are identified by lexical namespace URIs with a
       lexical representation in the form
       <code><strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code>.
       The integer class is a subclass of the class
@@ -393,18 +417,29 @@ example:resource(example:Class)
       <dt><code>urf:Real</code></dt>
 
       <dd>Real number are all of the measuring numbers and may include decimal
-      fractional parts. They are identified by lexical namesapce URIs with a
+      fractional parts. They are identified by lexical namespace URIs with a
       lexical representation in the form
       <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>.
       The integer class is a subclass of the class
       <code>urf:Number</code>.</dd>
+
+      <dt><code>urf:Ordinal</code></dt>
+
+      <dd>Ordinal resources are numbers that represent the position of an
+      element in a sequence. URF currently only supports finite ordinals,
+      which means that there will be a corresponding ordinal for every
+      positive whole numbers and zero. Ordinals are identified by lexical
+      namespace URIs with a lexical representation in the form
+      <code><var>romandigit</var><strong>+</strong></code>. The ordinal class
+      is a subclass of the class <code>urf:</code>Number.</dd>
 
       <dt><code>urf:Property</code></dt>
 
       <dd>Not every resource used as a predicate is an instance of the class
       <code>urf:Property</code>, but a resource may be declared to be of the
       property type to further specify its semantics and expected domain and
-      range.</dd>
+      range. The class <code>urf:Property</code> is a subclass of the class
+      <code>urf:Class</code>.</dd>
 
       <dt><code>urf:RegularExpression</code></dt>
 
@@ -428,7 +463,7 @@ example:resource(example:Class)
 
       <dd>Timestamp resources, which use a lexical namespace, are particular
       points in time and have a lexical form defined in [<a
-      href="#rfc3339">RFC3339</a>].</dd>
+      href="#rfc3339">RFC 3339</a>].</dd>
     </dl>
 
     <h3 id="lexical">Lexical Namespaces</h3>
@@ -446,7 +481,7 @@ example:resource(example:Class)
       and <code>"false"</code>. URF provides for a series of namespaces to
       identify resources that are typically identified by lexical
       representations. Each lexical namespace is an <code>info</code> [<a
-      href="#rfc4452">RFC4452</a>] URI with an info-identifier namespace of
+      href="#rfc4452">RFC 4452</a>] URI with an info-identifier namespace of
       <code>lexical</code>, and have the following format,</p><blockquote>
           <pre><code>info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
         </blockquote><p>where <var>encodedTypeURI</var> is the URI path
@@ -471,7 +506,7 @@ example:resource(example:Class)
 
       <dd><p>Any representation of a resource in a lexical namespace also
       implicitly asserts the type of the resource. A resource in a lexical
-      namespace can be identified by its URI as with any other resource.For
+      namespace can be identified by its URI as with any other resource. For
       example, the integer 123 can be identified by its URI
       <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
       as in the following example:</p><blockquote>
@@ -488,7 +523,7 @@ example:resource(example:Class)
           <dt><code>urf:Binary</code></dt>
 
           <dd><p>An binary resource may be identified by its [<a
-          href="#rfc4648">RFC4648</a>] base64url lexical form surrounded by
+          href="#rfc4648">RFC 4648</a>] base64url lexical form surrounded by
           percent signs. For example, the series of bytes <code>64</code>,
           <code>63</code>, <code>62</code>, <code>61</code> produce the
           lexical form, <code>"QD8-PQ=="</code>; the corresponding short
@@ -506,9 +541,9 @@ example:resource(example:Class)
           <dt><code>urf:Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          surrounded by exclamation points. For example, the following short
+          beginning with an ampersand. For example, the following short
           representation,</p><blockquote>
-              <pre><code>!true!</code></pre>
+              <pre><code>&amp;true</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
@@ -536,13 +571,12 @@ example:resource(example:Class)
 
           <dt><code>urf:Number</code></dt>
 
-          <dd><p>Number resources, including integer and real number
-          resources, may be identified by their lexical forms sounded by
-          number signs. The specific type of number resource yielded depends
-          on the lexical form used. For example, the following short
-          representations,</p><blockquote>
-              <pre><code>#123#
-#123.45#</code></pre>
+          <dd><p>Integer and real number resources may be identified by their
+          lexical forms introduced by the number sign. The specific type of
+          number resource yielded depends on the lexical form used. For
+          example, the following short representations,</p><blockquote>
+              <pre><code>#123
+#123.45</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
               <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
@@ -554,19 +588,19 @@ example:resource(example:Class)
 «"123.45"|urf|#Real»</code></pre>
             </blockquote></dd>
 
-          <dt><code>urf:Timestamp</code></dt>
+          <dt><code>urf:Ordinal</code></dt>
 
-          <dd><p>A timestamp resource may be identified by its [<a
-          href="#rfc3339">RFC3339</a>] lexical form with surrounding at signs
-          (<code>'@'</code>). For example, the following short
-          representation,</p><blockquote>
-              <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
+          <dd><p>Ordinal number resources may be identified by their lexical
+          forms preceded by the ordinal character <code>'º'</code>. For
+          example, the following short representation,</p><blockquote>
+              <pre><code>º5</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
-            </blockquote><p>which is also equivalent to the general short
-          representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"1996-12-19T16:39:57-08:00"|urf|#Timestamp»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code></pre>
+            </blockquote><p>which are also equivalent to the following general
+          short representation for resources in a lexical
+          namespace:</p><blockquote>
+              <pre><code>«"5"|urf|#Ordinal»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf:RegularExpression</code></dt>
@@ -597,6 +631,21 @@ example:resource(example:Class)
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"apple"|urf|#String»</code></pre>
+            </blockquote></dd>
+
+          <dt><code>urf:Timestamp</code></dt>
+
+          <dd><p>A timestamp resource may be identified by its [<a
+          href="#rfc3339">RFC 3339</a>] lexical form with surrounding at signs
+          (<code>'@'</code>). For example, the following short
+          representation,</p><blockquote>
+              <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
+            </blockquote><p>is equivalent to the following long
+          representation,</p><blockquote>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
+            </blockquote><p>which is also equivalent to the general short
+          representation for resources in a lexical namespace:</p><blockquote>
+              <pre><code>«"1996-12-19T16:39:57-08:00"|urf|#Timestamp»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf:URI</code></dt>
@@ -679,12 +728,12 @@ example:juan
       relationship between Juan and the <code>example:name</code>
       <code>"John"</code>. The assertion, "the string 'John' is in English",
       is contextual to the string "John" being the name of Juan. Similarly,
-      Juan could specify a <code>example:weight</code> of <code>#72#</code>
+      Juan could specify a <code>example:weight</code> of <code>#72</code>
       with an <code>example:unit</code> of <code>example:kilogram</code>.
-      Because the integer <code>#72#</code> may not represent a unit of
+      Because the integer <code>#72</code> may not represent a unit of
       kilograms in all contexts, its property <code>example:unit</code> should
       be considered to be in the scope of the relationship between Juan and
-      the <code>example:weight</code> <code>#72#</code>. The assertion, "the
+      the <code>example:weight</code> <code>#72</code>. The assertion, "the
       integer 72 is in kilograms", is contextual to the integer 72 being the
       weight of Juan.</p></dd>
 
@@ -700,7 +749,7 @@ example:juan
   {
     example:lang~example:english
   }
-  example:weight=#72#
+  example:weight=#72
   {
     example:unit~example:kilogram
   }
@@ -738,11 +787,11 @@ example:juan
 {
   example:name="William"
   {
-    urf:order~#0#
+    urf:order~#0
   },
   example:name="Bill"
   {
-    urf:order~#1#
+    urf:order~#1
   }
 }</code></pre>
         </blockquote>The same information may be presented in short
@@ -750,7 +799,7 @@ example:juan
       ordered values within matching backslash characters. A sequence does not
       result in a new type of value, but rather indicates that the given
       predicate should be asserted for each value, each with a scoped property
-      of <code>urf:order</code> with values starting at <code>#0#</code> and
+      of <code>urf:order</code> with values starting at <code>#0</code> and
       continuing sequentially. The following example represents information
       semantically identical to the previous example:<blockquote>
           <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
@@ -765,7 +814,7 @@ example:juan
 
     <p>Everything that is described in URF is referred to as a
     <dfn>resource</dfn>. For purposes of description within URF, each resource
-    may be identified using a URI [<a href="#rfc3986">RFC3986</a>].</p>
+    may be identified using a URI [<a href="#rfc3986">RFC 3986</a>].</p>
 
     <h3>Grammar</h3>
 
@@ -904,8 +953,9 @@ example:juan
       <strong>|</strong> <var>nameshort</var> <strong>|</strong>
       <var>urishort</var> <strong>|</strong> <var>stringshort</var>
       <strong>|</strong> <var>booleanshort</var> <strong>|</strong>
-      <var>numbershort</var> <strong>|</strong> <var>charactershort</var>
-      <strong>|</strong> <var>regexshort</var> <strong>|</strong>
+      <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var>
+      <strong>|</strong> <var>charactershort</var> <strong>|</strong>
+      <var>regexshort</var> <strong>|</strong>
       <var>timestampshort</var></code></p>
     </blockquote>
 
@@ -1047,30 +1097,41 @@ example:juan
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code> surrounded by the <code>'!'</code> character. A boolean
-    short form is equivalent to a resource of type <code>urf:Boolean</code>
-    using the corresponding lexical namespace. The boolean short form
-    <code>!true!</code> is the equivalent of the boolean resource
-    <code>«"true"|urf|#Boolean»</code>.</p>
+    <code>false</code> preceded by the <code>'&amp;'</code> character. A
+    boolean short form is equivalent to a resource of type
+    <code>urf:Boolean</code> using the corresponding lexical namespace. The
+    boolean short form <code>&amp;true</code> is the equivalent of the boolean
+    resource <code>«"true"|urf|#Boolean»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      !true!<strong>|</strong>!false!</code></p>
+      &amp;true<strong>|</strong>&amp;false</code></p>
     </blockquote>
 
-    <p>A number short form consists of roman digits with an optional decimal
-    with an optional exponent, all surrounded by the number sign
-    <code>'#'</code>. A number short form is equivalent to a resource of type
-    <code>urf:Integer</code> or <code>urf:Real</code>, depending on the
-    lexical form used, using the corresponding lexical namespace. The number
-    short form <code>#123#</code> is the equivalent of the number resource
-    <code>«"123"|urf|#Integer»</code>, and the number short form
-    <code>#123.45#</code> is the equivalent of the number resource
+    <p>A number short form consists of roman digits, optionally preceded by a
+    minus sign, with an optional decimal and optional exponent, all preceded
+    by the number sign <code>'#'</code>. A number short form is equivalent to
+    a resource of type <code>urf:Integer</code> or <code>urf:Real</code>,
+    depending on the lexical form used, using the corresponding lexical
+    namespace. The number short form <code>#123</code> is the equivalent of
+    the number resource <code>«"123"|urf|#Integer»</code>, and the number
+    short form <code>#123.45</code> is the equivalent of the number resource
     <code>«"123.45"|urf|#Real»</code>.</p>
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
-      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
+      #<strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
+    </blockquote>
+
+    <p>An ordinal short form consists of roman digits preceded by the ordinal
+    sign <code>'º'</code>. An ordinal short form is equivalent to a resource
+    of type <code>urf:Ordinal</code> using the corresponding lexical
+    namespace. The ordinal short form <code>º27</code> is the equivalent of
+    the ordinal resource <code>«"27"|urf|#Ordinal»</code>.</p>
+
+    <blockquote>
+      <p><code><var>ordinalshort</var> ⇒
+      º<var>romandigit</var><strong>+</strong></code></p>
     </blockquote>
 
     <p>A regular expression short form is a sequence of Unicode characters,
@@ -1104,8 +1165,8 @@ example:juan
 
     <p>An array short form consists of a bracketed sequence of element
     resources separated by commas. Each listed element resource represents the
-    value of an index property, in sequence beginning with the integer
-    property <code><code>#0#</code></code>.</p>
+    value of an ordinal index property, in sequence beginning with the ordinal
+    property <code><code>º0</code></code>.</p>
 
     <blockquote>
       <p><code><var>arrayshort</var> ⇒
@@ -1135,7 +1196,7 @@ example:juan
     <code>'\\'</code>. Each listed element resource indicates another
     assertion of the given predicate with the given element resource as the
     value, each with a contextual property of <code>urf:order</code> with
-    values starting at <code>#0#</code> and continuing sequentially.</p>
+    values starting at <code>#0</code> and continuing sequentially.</p>
 
     <blockquote>
       <p><code><var>sequenceshort</var> ⇒
@@ -1146,10 +1207,10 @@ example:juan
 
     <h3>JSON</h3>
 
-    <p>In the JavaScript Object Notation (JSON) [<a
-    href="#rfc4627">RFC4627</a>], every object besides strings, numbers, and
-    booleans are associative arrays using string keys. The following is a
-    complex JSON object, using every JSON data type available:</p>
+    <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
+    4627</a>], every object besides strings, numbers, and booleans are
+    associative arrays using string keys. The following is a complex JSON
+    object, using every JSON data type available:</p>
 
     <blockquote>
       <pre><code>{
@@ -1167,17 +1228,17 @@ example:juan
 
     <blockquote>
       <pre><code>{
-  "length"=#1234#,
-  "valid"=!true!,
+  "length"=#1234,
+  "valid"=&amp;true,
   "status"="processing",
-  "results"=[!false!, #5#, "dog", {"code"=#9.8#}]
+  "results"=[&amp;false, #5, "dog", {"code"=#9.8}]
 }</code></pre>
     </blockquote>
 
     <p>There is one slight semantic descrepancy between these two examples:
-    for arrays URF adds each element as the value of a property that is a true
-    integer; JSON adds each array element as the value of a string containing
-    the lexical form of an integer.</p>
+    URF uses a true ordinal property for each element of an array, while JSON
+    adds each array element as the value of a string containing the lexical
+    form of an integer.</p>
 
     <p>Although the above TURF representation replicates the simple semantics
     of the given JSON example, a better formulation that takes advantage of
@@ -1189,16 +1250,16 @@ example:juan
     <blockquote>
       <pre><code>(«http://example.com/example#Class»)
 {
-  length=#1234#,
-  valid=!true!,
+  length=#1234,
+  valid=&amp;true,
   status="processing",
-  results=[!false!, #5#, "dog", {"code"=#9.8#}]
+  results=[&amp;false, #5, "dog", {"code"=#9.8}]
 }</code></pre>
     </blockquote>
 
     <h3>VCard</h3>
 
-    <p>The VCard [<a href="#rfc2426">RFC2426</a>] name example,</p>
+    <p>The VCard [<a href="#rfc2426">RFC 2426</a>] name example,</p>
 
     <blockquote>
       <pre><code>N:Stevenson;John;Philip,Paul;Dr.;Jr.,M.D.,A.C.P.</code></pre>
@@ -1241,8 +1302,9 @@ example:juan
       facilitated by the Internet domain name system. JSON properties cannot
       be so aportioned, making name clashes more likely.</li>
 
-      <li>URF has two concrete number types,
-      <code>«http://urf.name/urf#Integer»</code> and
+      <li>URF has three concrete number types,
+      <code>«http://urf.name/urf#Real»</code>,
+      <code>«http://urf.name/urf#Integer»</code>, and
       <code>«http://urf.name/urf#Real»</code>. JSON has only a single number
       type.</li>
 
@@ -1317,54 +1379,12 @@ example:juan
     <p></p>
 
     <dl>
-      <dt id="dcns">DCNS</dt>
+      <dt id="dcmiNamespace">DCMI Namespace</dt>
 
       <dd>Andy Powell and Harry Wagner. <a
       href="http://dublincore.org/documents/dcmi-namespace/"><cite>Namespace
       Policy for the Dublin Core Metadata Initiative (DCMI)</cite></a>. Dublin
       Core Namespace Initiative, 2007.</dd>
-
-      <dt id="rfc2426">IETF RFC 2426</dt>
-
-      <dd>F. Dawson and T. Howes. <a
-      href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2426: vCard MIME
-      Directory Profile</cite></a>. Internet Engineering Task Force,
-      1998.</dd>
-
-      <dt id="rfc3339">IETF RFC 3339</dt>
-
-      <dd>G. Klyne and C. Newman. <a
-      href="http://www.ietf.org/rfc/rfc3339.txt"><cite>RFC 3339: Date and Time
-      on the Internet: Timestamps</cite></a>. Internet Engineering Task Force,
-      2002.</dd>
-
-      <dt id="rfc3986">IETF RFC 3986</dt>
-
-      <dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a
-      href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform
-      Resource Identifier (URI): Generic Syntax</cite></a>. Internet
-      Engineering Task Force, 2005.</dd>
-
-      <dt id="rfc4452">IETF RFC 4452</dt>
-
-      <dd>H. Van de Sompel, T. Hammond, E. Neylon, and S. Weibel. <a
-      href="http://www.ietf.org/rfc/rfc4452.txt"><cite>RFC 4452: The "info"
-      URI Scheme for Information Assets with Identifiers in Public
-      Namespaces</cite></a>. Internet Engineering Task Force, 2006.</dd>
-
-      <dt id="rfc4627">IETF RFC 4627</dt>
-
-      <dd>D. Crockford. <a
-      href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
-      application/json Media Type for JavaScript Object Notation
-      (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
-
-      <dt id="rfc4648">IETF RFC 4648</dt>
-
-      <dd>S. Josefsson. <a
-      href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,
-      Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task
-      Force, 2006.</dd>
 
       <dt id="rdfxml">RDF/XML</dt>
 
@@ -1372,7 +1392,55 @@ example:juan
       href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax
       Specification (Revised)</cite></a>. World Wide Web Consortium, 10
       February 2006.</dd>
+
+      <dt id="rfc2426">RFC 2426</dt>
+
+      <dd>F. Dawson and T. Howes. <a
+      href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2426: vCard MIME
+      Directory Profile</cite></a>. Internet Engineering Task Force,
+      1998.</dd>
+
+      <dt id="rfc3339">RFC 3339</dt>
+
+      <dd>G. Klyne and C. Newman. <a
+      href="http://www.ietf.org/rfc/rfc3339.txt"><cite>RFC 3339: Date and Time
+      on the Internet: Timestamps</cite></a>. Internet Engineering Task Force,
+      2002.</dd>
+
+      <dt id="rfc3986">RFC 3986</dt>
+
+      <dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a
+      href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform
+      Resource Identifier (URI): Generic Syntax</cite></a>. Internet
+      Engineering Task Force, 2005.</dd>
+
+      <dt id="rfc4452">RFC 4452</dt>
+
+      <dd>H. Van de Sompel, T. Hammond, E. Neylon, and S. Weibel. <a
+      href="http://www.ietf.org/rfc/rfc4452.txt"><cite>RFC 4452: The "info"
+      URI Scheme for Information Assets with Identifiers in Public
+      Namespaces</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rfc4627">RFC 4627</dt>
+
+      <dd>D. Crockford. <a
+      href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
+      application/json Media Type for JavaScript Object Notation
+      (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rfc4648">RFC 4648</dt>
+
+      <dd>S. Josefsson. <a
+      href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,
+      Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task
+      Force, 2006.</dd>
     </dl>
+
+    <h2>Acknowledgements</h2>
+
+    <p>Brad Neuberg encouraged the creation of an alternate RDF serialization;
+    Frank Manola made convincing arguments for using ordinals instead of
+    integers as array element predicates.</p>
 
     <h2>History</h2>
 
@@ -1397,6 +1465,16 @@ example:juan
           <li>Clarified and expanded namespace rules.</li>
 
           <li>Added <code>urf:Binary</code> type.</li>
+
+          <li>Added <code>urf:Ordinal</code> type.</li>
+
+          <li>Changed arrays to use ordinal indexes.</li>
+
+          <li>Removed trailing delimiter from TURF number short forms.</li>
+
+          <li>Removed trailing delimiter from TURF boolean short forms.</li>
+
+          <li>Changed TURF boolean short form delimiter.</li>
         </ul></dd>
 
       <dt>2007-09-15</dt>
