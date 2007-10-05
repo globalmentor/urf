@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-10-01</p>
+    <p>Version 2007-10-05</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -41,7 +41,7 @@
     <h2>Ontologies</h2>
 
     <p>The following are official URF ontologies sanctioned by this
-    specification, with links to their formal definitions in TURF:</p>
+    specification, with links (TODO) to their formal definitions in TURF:</p>
 
     <dl>
       <dt>URF</dt>
@@ -237,15 +237,26 @@ example.janedoe(foaf.Person):
       listing the unencoded local name of the resource, with an optional
       prefix separated by full stop or period. The prefix, if present, is the
       name of the label of a previously labeled URI. If no prefix is present,
-      the namespace is considered to be the namespace of the type of the
-      subject resource for properties, or the namespace of the corresponding
-      property for property values; a name reference without a prefix must not
-      be used in other context. If
-      <code>&lt;http://example.com/example&gt;</code> identifies a namespace
-      and is given the label <code>example</code>, for example, the reference
-      <code>example.resource</code> would indicate the same resource as would
-      the references <code>«|example|#resource»</code> and
-      <code>«http://example.com/example#resource»</code></p></dd>
+      the namespace is determined in the following manner:</p><dl>
+          <dt>Property Resources</dt>
+
+          <dd>The namespace of the subject resource is used.</dd>
+
+          <dt>Value Resources and Short Form Class Resources</dt>
+
+          <dd>The namespace of the corresponding property for which the
+          resource is a value.</dd>
+        </dl><p>A name reference must not be used without a prefix in any
+      other context (e.g. for the type of a root-level resource description).
+      If <code>&lt;http://example.com/example&gt;</code> identifies a
+      namespace and is given the label <code>example</code>, for example, the
+      reference <code>example.resource</code> would indicate the same resource
+      as would the references <code>«|example|#resource»</code> and
+      <code>«http://example.com/example#resource»</code>. If the resource were
+      the value of the property
+      <code>«http://example.com/example#property»</code>, the name reference
+      <code>resource</code> with no prefix could be used, as the reference
+      would inherit the namespace of the property resource.</p></dd>
     </dl>
 
     <p>This specification uses resources in the following namespaces, with
@@ -1459,7 +1470,7 @@ example.billy:
     <p></p>
 
     <dl>
-      <dt>2007-09-??</dt>
+      <dt>2007-09-05</dt>
 
       <dd><ul>
           <li>Added TURF Internet media type.</li>
@@ -1492,9 +1503,13 @@ example.billy:
 
           <li>Changed TURF properties section delimiter.</li>
 
+          <li>Improved TURF name grammar.</li>
+
           <li>Added <code>urf.Set</code> type.</li>
 
           <li>Renamed <code>urf.Array</code> to <code>urf.List</code>.</li>
+
+          <li>Clarified TURF name reference namespace inheritance.</li>
         </ul></dd>
 
       <dt>2007-09-15</dt>
