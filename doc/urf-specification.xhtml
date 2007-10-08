@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-10-05</p>
+    <p>Version 2007-10-08</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -1226,9 +1226,206 @@ example.billy:
       \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
     </blockquote>
 
+    <h2 id="ploop">PLOOP</h2>
+
+    <p>Descriptions of resources in semantic frameworks such as URF differ
+    from class instantiations of object-oriented programming language instance
+    such as Java in several ways:</p>
+
+    <ul>
+      <li>Programming languages usually provide <dfn>constructors</dfn> that
+      allow arguments solely for initializing an object. Resources in semantic
+      frameworks are initialized by their property descriptions.</li>
+
+      <li>Semantic frameworks describe properties as independent entities in
+      themselves, able to be applied even to resource types that have not yet
+      been created. Programming language properties usually only exist in
+      relation to a particular class definition, and may even exist only as
+      abstractions of "getter" and "setter" methods.</li>
+    </ul>
+
+    <p>It is possible to use URF as a Programming Language Ontology for
+    Objects and Properties (PLOOP), allowing long-term storage and/or object
+    tree instance descriptions of programming languages using TURF, for
+    example. The following specifies a canonical set of rules a processor must
+    follow for for constructing a hierarchy of programming language objects
+    based upon an URF description. All examples are represented using TURF and
+    are given in the Java programming language using the Guise Internet
+    application framework [<a href="#guise">Guise</a>]. A complete PLOOP
+    example (TODO) is provided at the end of this specification.</p>
+
+    <h3>Classes</h3>
+
+    <p>The URI of an URF class must indicate the complete package name and
+    class name of a programming language class to instantiate. In the
+    following example, the Java class
+    <code>com.guiseframework.component.Layoutpanel</code> should be
+    instantiated using its default constructor:</p>
+
+    <blockquote>
+      <pre><code>«info:java/com/guiseframework/component#LayoutPanel»</code></pre>
+    </blockquote>
+
+    <h3>Properties</h3>
+
+    <p>URF property resources describe absolute, semantically distinct
+    properties that are uniquely identifiable by their reference URIs and may
+    be applied to any resource with unchanged semantics. In a PLOOP context, a
+    property in the same namespace as the class type of its subject is
+    interpreted relative to the class using the local name of the property
+    URI. A PLOOP processor must use normal get/set conventions for the
+    language in question for interpreting the read/write properties available
+    for a particular class. For example, because the property
+    <code>«info:java/com/guiseframework/component#label»</code> is in the same
+    namespace as the type
+    <code>«info:java/com/guiseframework/component#Button»</code>, its local
+    name, <code>label</code>, is considered a property name for getting or
+    setting a value of an instance of the <code>Button</code> class:</p>
+
+    <blockquote>
+      <pre><code>«info:java/com/guiseframework/component#Button»:
+  button="Push Me"
+;</code></pre>
+    </blockquote>
+
+    <h3>Values</h3>
+
+    <h4>String Values</h4>
+
+    <p>If a class property expects a language type that is used as a string
+    literal, such as a Java <code>Enum</code>, a PLOOP processor must attempt
+    to convert a string value that type. Java enum values must be represented
+    by the canonical enum string representation converted to lowercase with
+    nderscore characters <code>'_'</code> replaced with hyphen characters
+    <code>'-'</code>. In the following example, the Guise Java class
+    <code>com.guiseframework.component.layout.FlowLayout</code> has no
+    <code>setFlow(java.lang.String)</code> method, but it does have a
+    <code>setFlow(com.guiseframework.component.layout.Flow)</code> method.
+    Because <code>com.guiseframework.component.layout.Flow</code> is a Java
+    enum class, a PLOOP processor must construct a
+    <code>com.guiseframework.component.layout.Flow</code> object from the
+    string "LINE" and assign it to the instance of
+    <code>com.guiseframework.component.layout.FlowLayout</code> using
+    <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
+
+    <blockquote>
+      <pre><code>«info:java/com/guiseframework/component/layout#FlowLayout»:
+  flow="line"
+;</code></pre>
+    </blockquote>
+
+    <h4>List and Set Values</h4>
+
+    <p>For <code>urf.List</code>, <code>urf.Set</code>, and
+    <code>urf.Map</code> resources, a PLOOP processor must attempt to find a
+    programming language class property that accepts a standard collection
+    type appropriate for that programming language. A programming language
+    collection must be created for the resource, and each element of the URF
+    collection must be converted recursively as needed according to PLOOP
+    rules. In the following example, the <code>urf.List</code> property value
+    will be converted to a <code>java.util.List</code> and used as an argument
+    to the
+    <code>com.guiseframework.component.LayoutPanel.setChildren(java.util.List)</code>
+    method:</p>
+
+    <blockquote>
+      <pre><code>«info:java/com/guiseframework/component#LayoutPanel»:
+  children=
+  [
+    «info:java/com/guiseframework/component#LayoutPanel»:
+      valueClass=«info:java/java/lang#Double»,
+      label="Input Temperature"
+    ;
+  ]
+;</code></pre>
+    </blockquote>
+
+    <h3>Constructors</h3>
+
+    <p>In programming languages classes many times have properties that can
+    only be set during initialization via the class constructor. PLOOP
+    specifies an algorithm for a PLOOP processor to determine the correct
+    constructor either by using non-list ordinal properties or by analyzing
+    the described URF property values and the available read/write properties
+    of the programming language class.</p>
+
+    <h4>Constructors using Non-List Ordinal Properties</h4>
+
+    <p>If a resource that is not an <code>urf.List</code> yet has ordinal
+    properties, a PLOOP processor must attempt to convert the corresponding
+    values into constructor arguments for the class constructor wiith the
+    fewest available arguments. A PLOOP instance would use the following
+    example to indicate that an instance of the Java class
+    <code>java.util.Locale</code> should be constructed using <code>new
+    Locale("en", "US")</code>:</p>
+
+    <blockquote>
+      <pre><code>«info:java/java/util#Locale»["en", "US]</code></pre>
+    </blockquote>
+
+    <h4>Constructors using Read-Only Properties</h4>
+
+    <p>If there are no non-list ordinal properties, a PLOOP processor
+    must:</p>
+
+    <ol>
+      <li>Look at the class constructor with the fewest number of parameters
+      (initially zero).</li>
+
+      <li>For each parameter, determine if there is a described URF property
+      for which the programming language class has a read-only property (using
+      appropriate programming language conventions for read-only properties)
+      of a compatible type.</li>
+
+      <li>If there are sufficient described properties to fulfill the
+      parameter requirements of the constructor, use that constructor.</li>
+
+      <li>If the parameter requirements of the constructor could not be
+      fulfilled, go to the next constructor with the same number of parameters
+      or, if there are no more constructors with the same number of
+      parameters, go to the next constructor with one more parameter.</li>
+    </ol>
+
+    <p>Under this algorithm, a PLOOP processor will always use a default
+    constructor (i.e. a constructor with no parameters) if it is available.
+    The following example illustrates a PLOOP processor attempting to
+    instantiate a Guise <code>com.guiseframework.component.TextControl</code>
+    Java class which has no default constructor but has a single-argument
+    constructor
+    <code>com.guiseframework.component.TextControl(java.lang.Class)</code> and
+    a read-only property <code>Class getValueClass()</code>.</p>
+
+    <blockquote>
+      <pre><code>«info:java/com/guiseframework/component#TextControl»:
+  valueClass=«info:java/java/lang#Double»,
+  label="Input Temperature"
+;</code></pre>
+    </blockquote>
+
+    <ol>
+      <li>The class <code>com.guiseframework.TextControl</code> is examined
+      for a default constructor, but there is none.</li>
+
+      <li>The class <code>com.guiseframework.TextControl</code> is examined
+      for a constructor with a single parameter; there is such a constructor:
+      <code>com.guiseframework.component.TextControl(java.lang.Class)</code>.<ol>
+          <li>The type of the single parameter, <code>java.lang.Class</code>,
+          corresponds to the return type of the read-only property
+          <code>com.guiseframework.component.TextControl.getValueClass()</code>.
+          The PLOOP instance provides a <code>valueClass</code> property, the
+          value of which indicates a Java class, so the second parameter of
+          the constructor is accepted using the specified class.</li>
+
+          <li>The constructor
+          <code>com.guiseframework.component.TextControl(java.lang.Class)</code>
+          is called using the instance of the Java class
+          <code>java.lang.Double</code>.</li>
+        </ol></li>
+    </ol>
+
     <h2>Examples</h2>
 
-    <h3>JSON</h3>
+    <h3 id="jsonExample">JSON</h3>
 
     <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
     4627</a>], every object besides strings, numbers, and booleans are
@@ -1409,6 +1606,11 @@ example.billy:
       Policy for the Dublin Core Metadata Initiative (DCMI)</cite></a>. Dublin
       Core Namespace Initiative, 2007.</dd>
 
+      <dt id="guise">Guise</dt>
+
+      <dd><a href="http://www.guiseframework.com/"><cite>Guise™ Internet
+      Application Framework</cite></a>. GlobalMentor, Inc.</dd>
+
       <dt id="rdfxml">RDF/XML</dt>
 
       <dd>Dave Beckett. <a
@@ -1470,6 +1672,12 @@ example.billy:
     <p></p>
 
     <dl>
+      <dt>2007-10-??</dt>
+
+      <dd><ul>
+          <li>Added PLOOP specification.</li>
+        </ul></dd>
+
       <dt>2007-10-05</dt>
 
       <dd><ul>
