@@ -14,7 +14,7 @@
 
     <p>Editor: Garret Wilson</p>
 
-    <p>Version 2007-10-08</p>
+    <p>Version 2007-10-11</p>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -41,17 +41,21 @@
     <h2>Ontologies</h2>
 
     <p>The following are official URF ontologies sanctioned by this
-    specification, with links (TODO) to their formal definitions in TURF:</p>
+    specification, with links to their formal definitions in TURF:</p>
 
     <dl>
-      <dt>URF</dt>
+      <dt><a href="urf.turf">URF</a></dt>
 
-      <dd>The core URF ontology that specifies the framework itself.</dd>
+      <dd>The core URF ontology for defining resources.</dd>
 
-      <dt>Content</dt>
+      <dt><a href="content.turf">Content</a></dt>
 
-      <dd>Describes the content of a resource, such as content type, size, and
-      actual content bytes.</dd>
+      <dd>The URF ontology for describing the content of a resource, such as
+      content type, size, and actual content bytes.</dd>
+
+      <dt><a href="select.turf">Select</a></dt>
+
+      <dd>The URF ontology for selecting resources and other objects.</dd>
     </dl>
 
     <h2>TURF Quick Start</h2>
@@ -237,15 +241,22 @@ example.janedoe(foaf.Person):
       listing the unencoded local name of the resource, with an optional
       prefix separated by full stop or period. The prefix, if present, is the
       name of the label of a previously labeled URI. If no prefix is present,
-      the namespace is determined in the following manner:</p><dl>
-          <dt>Property Resources</dt>
+      the namespace is inherited in the following manner.</p><dl>
+          <dt>Value Resources</dt>
 
-          <dd>The namespace of the subject resource is used.</dd>
+          <dd>Inherit the namespace of the corresponding property for which
+          the resource is a value.</dd>
 
-          <dt>Value Resources and Short Form Class Resources</dt>
+          <dt>Class Short Forms</dt>
 
-          <dd>The namespace of the corresponding property for which the
-          resource is a value.</dd>
+          <dd>Inherits the namespace of the corresponding property for which
+          the subject resource (the resource for which the class is a type) is
+          a value.</dd>
+
+          <dt>Init Short Forms, Property Resources, List Short Form Elements,
+          and Set Short Form Elements</dt>
+
+          <dd>Inherits the namespace of the type of the subject resource.</dd>
         </dl><p>A name reference must not be used without a prefix in any
       other context (e.g. for the type of a root-level resource description).
       If <code>&lt;http://example.com/example&gt;</code> identifies a
@@ -347,9 +358,10 @@ example.resource:
         </blockquote><p>As a shorthand representation, that a resource is an
       instance of one or more classes may be represented by placing the class
       resource after resource reference, surrounded by parentheses. Multiple
-      classes may be separated by commas. The following example is
-      semantically identical to the preceding example. Note also that, because
-      the properties of <code>example.resource</code> are in the same
+      classes may be separated by commas, and are added as <a
+      href="#orderedProperties">ordered properties</a>. The following example
+      is semantically identical to the preceding example. Note also that,
+      because the properties of <code>example.resource</code> are in the same
       namespace as its class <code>example.Class</code> presented in the class
       short form, the properties do not need name prefixes; their namespaces
       are understood to be the same as that of
@@ -764,12 +776,12 @@ example.juan:
         </blockquote></dd>
     </dl>
 
-    <h3>Ordered Properties</h3>
+    <h3 id="orderedProperties">Ordered Properties</h3>
 
     <dl>
       <dt>URF</dt>
 
-      <dd>Although all resource property assertions of a particular subject
+      <dd><p>Although all resource property assertions of a particular subject
       have no inherent order, URF provides a facility for declaring property
       order using scoped properties. Each property that should be considered
       to have an order relative to other assertions of the same property is
@@ -778,17 +790,18 @@ example.juan:
       property should be interpreted. The interpretation of the property's
       order is specific to the property in question. Although many uses cases
       will prefer a continuous, unduplicated sequence of order property values
-      beginning with <code>0</code>, this is not an URF requirement.</dd>
+      beginning with <code>0</code>, this is not an URF requirement.</p></dd>
 
       <dt>TURF</dt>
 
-      <dd>Ordered properties may be indicated using the general representation
-      for contextual properties. The following example indicates that a
-      resource has two names, "William" and "Bill", and that "Will" comes
-      before "Bill". (What it means that a name "comes before" another name
-      depends on the definition of the name property being used. Perhaps one
-      name comes before the other if used simultaneously, or perhaps one name
-      has a higher priority or is considered the "default" name.) <blockquote>
+      <dd><p>Ordered properties may be indicated using the general
+      representation for contextual properties. The following example
+      indicates that a resource has two names, "William" and "Bill", and that
+      "Will" comes before "Bill". (What it means that a name "comes before"
+      another name depends on the definition of the name property being used.
+      Perhaps one name comes before the other if used simultaneously, or
+      perhaps one name has a higher priority or is considered the "default"
+      name.) </p><blockquote>
           <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
 |example|&lt;http://example.com/example&gt;,
 example.billy:
@@ -811,6 +824,69 @@ example.billy:
 |example|&lt;http://example.com/example&gt;,
 example.billy:
   example.name=\"William",  "Bill"\
+;</code></pre>
+        </blockquote></dd>
+    </dl>
+
+    <h3>Programming Languages</h3>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>URF provides inherent support for describing how to instantiate
+      objects from programming languages such as Java. A class can be
+      identified as an object's type using a URI that identifies the type,
+      such as <code>«info:java/com.example.package#ExampleClass»</code> for
+      the Java class <code>com.example.package.ExampleClass</code>. One or
+      more ordered <code>urf.init</code> properties specify the resources to
+      be used for object initialization using a constructor with parameters
+      matching the given values. Although programming languages usually have
+      properties relative to each class, URF properties in a package's
+      namespace can be used to identify class properties by the local name of
+      each property. Each property value can be converted as needed to the
+      corresponding type of the programming language object property. When an
+      ontology of a semantic framework such as URF is used to represent
+      programming language objects, the ontology is referred to as a
+      Programming Language Ontology for Objects and Properties, or <a
+      href="#ploop">PLOOP</a>.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>TURF allows a shorthand notation for <code>urf.init</code>
+      properties by surrounding them with inverted and upright exlamation
+      marks. The class <code>com.guiseframework.Category</code> of the Guise
+      Internet application framework [<a href="#guise">Guise</a>], for
+      example, does not have a default constructor. The following example
+      provides two ordered <code>urf.init</code> property values of type
+      <code>urf.String</code>, which can be converted to a
+      <code>java.lang.String</code> object and used as arguments for the
+      <code>com.guiseframework.Category(java.lang.String,
+      java.lang.String)</code> constructor. Properties of that class will then
+      be set, recursively converting values such as <code>urf.List</code> to
+      the equivalent Java object such as
+      <code>java.util.List</code>.</p><blockquote>
+          <pre><code>|guise|&lt;info:java/com/guiseframework&gt;,
+(guise.Category)¡"category1", "First Category"!:
+  categories=
+  [
+    (guise.Category)¡"subcategoryA"!,
+    (guise.Category)¡"subcategoryB"!
+  ]
+;</code></pre>
+        </blockquote><p>This is equivalent to the following TURF long
+      form:</p><blockquote>
+          <pre><code>|guise|&lt;info:java/com/guiseframework&gt;,
+(guise.Category):
+  urf.init=\"category1", "First Category"\,
+  categories=
+  [
+    (guise.Category):
+      urf.init=\"subcategoryA"\
+    ;,
+    (guise.Category):
+      urf.init=\"subcategoryB"\
+    ;,
+  ]
 ;</code></pre>
         </blockquote></dd>
     </dl>
@@ -933,7 +1009,7 @@ example.billy:
 
     <blockquote>
       <p><code><var>resource</var> ⇒
-      <strong>[</strong>|<var>label</var>|<strong>]</strong><strong>[</strong><var>reference</var><strong>]</strong><strong>[</strong>(<var>type</var>s)<strong>]</strong><strong>[</strong><var>listshort</var><strong>]</strong><strong>[</strong><var>setshort</var><strong>]</strong><strong>[</strong>:<var>properties</var>;<strong>]</strong></code></p>
+      <strong>[</strong>|<var>label</var>|<strong>]</strong><strong>[</strong><var>reference</var><strong>]</strong><strong>[</strong>(<var>type</var>s)<strong>]</strong><strong>[</strong>¡inits!<strong>]</strong><strong>[</strong>:properties;<strong>]</strong><strong>[</strong><var>listshort</var><strong>]</strong><strong>[</strong><var>setshort</var><strong>]</strong></code></p>
     </blockquote>
 
     <p>A label consists of one or more name characters.</p>
@@ -1160,15 +1236,56 @@ example.billy:
       <var>escapedcontrol</var><strong>]*</strong>/</code></p>
     </blockquote>
 
-    <p>The type declaration consists of zero or more resource specifications
+    <p>The types declaration consists of zero or more resource descriptions
     between parenthes characters <code>'('</code> and <code>')'</code>, each
-    resource indicating a type of the resource being described. Indicating a
-    type in this manner is equivalent to indicating the type as the value of a
-    <code>urf.type</code> property.</p>
+    resource indicating a type of the resource being described. Indicating
+    types in this manner is equivalent to indicating the types as a sequence
+    of values of the <code>urf.type</code> property.</p>
 
     <blockquote>
       <p><code><var>types</var> ⇒
       (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
+    </blockquote>
+
+    <p>The inits declaration consists of zero or more resource descriptions
+    between <code>'¡'</code> and <code>'!'</code>, each resource indicating an
+    initialization argument of the resource being described. Indicating inits
+    in this manner is equivalent to indicating the inits as a sequence of
+    values of the <code>urf.init</code> property.</p>
+
+    <blockquote>
+      <p><code><var>inits</var> ⇒
+      (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
+    </blockquote>
+
+    <p>Properties consist of a comma-separated list of predicate resource and
+    object resource pairs. Within each of these pairs, the separator character
+    <code>'='</code> is used to denote normal properties, and the separator
+    <code>character '~'</code> is used to denote scoped properties in the
+    scope of the property's subject resource and its respective predicate
+    resource and subject resource. If a label is provided, it identifies the
+    proposition represented by the reification of the assertion.</p>
+
+    <blockquote>
+      <p><code><var>properties</var> ⇒
+      <strong>[</strong><var>property</var><strong>[,</strong><var>property</var><strong><strong>]*</strong>]</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>property</var> ⇒
+      <var>resource</var><strong>[</strong>|<var>label</var>|<strong>]</strong><strong>(</strong>=<strong>|</strong>~<strong>)</strong><strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
+    </blockquote>
+
+    <p>A sequence short form consists of a sequence of element resources
+    separated by commas and surrounded by the backslash character
+    <code>'\\'</code>. Each listed element resource indicates another
+    assertion of the given predicate with the given element resource as the
+    value, each with a contextual property of <code>urf.order</code> with
+    values starting at <code>#0</code> and continuing sequentially.</p>
+
+    <blockquote>
+      <p><code><var>sequenceshort</var> ⇒
+      \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
     </blockquote>
 
     <p>A list short form consists of a sequence of element resources
@@ -1196,36 +1313,6 @@ example.billy:
       {<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>}</code></p>
     </blockquote>
 
-    <p>Properties consist of a comma-separated list of predicate resource and
-    object resource pairs. Within each of these pairs, the separator
-    <code>'='</code> is used to denote normal properties, and the separator
-    <code>'~'</code> is used to denote scoped properties in the scope of the
-    property's subject resource and its respective predicate resource and
-    subject resource. If a label is provided, it identifies the proposition
-    represented by the reification of the assertion.</p>
-
-    <blockquote>
-      <p><code><var>properties</var> ⇒
-      <strong>[</strong><var>property</var><strong>[,</strong><var>property</var><strong><strong>]*</strong>]</strong></code></p>
-    </blockquote>
-
-    <blockquote>
-      <p><code><var>property</var> ⇒
-      <var>resource</var><strong>[</strong>|<var>label</var>|<strong>]</strong><strong>(</strong>=<strong>|</strong>~<strong>)</strong><strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
-    </blockquote>
-
-    <p>A sequence short form consists of a sequence of element resources
-    separated by commas and surrounded by the backslash character
-    <code>'\\'</code>. Each listed element resource indicates another
-    assertion of the given predicate with the given element resource as the
-    value, each with a contextual property of <code>urf.order</code> with
-    values starting at <code>#0</code> and continuing sequentially.</p>
-
-    <blockquote>
-      <p><code><var>sequenceshort</var> ⇒
-      \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
-    </blockquote>
-
     <h2 id="ploop">PLOOP</h2>
 
     <p>Descriptions of resources in semantic frameworks such as URF differ
@@ -1251,8 +1338,9 @@ example.billy:
     follow for for constructing a hierarchy of programming language objects
     based upon an URF description. All examples are represented using TURF and
     are given in the Java programming language using the Guise Internet
-    application framework [<a href="#guise">Guise</a>]. A complete PLOOP
-    example (TODO) is provided at the end of this specification.</p>
+    application framework [<a href="#guise">Guise</a>]. A complete <a
+    href="#ploopExample">PLOOP example</a> is provided at the end of this
+    specification.</p>
 
     <h3>Classes</h3>
 
@@ -1263,7 +1351,7 @@ example.billy:
     instantiated using its default constructor:</p>
 
     <blockquote>
-      <pre><code>«info:java/com/guiseframework/component#LayoutPanel»</code></pre>
+      <pre><code>(«info:java/com/guiseframework/component#LayoutPanel»)</code></pre>
     </blockquote>
 
     <h3>Properties</h3>
@@ -1283,7 +1371,7 @@ example.billy:
     setting a value of an instance of the <code>Button</code> class:</p>
 
     <blockquote>
-      <pre><code>«info:java/com/guiseframework/component#Button»:
+      <pre><code>(«info:java/com/guiseframework/component#Button»):
   button="Push Me"
 ;</code></pre>
     </blockquote>
@@ -1309,7 +1397,7 @@ example.billy:
     <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
 
     <blockquote>
-      <pre><code>«info:java/com/guiseframework/component/layout#FlowLayout»:
+      <pre><code>(«info:java/com/guiseframework/component/layout#FlowLayout»):
   flow="line"
 ;</code></pre>
     </blockquote>
@@ -1329,10 +1417,10 @@ example.billy:
     method:</p>
 
     <blockquote>
-      <pre><code>«info:java/com/guiseframework/component#LayoutPanel»:
+      <pre><code>(«info:java/com/guiseframework/component#LayoutPanel»):
   children=
   [
-    «info:java/com/guiseframework/component#LayoutPanel»:
+    («info:java/com/guiseframework/component#LayoutPanel»):
       valueClass=«info:java/java/lang#Double»,
       label="Input Temperature"
     ;
@@ -1349,23 +1437,23 @@ example.billy:
     the described URF property values and the available read/write properties
     of the programming language class.</p>
 
-    <h4>Constructors using Non-List Ordinal Properties</h4>
+    <h4>Constructors using <code>urf.init</code> Properties</h4>
 
-    <p>If a resource that is not an <code>urf.List</code> yet has ordinal
-    properties, a PLOOP processor must attempt to convert the corresponding
-    values into constructor arguments for the class constructor wiith the
-    fewest available arguments. A PLOOP instance would use the following
-    example to indicate that an instance of the Java class
-    <code>java.util.Locale</code> should be constructed using <code>new
-    Locale("en", "US")</code>:</p>
+    <p>If a resource has <code>urf.init</code> properties, a PLOOP processor
+    must use all the corresponding values to locate a constructor with the
+    correct number of parameters for which the URF property values can be
+    converted into constructor arguments. A PLOOP instance would use the
+    following example to indicate that an instance of the Guise class
+    <code>com.guiseframework.Category</code> should be constructed using
+    <code>new Category("category1", "First Category")</code>:</p>
 
     <blockquote>
-      <pre><code>«info:java/java/util#Locale»["en", "US]</code></pre>
+      <pre><code>(«info:java/com/guiseframework#Category»)¡"category1", "First Category"!</code></pre>
     </blockquote>
 
     <h4>Constructors using Read-Only Properties</h4>
 
-    <p>If there are no non-list ordinal properties, a PLOOP processor
+    <p>If there are no <code>urf.init</code> properties, a PLOOP processor
     must:</p>
 
     <ol>
@@ -1396,7 +1484,7 @@ example.billy:
     a read-only property <code>Class getValueClass()</code>.</p>
 
     <blockquote>
-      <pre><code>«info:java/com/guiseframework/component#TextControl»:
+      <pre><code>(«info:java/com/guiseframework/component#TextControl»):
   valueClass=«info:java/java/lang#Double»,
   label="Input Temperature"
 ;</code></pre>
@@ -1424,6 +1512,143 @@ example.billy:
     </ol>
 
     <h2>Examples</h2>
+
+    <h3 id="ploopExample">PLOOP</h3>
+
+    <p>The following TURF example uses URF as <a href="#ploop">PLOOP</a> for
+    the Guise Internet application framework [<a href="#guise">Guise</a>]
+    using the Java programming language. It defines a panel of Guise
+    components that allow temperature to be converted between Celsius and
+    Fahrenheit. (The control listeners and temperature conversion logic would
+    be defined elsewhere.)</p>
+
+    <blockquote>
+      <pre><code>|component|&lt;info:java/com/guiseframework/component&gt;,
+|layout|&lt;info:java/com/guiseframework/component/layout&gt;,
+|validator|&lt;info:java/com/guiseframework/validator&gt;,
+|demo|&lt;info:java/com/guiseframework/demo&gt;,
+(demo.TemperatureConversionPanel2):
+  label="Guise™ Demonstration: Temperature Conversion",
+  layout=(layout.FlowLayout):
+    flow="line"
+  ;,
+  name="temperatureConversionPanel",
+  children=
+  [
+    (component.LayoutPanel):
+      layout=(layout.FlowLayout):
+        flow="page"
+      ;,
+      name="inputPanel",
+      children=
+      [
+        (component.TextControl):
+          label="Input Temperature",
+          name="temperatureInput",
+          validator=(validator.ValueRequiredValidator),
+          valueClass=«info:java/java/lang#Float»
+        ;,
+        (component.TextControl):
+          editable=&amp;false,
+          label="Output Temperature",
+          name="temperatureOutput",
+          valueClass=«info:java/java/lang#Float»
+        ;
+      ]
+    ;,
+    (component.LayoutPanel):
+      layout=(layout.FlowLayout):
+        flow="page"
+      ;,
+      name="conversionPanel",
+      children=
+      [
+        (component.GroupPanel):
+          label="Input Scale",
+          layout=(layout.FlowLayout):
+            flow="page"
+          ;,
+          name="scalePanel",
+          children=
+          [
+            (component.CheckControl):
+              checkType="ellipse",
+              label="Calsius",
+              name="celsiusCheckControl"
+            ;,
+            (component.CheckControl):
+              checkType="ellipse",
+              label="Fahrenheit",
+              name="fahrenheitCheckControl"
+            ;
+          ]
+        ;,
+        (component.Button):
+          label="Convert",
+          name="conversionButton"
+        ;
+      ]
+    ;
+  ]
+;</code></pre>
+    </blockquote>
+
+    <p>The preceding example, when processed by an URF PLOOP processor, will
+    produce an object instance graph identical to that produced by the
+    following Java code:</p>
+
+    <blockquote>
+      <pre><code>import com.guiseframework.component.*;
+import com.guiseframework.component.layout.*;
+import com.guiseframework.validator.*;
+
+DefaultNavigationPanel navigationPanel=new DefaultNavigationPanel();
+navigationPanel.setName("temperatureConversionPanel");
+navigationPanel.setLayout(new FlowLayout(Flow.LINE));
+navigationPanel.setLabel("Guise\u2122 Demonstration: Temperature Conversion");
+
+LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));
+TextControl&amp;lt;Float&amp;gt; temperatureInput=new TextControl&amp;lt;Float&amp;gt;(Float.class);
+temperatureInput.setName("temperatureInput");
+temperatureInput.setLabel("Input Temperature");
+temperatureInput.setValidator(new ValueRequiredValidator&amp;lt;Float&amp;gt;());
+inputPanel.add(temperatureInput);
+
+TextControl&amp;lt;Float&amp;gt; temperatureOutput=temperatureOutput=new TextControl&amp;lt;Float&amp;gt;(Float.class);
+temperatureOutput.setName("temperatureOutput");
+temperatureOutput.setLabel("Output Temperature");
+temperatureOutput.setEditable(false);
+inputPanel.add(temperatureOutput);
+
+navigationPanel.add(inputPanel);
+
+LayoutPanel conversionPanel=new LayoutPanel();
+conversionPanel.setLayout(new FlowLayout(Flow.PAGE));
+
+GroupPanel scalePanel=new GroupPanel();
+scalePanel.setLayout(new FlowLayout(Flow.PAGE));
+
+scalePanel.setLabel("Input Scale");
+CheckControl celsiusCheckControl=celsiusCheckControl=new CheckControl();
+celsiusCheckControl.setName("celsiusCheckControl");
+celsiusCheckControl.setCheckType(CheckControl.CheckType.ELLIPSE);
+celsiusCheckControl.setLabel("Celsius");
+scalePanel.add(celsiusCheckControl);
+CheckControl fahrenheitCheckControl=fahrenheitCheckControl=new CheckControl();
+fahrenheitCheckControl.setName("fahrenheitCheckControl");
+fahrenheitCheckControl.setCheckType(CheckControl.CheckType.ELLIPSE);
+fahrenheitCheckControl.setLabel("Fahrenheit");
+scalePanel.add(fahrenheitCheckControl);
+
+conversionPanel.add(scalePanel);
+
+Button convertButton=new Button();
+convertButton.setName("conversionButton");
+convertButton.setLabel("Convert");
+conversionPanel.add(convertButton);
+navigationPanel.add(conversionPanel);
+</code></pre>
+    </blockquote>
 
     <h3 id="jsonExample">JSON</h3>
 
@@ -1475,6 +1700,66 @@ example.billy:
   results=[&amp;false, #5, "dog", {"code"=#9.8}]
 ;</code></pre>
     </blockquote>
+
+    <h3 id="rdfxmlExample">RDF/XML</h3>
+
+    <p>URF is a semantic superset of RDF, and can represent any construct
+    available in RDF. URF presents equivalents of many RDF classes as well. In
+    terms of representation formats, TURF can represent any semantic
+    information that is available using [<a href="#rdfxml">RDF/XML</a>], yet
+    is more flexible and has less restrictions. The following is a sample
+    RDF/XML representation of an RDF data instance using many of the
+    capabilities available in RDF/XML:</p>
+
+    <blockquote>
+      <pre><code>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE rdf:RDF [&lt;!ENTITY xsd "http://www.w3.org/2001/XMLSchema#"&gt;]&gt;
+&lt;rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:example="http://example.com/example#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+&gt;
+  &lt;foaf:Person rdf:about="http://example.com/example#janedoe"&gt;
+    &lt;foaf:nick xml:lang="pt-BR"&gt;Janinha&lt;/foaf:nick&gt;
+    &lt;example:age rdf:datatype="&amp;xsd;integer"&gt;23&lt;/example:age&gt;
+    &lt;example:favoriteSites rdf:parseType="Collection"&gt;
+      &lt;rdf:Description rdf:about="http://www.globalmentor.com/"/&gt;
+      &lt;rdf:Description rdf:about="http://www.garretwilson.com/"/&gt;
+    &lt;/example:favoriteSites&gt;
+  &lt;/foaf:Person&gt;
+&lt;/rdf:RDF&gt;</code></pre>
+    </blockquote>
+
+    <p>The following URF information represented in TURF is semantically
+    equivalent to the RDF information in the previous example represented in
+    RDF/XML:</p>
+
+    <blockquote>
+      <pre><code>|dc|&lt;http://purl.org/dc/elements/1.1/&gt;,
+|example|&lt;http://example.com/example&gt;,
+|foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
+|urf|&lt;http://urf.name/urf&gt;,
+example.janedoe(foaf.Person):
+  example.age=#23,
+  example.favoriteSites=
+  [
+    «http://www.globalmentor.com/»,
+    «http://www.garretwilson.com/»
+  ],
+  nick="Janinha":
+    dc.language~«info:lang/pt/BR»
+ ;
+;</code></pre>
+    </blockquote>
+
+    <p>Note that, rather than use special literal types or general strings,
+    URF promotes representation of resources by URIs. Thus the language tag
+    "pt-BR" for Brazilian Portuguese is represented as a resource with the URI
+    <code>&lt;info:lang/pt/BR&gt;</code>, and the integer value
+    <code>23</code> is represented as a resource with a URI in the
+    <code>urf.Integer</code> lexical namespace (shown here in its short form,
+    <code>#23</code>).</p>
 
     <h3>VCard</h3>
 
@@ -1562,7 +1847,8 @@ example.billy:
 
       <li>URF has a character type,
       <code>«http://urf.name/urf#Character»</code>. RDF, which uses XML Schema
-      data types (TODO cite), has no character type.</li>
+      datatypes [<a href="#xmlSchema2">XML Schema 2</a>], has no character
+      type.</li>
 
       <li>URF has a regular expression type,
       <code>«http://urf.name/urf#RegularExpression»</code>. RDF has no regular
@@ -1659,6 +1945,13 @@ example.billy:
       href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,
       Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task
       Force, 2006.</dd>
+
+      <dt id="xmlSchema2">XML Schema 2</dt>
+
+      <dd>Paul V. Biron and Ashok Malhotra. <a
+      href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2:
+      Datatypes Second Edition</cite></a>. World Wide Web Consortium, 28
+      October 2004.</dd>
     </dl>
 
     <h2>Acknowledgements</h2>
@@ -1675,7 +1968,20 @@ example.billy:
       <dt>2007-10-??</dt>
 
       <dd><ul>
+          <li>Changed order of TURF properties declaration.</li>
+
+          <li>Added <code>urf.init</code> property.</li>
+
           <li>Added PLOOP specification.</li>
+
+          <li>Improved and clarified TURF namespace inheritance rules.</li>
+
+          <li>Added list of ontologies along with links to their TURF
+          definitions.</li>
+
+          <li>Added RDF/XML example.</li>
+
+          <li>Added PLOOP example.</li>
         </ul></dd>
 
       <dt>2007-10-05</dt>
