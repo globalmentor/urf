@@ -4,17 +4,27 @@
 <html>
   <head>
     <title>Uniform Resource Framework (URF)</title>
+
+    <link href="http://www.globalmentor.com/css/specification.css"
+          rel="stylesheet" type="text/css" />
   </head>
 
   <body>
     <h1>Uniform Resource Framework (URF)</h1>
 
-    <p>Copyright © 2007 GlobalMentor, Inc. This specification may be freely
-    used but only in unmodifed form.</p>
+    <p>Copyright © 2007 <a href="http://www.globalmentor.com/">GlobalMentor,
+    Inc.</a> This specification may be freely used but only in unmodifed
+    form.</p>
 
-    <p>Editor: Garret Wilson</p>
+    <dl>
+      <dt>Editor</dt>
 
-    <p>Version 2007-10-11</p>
+      <dd><a href="http://www.garretwilson.com/">Garret Wilson</a></dd>
+
+      <dt>Version</dt>
+
+      <dd>2007-10-12</dd>
+    </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
     representing resources and their relationships. URF and its interchange
@@ -44,16 +54,16 @@
     specification, with links to their formal definitions in TURF:</p>
 
     <dl>
-      <dt><a href="urf.turf">URF</a></dt>
+      <dt id="urf"><a href="urf.turf">URF</a></dt>
 
       <dd>The core URF ontology for defining resources.</dd>
 
-      <dt><a href="content.turf">Content</a></dt>
+      <dt id="content"><a href="content.turf">Content</a></dt>
 
       <dd>The URF ontology for describing the content of a resource, such as
       content type, size, and actual content bytes.</dd>
 
-      <dt><a href="select.turf">Select</a></dt>
+      <dt id="select"><a href="select.turf">Select</a></dt>
 
       <dd>The URF ontology for selecting resources and other objects.</dd>
     </dl>
@@ -256,8 +266,12 @@ example.janedoe(foaf.Person):
           <dt>Init Short Forms, Property Resources, List Short Form Elements,
           and Set Short Form Elements</dt>
 
-          <dd>Inherits the namespace of the type of the subject resource.</dd>
-        </dl><p>A name reference must not be used without a prefix in any
+          <dd>Inherits the namespace of the first short type of the subject
+          resource.</dd>
+        </dl><p>In other words, all name short forms inherit the namespace of
+      the first short type of the subject resource, except for the types
+      themselves and the resource URI, which inherit the namespace of the
+      predicate URI. A name reference must not be used without a prefix in any
       other context (e.g. for the type of a root-level resource description).
       If <code>&lt;http://example.com/example&gt;</code> identifies a
       namespace and is given the label <code>example</code>, for example, the
@@ -941,7 +955,7 @@ example.billy:
       <p><code><var>object</var> ⇒ <var>resource</var></code></p>
     </blockquote>
 
-    <h2>TURF</h2>
+    <h2 id="turf">TURF</h2>
 
     <p>TURF is the text interchange format for URF. TURF emphasizes terseness
     and consistency while maintaining human readability, with a preference for
@@ -1511,6 +1525,25 @@ example.billy:
         </ol></li>
     </ol>
 
+    <h2>Reference Implementation</h2>
+
+    <p>GlobalMentor, Inc. maintains an open-source reference implementation
+    for processing URF. The library provides an API and source code for
+    parsing URF from TURF, parsing URF from RDF/XML, creating a Java instance
+    tree from URF, generating TURF from URF, generating URF from a Java
+    instance tree, and manipulating URF in-memory. The reference
+    implementation source code may be downloaded from the GlobalMentor
+    Subversion repository at <code>&lt;<a
+    href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;</code>.</p>
+
+    <p>GlobalMentor also maintains an online demonstration of live, dynamic
+    URF processing and exploration. The demonstration uses the Guise Internet
+    application framework [<a href="#guise">Guise</a>] and allows TURF or
+    RDF/XML to be processed and displayed as URF assertions, TURF, and a
+    dynamic tree or resources and properties. This URF processing
+    demonstration is available at <code>&lt;<a
+    href="http://www.guiseframework.com/demo/urfprocess">http://www.guiseframework.com/demo/urfprocess</a>&gt;</code>.</p>
+
     <h2>Examples</h2>
 
     <h3 id="ploopExample">PLOOP</h3>
@@ -1982,6 +2015,8 @@ example.janedoe(foaf.Person):
           <li>Added RDF/XML example.</li>
 
           <li>Added PLOOP example.</li>
+
+          <li>Added reference implementation links.</li>
         </ul></dd>
 
       <dt>2007-10-05</dt>
