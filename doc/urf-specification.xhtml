@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-10-12</dd>
+      <dd>2007-10-13</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -66,6 +66,12 @@
       <dt id="select"><a href="select.turf">Select</a></dt>
 
       <dd>The URF ontology for selecting resources and other objects.</dd>
+
+      <dt id="vcard"><a href="vcard.turf">VCard</a></dt>
+
+      <dd>The URF ontology for describing person resource or white-pages type
+      of directory information as described in [<a href="#rfc2426">RFC
+      2426</a>].</dd>
     </dl>
 
     <h2>TURF Quick Start</h2>
@@ -1794,28 +1800,55 @@ example.janedoe(foaf.Person):
     <code>urf.Integer</code> lexical namespace (shown here in its short form,
     <code>#23</code>).</p>
 
-    <h3>VCard</h3>
+    <h3 id="vcardExample">VCard</h3>
 
-    <p>The VCard [<a href="#rfc2426">RFC 2426</a>] name example,</p>
+    <p>The URF <a href="#vcard">VCard Ontology</a> provides a representation
+    of VCard [<a href="#rfc2426">RFC 2426</a>] within a semantic framework.
+    The following is VCard information in traditional vCard MIME Directory
+    Profile syntax as specified by [<a href="#rfc2426">RFC 2426</a>].</p>
 
     <blockquote>
-      <pre><code>N:Stevenson;John;Philip,Paul;Dr.;Jr.,M.D.,A.C.P.</code></pre>
+      <pre><code>BEGIN:vCard
+VERSION:3.0
+FN:Jane Doe
+N:Doe;Jane;Mary,Ann;Dr.;M.D.,Ph.D.
+ORG:Example Corporation;North American Division;Business Development
+TITLE:Directory of Business Development
+LABEL="123 Some Street\nSuite 45\nSomeplace, CA 12345"
+EMAIL;PREF:janedoe@example.com
+EMAIL:jdoe@example.org
+URL:http://www.example.com/home/jane/
+BDAY=1980-02-02T09:45:00
+CATEGORY:Internet,B2B,P2P,Web2.0,ABCD
+END:vCard</code></pre>
     </blockquote>
 
-    <p>can be represented in the following URF formulation, with added type
-    and subproperty information:</p>
+    <p>The same vCard information in its URF VCard formulation is shown below
+    for the resource <code>«http://example.com/example#janedoe»</code>:</p>
 
     <blockquote>
-      <pre><code>|urf|&lt;http://urf.name/urf&gt;,
-|vcard|&lt;http://urf.com/vcard&gt;,
-:
+      <pre><code>|vcard|&lt;http://urf.com/vcard&gt;,
+|example|&lt;http://example.com/example&gt;,
+example.janedoe:
+  vcard.fn="Jane Doe",
   vcard.n=(Name):
-    familyName="Stevenson",
-    givenName="John",
-    additionalName=\"Philip", "Paul"\,
+    familyName="Doe",
+    givenName="Jane",
+    additionalName=\"Mary", "Ann"\,
     honoraryPrefix="Dr.",
-    honorarySuffix=\"Jr.", "M.D.", "A.C.P."\
-  ;
+    honorarySuffix=\"M.D.", "Ph.D."\
+  ;,
+  vcard.org=\"Example Corporation", "North American Division", "Business Development"\,
+  vcard.title="Directory of Business Development",
+  vcard.label="123 Some Street\nSuite 45\nSomeplace, CA 12345",
+  vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
+  vcard.url=&lt;http://www.example.com/home/jane/&gt;,
+  vcard.bday=@1980-02-02T09:45:00@,
+  vcard.category="Internet",
+  vcard.category="B2B",
+  vcard.category="P2P",
+  vcard.category="Web2.0",
+  vcard.category="ABCD"
 ;</code></pre>
     </blockquote>
 
