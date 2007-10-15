@@ -133,7 +133,7 @@ example.janedoe(foaf.Person):
 
     <blockquote>
       <pre><code>«http://example.com/example#janedoe»:
-  «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
+  «http://urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
   «http://example.com/example#name»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
   «http://example.com/example#birthday»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
   «http://example.com/example#salary»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»:
@@ -268,7 +268,7 @@ example.janedoe(foaf.Person):
       reference would inherit the namespace of the property
       resource.</p><blockquote>
           <pre><code>|example1|&lt;http://example.com/example1&gt;,
-|example2|&lt;http://example.com/example2&gt;
+|example2|&lt;http://example.com/example2&gt;,
 example1.resource(example2.Class):
 
   *example1.value1 inherits the namespace of example1.property1*
@@ -294,7 +294,7 @@ example1.resource(example2.Class):
 
       <dd>An example namespace; used for hypothetical situations.</dd>
 
-      <dt><code>|urf|&lt;http://www.urf.name/urf&gt;</code></dt>
+      <dt><code>|urf|&lt;http://urf.name/urf&gt;</code></dt>
 
       <dd>The URF namespace for resource and properties related to the
       framework abstract model itself.</dd>
@@ -360,7 +360,7 @@ example.resource:
       following example, the resource <code>example.resource</code> is
       asserted to be an instance of the class
       <code>example.Class</code>:</p><blockquote>
-          <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
+          <pre><code>|urf|&lt;http://urf.name/urf&gt;,
 |example|&lt;http://example.com/example&gt;,
 example.resource:
   urf.type=example.Class,
@@ -813,7 +813,7 @@ example.resource(example.Class):
       <dd><p>The following example asserts that John believes the sky to have
       the color purple without asserting that the sky actually has that
       color:</p><blockquote>
-          <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
+          <pre><code>|urf|&lt;http://urf.name/urf&gt;,
 |example|&lt;http://example.com/example&gt;,
 example.john:
   example.believes=(urf.Proposition):
@@ -907,7 +907,7 @@ example.juan:
       Perhaps one name comes before the other if used simultaneously, or
       perhaps one name has a higher priority or is considered the "default"
       name.) </p><blockquote>
-          <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
+          <pre><code>|urf|&lt;http://urf.name/urf&gt;,
 |example|&lt;http://example.com/example&gt;,
 example.billy:
   example.name="William":
@@ -925,7 +925,7 @@ example.billy:
       of <code>urf.order</code> with values starting at <code>#0</code> and
       continuing sequentially. The following example represents information
       semantically identical to the previous example:<blockquote>
-          <pre><code>|urf|&lt;http://www.urf.name/urf&gt;,
+          <pre><code>|urf|&lt;http://urf.name/urf&gt;,
 |example|&lt;http://example.com/example&gt;,
 example.billy:
   example.name=\"William",  "Bill"\
@@ -980,7 +980,8 @@ example.billy:
 ;</code></pre>
         </blockquote><p>This is equivalent to the following TURF long
       form:</p><blockquote>
-          <pre><code>|guise|&lt;java:/com/guiseframework/&gt;,
+          <pre><code>|urf|&lt;http://urf.name/urf&gt;,
+|guise|&lt;java:/com/guiseframework/&gt;,
 (guise.Category):
   urf.init=\"category1", "First Category"\,
   categories=
@@ -990,7 +991,7 @@ example.billy:
     ;,
     (guise.Category):
       urf.init=\"subcategoryB"\
-    ;,
+    ;
   ]
 ;</code></pre>
         </blockquote></dd>
@@ -1655,7 +1656,7 @@ example.billy:
     Subversion repository at <code>&lt;<a
     href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;</code>.
     The API documentation may be found at &lt;<a
-    href="http://www.guiseframework.com/api/com/garretwilson/urf/"><code>http://www.guiseframework.com/api/com/garretwilson/urf/</code></a>&gt;.
+    href="http://www.guiseframework.com/api/com/garretwilson/urf/package-summary.html"><code>http://www.guiseframework.com/api/com/garretwilson/urf/package-summary.html</code></a>&gt;.
     The Guise Internet application framework [<a href="#guise">Guise</a>]
     development library contains the URF reference implementation already
     compiled, and is available at &lt;<a
@@ -1834,7 +1835,7 @@ navigationPanel.add(conversionPanel);
   "length"=#1234,
   "valid"=&amp;true,
   "status"="processing",
-  "results"=[&amp;false, #5, "dog", {"code"=#9.8}]
+  "results"=[&amp;false, #5, "dog", :"code"=#9.8;]
 ;</code></pre>
     </blockquote>
 
@@ -1847,15 +1848,16 @@ navigationPanel.add(conversionPanel);
     of the given JSON example, a better formulation that takes advantage of
     URF semantics would most importantly use actual properties rather than
     associative array string key pseudo-properties. An improved formulation
-    would also indicate the type of the resource. Such improvements are
+    would also indicate the type of the resources. Such improvements are
     illustrated in the following reformulation:</p>
 
     <blockquote>
-      <pre><code>(«http://example.com/example#Class»):
+      <pre><code>|urf|&lt;http://urf.name/urf&gt;,
+(«http://example.com/example#Class»):
   length=#1234,
   valid=&amp;true,
   status="processing",
-  results=[&amp;false, #5, "dog", {"code"=#9.8}]
+  results=[&amp;false, #5, "dog", (urf.Map):"code"=#9.8;]
 ;</code></pre>
     </blockquote>
 
@@ -2260,6 +2262,9 @@ example.janedoe:
           representation.</li>
 
           <li>Clarified and extended <code>urf.Temporal</code> types.</li>
+
+          <li>Changed base lexical namespace URI to
+          <code>&lt;http://urf.name/lexical/&gt;</code>.</li>
 
           <li>Added <code>urf.Language</code> type.</li>
 
