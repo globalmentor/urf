@@ -1847,11 +1847,13 @@ navigationPanel.add(conversionPanel);
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:example="http://example.com/example#"
   xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
 &gt;
   &lt;foaf:Person rdf:about="http://example.com/example#janedoe"&gt;
     &lt;foaf:nick xml:lang="pt-BR"&gt;Janinha&lt;/foaf:nick&gt;
     &lt;example:age rdf:datatype="&amp;xsd;integer"&gt;23&lt;/example:age&gt;
     &lt;example:birthdate rdf:datatype="&amp;xsd;date"&gt;1980-04-05&lt;/example:birthdate&gt;
+    &lt;example:motto rdf:parseType="Literal"&gt;Do it. Do it &lt;xhtml:em&gt;right&lt;/xhtml:em&gt;.&lt;/example:motto&gt;
     &lt;example:favoriteSites rdf:parseType="Collection"&gt;
       &lt;rdf:Description rdf:about="http://www.globalmentor.com/"/&gt;
       &lt;rdf:Description rdf:about="http://www.garretwilson.com/"/&gt;
@@ -1871,7 +1873,8 @@ navigationPanel.add(conversionPanel);
     RDF/XML:</p>
 
     <blockquote>
-      <pre><code>|dc|&lt;http://purl.org/dc/elements/1.1/&gt;,
+      <pre><code>|content|&lt;http://urf.name/content&gt;,
+|dc|&lt;http://purl.org/dc/elements/1.1/&gt;,
 |example|&lt;http://example.com/example&gt;,
 |foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
 example.janedoe(foaf.Person):
@@ -1882,6 +1885,9 @@ example.janedoe(foaf.Person):
     «http://www.globalmentor.com/»,
     «http://www.garretwilson.com/»
   ],
+  example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
+    content.type~«info:media/text/xml-external-parsed-entity»
+  ;,
   example.possibleVacationDestinations=
   {
     "Paris",
