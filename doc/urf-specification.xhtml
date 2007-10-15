@@ -134,10 +134,10 @@ example.janedoe(foaf.Person):
     <blockquote>
       <pre><code>«http://example.com/example#janedoe»:
   «http://www.urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
-  «http://example.com/example#name»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
-  «http://example.com/example#birthday»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
-  «http://example.com/example#salary»=«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»:
-    «http://example.com/example#currency»~«info:lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
+  «http://example.com/example#name»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
+  «http://example.com/example#birthday»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
+  «http://example.com/example#salary»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»:
+    «http://example.com/example#currency»~«http://urf.name/lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
   ;
 ;</code></pre>
     </blockquote>
@@ -386,7 +386,8 @@ example.resource(example.Class):
 
     <h3>URF Types</h3>
 
-    <p>URF comes with several built-in types, including:</p>
+    <p>URF and its standard ontologies comes with several built-in types,
+    including:</p>
 
     <dl>
       <dt><code>urf.Binary</code></dt>
@@ -459,17 +460,24 @@ example.resource(example.Class):
       The integer class is a subclass of the class
       <code>urf.Number</code>.</dd>
 
+      <dt><code>urf.Language</code></dt>
+
+      <dd>Language resources represent human langages and use lexical
+      namespace URIs. The lexical form of each is the corresponding
+      <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC
+      4646</a>].</dd>
+
       <dt><code>urf.List</code></dt>
 
       <dd>List resources are resources that contain other <dfn>element</dfn>
       resources at certain <dfn>indexes</dfn> of the list. A list, like normal
       resources, may have any property, but the properties representing the
       elements of the list lie in the ordinal namespace
-      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>,
+      <code>&lt;http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>,
       each representing the ordinal index of the element. That is, if a list
       contains an element at index 5, the element resource will appear as a
       value of the property
-      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
+      <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
       (that is, the property <code>«"5"(urf.Ordinal)»</code>, or simply
       <code>º5</code>). Although many uses cases will prefer a continuous,
       unduplicated sequence of index properties beginning with
@@ -480,6 +488,15 @@ example.resource(example.Class):
       <dd>A resource for which the properties represent key values (and are
       typically instances of <code>urf.String</code>), and for which the first
       value of each property represents the value for that key.</dd>
+
+      <dt><code>urf.MediaType</code></dt>
+
+      <dd>A media type resource is an Internet media types described by [<a
+      href="#rfc2046">RFC 2046</a>]. Internet media types are also known as
+      <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources
+      use lexical namespace URIs, and each has a lexical form corresponding to
+      its [<a href="#rfc2046">RFC 2046</a>] representation without any media
+      type parameters.</dd>
 
       <dt><code>urf.Ordinal</code></dt>
 
@@ -562,6 +579,15 @@ example.resource(example.Class):
       with semantics corresponding to the UTC offset described in [<a
       href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC
       2445</a>].</dd>
+
+      <dt><code>content.MediaType</code></dt>
+
+      <dd>A media type resource is an Internet media types described by [<a
+      href="#rfc2046">RFC 2046</a>]. Internet media types are also known as
+      <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources
+      use lexical namespace URIs, and each has a lexical form corresponding to
+      its [<a href="#rfc2046">RFC 2046</a>] representation without any media
+      type parameters.</dd>
     </dl>
 
     <h3 id="lexical">Lexical Namespaces</h3>
@@ -578,10 +604,10 @@ example.resource(example.Class):
       are usually represented as the character sequences <code>"true"</code>
       and <code>"false"</code>. URF provides for a series of namespaces to
       identify resources that are typically identified by lexical
-      representations. Each lexical namespace is an <code>info</code> [<a
-      href="#rfc4452">RFC 4452</a>] URI with an info-identifier namespace of
-      <code>lexical</code>, and have the following format,</p><blockquote>
-          <pre><code>info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
+      representations. Each lexical namespace URI begins with the general URF
+      lexical namespace URI <code>&lt;http://urf.name/lexical/&gt;</code> and
+      has the following format,</p><blockquote>
+          <pre><code>http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
         </blockquote><p>where <var>encodedTypeURI</var> is the URI path
       segment-encoded form of the full type URI of the resource, and
       <var>encodedLexicalForm</var> is the URI path segment-encoded canonical
@@ -589,7 +615,7 @@ example.resource(example.Class):
       example, the integer 123, which is of the type
       <code>«http://urf.name/urf#Integer»</code>, is represented in URF using
       the following URI:</p><blockquote>
-          <pre><code>info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+          <pre><code>http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
         </blockquote><p>A resource in a lexical namespace is implicitly an
       instance of the type indicated in the <var>encodedTypeURI</var> section
       of the URI. In all other aspects resources in lexical namespaces are no
@@ -606,9 +632,9 @@ example.resource(example.Class):
       implicitly asserts the type of the resource. A resource in a lexical
       namespace can be identified by its URI as with any other resource. For
       example, the integer 123 can be identified by its URI
-      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
+      <code>&lt;http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code>
       as in the following example:</p><blockquote>
-          <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
+          <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
         </blockquote><p>Rather than indicating directly the URI of a resource
       in a lexical namespace, the resource may be identified by indicating the
       canonical lexical form of the resource, followed by the contents of the
@@ -631,7 +657,7 @@ example.resource(example.Class):
               <pre><code>%QD8-PQ==%</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Binary#QD8-PQ%3D%3D»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Binary#QD8-PQ%3D%3D»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -646,7 +672,7 @@ example.resource(example.Class):
               <pre><code>&amp;true</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -662,7 +688,7 @@ example.resource(example.Class):
               <pre><code>'x'</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -679,8 +705,8 @@ example.resource(example.Class):
 #123.45</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
-«info:lexical/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
+«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
             </blockquote><p>which are also equivalent to the following general
           short representations for resources in a lexical namespace,
           respectively:</p><blockquote>
@@ -696,7 +722,7 @@ example.resource(example.Class):
               <pre><code>º5</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code></pre>
             </blockquote><p>which are also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
@@ -712,7 +738,7 @@ example.resource(example.Class):
               <pre><code>/a?b+c*/</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"a?b+c*"(urf.RegularExpression)»</code></pre>
@@ -727,7 +753,7 @@ example.resource(example.Class):
               <pre><code>"apple"</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"apple"(urf.String)»</code></pre>
@@ -745,7 +771,7 @@ example.resource(example.Class):
               <pre><code>@16:39:57-08:00@</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#16%3A39%3A57-08%3A00»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#16%3A39%3A57-08%3A00»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"16:39:57-08:00"(urf.Timestamp)»</code></pre>
@@ -760,7 +786,7 @@ example.resource(example.Class):
               <pre><code>&lt;http://urf.name/urf#type&gt;</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
               <pre><code>«"http://urf.name/urf#type"(urf.URI)»</code></pre>
@@ -915,10 +941,10 @@ example.billy:
       <dd><p>URF provides inherent support for describing how to instantiate
       objects from programming languages such as Java. A class can be
       identified as an object's type using a URI that identifies the type,
-      such as <code>«info:java/com.example.package#ExampleClass»</code> for
-      the Java class <code>com.example.package.ExampleClass</code>. One or
-      more ordered <code>urf.init</code> properties specify the resources to
-      be used for object initialization using a constructor with parameters
+      such as <code>«java:/com/example/package/ExampleClass»</code> for the
+      Java class <code>com.example.package.ExampleClass</code>. One or more
+      ordered <code>urf.init</code> properties specify the resources to be
+      used for object initialization using a constructor with parameters
       matching the given values. Although programming languages usually have
       properties relative to each class, URF properties in a package's
       namespace can be used to identify class properties by the local name of
@@ -944,7 +970,7 @@ example.billy:
       be set, recursively converting values such as <code>urf.List</code> to
       the equivalent Java object such as
       <code>java.util.List</code>.</p><blockquote>
-          <pre><code>|guise|&lt;info:java/com/guiseframework&gt;,
+          <pre><code>|guise|&lt;java:/com/guiseframework/&gt;,
 (guise.Category)¡"category1", "First Category"!:
   categories=
   [
@@ -954,7 +980,7 @@ example.billy:
 ;</code></pre>
         </blockquote><p>This is equivalent to the following TURF long
       form:</p><blockquote>
-          <pre><code>|guise|&lt;info:java/com/guiseframework&gt;,
+          <pre><code>|guise|&lt;java:/com/guiseframework/&gt;,
 (guise.Category):
   urf.init=\"category1", "First Category"\,
   categories=
@@ -1127,7 +1153,7 @@ example.billy:
     immediately followed by the type of the resource, which must contain a
     resource reference. Any URI reference that includes a lexical
     representation is equivalent to a URI reference in the form
-    <code>«info:lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
+    <code>«http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
 
     <blockquote>
       <p><code><var>urireference</var> ⇒
@@ -1458,7 +1484,7 @@ example.billy:
     instantiated using its default constructor:</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework/component#LayoutPanel»)</code></pre>
+      <pre><code>(«java:/com/guiseframework/component/LayoutPanel»)</code></pre>
     </blockquote>
 
     <h3>Properties</h3>
@@ -1471,14 +1497,14 @@ example.billy:
     URI. A PLOOP processor must use normal get/set conventions for the
     language in question for interpreting the read/write properties available
     for a particular class. For example, because the property
-    <code>«info:java/com/guiseframework/component#label»</code> is in the same
+    <code>«java:/com/guiseframework/component/label»</code> is in the same
     namespace as the type
-    <code>«info:java/com/guiseframework/component#Button»</code>, its local
-    name, <code>label</code>, is considered a property name for getting or
-    setting a value of an instance of the <code>Button</code> class:</p>
+    <code>«java:/com/guiseframework/component/Button»</code>, its local name,
+    <code>label</code>, is considered a property name for getting or setting a
+    value of an instance of the <code>Button</code> class:</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework/component#Button»):
+      <pre><code>(«java:/com/guiseframework/component/Button»):
   button="Push Me"
 ;</code></pre>
     </blockquote>
@@ -1504,7 +1530,7 @@ example.billy:
     <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework/component/layout#FlowLayout»):
+      <pre><code>(«java:/com/guiseframework/component/layout/FlowLayout»):
   flow="line"
 ;</code></pre>
     </blockquote>
@@ -1524,11 +1550,11 @@ example.billy:
     method:</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework/component#LayoutPanel»):
+      <pre><code>(«java:/com/guiseframework/component/LayoutPanel»):
   children=
   [
-    («info:java/com/guiseframework/component#LayoutPanel»):
-      valueClass=«info:java/java/lang#Double»,
+    («java:/com/guiseframework/component/LayoutPanel»):
+      valueClass=«java:/java/lang/Double»,
       label="Input Temperature"
     ;
   ]
@@ -1555,7 +1581,7 @@ example.billy:
     <code>new Category("category1", "First Category")</code>:</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework#Category»)¡"category1", "First Category"!</code></pre>
+      <pre><code>(«java:/com/guiseframework/Category»)¡"category1", "First Category"!</code></pre>
     </blockquote>
 
     <h4>Constructors using Read-Only Properties</h4>
@@ -1591,8 +1617,8 @@ example.billy:
     a read-only property <code>Class getValueClass()</code>.</p>
 
     <blockquote>
-      <pre><code>(«info:java/com/guiseframework/component#TextControl»):
-  valueClass=«info:java/java/lang#Double»,
+      <pre><code>(«java:/com/guiseframework/component/TextControl»):
+  valueClass=«java:/java/lang/Double»,
   label="Input Temperature"
 ;</code></pre>
     </blockquote>
@@ -1629,7 +1655,11 @@ example.billy:
     Subversion repository at <code>&lt;<a
     href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;</code>.
     The API documentation may be found at &lt;<a
-    href="http://www.guiseframework.com/api/com/garretwilson/urf/"><code>http://www.guiseframework.com/api/com/garretwilson/urf/</code></a>&gt;.</p>
+    href="http://www.guiseframework.com/api/com/garretwilson/urf/"><code>http://www.guiseframework.com/api/com/garretwilson/urf/</code></a>&gt;.
+    The Guise Internet application framework [<a href="#guise">Guise</a>]
+    development library contains the URF reference implementation already
+    compiled, and is available at &lt;<a
+    href="http://www.guiseframework.com/com.guiseframework-unlicensed.jar">http://www.guiseframework.com/com.guiseframework-unlicensed.jar</a>&gt;.</p>
 
     <p>GlobalMentor also maintains an online demonstration of live, dynamic
     URF processing and exploration. The demonstration uses the Guise Internet
@@ -1651,10 +1681,10 @@ example.billy:
     be defined elsewhere.)</p>
 
     <blockquote>
-      <pre><code>|component|&lt;info:java/com/guiseframework/component&gt;,
-|layout|&lt;info:java/com/guiseframework/component/layout&gt;,
-|validator|&lt;info:java/com/guiseframework/validator&gt;,
-|demo|&lt;info:java/com/guiseframework/demo&gt;,
+      <pre><code>|component|&lt;java:/com/guiseframework/component/&gt;,
+|layout|&lt;java:/com/guiseframework/component/layout/&gt;,
+|validator|&lt;java:/com/guiseframework/validator/&gt;,
+|demo|&lt;java:/com/guiseframework/demo/&gt;,
 (demo.TemperatureConversionPanel2):
   label="Guise™ Demonstration: Temperature Conversion",
   layout=(layout.FlowLayout):
@@ -1674,13 +1704,13 @@ example.billy:
           label="Input Temperature",
           name="temperatureInput",
           validator=(validator.ValueRequiredValidator),
-          valueClass=«info:java/java/lang#Float»
+          valueClass=«java:/java/lang/Float»
         ;,
         (component.TextControl):
           editable=&amp;false,
           label="Output Temperature",
           name="temperatureOutput",
-          valueClass=«info:java/java/lang#Float»
+          valueClass=«java:/java/lang/Float»
         ;
       ]
     ;,
@@ -1877,6 +1907,7 @@ navigationPanel.add(conversionPanel);
 |dc|&lt;http://purl.org/dc/elements/1.1/&gt;,
 |example|&lt;http://example.com/example&gt;,
 |foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
+|urf|&lt;http://urf.name/urf&gt;,
 example.janedoe(foaf.Person):
   example.age=#23,
   example.birthdate=@1980-04-05@,
@@ -1886,7 +1917,7 @@ example.janedoe(foaf.Person):
     «http://www.garretwilson.com/»
   ],
   example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
-    content.type~«info:media/text/xml-external-parsed-entity»
+    content.type~«"text/xml-external-parsed-entity/xml-external-parsed-entity"(urf.MediaType)»
   ;,
   example.possibleVacationDestinations=
   {
@@ -1894,15 +1925,15 @@ example.janedoe(foaf.Person):
     "Rome"
   },
   nick="Janinha":
-    dc.language~«info:lang/pt/BR»
+    dc.language~«"pt-BR"(urf.Language)»
   ;
 ;</code></pre>
     </blockquote>
 
     <p>Note that, rather than use special literal types or general strings,
-    URF promotes representation of resources by URIs. Thus the language tag
-    "pt-BR" for Brazilian Portuguese is represented as a resource with the URI
-    <code>&lt;info:lang/pt/BR&gt;</code>, and the integer value
+    URF promotes the representation of resources by URIs. Thus the language
+    tag "pt-BR" for Brazilian Portuguese is represented as a resource a URI
+    <code>urf.Language</code> lexical namespace, and the integer value
     <code>23</code> is represented as a resource with a URI in the
     <code>urf.Integer</code> lexical namespace (shown here in its short form,
     <code>#23</code>).</p>
@@ -2123,6 +2154,13 @@ example.janedoe:
       Specification (Revised)</cite></a>. World Wide Web Consortium,
       2006-02-10.</dd>
 
+      <dt id="rfc2046">RFC 2046</dt>
+
+      <dd>N. Freed and N. Borenstein. <a
+      href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose
+      Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>.
+      Internet Engineering Task Force, 1996.</dd>
+
       <dt id="rfc2426">RFC 2426</dt>
 
       <dd>F. Dawson and T. Howes. <a
@@ -2158,19 +2196,19 @@ example.janedoe:
       Resource Identifier (URI): Generic Syntax</cite></a>. Internet
       Engineering Task Force, 2005.</dd>
 
-      <dt id="rfc4452">RFC 4452</dt>
-
-      <dd>H. Van de Sompel, T. Hammond, E. Neylon, and S. Weibel. <a
-      href="http://www.ietf.org/rfc/rfc4452.txt"><cite>RFC 4452: The "info"
-      URI Scheme for Information Assets with Identifiers in Public
-      Namespaces</cite></a>. Internet Engineering Task Force, 2006.</dd>
-
       <dt id="rfc4627">RFC 4627</dt>
 
       <dd>D. Crockford. <a
       href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The
       application/json Media Type for JavaScript Object Notation
       (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
+
+      <dt id="rfc4646">RFC 4646</dt>
+
+      <dd>A. Phillips and M. Davis. <a
+      href="http://www.ietf.org/rfc/rfc4646.txt"><cite>RFC 4646: Tags for
+      Identifying Languages</cite></a>. Internet Engineering Task Force,
+      2006.</dd>
 
       <dt id="rfc4648">RFC 4648</dt>
 
@@ -2222,6 +2260,12 @@ example.janedoe:
           representation.</li>
 
           <li>Clarified and extended <code>urf.Temporal</code> types.</li>
+
+          <li>Added <code>urf.Language</code> type.</li>
+
+          <li>Added <code>urf.MediaType</code> type.</li>
+
+          <li>Changed PLOOP example to use <code>java:</code> URIs.</li>
         </ul></dd>
 
       <dt>2007-10-05</dt>
