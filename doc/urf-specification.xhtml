@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-10-13</dd>
+      <dd>2007-10-15</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -74,7 +74,7 @@
       2426</a>].</dd>
     </dl>
 
-    <h2>TURF Quick Start</h2>
+    <h2>URF and TURF Quick Start</h2>
 
     <p>The following is the URI <code>http://urf.name/urf#janedoe</code>:</p>
 
@@ -389,22 +389,6 @@ example.resource(example.Class):
     <p>URF comes with several built-in types, including:</p>
 
     <dl>
-      <dt><code>urf.List</code></dt>
-
-      <dd>List resources are resources that contain other <dfn>element</dfn>
-      resources at certain <dfn>indexes</dfn> of the list. A list, like normal
-      resources, may have any property, but the properties representing the
-      elements of the list lie in the ordinal namespace
-      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>,
-      each representing the ordinal index of the element. That is, if a list
-      contains an element at index 5, the element resource will appear as a
-      value of the property
-      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
-      (that is, the property <code>«"5"(urf.Ordinal)»</code>, or simply
-      <code>º5</code>). Although many uses cases will prefer a continuous,
-      unduplicated sequence of index properties beginning with
-      <code>º5</code>, this is not an URF requirement.</dd>
-
       <dt><code>urf.Binary</code></dt>
 
       <dd>Binary resources represent arbitrarily long sequences of bytes.
@@ -433,6 +417,39 @@ example.resource(example.Class):
       <code>urf.Class</code> is a subclass of the class
       <code>urf.Resource</code>.</dd>
 
+      <dt><code>urf.Date</code></dt>
+
+      <dd>Date resources represent calendar dates in terms of calendar year,
+      calendar month, and calendar day of month. They use a lexical namespace
+      with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of
+      <code><var>YYYY</var>-<var>MM</var>-<var>DD</var></code> as defined in
+      [<a href="#iso8601">ISO 8601</a>].</dd>
+
+      <dt><code>urf.DateTime</code></dt>
+
+      <dd>A date time resource represents a time of day on a particular
+      calendar date. They use a lexical namespace with a lexical form
+      combining the lexical forms of <code>urf.Date</code> and
+      <code>urf.Time</code> separated by <code>T</code>:
+      <code><var>YYYY</var>-<var>MM</var>-<var>DD</var>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code>
+      with optional UTC offset as defined in [<a href="#iso8601">ISO
+      8601</a>]. A form without the optional UTC offset is said to be
+      <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and
+      should not be used unless a time independent of a time zone is to be
+      specified. In most cases a <dfn>fixed time</dfn> is appropriate and a
+      form with the UTC offset should be used. The hours component represents
+      midnight as <code>00</code> and must not have a value larger than
+      <code>23</code>.</dd>
+
+      <dt><code>urf.Duration</code></dt>
+
+      <dd>Duration resources represent lengths of time. They use a lexical
+      namespace with a lexical form consistent with [<a href="#rfc2445">RFC
+      2445</a>] of
+      <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>,
+      with optional shorter forms and optional decimal components using the
+      full stop as defined in [<a href="#iso8601">ISO 8601</a>].</dd>
+
       <dt><code>urf.Integer</code></dt>
 
       <dd>Integer resources are the positive whole numbers, the negative whole
@@ -442,21 +459,27 @@ example.resource(example.Class):
       The integer class is a subclass of the class
       <code>urf.Number</code>.</dd>
 
-      <dt><code>urf.Real</code></dt>
+      <dt><code>urf.List</code></dt>
 
-      <dd>Real number are all of the measuring numbers and may include decimal
-      fractional parts. They are identified by lexical namespace URIs with a
-      lexical representation in the form
-      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>.
-      The integer class is a subclass of the class
-      <code>urf.Number</code>.</dd>
+      <dd>List resources are resources that contain other <dfn>element</dfn>
+      resources at certain <dfn>indexes</dfn> of the list. A list, like normal
+      resources, may have any property, but the properties representing the
+      elements of the list lie in the ordinal namespace
+      <code>&lt;info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>,
+      each representing the ordinal index of the element. That is, if a list
+      contains an element at index 5, the element resource will appear as a
+      value of the property
+      <code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
+      (that is, the property <code>«"5"(urf.Ordinal)»</code>, or simply
+      <code>º5</code>). Although many uses cases will prefer a continuous,
+      unduplicated sequence of index properties beginning with
+      <code>º5</code>, this is not an URF requirement.</dd>
 
-      <dt><code>urf.Set</code></dt>
+      <dt><code>urf.Map</code></dt>
 
-      <dd>Set resources are resources that contain at most one instance of
-      other <dfn>element</dfn> resources. A set, like normal resources, may
-      have any property, but the properties representing the elements of the
-      set appear as values of the <code>urf.element</code> property.</dd>
+      <dd>A resource for which the properties represent key values (and are
+      typically instances of <code>urf.String</code>), and for which the first
+      value of each property represents the value for that key.</dd>
 
       <dt><code>urf.Ordinal</code></dt>
 
@@ -476,6 +499,15 @@ example.resource(example.Class):
       range. The class <code>urf.Property</code> is a subclass of the class
       <code>urf.Class</code>.</dd>
 
+      <dt><code>urf.Real</code></dt>
+
+      <dd>Real number are all of the measuring numbers and may include decimal
+      fractional parts. They are identified by lexical namespace URIs with a
+      lexical representation in the form
+      <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>.
+      The integer class is a subclass of the class
+      <code>urf.Number</code>.</dd>
+
       <dt><code>urf.RegularExpression</code></dt>
 
       <dd>Regular expression resources are text-based patterns that define
@@ -489,16 +521,47 @@ example.resource(example.Class):
       <code>urf.Resource</code> are both instances of the class
       <code>urf.Resource</code>.</dd>
 
+      <dt><code>urf.Set</code></dt>
+
+      <dd>Set resources are resources that contain at most one instance of
+      other <dfn>element</dfn> resources. A set, like normal resources, may
+      have any property, but the properties representing the elements of the
+      set appear as values of the <code>urf.element</code> property.</dd>
+
       <dt><code>urf.String</code></dt>
 
       <dd>String resources are sequences of Unicode code points or text and
       lie in the corresponding lexical namespace.</dd>
 
-      <dt><code>urf.Timestamp</code></dt>
+      <dt><code>urf.Time</code></dt>
 
-      <dd>Timestamp resources, which use a lexical namespace, are particular
-      points in time and have a lexical form defined in [<a
-      href="#rfc3339">RFC 3339</a>].</dd>
+      <dd>Time resources represent time of day. They use a lexical namespace
+      with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of
+      <code><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code>
+      with optional UTC offset as defined in [<a href="#iso8601">ISO
+      8601</a>]. A form without the optional UTC offset is said to be
+      <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and
+      should not be used unless a time independent of a time zone is to be
+      specified. In most cases a <dfn>fixed time</dfn> is appropriate and a
+      form with the UTC offset should be used. The hours component represents
+      midnight as <code>00</code> and must not have a value larger than
+      <code>23</code>.</dd>
+
+      <dt><code>urf.URI</code></dt>
+
+      <dd>URI resources are sequences of Unicode code points that function as
+      resource identifiers and conform to [<a href="#rfc3986">RFC 3986</a>].
+      They lie in the corresponding lexical namespace with a lexical form
+      specified by [<a href="#rfc3986">RFC 3986</a>].</dd>
+
+      <dt><code>urf.UTCOffset</code></dt>
+
+      <dd>UTC offset resources represent an offset from UTC to local time.
+      They use a lexical namespace with a lexical form of
+      <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var>
+      with semantics corresponding to the UTC offset described in [<a
+      href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC
+      2445</a>].</dd>
     </dl>
 
     <h3 id="lexical">Lexical Namespaces</h3>
@@ -550,7 +613,9 @@ example.resource(example.Class):
       in a lexical namespace, the resource may be identified by indicating the
       canonical lexical form of the resource, followed by the contents of the
       URI of the type of the resource. The integer 123 may therefore be
-      represented in the following short form:</p><blockquote>
+      represented as either of the following short forms:</p><blockquote>
+          <pre><code>«"123"(«http://urf.name/urf#Integer»)»</code></pre>
+        </blockquote><blockquote>
           <pre><code>«"123"(urf.Integer)»</code></pre>
         </blockquote><p>The lexical namespaces for several types have
       additional short representations. The examples below assume that the
@@ -668,19 +733,22 @@ example.resource(example.Class):
               <pre><code>«"apple"(urf.String)»</code></pre>
             </blockquote></dd>
 
-          <dt><code>urf.Timestamp</code></dt>
+          <dt><code>urf.Temporal</code></dt>
 
-          <dd><p>A timestamp resource may be identified by its [<a
-          href="#rfc3339">RFC 3339</a>] lexical form with surrounding at signs
-          (<code>'@'</code>). For example, the following short
-          representation,</p><blockquote>
-              <pre><code>@1996-12-19T16:39:57-08:00@</code></pre>
+          <dd><p>A temporal resource such as <code>urf.Date</code>,
+          <code>urf.DateTime</code>, <code>urf.Duration</code>,
+          <code>urf.Time</code>, or <code>urf.UTCOffset</code> may be
+          identified by its lexical form with surrounding at signs
+          (<code>'@'</code>). The specific temporal type can be determined by
+          the specific lexical form used. For example, the following short
+          representation for urf.Time,</p><blockquote>
+              <pre><code>@16:39:57-08:00@</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
-              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#1996-12-19T16%3A39%3A57-08%3A00»</code></pre>
+              <pre><code>«info:lexical/http%3A%2F%2Furf.name%2Furf%23String#16%3A39%3A57-08%3A00»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"1996-12-19T16:39:57-08:00"(urf.Timestamp)»</code></pre>
+              <pre><code>«"16:39:57-08:00"(urf.Timestamp)»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.URI</code></dt>
@@ -1050,7 +1118,7 @@ example.billy:
       <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var>
       <strong>|</strong> <var>charactershort</var> <strong>|</strong>
       <var>regexshort</var> <strong>|</strong>
-      <var>timestampshort</var></code></p>
+      <var>temporalshort</var></code></p>
     </blockquote>
 
     <p>A resource URI reference is enclosed in angle quotes. The contents is
@@ -1250,6 +1318,29 @@ example.billy:
       <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var>
       <strong>|</strong>
       <var>escapedcontrol</var><strong>]*</strong>/</code></p>
+    </blockquote>
+
+    <p>A temporal short form consists of the lexical form of a temporal
+    resource such as <code>urf.Date</code>, <code>urf.DateTime</code>,
+    <code>urf.Duration</code>, <code>urf.Time</code>, or
+    <code>urf.UTCOffset</code>, surrounded by matching at signs
+    (<code>'@'</code>). A temporal short form is equivalent to a resource of
+    the corresponding urf.Temporal type, based upon the specific lexical form
+    used. The temporarl short form <code>@1999-03-04@</code> is the equivalent
+    of the number resource <code>«"1999-03-04"(urf.Date)»</code>, for
+    example.</p>
+
+    <blockquote>
+      <p><code><var>temporalshort</var> ⇒
+      @<strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><strong>)</strong>
+      <strong>|</strong>
+      <strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><code>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code><strong>)</strong>
+      <strong>|</strong>
+      <strong>(</strong><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong><strong>)</strong>
+      <strong>|</strong>
+      <strong>(</strong>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S<strong>)</strong>
+      <strong>|</strong>
+      <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code></p>
     </blockquote>
 
     <p>The types declaration consists of zero or more resource descriptions
@@ -1536,7 +1627,9 @@ example.billy:
     instance tree, and manipulating URF in-memory. The reference
     implementation source code may be downloaded from the GlobalMentor
     Subversion repository at <code>&lt;<a
-    href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;</code>.</p>
+    href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;</code>.
+    The API documentation may be found at &lt;<a
+    href="http://www.guiseframework.com/api/com/garretwilson/urf/"><code>http://www.guiseframework.com/api/com/garretwilson/urf/</code></a>&gt;.</p>
 
     <p>GlobalMentor also maintains an online demonstration of live, dynamic
     URF processing and exploration. The demonstration uses the Guise Internet
@@ -1758,10 +1851,17 @@ navigationPanel.add(conversionPanel);
   &lt;foaf:Person rdf:about="http://example.com/example#janedoe"&gt;
     &lt;foaf:nick xml:lang="pt-BR"&gt;Janinha&lt;/foaf:nick&gt;
     &lt;example:age rdf:datatype="&amp;xsd;integer"&gt;23&lt;/example:age&gt;
+    &lt;example:birthdate rdf:datatype="&amp;xsd;date"&gt;1980-04-05&lt;/example:birthdate&gt;
     &lt;example:favoriteSites rdf:parseType="Collection"&gt;
       &lt;rdf:Description rdf:about="http://www.globalmentor.com/"/&gt;
       &lt;rdf:Description rdf:about="http://www.garretwilson.com/"/&gt;
     &lt;/example:favoriteSites&gt;
+    &lt;example:possibleVacationDestinations&gt;
+      &lt;rdf:Alt&gt;
+        &lt;rdf:li&gt;Paris&lt;/rdf:li&gt;
+        &lt;rdf:li&gt;Rome&lt;/rdf:li&gt;
+      &lt;/rdf:Alt&gt;
+    &lt;/example:possibleVacationDestinations&gt;
   &lt;/foaf:Person&gt;
 &lt;/rdf:RDF&gt;</code></pre>
     </blockquote>
@@ -1774,17 +1874,22 @@ navigationPanel.add(conversionPanel);
       <pre><code>|dc|&lt;http://purl.org/dc/elements/1.1/&gt;,
 |example|&lt;http://example.com/example&gt;,
 |foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
-|urf|&lt;http://urf.name/urf&gt;,
 example.janedoe(foaf.Person):
   example.age=#23,
+  example.birthdate=@1980-04-05@,
   example.favoriteSites=
   [
     «http://www.globalmentor.com/»,
     «http://www.garretwilson.com/»
   ],
+  example.possibleVacationDestinations=
+  {
+    "Paris",
+    "Rome"
+  },
   nick="Janinha":
     dc.language~«info:lang/pt/BR»
- ;
+  ;
 ;</code></pre>
     </blockquote>
 
@@ -1941,6 +2046,11 @@ example.janedoe:
       datatypes [<a href="#xmlSchema2">XML Schema 2</a>], has no character
       type.</li>
 
+      <li>URF has several date/time types which are compatible with [<a
+      href="#iso8601">ISO 8601</a>], [<a href="#rfc3339">RFC 3339</a>], and
+      [<a href="#rfc2445">RFC 2445</a>]. RDF, which uses XML Schema datatypes
+      [<a href="#xmlSchema2">XML Schema 2</a>], has no character type.</li>
+
       <li>URF has a regular expression type,
       <code>«http://urf.name/urf#RegularExpression»</code>. RDF has no regular
       expression type.</li>
@@ -1994,12 +2104,18 @@ example.janedoe:
       <dd><a href="http://www.guiseframework.com/"><cite>Guise™ Internet
       Application Framework</cite></a>. GlobalMentor, Inc.</dd>
 
+      <dt id="iso8601">ISO 8601</dt>
+
+      <dd><cite>ISO 8601:2004(E): Data elements and interchange formats —
+      Information interchange — Representation of dates and times</cite>.
+      International Organization for Standardization, 2004-12-01.</dd>
+
       <dt id="rdfxml">RDF/XML</dt>
 
       <dd>Dave Beckett. <a
       href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax
-      Specification (Revised)</cite></a>. World Wide Web Consortium, 10
-      February 2006.</dd>
+      Specification (Revised)</cite></a>. World Wide Web Consortium,
+      2006-02-10.</dd>
 
       <dt id="rfc2426">RFC 2426</dt>
 
@@ -2007,6 +2123,13 @@ example.janedoe:
       href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2426: vCard MIME
       Directory Profile</cite></a>. Internet Engineering Task Force,
       1998.</dd>
+
+      <dt id="rfc2445">RFC 2445</dt>
+
+      <dd>F. Dawson and and D. Stenerson. <a
+      href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2445: Internet
+      Calendaring and Scheduling Core Object Specification
+      (iCalendar)</cite></a>. Internet Engineering Task Force, 1998.</dd>
 
       <dt id="rfc3339">RFC 3339</dt>
 
@@ -2054,8 +2177,8 @@ example.janedoe:
 
       <dd>Paul V. Biron and Ashok Malhotra. <a
       href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2:
-      Datatypes Second Edition</cite></a>. World Wide Web Consortium, 28
-      October 2004.</dd>
+      Datatypes Second Edition</cite></a>. World Wide Web Consortium,
+      2004-10-28.</dd>
     </dl>
 
     <h2>Acknowledgements</h2>
@@ -2091,6 +2214,8 @@ example.janedoe:
 
           <li>Improved and simplified TURF URI and URI reference lexical form
           representation.</li>
+
+          <li>Clarified and extended <code>urf.Temporal</code> types.</li>
         </ul></dd>
 
       <dt>2007-10-05</dt>
