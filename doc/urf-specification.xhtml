@@ -135,7 +135,7 @@ example.janedoe(foaf.Person):
       <pre><code>«http://example.com/example#janedoe»:
   «http://urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
   «http://example.com/example#name»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
-  «http://example.com/example#birthday»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#1980-01-01»,
+  «http://example.com/example#birthday»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Date#1980-01-01»,
   «http://example.com/example#salary»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»:
     «http://example.com/example#currency»~«http://urf.name/lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
   ;
@@ -448,7 +448,7 @@ example.resource(example.Class):
       namespace with a lexical form consistent with [<a href="#rfc2445">RFC
       2445</a>] and [<a href="#iso8601">ISO 8601</a>] of
       <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>,
-      where <var>n</var> is some positive number of roman digits and either
+      where <var>n</var> is some positive number of roman digits and at least
       the date or time section is present.</dd>
 
       <dt><code>urf.Enum</code></dt>
