@@ -17,13 +17,13 @@
     form.</p>
 
     <dl>
-      <dt>Editor</dt>
+      <dt>Author</dt>
 
       <dd><a href="http://www.garretwilson.com/">Garret Wilson</a></dd>
 
       <dt>Version</dt>
 
-      <dd>2007-10-15</dd>
+      <dd>2007-10-16</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -121,7 +121,7 @@
 *describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;*
 example.janedoe(foaf.Person):
   example.name="Jane Doe",
-  example.birthday=@1980-01-01@,
+  example.birthday=@1980-01-01,
   example.salary=#1000000:
     example.currency~«"usd"(example.Currency)»
   ;
@@ -446,10 +446,15 @@ example.resource(example.Class):
 
       <dd>Duration resources represent lengths of time. They use a lexical
       namespace with a lexical form consistent with [<a href="#rfc2445">RFC
-      2445</a>] of
-      <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>,
-      with optional shorter forms and optional decimal components using the
-      full stop as defined in [<a href="#iso8601">ISO 8601</a>].</dd>
+      2445</a>] and [<a href="#iso8601">ISO 8601</a>] of
+      <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>,
+      where <var>n</var> is some positive number of roman digits and either
+      the date or time section is present.</dd>
+
+      <dt><code>urf.Enum</code></dt>
+
+      <dd>The base class of class resources having lexical URIs the lexical
+      forms of which are enumerated as class list elements.</dd>
 
       <dt><code>urf.Integer</code></dt>
 
@@ -764,17 +769,31 @@ example.resource(example.Class):
           <dd><p>A temporal resource such as <code>urf.Date</code>,
           <code>urf.DateTime</code>, <code>urf.Duration</code>,
           <code>urf.Time</code>, or <code>urf.UTCOffset</code> may be
-          identified by its lexical form with surrounding at signs
+          identified by its lexical form with a beginning at sign
           (<code>'@'</code>). The specific temporal type can be determined by
           the specific lexical form used. For example, the following short
-          representation for urf.Time,</p><blockquote>
-              <pre><code>@16:39:57-08:00@</code></pre>
-            </blockquote><p>is equivalent to the following long
-          representation,</p><blockquote>
-              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#16%3A39%3A57-08%3A00»</code></pre>
-            </blockquote><p>which is also equivalent to the general short
+          representation for <code>urf.Date</code>, <code>urf.Time</code>,
+          <code>urf.DateTime</code>, <code>urf.Duration</code>, and
+          <code>urf.UTFOffset</code>, respectively</p><blockquote>
+              <pre><code>@1980-05-06
+@16:39:57-08:00
+@1980-05-06T16:39:57-08:00
+@P100Y5M3DT8H2M10.5S
+@-08:00</code></pre>
+            </blockquote><p>are equivalent to the following long
+          representations,</p><blockquote>
+              <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Date#1980-05-06»
+«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Time#16%3A39%3A57-08%3A00»
+«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23DateTime#1980-05-06T16%3A39%3A57-08%3A00»
+«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Duration#P100Y5M3DT8H2M10.5S»
+«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23UTCOffset#-08:00»</code></pre>
+            </blockquote><p>which are also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"16:39:57-08:00"(urf.Timestamp)»</code></pre>
+              <pre><code>«"1980-05-06"(urf.Date)»
+«"16:39:57-08:00"(urf.Time)»
+«"1980-05-06T16:39:57-08:00"(urf.DateTime)»
+«"P100Y5M3DT8H2M10.5S"(urf.Duration)»
+«"-08:00"(urf.UTCOffset)»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.URI</code></dt>
@@ -792,6 +811,41 @@ example.resource(example.Class):
               <pre><code>«"http://urf.name/urf#type"(urf.URI)»</code></pre>
             </blockquote></dd>
         </dl></dd>
+    </dl>
+
+    <h3 id="enum">Enums</h3>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>URF provides a special class, the <code>urf.Enum</code>, for
+      declaring subclasses that have values from a finite set of lexical
+      forms. The URI of each instance of the enum subclass is a normal lexical
+      URI, made up of the enum type (the <code>urf.Enum</code> subclass) and
+      the lexical form of the enum value. <code>urf.Enum</code> is in turn a
+      subclass of <code>urf.List</code>, and the lexical form values of the
+      enum type are specified as list elements of the <code>urf.Enum</code>
+      subclass. For example, the URF class <code>urf.Boolean</code> is a
+      subclass of <code>urf.Enum</code>, and its lexical form values are
+      <code>"false"</code> and <code>"true"</code>. The URI of each
+      urf.Boolean instance is formed following normal URF lexical URI rules,
+      resulting in
+      <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#false»</code>
+      and
+      <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code>.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>The following is the definition of the <code>urf.Boolean</code>
+      class, which is a typical enum subclass:</p><blockquote>
+          <pre><code>urf.Boolean(urf.Class):
+  urf.subClassOf=urf.Enum
+;
+[
+  "false",
+  "true"
+]</code></pre>
+        </blockquote></dd>
     </dl>
 
     <h3>Reification</h3>
@@ -1315,7 +1369,12 @@ example.billy:
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
-      #<strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+[</strong>.<var>romandigit</var><strong>+][</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong></code></p>
+      #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>+][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>+]</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>n</var> ⇒
+      <var>romandigit</var><strong>+</strong></code></p>
     </blockquote>
 
     <p>An ordinal short form consists of roman digits preceded by the ordinal
@@ -1326,7 +1385,7 @@ example.billy:
 
     <blockquote>
       <p><code><var>ordinalshort</var> ⇒
-      º<var>romandigit</var><strong>+</strong></code></p>
+      º<var>n</var><strong>+</strong></code></p>
     </blockquote>
 
     <p>A regular expression short form is a sequence of Unicode characters,
@@ -1350,12 +1409,13 @@ example.billy:
     <p>A temporal short form consists of the lexical form of a temporal
     resource such as <code>urf.Date</code>, <code>urf.DateTime</code>,
     <code>urf.Duration</code>, <code>urf.Time</code>, or
-    <code>urf.UTCOffset</code>, surrounded by matching at signs
-    (<code>'@'</code>). A temporal short form is equivalent to a resource of
-    the corresponding urf.Temporal type, based upon the specific lexical form
-    used. The temporarl short form <code>@1999-03-04@</code> is the equivalent
-    of the number resource <code>«"1999-03-04"(urf.Date)»</code>, for
-    example.</p>
+    <code>urf.UTCOffset</code>, beginnint with an at sign (<code>'@'</code>).
+    An <code>urf.Duration</code> requires at least the date or the time
+    section to be present. A temporal short form is equivalent to a resource
+    of the corresponding urf.Temporal type, based upon the specific lexical
+    form used. The temporal short form <code>@1999-03-04@</code> is the
+    equivalent of the number resource <code>«"1999-03-04"(urf.Date)»</code>,
+    for example.</p>
 
     <blockquote>
       <p><code><var>temporalshort</var> ⇒
@@ -1365,9 +1425,9 @@ example.billy:
       <strong>|</strong>
       <strong>(</strong><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong><strong>)</strong>
       <strong>|</strong>
-      <strong>(</strong>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S<strong>)</strong>
+      <strong>(</strong>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong><strong>)</strong>
       <strong>|</strong>
-      <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code></p>
+      <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong></code></p>
     </blockquote>
 
     <p>The types declaration consists of zero or more resource descriptions
@@ -1912,7 +1972,7 @@ navigationPanel.add(conversionPanel);
 |urf|&lt;http://urf.name/urf&gt;,
 example.janedoe(foaf.Person):
   example.age=#23,
-  example.birthdate=@1980-04-05@,
+  example.birthdate=@1980-04-05,
   example.favoriteSites=
   [
     «http://www.globalmentor.com/»,
@@ -2012,7 +2072,7 @@ example.janedoe:
   \,
   vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
   vcard.url=&lt;http://www.example.com/home/jane/&gt;,
-  vcard.bday=@1980-02-02T09:45:00@,
+  vcard.bday=@1980-02-02T09:45:00,
   vcard.category="Internet",
   vcard.category="B2B",
   vcard.category="P2P",
@@ -2053,9 +2113,8 @@ example.janedoe:
       <code>«http://urf.name/urf#Character»</code>. JSON has no character
       type.</li>
 
-      <li>URF has a timestamp type,
-      <code>«http://urf.name/urf#Timestamp»</code>. JSON has no date or time
-      type.</li>
+      <li>URF has several date and time-related types. JSON has no date or
+      time type.</li>
     </ul>
 
     <h3>Differences between URF and RDF</h3>
@@ -2238,7 +2297,7 @@ example.janedoe:
     <p></p>
 
     <dl>
-      <dt>2007-10-??</dt>
+      <dt>2007-10-16</dt>
 
       <dd><ul>
           <li>Changed order of TURF properties declaration.</li>
@@ -2271,6 +2330,10 @@ example.janedoe:
           <li>Added <code>urf.MediaType</code> type.</li>
 
           <li>Changed PLOOP example to use <code>java:</code> URIs.</li>
+
+          <li>Removed trailing delimiter from TURF temporal short forms.</li>
+
+          <li>Added <code>urf.Enum</code> description.</li>
         </ul></dd>
 
       <dt>2007-10-05</dt>
