@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-10-16</dd>
+      <dd>2007-10-17</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -151,7 +151,8 @@ example.janedoe(foaf.Person):
 
       <dd><p>Everything that can be described by URF is referred to as a
       <dfn>resource</dfn>. Every resource is an instance of the class
-      <code>urf.Resource</code>.</p></dd>
+      <code>urf.Resource</code>. A group of described resources is referred to
+      as an <dfn>URF instance</dfn>.</p></dd>
 
       <dt>TURF</dt>
 
@@ -161,10 +162,9 @@ example.janedoe(foaf.Person):
           <pre><code>:;</code></pre>
         </blockquote><p>A resource can optionally be given a label which can
       be used as a short representation to refer the resource only within the
-      interchange document. A resource label is a series of <a
-      href="#namechar">name characters</a> placed in front of a resource
-      description and surrounded by vertical bars, as in the following
-      example:</p><blockquote>
+      interchange document. A resource label is a <a href="#name">name</a>
+      placed in front of a resource description and surrounded by vertical
+      bars, as in the following example:</p><blockquote>
           <pre><code>|label|:;</code></pre>
         </blockquote></dd>
     </dl>
@@ -440,7 +440,8 @@ example.resource(example.Class):
       specified. In most cases a <dfn>fixed time</dfn> is appropriate and a
       form with the UTC offset should be used. The hours component represents
       midnight as <code>00</code> and must not have a value larger than
-      <code>23</code>.</dd>
+      <code>23</code>. The UTC offset <code>-00:00</code> is not allowed;
+      <code>+00:00</code> must be used instead.</dd>
 
       <dt><code>urf.Duration</code></dt>
 
@@ -567,7 +568,8 @@ example.resource(example.Class):
       specified. In most cases a <dfn>fixed time</dfn> is appropriate and a
       form with the UTC offset should be used. The hours component represents
       midnight as <code>00</code> and must not have a value larger than
-      <code>23</code>.</dd>
+      <code>23</code>. The UTC offset <code>-00:00</code> is not allowed;
+      <code>+00:00</code> must be used instead.</dd>
 
       <dt><code>urf.URI</code></dt>
 
@@ -582,8 +584,9 @@ example.resource(example.Class):
       They use a lexical namespace with a lexical form of
       <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var>
       with semantics corresponding to the UTC offset described in [<a
-      href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC
-      2445</a>].</dd>
+      href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The
+      UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must
+      be used instead.</dd>
 
       <dt><code>content.MediaType</code></dt>
 
@@ -1051,6 +1054,32 @@ example.billy:
         </blockquote></dd>
     </dl>
 
+    <h3>TURF Container</h3>
+
+    <dl>
+      <dt>TURF</dt>
+
+      <dd><p>A TURF representation of an URF instance may optionally be placed
+      inside a <dfn>TURF container</dfn>. This is especially useful in
+      situations in which there may some doubt as to the type of content, as
+      the TURF container unambiguously identifies the content as TURF. The
+      TURF container adds no semantics to the URF instance—it is merely a
+      syntactic marker. It consists of the marker <code>^URF</code> followed
+      by the URF instance between brackets <code>'['</code> and
+      <code>']'</code>. If present in a file, it must occur at the beginning
+      of the file, after the Byte Order Mark (BOM), if any [<a
+      href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p><blockquote>
+          <pre><code>^URF
+[
+  |example|&lt;http://example.com/example&gt;,
+  |foaf|&lt;http://xmlns.com/foaf/0.1/&gt;,
+
+  example.janedoe(foaf.Person),
+  example.johndoe(foaf.Person),
+]</code></pre>
+        </blockquote></dd>
+    </dl>
+
     <h2>URF</h2>
 
     <p>Everything that is described in URF is referred to as a
@@ -1114,15 +1143,15 @@ example.billy:
     is:</p>
 
     <blockquote>
-      <p><code>application/turf</code></p>
+      <p><code>text/urf+turf</code></p>
     </blockquote>
 
     <p>For any application-specific URF data encoded as TURF should be
-    represented as <code>application/<var>applicationName</var>+turf</code> to
-    allow the data to be recognized as such, where <var>applicationName</var>
-    is the application-specific identifier for the URF information. <em>Note:
-    These Internet media types have yet to be registered with the
-    IANA.</em></p>
+    represented as
+    <code>application/<var>applicationName</var>+urf+turf</code> to allow the
+    data to be recognized as such, where <var>applicationName</var> is the
+    application-specific identifier for the URF information. <em>Note: These
+    Internet media types have yet to be registered with the IANA.</em></p>
 
     <h3>Encoding</h3>
 
@@ -1133,7 +1162,17 @@ example.billy:
     TURF interchange document files should use a UTF-8 U+FEFF signature (the
     so-called UTF-8 Byte Order Mark or BOM) at their beginning to notify
     general text processing agents that may not be aware of TURF that UTF-8
-    encoding is being used.</p>
+    encoding is being used [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
+
+    <h3>Container</h3>
+
+    <p>A TURF container can optionally surround resources, and must be used in
+    situations in which there is some doubt as to whether the content is TURF.
+    The container consists of the signature <code>^URF</code> followed by
+    optional separators and then bracket characters <code>'['</code> and
+    <code>']'</code> surrounding any resources. A TURF container should be
+    used in TURF files, and if present it must occur at the beginning of the
+    file, after the Byte Order Mark (BOM), if any.</p>
 
     <h3>Grammar</h3>
 
@@ -1155,11 +1194,12 @@ example.billy:
     </blockquote>
 
     <p>A TURF interchange document is encoded in UTF-8, and is composed of one
-    or more resource descriptions, separated by commas.</p>
+    or more resource descriptions, separated by commas. A TURF container
+    <code>^URF[]</code> can optionally surround the resources.</p>
 
     <blockquote>
-      <p><code><var>TURF</var> ⇒
-      <var>resource</var><strong>[</strong>,<var>resource</var><strong>]*</strong></code></p>
+      <p><code><var>TURF</var> ⇒ resource<strong>*</strong> <strong>|</strong>
+      ^URF [ <var>resource</var><strong>*</strong> ]</code></p>
     </blockquote>
 
     <p>Each resource description must have at least one of the following
@@ -1172,17 +1212,25 @@ example.billy:
       <strong>[</strong>|<var>label</var>|<strong>]</strong><strong>[</strong><var>reference</var><strong>]</strong><strong>[</strong>(<var>type</var>s)<strong>]</strong><strong>[</strong>¡inits!<strong>]</strong><strong>[</strong>:properties;<strong>]</strong><strong>[</strong><var>listshort</var><strong>]</strong><strong>[</strong><var>setshort</var><strong>]</strong></code></p>
     </blockquote>
 
-    <p>A label consists of one or more name characters.</p>
+    <p>A label consists of a name.</p>
 
     <blockquote>
-      <p><code><var>label</var> ⇒
-      <var>namechar</var><strong>+</strong></code></p>
+      <p><code><var>label</var> ⇒ <var>name</var></code></p>
     </blockquote>
 
-    <p>A name character is any letter, digit, or connector such as the
-    underscore character <code>'_'</code>.</p>
+    <p>A name is any letter followed by any number of letters, digits, or
+    connectors such as the underscore character <code>'_'</code>.</p>
 
-    <blockquote id="namechar">
+    <blockquote id="name">
+      <p><code><var>name</var> ⇒
+      <var>namebeginchar</var><strong>(</strong><var>namechar</var><strong>)</strong><strong>*</strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>namebeginchar</var> ⇒ <var>Unicode Letter</var></code></p>
+    </blockquote>
+
+    <blockquote>
       <p><code><var>namechar</var> ⇒ <var>Unicode Letter</var>
       <strong>|</strong> <var>Unicode Decimal Digit Number</var>
       <strong>|</strong> <var>Unicode Connector Punctuation</var></code></p>
@@ -1193,7 +1241,7 @@ example.billy:
 
     <blockquote>
       <p><code><var>reference</var> ⇒ <var>urireference</var>
-      <strong>|</strong> <var>nameshort</var> <strong>|</strong>
+      <strong>|</strong> <var>namereference</var> <strong>|</strong>
       <var>urishort</var> <strong>|</strong> <var>stringshort</var>
       <strong>|</strong> <var>booleanshort</var> <strong>|</strong>
       <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var>
@@ -1221,29 +1269,26 @@ example.billy:
       <p><code><var>type</var> ⇒ <var>resource</var></code></p>
     </blockquote>
 
-    <p>A name short reference is a sequence of name characters together
-    representing the local name of a resource, optionally preceded by other
-    name characters ending with the full stop or period character
-    <code>'.'</code>, together representing the name of a label of a
-    predeclared namespace URI. If no prefix is present, the namespace is the
-    same as the namespace of the predicate resource for object resources; or
-    the namespace of the first type short form of the subject resource for
-    predicate resources. The local name is the unencoded form of the fragment
-    to be appended to the namespace URI.</p>
+    <p>A name reference is a <var>name</var> representing the local name of a
+    resource, optionally preceded by a <var>name</var> ending with the full
+    stop or period character <code>'.'</code>, together representing the name
+    of a label of a predeclared namespace URI. If no prefix is present, the
+    namespace is the same as the namespace of the predicate resource for
+    object resources; or the namespace of the first type short form of the
+    subject resource for predicate resources. The local name is the unencoded
+    form of the fragment to be appended to the namespace URI.</p>
 
     <blockquote>
-      <p><code><var>nameshort</var> ⇒
+      <p><code><var>namereference</var> ⇒
       <strong>[</strong>prefix.<strong>]</strong>localName</code></p>
     </blockquote>
 
     <blockquote>
-      <p><code><var>prefix</var> ⇒
-      <var>namechar</var><strong>+</strong></code></p>
+      <p><code><var>prefix</var> ⇒ <var>name</var></code></p>
     </blockquote>
 
     <blockquote>
-      <p><code><var>localName</var> ⇒
-      <var>namechar</var><strong>+</strong></code></p>
+      <p><code><var>localName</var> ⇒ <var>name</var></code></p>
     </blockquote>
 
     <p>A string short form is a sequence of Unicode characters, using the
@@ -1369,7 +1414,7 @@ example.billy:
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
-      #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>+][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>+]</strong></code></p>
+      #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong></code></p>
     </blockquote>
 
     <blockquote>
@@ -1384,8 +1429,7 @@ example.billy:
     the ordinal resource <code>«"27"(urf.Ordinal)»</code>.</p>
 
     <blockquote>
-      <p><code><var>ordinalshort</var> ⇒
-      º<var>n</var><strong>+</strong></code></p>
+      <p><code><var>ordinalshort</var> ⇒ º<var>n</var></code></p>
     </blockquote>
 
     <p>A regular expression short form is a sequence of Unicode characters,
@@ -1411,11 +1455,14 @@ example.billy:
     <code>urf.Duration</code>, <code>urf.Time</code>, or
     <code>urf.UTCOffset</code>, beginnint with an at sign (<code>'@'</code>).
     An <code>urf.Duration</code> requires at least the date or the time
-    section to be present. A temporal short form is equivalent to a resource
-    of the corresponding urf.Temporal type, based upon the specific lexical
-    form used. The temporal short form <code>@1999-03-04@</code> is the
-    equivalent of the number resource <code>«"1999-03-04"(urf.Date)»</code>,
-    for example.</p>
+    section to be present. The hours component represents midnight as
+    <code>00</code> and must not have a value larger than <code>23</code>. The
+    UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be
+    used instead. A temporal short form is equivalent to a resource of the
+    corresponding urf.Temporal type, based upon the specific lexical form
+    used. The temporal short form <code>@1999-03-04@</code> is the equivalent
+    of the number resource <code>«"1999-03-04"(urf.Date)»</code>, for
+    example.</p>
 
     <blockquote>
       <p><code><var>temporalshort</var> ⇒
@@ -1508,22 +1555,6 @@ example.billy:
     </blockquote>
 
     <h2 id="ploop">PLOOP</h2>
-
-    <p>Descriptions of resources in semantic frameworks such as URF differ
-    from class instantiations of object-oriented programming language instance
-    such as Java in several ways:</p>
-
-    <ul>
-      <li>Programming languages usually provide <dfn>constructors</dfn> that
-      allow arguments solely for initializing an object. Resources in semantic
-      frameworks are initialized by their property descriptions.</li>
-
-      <li>Semantic frameworks describe properties as independent entities in
-      themselves, able to be applied even to resource types that have not yet
-      been created. Programming language properties usually only exist in
-      relation to a particular class definition, and may even exist only as
-      abstractions of "getter" and "setter" methods.</li>
-    </ul>
 
     <p>It is possible to use URF as a Programming Language Ontology for
     Objects and Properties (PLOOP), allowing long-term storage and/or object
@@ -1827,13 +1858,13 @@ navigationPanel.setLayout(new FlowLayout(Flow.LINE));
 navigationPanel.setLabel("Guise\u2122 Demonstration: Temperature Conversion");
 
 LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));
-TextControl&amp;lt;Float&amp;gt; temperatureInput=new TextControl&amp;lt;Float&amp;gt;(Float.class);
+TextControl&lt;Float&gt; temperatureInput=new TextControl&lt;Float&gt;(Float.class);
 temperatureInput.setName("temperatureInput");
 temperatureInput.setLabel("Input Temperature");
-temperatureInput.setValidator(new ValueRequiredValidator&amp;lt;Float&amp;gt;());
+temperatureInput.setValidator(new ValueRequiredValidator&lt;Float&gt;());
 inputPanel.add(temperatureInput);
 
-TextControl&amp;lt;Float&amp;gt; temperatureOutput=temperatureOutput=new TextControl&amp;lt;Float&amp;gt;(Float.class);
+TextControl&lt;Float&gt; temperatureOutput=temperatureOutput=new TextControl&lt;Float&gt;(Float.class);
 temperatureOutput.setName("temperatureOutput");
 temperatureOutput.setLabel("Output Temperature");
 temperatureOutput.setEditable(false);
@@ -1979,7 +2010,7 @@ example.janedoe(foaf.Person):
     «http://www.garretwilson.com/»
   ],
   example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
-    content.type~«"text/xml-external-parsed-entity/xml-external-parsed-entity"(urf.MediaType)»
+    content.type~«"text/xml-external-parsed-entity"(urf.MediaType)»
   ;,
   example.possibleVacationDestinations=
   {
@@ -2113,8 +2144,9 @@ example.janedoe:
       <code>«http://urf.name/urf#Character»</code>. JSON has no character
       type.</li>
 
-      <li>URF has several date and time-related types. JSON has no date or
-      time type.</li>
+      <li>URF has several date/time types which are compatible with [<a
+      href="#iso8601">ISO 8601</a>], [<a href="#rfc3339">RFC 3339</a>], and
+      [<a href="#rfc2445">RFC 2445</a>]. JSON has no date or time type.</li>
     </ul>
 
     <h3>Differences between URF and RDF</h3>
@@ -2143,11 +2175,6 @@ example.janedoe:
       <code>«http://urf.name/urf#Character»</code>. RDF, which uses XML Schema
       datatypes [<a href="#xmlSchema2">XML Schema 2</a>], has no character
       type.</li>
-
-      <li>URF has several date/time types which are compatible with [<a
-      href="#iso8601">ISO 8601</a>], [<a href="#rfc3339">RFC 3339</a>], and
-      [<a href="#rfc2445">RFC 2445</a>]. RDF, which uses XML Schema datatypes
-      [<a href="#xmlSchema2">XML Schema 2</a>], has no character type.</li>
 
       <li>URF has a regular expression type,
       <code>«http://urf.name/urf#RegularExpression»</code>. RDF has no regular
@@ -2278,6 +2305,13 @@ example.janedoe:
       Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task
       Force, 2006.</dd>
 
+      <dt id="unicodeBOMFAQ">Unicode BOM FAQ</dt>
+
+      <dd>Asmus Freytag and Mark Davis. <a
+      href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode
+      Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved
+      2006-06-07.</dd>
+
       <dt id="xmlSchema2">XML Schema 2</dt>
 
       <dd>Paul V. Biron and Ashok Malhotra. <a
@@ -2297,6 +2331,17 @@ example.janedoe:
     <p></p>
 
     <dl>
+      <dt>2007-??-??</dt>
+
+      <dd><ul>
+          <li>Changed TURF Internet media type to
+          <code>text/turf+urf</code>.</li>
+
+          <li>Added TURF container syntax.</li>
+
+          <li>Improved TURF name grammar.</li>
+        </ul></dd>
+
       <dt>2007-10-16</dt>
 
       <dd><ul>
