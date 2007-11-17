@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-11-11</dd>
+      <dd>2007-11-17</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -125,12 +125,11 @@
 
     <blockquote>
       <pre><code>`URF
-† *declare the example and foaf namespaces*
+†   *declare the example and foaf namespaces*
   "example"=&lt;http://example.com/example&gt;,
   "foaf"=&lt;http://xmlns.com/foaf/0.1/&gt;
 ‡
-¤
-  *describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;*
+¤   *describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;*
   example.janedoe(foaf.Person):
   example.name="Jane Doe",
     example.birthday=@1980-01-01,
@@ -142,11 +141,11 @@
     </blockquote>
 
     <p>The following is semantically equivalent to the preceding example but
-    uses longer TURF forms (and no comments):</p>
+    uses long URI references and no comments:</p>
 
     <blockquote>
       <pre><code>`URF
-†
+¤
   «http://example.com/example#janedoe»:
     «http://urf.name/urf#type»=«http://xmlns.com/foaf/0.1/Person»,
     «http://example.com/example#name»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»,
@@ -155,6 +154,90 @@
       «http://example.com/example#currency»`=«http://urf.name/lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
     ;
   ;
+.</code></pre>
+    </blockquote>
+
+    <p>This is the proposition, "The moon is made of cheese."</p>
+
+    <blockquote>
+      <pre><code>`URF
+†
+  "example"=&lt;http://example.com/example&gt;
+‡
+¤
+  “example.moon, example.madeOf, example.cheese”
+.</code></pre>
+    </blockquote>
+
+    <p>It can be asserted that Little Johnny believes the moon is made of
+    cheese:</p>
+
+    <blockquote>
+      <pre><code>`URF
+†
+  "example"=&lt;http://example.com/example&gt;
+‡
+¤
+  example.littleJohnny:
+    believes=“example.moon, example.madeOf, example.cheese”
+  ;
+.</code></pre>
+    </blockquote>
+
+    <p>It can also be asserted that the moon is made of cheese and that Little
+    Johnny believes this to be true:</p>
+
+    <blockquote>
+      <pre><code>`URF
+†
+  "example"=&lt;http://example.com/example&gt;
+‡
+¤
+  example.moon:
+    madeOf|cheeseMoon|=example.cheese
+  ;
+  example.littleJohnny:
+    believes=|cheeseMoon|
+  ;
+.</code></pre>
+    </blockquote>
+
+    <p>The following indicates that a knowledge community long ago held the
+    moon to be made of cheese:</p>
+
+    <blockquote>
+      <pre><code>`URF
+†
+  "urf"=&lt;http://urf.name/urf&gt;,
+  "example"=&lt;http://example.com/example&gt;
+‡
+¤
+  example.community(urf.Community):
+    example:when=example.longAgo
+  ;
+  {
+    “example.moon, example.madeOf, example.cheese”
+  }
+.</code></pre>
+    </blockquote>
+
+    <p>The following example is semantically identical to the previous one but
+    uses the community short form:</p>
+
+    <blockquote>
+      <pre><code>`URF
+†
+  "urf"=&lt;http://urf.name/urf&gt;,
+  "example"=&lt;http://example.com/example&gt;
+‡
+¤
+  example.community(urf.Community):
+    example:when=example.longAgo
+  ;
+  ¤
+    example.moon:
+      madeOf=example.cheese
+  .
 .</code></pre>
     </blockquote>
 
@@ -1408,9 +1491,9 @@
       <strong>[</strong>(<var>type</var>s)<strong>]</strong>
       <strong>[</strong>¡inits!<strong>]</strong>
       <strong>[</strong>:properties;<strong>]</strong>
+      <strong>[</strong><var>communityshort</var><strong>]</strong>
       <strong>[</strong><var>listshort</var><strong>]</strong>
-      <strong>[</strong><var>setshort</var><strong>]</strong>
-      <strong>[</strong><var>communityshort</var><strong>]</strong></code></p>
+      <strong>[</strong><var>setshort</var><strong>]</strong></code></p>
     </blockquote>
 
     <p>A label consists of a name.</p>
@@ -1756,6 +1839,19 @@
       \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
     </blockquote>
 
+    <p>A community short form consists of a sequence of resources surrounded
+    by the currency symbol <code>'¤'</code> and the full stop character
+    <code>'.'</code>, separated by commas. Each listed resource represents an
+    unreified proposition that is a value of the <code>urf.element</code>
+    property. The presence of a community short form implies a type of
+    <code>urf.Community</code> if no other types have yet been specified,
+    either implicitly or explicitly.</p>
+
+    <blockquote>
+      <p><code><var>communityshort</var> ⇒
+      ¤<strong>[</strong>resource<strong>[</strong>,resource<strong>]*].</strong></code></p>
+    </blockquote>
+
     <p>A list short form consists of a sequence of element resources
     surrounded by bracket characters <code>'['</code> and <code>']'</code> and
     separated by commas. Each listed element resource represents the value of
@@ -1779,19 +1875,6 @@
     <blockquote>
       <p><code><var>setshort</var> ⇒
       {<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>}</code></p>
-    </blockquote>
-
-    <p>A community short form consists of a sequence of resources surrounded
-    by the currency symbol <code>'¤'</code> and the full stop character
-    <code>'.'</code>, separated by commas. Each listed resource represents an
-    unreified proposition that is a value of the <code>urf.element</code>
-    property. The presence of a community short form implies a type of
-    <code>urf.Community</code> if no other types have yet been specified,
-    either implicitly or explicitly.</p>
-
-    <blockquote>
-      <p><code><var>communityshort</var> ⇒
-      ¤<strong>[</strong>resource<strong>[</strong>,resource<strong>]*].</strong></code></p>
     </blockquote>
 
     <h2 id="ploop">PLOOP</h2>
@@ -1907,7 +1990,7 @@
     Subversion repository at &lt;<a
     href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;.
     The API documentation may be found at &lt;<a
-    href="http://www.guiseframework.com/api/com/garretwilson/urf/package-summary.html">http://www.guiseframework.com/api/com/garretwilson/urf/package-summary.html</a>&gt;.
+    href="http://www.guiseframework.com/doc/api/com/garretwilson/urf/package-summary.html">http://www.guiseframework.com/doc/api/com/garretwilson/urf/package-summary.html</a>&gt;.
     The Guise Internet application framework [<a href="#guise">Guise</a>]
     development library contains the URF reference implementation already
     compiled, and is available at &lt;<a
@@ -2081,7 +2164,7 @@ navigationPanel.add(conversionPanel);
 
     <p>While this representation has some undesirable traits (e.g. strings are
     not recommended as general property identifiers except in the case of
-    resources used as maps), the following URF representation is semantically
+    resources used as maps), the following TURF representation is semantically
     identical to the JSON example above:</p>
 
     <blockquote>
