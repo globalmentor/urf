@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-11-17</dd>
+      <dd>2007-11-18</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -127,14 +127,17 @@ $
 
 †
 † This is an example TURF interchange document.
-† Comments are flexible to allow terseness or promote readability.
+† Comments can be terse or verbosely readable.
 ‡
 
-$   †declare the example and foaf namespaces‡
+†declare the example and foaf namespaces‡
+$
   "example"=&lt;http://example.com/example&gt;,
   "foaf"=&lt;http://xmlns.com/foaf/0.1/&gt;
 $
-¤   †describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
+
+†describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
+¤
   example.janedoe(foaf.Person):
   example.name="Jane Doe",
     example.birthday=@1980-01-01,
@@ -374,10 +377,10 @@ $
 $
 ¤
   (component.Button):
-    label="Convert",
-  ;
+    label="Convert"
+  ;,
   example.janedoe(foaf.Person):
-    example.name="Jane Doe",
+    example.name="Jane Doe"
   ;
 .</code></pre>
         </blockquote>Namespace declarations within a TURF document are purely
@@ -488,17 +491,14 @@ $
       resource after the resource reference surrounded by parentheses.
       Multiple classes may be separated by commas, and are added as <a
       href="#orderedProperties">ordered properties</a>. The following example
-      is semantically identical to the preceding example. Note also that,
-      because the property of <code>example.resource</code> uses the URI of
-      the class <code>example.Class</code> as its namespace, the property does
-      not need a name prefix.</p><blockquote>
+      is semantically identical to the preceding example.</p><blockquote>
           <pre><code>`URF
 $
   "example"=&lt;http://example.com/example&gt;
 $
 ¤
   example.resource(example.Class):
-    property=example.value
+    example.property=example.value
   ;
 .</code></pre>
         </blockquote></dd>
@@ -786,9 +786,9 @@ $
           <dt><code>urf.Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          beginning with an ampersand. For example, the following short
+          beginning with an asterisk. For example, the following short
           representation,</p><blockquote>
-              <pre><code>&amp;true</code></pre>
+              <pre><code>*true</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
@@ -995,9 +995,9 @@ $
 ¤
   example.john:
     example.believes=(urf.Proposition):
-      subject=example.sky,
-      predicate=example.color,
-      object=example.purple
+      urf.subject=example.sky,
+      urf.predicate=example.color,
+      urf.object=example.purple
     ;
   ;
 .</code></pre>
@@ -1431,15 +1431,15 @@ $
     is:</p>
 
     <blockquote>
-      <p><code>text/urf+turf</code></p>
+      <p><code>application/turf</code></p>
     </blockquote>
 
     <p>For any application-specific URF data encoded as TURF should be
-    represented as
-    <code>application/<var>applicationName</var>+urf+turf</code> to allow the
-    data to be recognized as such, where <var>applicationName</var> is the
-    application-specific identifier for the URF information. <em>Note: These
-    Internet media types have yet to be registered with the IANA.</em></p>
+    represented as <code>application/<var>applicationName</var>+turf</code> to
+    allow the data to be recognized as such, where <var>applicationName</var>
+    is the application-specific identifier for the URF information. <em>Note:
+    These Internet media types have yet to be registered with the
+    IANA.</em></p>
 
     <h3>Encoding</h3>
 
@@ -1700,15 +1700,15 @@ $
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code> preceded by the <code>'&amp;'</code> character. A
-    boolean short form is equivalent to a resource of type
-    <code>urf.Boolean</code> using the corresponding lexical namespace. The
-    boolean short form <code>&amp;true</code> is the equivalent of the boolean
-    resource <code>«"true"(urf.Boolean)»</code>.</p>
+    <code>false</code> preceded by the <code>'*'</code> character. A boolean
+    short form is equivalent to a resource of type <code>urf.Boolean</code>
+    using the corresponding lexical namespace. The boolean short form
+    <code>*true</code> is the equivalent of the boolean resource
+    <code>«"true"(urf.Boolean)»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      &amp;true<strong>|</strong>&amp;false</code></p>
+      *true<strong>|</strong>*false</code></p>
     </blockquote>
 
     <p>A number short form consists of roman digits, optionally preceded by a
@@ -1988,7 +1988,7 @@ $
     enumerated type. In the following example, the Guise Java class
     <code>com.guiseframework.component.layout.FlowLayout</code> has a
     <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The
-    lexical URI «"LINE"(Flow)» indicates a type of
+    lexical URI <code>«"LINE"(layout.Flow)»</code> indicates a type of
     <code>com.guiseframework.component.layout.Flow</code>, which is a Java
     enum class. A PLOOP processor must construct a
     <code>com.guiseframework.component.layout.Flow</code> object from the
@@ -2000,7 +2000,7 @@ $
       <pre><code>`URF
 ¤
   («java:/com/guiseframework/component/layout/FlowLayout»):
-    flow=«"LINE"(Flow)»
+    flow=«"LINE"(layout.Flow)»
   ;
 .</code></pre>
     </blockquote>
@@ -2053,14 +2053,14 @@ $
   (demo.TemperatureConversionPanel2):
     label="Guise™ Demonstration: Temperature Conversion",
     layout=(layout.FlowLayout):
-      flow=«"LINE"(Flow)»
+      flow=«"LINE"(layout.Flow)»
     ;,
     name="temperatureConversionPanel",
     children=
     [
       (component.LayoutPanel):
         layout=(layout.FlowLayout):
-          flow=«"PAGE"(Flow)»
+          flow=«"PAGE"(layout.Flow)»
         ;,
         name="inputPanel",
         children=
@@ -2071,7 +2071,7 @@ $
             validator=(validator.ValueRequiredValidator)
           ;,
           (component.TextControl)¡«java:/java/lang/Double»!:
-            editable=&amp;false,
+            editable=*false,
             label="Output Temperature",
             name="temperatureOutput"
           ;
@@ -2079,7 +2079,7 @@ $
       ;,
       (component.LayoutPanel):
         layout=(layout.FlowLayout):
-          flow=«"PAGE"(Flow)»
+          flow=«"PAGE"(layout.Flow)»
         ;,
         name="conversionPanel",
         children=
@@ -2087,7 +2087,7 @@ $
           (component.GroupPanel):
             label="Input Scale",
             layout=(layout.FlowLayout):
-              flow=«"PAGE"(Flow)»
+              flow=«"PAGE"(layout.Flow)»
             ;,
             name="scalePanel",
             children=
@@ -2198,9 +2198,9 @@ navigationPanel.add(conversionPanel);
 ¤
   :
     "length"=#1234,
-    "valid"=&amp;true,
+    "valid"=*true,
     "status"="processing",
-    "results"=[&amp;false, #5, "dog", :"code"=#9.8;]
+    "results"=[*false, #5, "dog", :"code"=#9.8;]
   ;
 .</code></pre>
     </blockquote>
@@ -2226,9 +2226,9 @@ $
 ¤
   («example.Class»):
     example.length=#1234,
-    example.valid=&amp;true,
+    example.valid=*true,
     example.status="processing",
-    example.results=[&amp;false, #5, "dog", (urf.Map):"code"=#9.8;]
+    example.results=[*false, #5, "dog", (urf.Map):"code"=#9.8;]
   ;
 .</code></pre>
     </blockquote>
@@ -2407,8 +2407,6 @@ $
 
     <h3>Differences between URF and JSON</h3>
 
-    <p></p>
-
     <ul>
       <li>Any URF resource may be identified by a URI. JSON makes no provision
       for identifying resources.</li>
@@ -2483,8 +2481,6 @@ $
 
     <h3>Differences between URF and XML</h3>
 
-    <p></p>
-
     <ul>
       <li>URF provides a single type of subrelation: properties. XML provides
       two types of subrelations: attributes and child elements.</li>
@@ -2494,8 +2490,6 @@ $
     </ul>
 
     <h3>Differences between TURF and RDF/XML</h3>
-
-    <p></p>
 
     <ul>
       <li>TURF allows any resource, including strings and other resources in
@@ -2507,8 +2501,6 @@ $
     </ul>
 
     <h2>References</h2>
-
-    <p></p>
 
     <dl>
       <dt id="dcmiNamespace">DCMI Namespace</dt>
@@ -2622,15 +2614,10 @@ $
 
     <h2>History</h2>
 
-    <p></p>
-
     <dl>
-      <dt>2007-??-??</dt>
+      <dt>2007-11-18</dt>
 
       <dd><ul>
-          <li>Changed TURF Internet media type to
-          <code>text/turf+urf</code>.</li>
-
           <li>Added TURF preamble.</li>
 
           <li>Improved TURF name grammar.</li>
@@ -2657,6 +2644,8 @@ $
           <li>Changed comment syntax.</li>
 
           <li>Expanded rules for URI namespace determination.</li>
+
+          <li>Changed syntax for <code>urf.Boolean</code> short form.</li>
         </ul></dd>
 
       <dt>2007-10-16</dt>
