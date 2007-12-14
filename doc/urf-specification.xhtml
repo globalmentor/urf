@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-11-22</dd>
+      <dd>2007-12-13</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -94,19 +94,22 @@
 
     <blockquote>
       <pre><code>`URF
-«http://example.com/example#janedoe»</code></pre>
+¤
+  «http://example.com/example#janedoe»
+.</code></pre>
     </blockquote>
 
     <p>For namespaced resource URIs, the URI reference can be replaced with a
     name reference. Namespaces are declared in a TURF preamble section
-    surrounded by the dollar sign <code>'*'</code>. The following example
-    identifies the same resource as in the previous example.</p>
+    surrounded by the colon <code>':'</code> and semicolon <code>';'</code>
+    characters, separated by commas using the tilde character <code>'~'</code>
+    to associate the namespace prefix with the namespace URI. The following
+    example identifies the same resource as in the previous example.</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.janedoe
 .</code></pre>
@@ -121,7 +124,7 @@
     with a double dagger.</p>
 
     <blockquote>
-      <pre><code>`URF
+      <pre><code>`URF:
 
 ††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††
 †
@@ -130,16 +133,14 @@
 †
 ††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††‡
 
-†declare the example and foaf namespaces‡
-*
-  "example"=&lt;http://example.com/example&gt;,
-  "foaf"=&lt;http://xmlns.com/foaf/0.1/&gt;
-*
-
-†describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
+  †declare the example and foaf namespaces‡
+  "example"~&lt;http://example.com/example&gt;,
+  "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
+;
 ¤
+  †describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
   example.janedoe(foaf.Person):
-  example.name="Jane Doe",
+    example.name="Jane Doe",
     example.birthday=@1980-01-01,
     example.salary=#1000000:
       example.currency`=«"usd"(example.Currency)»
@@ -168,10 +169,9 @@
     <p>This is the proposition, "The moon is made of cheese."</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   “example.moon, example.madeOf, example.cheese”
 .</code></pre>
@@ -181,10 +181,9 @@
     cheese:</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.littleJohnny:
     example.believes=“example.moon, example.madeOf, example.cheese”
@@ -196,10 +195,9 @@
     Johnny believes this to be true:</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.moon:
     example.madeOf|cheeseMoon|=example.cheese
@@ -214,11 +212,10 @@
     moon to be made of cheese:</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.community(urf.Community):
     example.when=example.longAgo
@@ -233,11 +230,10 @@
     uses the community short form:</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.community(urf.Community):
     example.when=example.longAgo
@@ -356,25 +352,24 @@
       <dd><p>A resource within a namespace can be identified by a <dfn>name
       reference</dfn> by listing the unencoded local name of the resource,
       with an optional prefix separated by full stop or period. The prefix, if
-      present, is a string that has been associated with some namespace URI in
-      the TURF preamble, which is surrounded by matching asterisk characters
-      <code>'*'</code>. If a property name reference has no prefix, the
-      namespace is the URI of the type of the subject resource. No other
-      resources may have name references without prefixes.</p><p>In the
-      following example, the name reference <code>component.Button</code> is
+      present, is a string that has been associated with some namespace URI
+      using a tilde character <code>'~'</code> in the TURF preamble, which is
+      surrounded by colon <code>':'</code> and semicolon <code>';'</code>
+      characters. If a property name reference has no prefix, the namespace is
+      the URI of the type of the subject resource. No other resources may have
+      name references without prefixes.</p><p>In the following example, the
+      name reference <code>component.Button</code> is equivalent to the URI
+      reference <code>«java:/com/guiseframework/component/Button»</code>, and
+      the name reference of its sole property, <code>label</code>, is
       equivalent to the URI reference
-      <code>«java:/com/guiseframework/component/Button»</code>, and the name
-      reference of its sole property, <code>label</code>, is equivalent to the
-      URI reference
       <code>«java:/com/guiseframework/component/Button#label»</code>. Another
       resource is also described that uses name references with prefixes for
       its URI, type, and property.</p><blockquote>
-          <pre><code>`URF
-*
-  "component"=&lt;java:/com/guiseframework/component/&gt;,
-  "example"=&lt;http://example.com/example&gt;,
-  "foaf"=&lt;http://xmlns.com/foaf/0.1/&gt;
-*
+          <pre><code>`URF:
+  "component"~&lt;java:/com/guiseframework/component/&gt;,
+  "example"~&lt;http://example.com/example&gt;,
+  "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
+;
 ¤
   (component.Button):
     label="Convert"
@@ -392,16 +387,16 @@
     corresponding prefixes:</p>
 
     <dl>
-      <dt><code>"dc"=&lt;http://purl.org/dc/elements/1.1/&gt;</code></dt>
+      <dt><code>"dc"~&lt;http://purl.org/dc/elements/1.1/&gt;</code></dt>
 
       <dd>The Dublin Core Metadata Initiative namespace [<a
       href="#dcmiNamespace">DCMI Namespace</a>].</dd>
 
-      <dt><code>"example"=&lt;http://example.com/example&gt;</code></dt>
+      <dt><code>"example"~&lt;http://example.com/example&gt;</code></dt>
 
       <dd>An example namespace; used for hypothetical situations.</dd>
 
-      <dt><code>"urf"=&lt;http://urf.name/urf&gt;</code></dt>
+      <dt><code>"urf"~&lt;http://urf.name/urf&gt;</code></dt>
 
       <dd>The URF namespace for resource and properties related to the
       framework abstract model itself.</dd>
@@ -444,10 +439,9 @@
       <code>&lt;http://example.com/example&gt;</code> with the prefix string
       <code>"example"</code>, the above example could be represented in the
       following representation:</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.resource:
     example.property=example.value
@@ -475,11 +469,10 @@
       following example, the resource <code>example.resource</code> is
       asserted to be an instance of the class
       <code>example.Class</code>:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.resource:
     urf.type=example.Class,
@@ -492,10 +485,9 @@
       Multiple classes may be separated by commas, and are added as <a
       href="#orderedProperties">ordered properties</a>. The following example
       is semantically identical to the preceding example.</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.resource(example.Class):
     example.property=example.value
@@ -786,9 +778,9 @@
           <dt><code>urf.Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          beginning with an underscore. For example, the following short
+          beginning with an asterisk. For example, the following short
           representation,</p><blockquote>
-              <pre><code>_true</code></pre>
+              <pre><code>*true</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
@@ -952,10 +944,9 @@
 
       <dd><p>The following is the definition of the <code>urf.Boolean</code>
       class, which is a typical enum subclass:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;
+;
 ¤
   urf.Boolean(urf.Class):
     urf.subClassOf=urf.Enum
@@ -987,11 +978,10 @@
       <dd><p>The following example asserts that John believes the sky to have
       the color purple without asserting that the sky actually has that
       color:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.john:
     example.believes=(urf.Proposition):
@@ -1006,11 +996,10 @@
       quotation mark <code>'“'</code> and closed double quotation mark
       <code>'”'</code> characters. The following example is semantically
       equivalent to the previous one:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.john:
     example.believes=“example.sky, example.color, example.purple”
@@ -1027,10 +1016,9 @@
       asserted that John believes this proposition; the second assertion is
       therefore semantically identical to the one in the previous
       example.</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.sky:
     example:color|skyColorPurple|=example:purple
@@ -1076,10 +1064,9 @@
       subject serving as the value of some other resource's property, the
       grave accent character <code>'`'</code> is used before the equals sign
       <code>'='</code> in the property declaration:</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.juan:
     example.name="John":
@@ -1123,11 +1110,10 @@
       one name comes before the other if used simultaneously, or perhaps one
       name has a higher priority or is considered the "default" name.)
       </p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.billy:
     example.name="William":
@@ -1146,11 +1132,10 @@
       of <code>urf.order</code> with values starting at <code>#0</code> and
       continuing sequentially. The following example represents information
       semantically identical to the previous example:<blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.billy:
     example.name=\"William",  "Bill"\
@@ -1203,10 +1188,9 @@
       be set, recursively converting values such as <code>urf.List</code> to
       the equivalent Java object such as
       <code>java.util.List</code>.</p><blockquote>
-          <pre><code>`URF
-*
-  "guise"=&lt;java:/com/guiseframework/&gt;
-*
+          <pre><code>`URF:
+  "guise"~&lt;java:/com/guiseframework/&gt;
+;
 ¤
   (guise.Category)¡"category1", "First Category"!:
     categories=
@@ -1218,11 +1202,10 @@
 .</code></pre>
         </blockquote><p>This is equivalent to the following TURF long
       form:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "guise"=&lt;java:/com/guiseframework/&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "guise"~&lt;java:/com/guiseframework/&gt;
+;
 ¤
   (guise.Category):
     urf.inits=["category1", "First Category"],
@@ -1268,10 +1251,9 @@
       the American holiday Groundhog Day, whether Punxsutawney Phil sees his
       shadow is considered to be a prognostication regarding the onset of
       spring weather.)</p><blockquote>
-          <pre><code>`URF
-*
-  "punx"=&lt;http://example.com/punxsutawney&gt;
-*
+          <pre><code>`URF:
+  "punx"~&lt;http://example.com/punxsutawney&gt;
+;
 ¤
   punx.Phil:
     punx:predicts=punx.weather
@@ -1289,11 +1271,10 @@
       Phil predicts the weather, the following example asserts that <em>the
       community of Punxsutawney</em> asserts (believes or holds) that
       Punxsutawney Phil predicts the weather:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "punx"=&lt;http://example.com/punxsutawney&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "punx"~&lt;http://example.com/punxsutawney&gt;
+;
 ¤
   punx.Punxsutawney(urf.Community)
   ¤
@@ -1305,11 +1286,10 @@
       be represented in the following longer form, with the propositions
       (shown here in short form) that are asserted in the community explicitly
       reified:</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "punx"=&lt;http://example.com/punxsutawney&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "punx"~&lt;http://example.com/punxsutawney&gt;
+;
 ¤
   punx.Punxsutawney(urf.Community)
   {
@@ -1321,10 +1301,9 @@
       scoped properties may be represented in the same manner as other
       knowledge community representations. The following is the scoped
       property example given earlier in its short form:</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.juan:
     example.name="John":
@@ -1343,10 +1322,9 @@
       following example, which uses labels to indicate the reification of the
       asserted propositions relating to
       <code>example.juan</code>:</p><blockquote>
-          <pre><code>`URF
-*
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.juan:
     example.name|juanNameJohn|="John",
@@ -1371,11 +1349,10 @@
       reified propositions asserted within that community. Therefore, the
       previous example can be represented in a more fully reified form (using
       proposition short forms):</p><blockquote>
-          <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.juan:
     example.name="John",
@@ -1469,7 +1446,7 @@
     <code>'†'</code> and double dagger <code>'‡'</code> characters.</p>
 
     <blockquote>
-      <p><code><var>SEPARATOR</var> ⇒ Unicode Paragraph Separator
+      <p><code><var>separator</var> ⇒ Unicode Paragraph Separator
       <strong>|</strong> Unicode Segment Separator <strong>|</strong> Unicode
       Whitespace <strong>|</strong> <var>comment</var></code></p>
     </blockquote>
@@ -1483,41 +1460,36 @@
     </blockquote>
 
     <p>A TURF interchange document is encoded in UTF-8 and begins with the
-    TURF signature <code>`URF</code> followed by an optional preamble and the
-    instance community, which contains zero or more resource descriptions,
-    separated by commas.</p>
+    TURF signature <code>`URF</code> followed by the description of the
+    instance community, which consists of optional properties and a required
+    community short representation.</p>
 
     <blockquote>
-      <p><code><var>TURF</var> ⇒
-      <var>signature</var><strong>[</strong><var>preamble</var><strong>]</strong>¤<strong>[</strong><var>resource</var><strong>[</strong>,<var>resource</var><strong>]*]</strong>.</code></p>
+      <p><code><var>TURF</var> ⇒ signature
+      <strong>[</strong>:<var>properties</var>;<strong>]</strong>
+      <var>communityshort</var></code></p>
     </blockquote>
 
     <blockquote>
       <p><code><var>signature</var> ⇒ `URF</code></p>
     </blockquote>
 
-    <p>The preamble, if present, is surrounded by asterisks <code>'*'</code>.
-    It contains one ore more associations of prefix string to namespace URI,
-    separated by commas</p>
-
-    <blockquote>
-      <p><code><var>preamble</var> ⇒
-      *<strong>[</strong><var>stringshort</var>=<var>urishort</var><strong>[</strong>,<var>stringshort</var>=<var>urishort</var><strong>]*]</strong>*</code></p>
-    </blockquote>
-
-    <p>Each resource description must have at least one of the following
-    optional components, any may have any or all of them: a label, a
-    reference, a type declaration, a set of property definitions, a community
-    short form, a proposition form, a list short form, and a set short
-    form.</p>
+    <p>The community short form, the grammar of which is below, is delimited
+    by the currency character <code>'¤'</code> and the full stop character
+    <code>'.'</code> and contains zero or more resource descriptions,
+    separated by commas. Each resource description must have at least one of
+    the following optional components, any may have any or all of them: a
+    label, a reference, a type declaration, a set of property definitions, a
+    community short form, a proposition form, a list short form, and a set
+    short form.</p>
 
     <blockquote>
       <p><code><var>resource</var> ⇒
       <strong>[</strong>|<var>label</var>|<strong>]</strong>
       <strong>[</strong><var>reference</var><strong>]</strong>
       <strong>[</strong>(<var>type</var>s)<strong>]</strong>
-      <strong>[</strong>¡inits!<strong>]</strong>
-      <strong>[</strong>:properties;<strong>]</strong>
+      <strong>[</strong>¡<var>inits</var>!<strong>]</strong>
+      <strong>[</strong>:<var>properties</var>;<strong>]</strong>
       <strong>[</strong><var>communityshort</var><strong>]</strong>
       <strong>[</strong><var>propositionshort</var><strong>]</strong>
       <strong>[</strong><var>listshort</var><strong>]</strong>
@@ -1585,11 +1557,12 @@
     resource, optionally preceded by a <var>name</var> ending with the full
     stop or period character <code>'.'</code>, together representing the URI
     of a resource. The prefix, if present, must have been associated with a
-    namespace URI in the TURF preamble. If no prefix is present for a
-    property, the namespace is the URI of the first type of the subject
-    resource. A prefix must be present in all other name references. The local
-    name is the unencoded form of the fragment to be appended to the namespace
-    URI.</p>
+    namespace URI in using the tilde character <code>'~'</code> either in the
+    properties of the current resource or one of its subject resources. If no
+    prefix is present for a property, the namespace is the URI of the first
+    type of the subject resource. A prefix must be present in all other name
+    references. The local name is the unencoded form of the fragment to be
+    appended to the namespace URI.</p>
 
     <blockquote>
       <p><code><var>namereference</var> ⇒
@@ -1704,15 +1677,15 @@
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code> preceded by the underscore character <code>'_'</code>.
-    A boolean short form is equivalent to a resource of type
-    <code>urf.Boolean</code> using the corresponding lexical namespace. The
-    boolean short form <code>_true</code> is the equivalent of the boolean
-    resource <code>«"true"(urf.Boolean)»</code>.</p>
+    <code>false</code> preceded by an asterisk <code>'*'</code>. A boolean
+    short form is equivalent to a resource of type <code>urf.Boolean</code>
+    using the corresponding lexical namespace. The boolean short form
+    <code>*true</code> is the equivalent of the boolean resource
+    <code>«"true"(urf.Boolean)»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      _true<strong>|</strong>_false</code></p>
+      *true<strong>|</strong>*false</code></p>
     </blockquote>
 
     <p>A number short form consists of roman digits, optionally preceded by a
@@ -1822,7 +1795,7 @@
 
     <blockquote>
       <p><code><var>properties</var> ⇒
-      <strong>[</strong><var>property</var><strong>[,</strong><var>property</var><strong><strong>]*</strong>]</strong></code></p>
+      <strong>[</strong><var>property</var><strong>[</strong>,<var>property</var><strong><strong>]*</strong>]</strong></code></p>
     </blockquote>
 
     <blockquote>
@@ -1839,7 +1812,7 @@
 
     <blockquote>
       <p><code><var>sequenceshort</var> ⇒
-      \<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>\</code></p>
+      \<strong>[</strong><var>resource</var><strong>[</strong>,<var>resource</var><strong>]*]</strong>\</code></p>
     </blockquote>
 
     <p>A community short form consists of a sequence of resources surrounded
@@ -1852,7 +1825,7 @@
 
     <blockquote>
       <p><code><var>communityshort</var> ⇒
-      ¤<strong>[</strong>resource<strong>[</strong>,resource<strong>]*].</strong></code></p>
+      ¤<strong>[</strong><var>resource</var><strong>[</strong>,<var>resource</var><strong>]*].</strong></code></p>
     </blockquote>
 
     <p>A proposition short form lists the subject, predicate, and object of a
@@ -1866,8 +1839,9 @@
     explicitly.</p>
 
     <blockquote>
-      <p><code><var>propositionshort</var> ⇒ “<var>subject</var>,
-      <var>predicate</var>, <var>object</var>”</code></p>
+      <p><code><var>propositionshort</var> ⇒ “<var>subject</var>
+      <var>separator</var>+ <var>predicate</var>
+      <var>separator</var><strong>+</strong> <var>object</var>”</code></p>
     </blockquote>
 
     <blockquote>
@@ -2036,6 +2010,66 @@
 
     <h2>Examples</h2>
 
+    <h3 id="jsonExample">JSON</h3>
+
+    <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
+    4627</a>], every object besides strings, numbers, and booleans are
+    associative arrays using string keys. The following is a complex JSON
+    object, using every JSON data type available:</p>
+
+    <blockquote>
+      <pre><code>{
+  "length":1234,
+  "valid":true,
+  "status":"processing",
+  "results":[false, 5, "dog", {"code":9.8}]
+}</code></pre>
+    </blockquote>
+
+    <p>While this representation has some undesirable traits (e.g. strings are
+    not recommended as general property identifiers except in the case of
+    resources used as maps), the following TURF representation is semantically
+    identical to the JSON example above:</p>
+
+    <blockquote>
+      <pre><code>`URF
+¤
+  :
+    "length"=#1234,
+    "valid"=*true,
+    "status"="processing",
+    "results"=[*false, #5, "dog", :"code"=#9.8;]
+  ;
+.</code></pre>
+    </blockquote>
+
+    <p>There is one slight semantic descrepancy between these two examples:
+    URF uses a true ordinal property for each list element, while JSON adds
+    each array element as the value of a string containing the lexical form of
+    an integer.</p>
+
+    <p>Although the above TURF representation replicates the simple semantics
+    of the given JSON example, a better formulation that takes advantage of
+    URF semantics would most importantly use actual properties rather than
+    associative array string key pseudo-properties. An improved formulation
+    would also indicate the type of the resources. Such improvements are
+    illustrated in the following reformulation:</p>
+
+    <blockquote>
+      <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
+¤
+  (example.Class):
+    example.length=#1234,
+    example.valid=*true,
+    example.status="processing",
+    example.results=[*false, #5, "dog", (urf.Map):"code"=#9.8;]
+  ;
+.</code></pre>
+    </blockquote>
+
     <h3 id="ploopExample">PLOOP</h3>
 
     <p>The following TURF example uses URF as <a href="#ploop">PLOOP</a> for
@@ -2046,13 +2080,12 @@
     be defined elsewhere.)</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "component"=&lt;java:/com/guiseframework/component/&gt;,
-  "layout"=&lt;java:/com/guiseframework/component/layout/&gt;,
-  "validator"=&lt;java:/com/guiseframework/validator/&gt;,
-  "demo"=&lt;java:/com/guiseframework/demo/&gt;
-*
+      <pre><code>`URF:
+  "component"~&lt;java:/com/guiseframework/component/&gt;,
+  "layout"~&lt;java:/com/guiseframework/component/layout/&gt;,
+  "validator"~&lt;java:/com/guiseframework/validator/&gt;,
+  "demo"~&lt;java:/com/guiseframework/demo/&gt;
+;
 ¤
   (demo.TemperatureConversionPanel2):
     label="Guise™ Demonstration: Temperature Conversion",
@@ -2075,7 +2108,7 @@
             validator=(validator.ValueRequiredValidator)
           ;,
           (component.TextControl)¡«java:/java/lang/Double»!:
-            editable=_false,
+            editable=*false,
             label="Output Temperature",
             name="temperatureOutput"
           ;
@@ -2176,67 +2209,6 @@ navigationPanel.add(conversionPanel);
 </code></pre>
     </blockquote>
 
-    <h3 id="jsonExample">JSON</h3>
-
-    <p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC
-    4627</a>], every object besides strings, numbers, and booleans are
-    associative arrays using string keys. The following is a complex JSON
-    object, using every JSON data type available:</p>
-
-    <blockquote>
-      <pre><code>{
-  "length":1234,
-  "valid":true,
-  "status":"processing",
-  "results":[false, 5, "dog", {"code":9.8}]
-}</code></pre>
-    </blockquote>
-
-    <p>While this representation has some undesirable traits (e.g. strings are
-    not recommended as general property identifiers except in the case of
-    resources used as maps), the following TURF representation is semantically
-    identical to the JSON example above:</p>
-
-    <blockquote>
-      <pre><code>`URF
-¤
-  :
-    "length"=#1234,
-    "valid"=_true,
-    "status"="processing",
-    "results"=[_false, #5, "dog", :"code"=#9.8;]
-  ;
-.</code></pre>
-    </blockquote>
-
-    <p>There is one slight semantic descrepancy between these two examples:
-    URF uses a true ordinal property for each list element, while JSON adds
-    each array element as the value of a string containing the lexical form of
-    an integer.</p>
-
-    <p>Although the above TURF representation replicates the simple semantics
-    of the given JSON example, a better formulation that takes advantage of
-    URF semantics would most importantly use actual properties rather than
-    associative array string key pseudo-properties. An improved formulation
-    would also indicate the type of the resources. Such improvements are
-    illustrated in the following reformulation:</p>
-
-    <blockquote>
-      <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
-¤
-  («example.Class»):
-    example.length=#1234,
-    example.valid=_true,
-    example.status="processing",
-    example.results=[_false, #5, "dog", (urf.Map):"code"=#9.8;]
-  ;
-.</code></pre>
-    </blockquote>
-
     <h3 id="rdfxmlExample">RDF/XML</h3>
 
     <p>URF is a semantic superset of RDF, and can represent any construct
@@ -2281,14 +2253,13 @@ navigationPanel.add(conversionPanel);
     RDF/XML:</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "urf"=&lt;http://urf.name/urf&gt;,
-  "content"=&lt;http://urf.name/content&gt;,
-  "dc"=&lt;http://purl.org/dc/elements/1.1/&gt;,
-  "example"=&lt;http://example.com/example&gt;,
-  "foaf"=&lt;http://xmlns.com/foaf/0.1/&gt;
-*
+      <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "content"~&lt;http://urf.name/content&gt;,
+  "dc"~&lt;http://purl.org/dc/elements/1.1/&gt;,
+  "example"~&lt;http://example.com/example&gt;,
+  "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
+;
 ¤
   example.janedoe(foaf.Person):
     example.age=#23,
@@ -2354,11 +2325,10 @@ END:vCard</code></pre>
     <dfn>structured values</dfn>.</p>
 
     <blockquote>
-      <pre><code>`URF
-*
-  "vcard"=&lt;http://urf.com/vcard&gt;,
-  "example"=&lt;http://example.com/example&gt;
-*
+      <pre><code>`URF:
+  "vcard"~&lt;http://urf.com/vcard&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
 ¤
   example.janedoe:
     vcard.fn="Jane Doe",
@@ -2619,6 +2589,16 @@ END:vCard</code></pre>
     <h2>History</h2>
 
     <dl>
+      <dt>2007-??-??</dt>
+
+      <dd><ul>
+          <li>Changed TURF preamble delimiters.</li>
+
+          <li>Changed TURF namespace association delimiter.</li>
+
+          <li>Changed syntax for <code>urf.Boolean</code> short form.</li>
+        </ul></dd>
+
       <dt>2007-11-22</dt>
 
       <dd><ul>
