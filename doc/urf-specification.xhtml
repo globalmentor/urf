@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-12-13</dd>
+      <dd>2007-12-13a</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -143,7 +143,7 @@
     example.name="Jane Doe",
     example.birthday=@1980-01-01,
     example.salary=#1000000:
-      example.currency`=«"usd"(example.Currency)»
+      example.currency`=«(example.Currency)"usd"»
     ;
   ;
 .</code></pre>
@@ -596,7 +596,7 @@
       contains an element at index 5, the element resource will appear as a
       value of the property
       <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code>
-      (that is, the property <code>«"5"(urf.Ordinal)»</code>, or simply
+      (that is, the property <code>«(urf.Ordinal)"5"»</code>, or simply
       <code>º5</code>). Although many uses cases will prefer a continuous,
       unduplicated sequence of index properties beginning with
       <code>º5</code>, this is not an URF requirement.</dd>
@@ -748,12 +748,13 @@
           <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
         </blockquote><p>Rather than indicating directly the URI of a resource
       in a lexical namespace, the resource may be identified by indicating the
-      canonical lexical form of the resource, followed by the contents of the
-      URI of the type of the resource. The integer 123 may therefore be
-      represented as either of the following short forms:</p><blockquote>
-          <pre><code>«"123"(«http://urf.name/urf#Integer»)»</code></pre>
+      type of the resource in parenthesis inside the URI reference, followed
+      by the canonical lexical form of the resource as a string. The integer
+      123 may therefore be represented as either of the following short
+      forms:</p><blockquote>
+          <pre><code>«(«http://urf.name/urf#Integer»)"123"»</code></pre>
         </blockquote><blockquote>
-          <pre><code>«"123"(urf.Integer)»</code></pre>
+          <pre><code>«(urf.Integer)"123"»</code></pre>
         </blockquote><p>The lexical namespaces for several types have
       additional short representations. The examples below assume that the
       label <code>urf</code> has been assigned to the URF namespace.</p><dl>
@@ -772,7 +773,7 @@
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«"QD8-PQ=="(urf.Binary)»</code></pre>
+              <pre><code>«(urf.Binary)"QD8-PQ=="»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Boolean</code></dt>
@@ -787,7 +788,7 @@
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«"true"(urf.Boolean)»</code></pre>
+              <pre><code>«(urf.Boolean)"true"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Character</code></dt>
@@ -803,7 +804,7 @@
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«"x"(urf.Character)»</code></pre>
+              <pre><code>«(urf.Character)"x"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Number</code></dt>
@@ -821,8 +822,8 @@
             </blockquote><p>which are also equivalent to the following general
           short representations for resources in a lexical namespace,
           respectively:</p><blockquote>
-              <pre><code>«"123"(urf.Integer)»
-«"123.45"(urf.Real)»</code></pre>
+              <pre><code>«(urf.Integer)"123"»
+«(urf.Real)"123.45"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Ordinal</code></dt>
@@ -837,7 +838,7 @@
             </blockquote><p>which are also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«"5"(urf.Ordinal)»</code></pre>
+              <pre><code>«(urf.Ordinal)"5"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.RegularExpression</code></dt>
@@ -852,7 +853,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"a?b+c*"(urf.RegularExpression)»</code></pre>
+              <pre><code>«(urf.RegularExpression)"a?b+c*"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.String</code></dt>
@@ -867,7 +868,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"apple"(urf.String)»</code></pre>
+              <pre><code>«(urf.String)"apple"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Temporal</code></dt>
@@ -895,11 +896,11 @@
 «http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23UTCOffset#-08:00»</code></pre>
             </blockquote><p>which are also equivalent to the general short
           representations for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"1980-05-06"(urf.Date)»
-«"16:39:57-08:00"(urf.Time)»
-«"1980-05-06T16:39:57-08:00"(urf.DateTime)»
-«"P100Y5M3DT8H2M10.5S"(urf.Duration)»
-«"-08:00"(urf.UTCOffset)»</code></pre>
+              <pre><code>«(urf.Date)"1980-05-06"»
+«(urf.Time)"16:39:57-08:00"»
+«(urf.DateTime)"1980-05-06T16:39:57-08:00"»
+«(urf.Duration)"P100Y5M3DT8H2M10.5S"»
+«(urf.UTCOffset)"-08:00"»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.URI</code></dt>
@@ -914,7 +915,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«"http://urf.name/urf#type"(urf.URI)»</code></pre>
+              <pre><code>«(urf.URI)"http://urf.name/urf#type"»</code></pre>
             </blockquote></dd>
         </dl></dd>
     </dl>
@@ -1535,16 +1536,16 @@
     </blockquote>
 
     <p>A resource URI reference is enclosed in angle quotes. The contents is
-    either the text of a URI (or relative reference), or a string containing
-    the lexical representation of a resource in a lexical namespace,
-    immediately followed by the type of the resource, which must contain a
-    resource reference. Any URI reference that includes a lexical
-    representation is equivalent to a URI reference in the form
+    either the text of a URI (or relative reference); or a pair of parentheses
+    containing a resource reference to a lexical type, immediately followed by
+    a string containing the lexical representation of a resource. Any URI
+    reference that includes a lexical representation is equivalent to a URI
+    reference in the form
     <code>«http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
 
     <blockquote>
       <p><code><var>urireference</var> ⇒
-      «<strong>(</strong><var>stringshort</var>(<var>type</var>)<strong>)</strong>
+      «<strong>(</strong>(<var><var>type</var></var>)<var>stringshort</var><strong>)</strong>
       <strong>|</strong>
       <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>»</code></p>
     </blockquote>
@@ -1583,7 +1584,7 @@
     characters must be escaped. A string short form is equivalent to a
     resource of type <code>urf.String</code> using the corresponding lexical
     namespace. The string short form <code>"example"</code> is the equivalent
-    of the string resource <code>«"example"(urf.String)»</code>.</p>
+    of the string resource <code>«(urf.String)"example"»</code>.</p>
 
     <blockquote id="stringshort">
       <p><code><var>stringshort</var> ⇒ "<strong>[</strong><var>Unicode
@@ -1646,7 +1647,7 @@
     must be escaped. A character short form is equivalent to a resource of
     type <code>urf.Character</code> using the corresponding lexical namespace.
     The character short form <code>'x'</code> is the equivalent of the
-    character resource <code>«"x"(urf.Character)»</code>.</p>
+    character resource <code>«(urf.Character)"x"»</code>.</p>
 
     <blockquote id="charactershort">
       <p><code><var>charactershort</var> ⇒ '<strong>[</strong><var>Unicode
@@ -1669,7 +1670,7 @@
     interchange document. A URI short form is equivalent to a resource of type
     <code>urf.URI</code> using the corresponding lexical namespace. The URI
     short form <code>&lt;http://example.com&gt;</code> is the equivalent of
-    the URI resource <code>«"http://example.com"(urf.URI)»</code>.</p>
+    the URI resource <code>«(urf.URI)"http://example.com"»</code>.</p>
 
     <blockquote>
       <p><code><var>urishort</var> ⇒
@@ -1681,7 +1682,7 @@
     short form is equivalent to a resource of type <code>urf.Boolean</code>
     using the corresponding lexical namespace. The boolean short form
     <code>*true</code> is the equivalent of the boolean resource
-    <code>«"true"(urf.Boolean)»</code>.</p>
+    <code>«(urf.Boolean)"true"»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
@@ -1694,9 +1695,9 @@
     a resource of type <code>urf.Integer</code> or <code>urf.Real</code>,
     depending on the lexical form used, using the corresponding lexical
     namespace. The number short form <code>#123</code> is the equivalent of
-    the number resource <code>«"123"(urf.Integer)»</code>, and the number
+    the number resource <code>«(urf.Integer)"123"»</code>, and the number
     short form <code>#123.45</code> is the equivalent of the number resource
-    <code>«"123.45"(urf.Real)»</code>.</p>
+    <code>«(urf.Real)"123.45"»</code>.</p>
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
@@ -1712,7 +1713,7 @@
     sign <code>'º'</code>. An ordinal short form is equivalent to a resource
     of type <code>urf.Ordinal</code> using the corresponding lexical
     namespace. The ordinal short form <code>º27</code> is the equivalent of
-    the ordinal resource <code>«"27"(urf.Ordinal)»</code>.</p>
+    the ordinal resource <code>«(urf.Ordinal)"27"»</code>.</p>
 
     <blockquote>
       <p><code><var>ordinalshort</var> ⇒ º<var>n</var></code></p>
@@ -1726,7 +1727,7 @@
     <code>urf.RegularExpression</code> using the corresponding lexical
     namespace. The regular expression short form <code>/a?b+c*/</code> is the
     equivalent of the string resource
-    <code>«"a?b+c*"(urf.RegularExpression)»</code>.</p>
+    <code>«(urf.RegularExpression)"a?b+c*"»</code>.</p>
 
     <blockquote id="regexshort">
       <p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode
@@ -1747,7 +1748,7 @@
     used instead. A temporal short form is equivalent to a resource of the
     corresponding urf.Temporal type, based upon the specific lexical form
     used. The temporal short form <code>@1999-03-04@</code> is the equivalent
-    of the number resource <code>«"1999-03-04"(urf.Date)»</code>, for
+    of the number resource <code>«(urf.Date)"1999-03-04"»</code>, for
     example.</p>
 
     <blockquote>
@@ -1966,7 +1967,7 @@
     enumerated type. In the following example, the Guise Java class
     <code>com.guiseframework.component.layout.FlowLayout</code> has a
     <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The
-    lexical URI <code>«"LINE"(layout.Flow)»</code> indicates a type of
+    lexical URI <code>«(layout.Flow)"LINE"»</code> indicates a type of
     <code>com.guiseframework.component.layout.Flow</code>, which is a Java
     enum class. A PLOOP processor must construct a
     <code>com.guiseframework.component.layout.Flow</code> object from the
@@ -1978,7 +1979,7 @@
       <pre><code>`URF
 ¤
   («java:/com/guiseframework/component/layout/FlowLayout»):
-    flow=«"LINE"(layout.Flow)»
+    flow=«(layout.Flow)"LINE"»
   ;
 .</code></pre>
     </blockquote>
@@ -2090,14 +2091,14 @@
   (demo.TemperatureConversionPanel2):
     label="Guise™ Demonstration: Temperature Conversion",
     layout=(layout.FlowLayout):
-      flow=«"LINE"(layout.Flow)»
+      flow=«(layout.Flow)"LINE"»
     ;,
     name="temperatureConversionPanel",
     children=
     [
       (component.LayoutPanel):
         layout=(layout.FlowLayout):
-          flow=«"PAGE"(layout.Flow)»
+          flow=«(layout.Flow)"PAGE"»
         ;,
         name="inputPanel",
         children=
@@ -2116,7 +2117,7 @@
       ;,
       (component.LayoutPanel):
         layout=(layout.FlowLayout):
-          flow=«"PAGE"(layout.Flow)»
+          flow=«(layout.Flow)"PAGE"»
         ;,
         name="conversionPanel",
         children=
@@ -2124,7 +2125,7 @@
           (component.GroupPanel):
             label="Input Scale",
             layout=(layout.FlowLayout):
-              flow=«"PAGE"(layout.Flow)»
+              flow=«(layout.Flow)"PAGE"»
             ;,
             name="scalePanel",
             children=
@@ -2270,7 +2271,7 @@ navigationPanel.add(conversionPanel);
       «http://www.garretwilson.com/»
     ],
     example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
-      content.type`=«"text/xml-external-parsed-entity"(content.MediaType)»
+      content.type`=«(content.MediaType)"text/xml-external-parsed-entity"»
     ;,
     example.possibleVacationDestinations=
     {
@@ -2278,7 +2279,7 @@ navigationPanel.add(conversionPanel);
       "Rome"
     },
     nick="Janinha":
-      dc.language`=«"pt-BR"(urf.Language)»
+      dc.language`=«(urf.Language)"pt-BR"»
     ;
   ;
 .</code></pre>
@@ -2342,9 +2343,9 @@ END:vCard</code></pre>
     vcard.org=\"Example Corporation", "North American Division", "Business Development"\,
     vcard.title="Directory of Business Development",
     vcard.adr=(vcard.Adr):
-      vcard.adrType=«"work"(vcard.AdrType)»,
-      vcard.adrType=«"postal"(vcard.AdrType)»,
-      vcard.adrType=«"parcel"(vcard.AdrType)»,
+      vcard.adrType=«(vcard.AdrType)"work"»,
+      vcard.adrType=«(vcard.AdrType)"postal"»,
+      vcard.adrType=«(vcard.AdrType)"parcel"»,
       vcard.extendedAddress="Suite 45",
       vcard.streetAddress="123 Some Street",
       vcard.locality="Someplace",
@@ -2356,13 +2357,13 @@ END:vCard</code></pre>
     vcard.tel=
     \
       «tel:+1-234-567-8910»:
-        vcard.telType=«"voice"(vcard.TelType)»,
-        vcard.telType=«"work"(vcard.TelType)»
+        vcard.telType=«(vcard.TelType)"voice"»,
+        vcard.telType=«(vcard.TelType)"work"»
       ;,
       «tel:+1-234-567-8911»:
-        vcard.telType=«"voice"(vcard.TelType)»,
-        vcard.telType=«"home"(vcard.TelType)»,
-        vcard.telType=«"cell"(vcard.TelType)»
+        vcard.telType=«(vcard.TelType)"voice"»,
+        vcard.telType=«(vcard.TelType)"home"»,
+        vcard.telType=«(vcard.TelType)"cell"»
       ;
     \,
     vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
@@ -2597,6 +2598,9 @@ END:vCard</code></pre>
           <li>Changed TURF namespace association delimiter.</li>
 
           <li>Changed syntax for <code>urf.Boolean</code> short form.</li>
+
+          <li>Changed order of string and type in TURF lexical form
+          reference.</li>
         </ul></dd>
 
       <dt>2007-11-22</dt>
