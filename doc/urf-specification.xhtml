@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-12-13a</dd>
+      <dd>2007-12-23</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -141,8 +141,8 @@
   †describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
   example.janedoe(foaf.Person):
     example.name="Jane Doe",
-    example.birthday=@1980-01-01,
-    example.salary=#1000000:
+    example.birthday=@1980-01-01@,
+    example.salary=#1000000#:
       example.currency`=«(example.Currency)"usd"»
     ;
   ;
@@ -779,9 +779,9 @@
           <dt><code>urf.Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          beginning with an asterisk. For example, the following short
-          representation,</p><blockquote>
-              <pre><code>*true</code></pre>
+          surrounded by matching asterisks (<code>'*'</code>). For example,
+          the following short representation,</p><blockquote>
+              <pre><code>*true*</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
@@ -810,11 +810,12 @@
           <dt><code>urf.Number</code></dt>
 
           <dd><p>Integer and real number resources may be identified by their
-          lexical forms introduced by the number sign. The specific type of
-          number resource yielded depends on the lexical form used. For
-          example, the following short representations,</p><blockquote>
-              <pre><code>#123
-#123.45</code></pre>
+          lexical forms surrounded by matching number signs
+          (<code>'#'</code>). The specific type of number resource yielded
+          depends on the lexical form used. For example, the following short
+          representations,</p><blockquote>
+              <pre><code>#123#
+#123.45#</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
@@ -845,8 +846,8 @@
 
           <dd><p>A regular expression resource may be identified by its <a
           href="#regexshort">regular expression-escaped lexical form</a>
-          surrounded by slashes ('/'). For example, the following short
-          representation,</p><blockquote>
+          surrounded by slashes (<code>'/'</code>). For example, the following
+          short representation,</p><blockquote>
               <pre><code>/a?b+c*/</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
@@ -876,17 +877,17 @@
           <dd><p>A temporal resource such as <code>urf.Date</code>,
           <code>urf.DateTime</code>, <code>urf.Duration</code>,
           <code>urf.Time</code>, or <code>urf.UTCOffset</code> may be
-          identified by its lexical form with a beginning at sign
+          identified by its lexical form surrounded by matching at signs
           (<code>'@'</code>). The specific temporal type can be determined by
           the specific lexical form used. For example, the following short
           representations for <code>urf.Date</code>, <code>urf.Time</code>,
           <code>urf.DateTime</code>, <code>urf.Duration</code>, and
           <code>urf.UTFOffset</code>,</p><blockquote>
-              <pre><code>@1980-05-06
-@16:39:57-08:00
-@1980-05-06T16:39:57-08:00
-@P100Y5M3DT8H2M10.5S
-@-08:00</code></pre>
+              <pre><code>@1980-05-06@
+@16:39:57-08:00@
+@1980-05-06T16:39:57-08:00@
+@P100Y5M3DT8H2M10.5S@
+@-08:00@</code></pre>
             </blockquote><p>are equivalent to the following long
           representations, respectively,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Date#1980-05-06»
@@ -1048,12 +1049,12 @@
       <code>"John"</code>. The assertion, "the string 'John' is in English",
       is contextual to the string "John" being the name of
       Juan.</p><p>Similarly, Juan could specify a <code>example.weight</code>
-      of <code>#72</code> with an <code>example.unit</code> of
-      <code>example.kilogram</code>. Because the integer <code>#72</code> may
+      of <code>#72#</code> with an <code>example.unit</code> of
+      <code>example.kilogram</code>. Because the integer <code>#72#</code> may
       not represent a unit of kilograms in all contexts, its property
       <code>example.unit</code> should be considered to be in the scope of the
       relationship between Juan and the <code>example.weight</code>
-      <code>#72</code>. The assertion, "the integer 72 is in kilograms", is
+      <code>#72#</code>. The assertion, "the integer 72 is in kilograms", is
       contextual to the integer 72 being the weight of Juan.</p><p>Scoped
       propositions are actually propositions asserted in separate <a
       href="#communities">knowledge communities</a> created by their context
@@ -1073,7 +1074,7 @@
     example.name="John":
       example.lang`=example.english
     ;,
-    example.weight=#72:
+    example.weight=#72#:
       example.unit`=example.kilogram
     ;
   ;
@@ -1118,10 +1119,10 @@
 ¤
   example.billy:
     example.name="William":
-      urf.order`=#0
+      urf.order`=#0#
     ;,
     example.name="Bill":
-      urf.order`=#1
+      urf.order`=#1#
     ;
   ;
 .</code></pre>
@@ -1130,7 +1131,7 @@
       ordered values within matching backslash characters. A sequence does not
       result in a new type of value, but rather indicates that the given
       predicate should be asserted for each value, each with a scoped property
-      of <code>urf.order</code> with values starting at <code>#0</code> and
+      of <code>urf.order</code> with values starting at <code>#0#</code> and
       continuing sequentially. The following example represents information
       semantically identical to the previous example:<blockquote>
           <pre><code>`URF:
@@ -1310,7 +1311,7 @@
     example.name="John":
       example.lang`=example.english
     ;,
-    example.weight=#72:
+    example.weight=#72#:
       example.unit`=example.kilogram
     ;
   ;
@@ -1335,10 +1336,10 @@
         example.lang=example.english
       ;
     .,
-    example.weight|juanWeight72|=#72,
+    example.weight|juanWeight72|=#72#,
     |juanWeight72|
     ¤
-      #72:
+      #72#:
         example.unit=example.kilogram
       ;
     .
@@ -1357,23 +1358,23 @@
 ¤
   example.juan:
     example.name="John",
-    example.weight=#72,
+    example.weight=#72#,
     “example.juan, example.name, "John"”
     {
       “"John", example.lang, example.english”
     },
-    “example.juan, example.weight, #72”
+    “example.juan, example.weight, #72#”
     {
-      “#72, example.unit, example.kilogram”
+      “#72#, example.unit, example.kilogram”
     }
   ;
 .</code></pre>
         </blockquote><p>Note that <code>example.name="John"</code> and
-      <code>example.weight=#72</code> are listed separately as assertions of
+      <code>example.weight=#72#</code> are listed separately as assertions of
       John's name and weight; those two propositions are later explicitly
       reified as propositions and serve as separate knowledge communities
       containing other assertions about the name <code>"John"</code> and the
-      weight <code>#72</code>.</p></dd>
+      weight <code>#72#</code>.</p></dd>
     </dl>
 
     <h2>URF</h2>
@@ -1678,30 +1679,31 @@
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code> preceded by an asterisk <code>'*'</code>. A boolean
-    short form is equivalent to a resource of type <code>urf.Boolean</code>
-    using the corresponding lexical namespace. The boolean short form
-    <code>*true</code> is the equivalent of the boolean resource
-    <code>«(urf.Boolean)"true"»</code>.</p>
+    <code>false</code> surrounded by matching asterisks <code>'*'</code>. A
+    boolean short form is equivalent to a resource of type
+    <code>urf.Boolean</code> using the corresponding lexical namespace. The
+    boolean short form <code>*true*</code> is the equivalent of the boolean
+    resource <code>«(urf.Boolean)"true"»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      *true<strong>|</strong>*false</code></p>
+      *true*<strong>|</strong>*false*</code></p>
     </blockquote>
 
-    <p>A number short form consists of roman digits, optionally preceded by a
-    minus sign, with an optional decimal and optional exponent, all preceded
-    by the number sign <code>'#'</code>. A number short form is equivalent to
-    a resource of type <code>urf.Integer</code> or <code>urf.Real</code>,
-    depending on the lexical form used, using the corresponding lexical
-    namespace. The number short form <code>#123</code> is the equivalent of
-    the number resource <code>«(urf.Integer)"123"»</code>, and the number
-    short form <code>#123.45</code> is the equivalent of the number resource
+    <p>A number short form consists of Roman digits, optionally preceded by a
+    minus sign, with an optional decimal and optional exponent, all surrounded
+    by matching number signs <code>'#'</code>. A number short form is
+    equivalent to a resource of type <code>urf.Integer</code> or
+    <code>urf.Real</code>, depending on the lexical form used, using the
+    corresponding lexical namespace. The number short form <code>#123#</code>
+    is the equivalent of the number resource
+    <code>«(urf.Integer)"123"»</code>, and the number short form
+    <code>#123.45#</code> is the equivalent of the number resource
     <code>«(urf.Real)"123.45"»</code>.</p>
 
     <blockquote>
       <p><code><var>numbershort</var> ⇒
-      #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong></code></p>
+      #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong>#</code></p>
     </blockquote>
 
     <blockquote>
@@ -1709,14 +1711,14 @@
       <var>romandigit</var><strong>+</strong></code></p>
     </blockquote>
 
-    <p>An ordinal short form consists of roman digits preceded by the ordinal
-    sign <code>'º'</code>. An ordinal short form is equivalent to a resource
-    of type <code>urf.Ordinal</code> using the corresponding lexical
-    namespace. The ordinal short form <code>º27</code> is the equivalent of
+    <p>An ordinal short form consists of roman digits surrounded by matching
+    ordinal signs <code>'º'</code>. An ordinal short form is equivalent to a
+    resource of type <code>urf.Ordinal</code> using the corresponding lexical
+    namespace. The ordinal short form <code>º27º</code> is the equivalent of
     the ordinal resource <code>«(urf.Ordinal)"27"»</code>.</p>
 
     <blockquote>
-      <p><code><var>ordinalshort</var> ⇒ º<var>n</var></code></p>
+      <p><code><var>ordinalshort</var> ⇒ º<var>n</var>º</code></p>
     </blockquote>
 
     <p>A regular expression short form is a sequence of Unicode characters,
@@ -1740,16 +1742,16 @@
     <p>A temporal short form consists of the lexical form of a temporal
     resource such as <code>urf.Date</code>, <code>urf.DateTime</code>,
     <code>urf.Duration</code>, <code>urf.Time</code>, or
-    <code>urf.UTCOffset</code>, beginnint with an at sign (<code>'@'</code>).
-    An <code>urf.Duration</code> requires at least the date or the time
-    section to be present. The hours component represents midnight as
-    <code>00</code> and must not have a value larger than <code>23</code>. The
-    UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be
-    used instead. A temporal short form is equivalent to a resource of the
-    corresponding urf.Temporal type, based upon the specific lexical form
-    used. The temporal short form <code>@1999-03-04@</code> is the equivalent
-    of the number resource <code>«(urf.Date)"1999-03-04"»</code>, for
-    example.</p>
+    <code>urf.UTCOffset</code>, surrounded by matching at signs
+    (<code>'@'</code>). An <code>urf.Duration</code> requires at least the
+    date or the time section to be present. The hours component represents
+    midnight as <code>00</code> and must not have a value larger than
+    <code>23</code>. The UTC offset <code>-00:00</code> is not allowed;
+    <code>+00:00</code> must be used instead. A temporal short form is
+    equivalent to a resource of the corresponding urf.Temporal type, based
+    upon the specific lexical form used. The temporal short form
+    <code>@1999-03-04@</code> is the equivalent of the number resource
+    <code>«(urf.Date)"1999-03-04"»</code>, for example.</p>
 
     <blockquote>
       <p><code><var>temporalshort</var> ⇒
@@ -1761,7 +1763,7 @@
       <strong>|</strong>
       <strong>(</strong>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong><strong>)</strong>
       <strong>|</strong>
-      <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong></code></p>
+      <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code></p>
     </blockquote>
 
     <p>The types declaration consists of zero or more resource descriptions
@@ -1809,7 +1811,7 @@
     <code>'\\'</code>. Each listed element resource indicates another
     assertion of the given predicate with the given element resource as the
     value, each with a contextual property of <code>urf.order</code> with
-    values starting at <code>#0</code> and continuing sequentially.</p>
+    values starting at <code>#0#</code> and continuing sequentially.</p>
 
     <blockquote>
       <p><code><var>sequenceshort</var> ⇒
@@ -1861,7 +1863,7 @@
     surrounded by bracket characters <code>'['</code> and <code>']'</code> and
     separated by commas. Each listed element resource represents the value of
     an ordinal index property, in sequence beginning with the ordinal property
-    <code><code>º0</code></code>. The presence of a list short form implies a
+    <code><code>º0º</code></code>. The presence of a list short form implies a
     type of <code>urf.List</code> if no other types have yet been specified,
     either implicitly or explicitly.</p>
 
@@ -2036,10 +2038,10 @@
       <pre><code>`URF
 ¤
   :
-    "length"=#1234,
-    "valid"=*true,
+    "length"=#1234#,
+    "valid"=*true*,
     "status"="processing",
-    "results"=[*false, #5, "dog", :"code"=#9.8;]
+    "results"=[*false*, #5#, "dog", :"code"=#9.8#;]
   ;
 .</code></pre>
     </blockquote>
@@ -2063,10 +2065,10 @@
 ;
 ¤
   (example.Class):
-    example.length=#1234,
-    example.valid=*true,
+    example.length=#1234#,
+    example.valid=*true*,
     example.status="processing",
-    example.results=[*false, #5, "dog", (urf.Map):"code"=#9.8;]
+    example.results=[*false*, #5#, "dog", (urf.Map):"code"=#9.8#;]
   ;
 .</code></pre>
     </blockquote>
@@ -2109,7 +2111,7 @@
             validator=(validator.ValueRequiredValidator)
           ;,
           (component.TextControl)¡«java:/java/lang/Double»!:
-            editable=*false,
+            editable=*false*,
             label="Output Temperature",
             name="temperatureOutput"
           ;
@@ -2263,8 +2265,8 @@ navigationPanel.add(conversionPanel);
 ;
 ¤
   example.janedoe(foaf.Person):
-    example.age=#23,
-    example.birthdate=@1980-04-05,
+    example.age=#23#,
+    example.birthdate=@1980-04-05@,
     example.favoriteSites=
     [
       «http://www.globalmentor.com/»,
@@ -2291,7 +2293,7 @@ navigationPanel.add(conversionPanel);
     <code>urf.Language</code> lexical namespace, and the integer value
     <code>23</code> is represented as a resource with a URI in the
     <code>urf.Integer</code> lexical namespace (shown here in its short form,
-    <code>#23</code>).</p>
+    <code>#23#</code>).</p>
 
     <h3 id="vcardExample">VCard</h3>
 
@@ -2368,7 +2370,7 @@ END:vCard</code></pre>
     \,
     vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
     vcard.url=&lt;http://www.example.com/home/jane/&gt;,
-    vcard.bday=@1980-02-02T09:45:00,
+    vcard.bday=@1980-02-02T09:45:00@,
     vcard.category="Internet",
     vcard.category="B2B",
     vcard.category="P2P",
@@ -2590,7 +2592,7 @@ END:vCard</code></pre>
     <h2>History</h2>
 
     <dl>
-      <dt>2007-??-??</dt>
+      <dt>2007-12-23</dt>
 
       <dd><ul>
           <li>Changed TURF preamble delimiters.</li>
@@ -2601,6 +2603,10 @@ END:vCard</code></pre>
 
           <li>Changed order of string and type in TURF lexical form
           reference.</li>
+
+          <li>Brought back requirement for ending delimiters for TURF number,
+          temporal, and ordinal short representations to prevent an ambigious
+          grammar.</li>
         </ul></dd>
 
       <dt>2007-11-22</dt>
