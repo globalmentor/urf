@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-12-23</dd>
+      <dd>2007-12-31</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -521,6 +521,16 @@
 
       <dd>Character resources are the Unicode code points, and their lexical
       forms are the Unicode characters represented by those code points.</dd>
+
+      <dt><code>content.CharacterEncoding</code></dt>
+
+      <dd>A character encoding resource is the name of the mapping of integer
+      values to a set of characters. This is equivalent to the
+      <code>charset</code> Internet media type parameter described by [<a
+      href="#rfc2046">RFC 2046</a>]. Internet media types are also known as
+      <dfn>MIME types</dfn> and <dfn>content types</dfn>. The lexical form
+      should include both character encoding form and the character encoding
+      scheme in lowercase form, such as <code>utf-16be</code>.</dd>
 
       <dt><code>urf.Class</code></dt>
 
@@ -1402,7 +1412,24 @@
     <p>TURF is the text interchange format for URF. TURF emphasizes terseness
     and consistency while maintaining human readability, with a preference for
     using symbols from existing interchange formats such as JSON and
-    programming languages such as Java and C#.</p>
+    programming languages such as Java and C#. TURF has several useful
+    properties, including:</p>
+
+    <ul>
+      <li>TURF has a signature character sequence, <code>`URF</code>, for easy
+      recognition.</li>
+
+      <li>TURF has unambiguous beginning and end delimiters, allowing TURF to
+      be embedded in existing text-based content.</li>
+
+      <li>Whitespace separators and comments may be removed with no loss of
+      semantics, resulting in an extremely compact representation.</li>
+
+      <li>Standard delimiters are used, such as <code>{…}</code> for sets,
+      <code>[…]</code> for lists, <code>"…"</code> for strings,
+      <code>&lt;…&gt;</code> for URIs, <code>#…#</code> for numbers, and
+      <code>º…º</code> for ordinals.</li>
+    </ul>
 
     <h3>Internet Media Type</h3>
 
@@ -1995,9 +2022,9 @@
     instance tree, and manipulating URF in-memory. The reference
     implementation source code may be downloaded from the GlobalMentor
     Subversion repository at &lt;<a
-    href="https://svn.globalmentor.com/java/src/com/garretwilson/urf/">https://svn.globalmentor.com/java/src/com/garretwilson/urf/</a>&gt;.
+    href="https://svn.globalmentor.com/java/src/com/globalmentor/urf/">https://svn.globalmentor.com/java/src/com/globalmentor/urf/</a>&gt;.
     The API documentation may be found at &lt;<a
-    href="http://www.guiseframework.com/doc/api/com/garretwilson/urf/package-summary.html">http://www.guiseframework.com/doc/api/com/garretwilson/urf/package-summary.html</a>&gt;.
+    href="http://www.guiseframework.com/doc/api/com/globalmentor/urf/package-summary.html">http://www.guiseframework.com/doc/api/com/globalmentor/urf/package-summary.html</a>&gt;.
     The Guise Internet application framework [<a href="#guise">Guise</a>]
     development library contains the URF reference implementation already
     compiled, and is available at &lt;<a
@@ -2592,6 +2619,14 @@ END:vCard</code></pre>
     <h2>History</h2>
 
     <dl>
+      <dt>2007-12-31</dt>
+
+      <dd><ul>
+          <li>Added <code>content.CharacterEncoding</code> class.</li>
+
+          <li>Renamed URF reference implementation Java package.</li>
+        </ul></dd>
+
       <dt>2007-12-23</dt>
 
       <dd><ul>
