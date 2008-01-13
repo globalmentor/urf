@@ -12,9 +12,9 @@
   <body>
     <h1>Uniform Resource Framework (URF)</h1>
 
-    <p>Copyright © 2007 <a href="http://www.globalmentor.com/">GlobalMentor,
-    Inc.</a> This specification may be freely used but only in unmodifed
-    form.</p>
+    <p>Copyright © 2007-2008 <a
+    href="http://www.globalmentor.com/">GlobalMentor, Inc.</a> This
+    specification may be freely used but only in unmodifed form.</p>
 
     <dl>
       <dt>Author</dt>
@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2007-12-31</dd>
+      <dd>2008-01-08</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -613,9 +613,11 @@
 
       <dt><code>urf.Map</code></dt>
 
-      <dd>A resource for which the properties represent key values (and are
-      typically instances of <code>urf.String</code>), and for which the first
-      value of each property represents the value for that key.</dd>
+      <dd>A resource containing associations between keys and values. Each
+      association is represented by an instance of <code>urf.MapEntry</code>,
+      which indicates a value for the property <code>urf.key</code> and the
+      property <code>urf.value</code>. Each map entry is the value of an
+      <code>urf.entry</code> property of the map resource.</dd>
 
       <dt><code>urf.Ordinal</code></dt>
 
@@ -1522,7 +1524,8 @@
       <strong>[</strong><var>communityshort</var><strong>]</strong>
       <strong>[</strong><var>propositionshort</var><strong>]</strong>
       <strong>[</strong><var>listshort</var><strong>]</strong>
-      <strong>[</strong><var>setshort</var><strong>]</strong></code></p>
+      <strong>[</strong><var>setshort</var><strong>]</strong>
+      <strong>[</strong>mapshort<strong>]</strong></code></p>
     </blockquote>
 
     <p>A label consists of a name.</p>
@@ -1911,6 +1914,36 @@
       {<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>}</code></p>
     </blockquote>
 
+    <p>A map short form consists of a sequence of key/value associations
+    surrounded by tortoise shell bracket characters <code>'〔'</code> and
+    <code>'〕'</code>. Each key is separated from its value using the equals
+    sign <code>'='</code>, and the key/value combinations are separated by
+    commas. Each key/value association represents a resource of type
+    <code>urf.MapEntry</code> as a value of the <code>urf.entry</code>
+    property of the map resource, with key a value of the map entry
+    <code>urf.key</code> property, and the value a value of the map entry
+    <code>urf.value</code> property. The presence of a map short form implies
+    a type of <code>urf.Map</code> if no other types have yet been specified,
+    either implicitly or explicitly.</p>
+
+    <blockquote>
+      <p><code><var>mapshort</var> ⇒
+      〔<strong>[</strong><var>mapentry</var><strong>[</strong>,<var>mapentry</var><strong><strong>]*</strong>]</strong>〕</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>mapentry</var> ⇒
+      <var>key</var>=<var>value</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>key</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>value</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
     <h2 id="ploop">PLOOP</h2>
 
     <p>It is possible to use URF as a Programming Language Ontology for
@@ -1987,10 +2020,11 @@
     <p>In general, URF resources with URIs that are recognized must be
     converted to the equivalent type in the programming language. For example,
     in Java all resources of type <code>urf.Integer</code> must be converted
-    to instances of java.lang.Integer. Likewise in Java urf.List, urf.Set, and
-    urf.Map resources must be converted to java.util.List, java.util.Set,
-    java.util.Set, and java.util.Map instances, respectively, with each
-    element recursively instantiated or converted as needed. A resource with a
+    to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>,
+    <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted
+    to <code>java.util.List</code>, <code>java.util.Set</code>, and
+    <code>java.util.Map</code> instances, respectively, with each element or
+    entry recursively instantiated or converted as needed. A resource with a
     lexical URI must be converted if possible to a programming language type
     functioning as a lexical identifier, if its lexical type indicates such an
     enumerated type. In the following example, the Guise Java class
@@ -2095,7 +2129,7 @@
     example.length=#1234#,
     example.valid=*true*,
     example.status="processing",
-    example.results=[*false*, #5#, "dog", (urf.Map):"code"=#9.8#;]
+    example.results=[*false*, #5#, "dog", 〔"code"=#9.8#〕]
   ;
 .</code></pre>
     </blockquote>
@@ -2619,6 +2653,16 @@ END:vCard</code></pre>
     <h2>History</h2>
 
     <dl>
+      <dt>2008-??-??</dt>
+
+      <dd><ul>
+          <li>Improved semantics of <code>urf.Map</code> by adding map entries
+          to distinguish between properties and map key/value
+          associations.</li>
+
+          <li>Added delimiters for <code>urf.Map</code> short form.</li>
+        </ul></dd>
+
       <dt>2007-12-31</dt>
 
       <dd><ul>
