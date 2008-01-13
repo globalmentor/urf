@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2008-01-08</dd>
+      <dd>2008-01-12</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -129,7 +129,6 @@
 ††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††
 †
 † This is an example TURF interchange document.
-† Comments can be terse or verbosely readable.
 †
 ††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††††‡
 
@@ -139,11 +138,11 @@
 ;
 ¤
   †describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
-  example.janedoe(foaf.Person):
+  example.janedoe*foaf.Person:
     example.name="Jane Doe",
     example.birthday=@1980-01-01@,
     example.salary=#1000000#:
-      example.currency`=«(example.Currency)"usd"»
+      example.currency`=«*example.Currency("usd")»
     ;
   ;
 .</code></pre>
@@ -217,7 +216,7 @@
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  example.community(urf.Community):
+  example.community*urf.Community*:
     example.when=example.longAgo
   ;
   {
@@ -235,7 +234,7 @@
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  example.community(urf.Community):
+  example.community*urf.Community*:
     example.when=example.longAgo
   ;
   ¤
@@ -371,10 +370,10 @@
   "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
 ;
 ¤
-  (component.Button):
+  *component.Button:
     label="Convert"
   ;,
-  example.janedoe(foaf.Person):
+  example.janedoe*foaf.Person:
     example.name="Jane Doe"
   ;
 .</code></pre>
@@ -480,16 +479,15 @@
   ;
 .</code></pre>
         </blockquote><p>As a shorthand representation, that a resource is an
-      instance of one or more classes may be represented by placing the class
-      resource after the resource reference surrounded by parentheses.
-      Multiple classes may be separated by commas, and are added as <a
-      href="#orderedProperties">ordered properties</a>. The following example
-      is semantically identical to the preceding example.</p><blockquote>
+      instance of one or more classes may be represented by placing a
+      reference to the class resources after the resource reference, each
+      preceded by an asterisk (<code>'*'</code>). The following example is
+      semantically identical to the preceding example.</p><blockquote>
           <pre><code>`URF:
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  example.resource(example.Class):
+  example.resource*example.Class:
     example.property=example.value
   ;
 .</code></pre>
@@ -713,6 +711,48 @@
       type parameters.</dd>
     </dl>
 
+    <h3>Selectors</h3>
+
+    <dl>
+      <dt>URF</dt>
+
+      <dd><p>A resource may have a <dfn>selector</dfn> that indicates how a
+      specific instance of a class is to be selected. A selector for an
+      instance of a particular class is represented by the
+      <code>urf.List</code> value of a scoped <code>urf.selector</code>
+      property in the scope of the resource's <code>urf.type</code> property
+      for the class instance being selected.</p></dd>
+
+      <dt>TURF</dt>
+
+      <dd><p>A selector for a particular type may be represented in short form
+      by one or more comma-separated resources withing parenthesis after the
+      type short form. The following example selects an instance of the type
+      <code>example.Point</code> using the selector <code>[#5#, #8#]</code>,
+      assumedly indicating five units along the X axis and eight units along
+      the Y axis.</p><blockquote>
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
+¤
+  *example.Point(#5#, #8#)
+.</code></pre>
+        </blockquote><p>The following example is semantically equivalent to
+      the short form above:</p><blockquote>
+          <pre><code>`URF:
+  "urf"~&lt;http://urf.name/urf&gt;,
+  "example"~&lt;http://example.com/example&gt;
+;
+¤
+  :
+    urf.type=example.Point:
+      urf.selector`=[#5#, #8#]
+    ;
+  ;
+.</code></pre>
+        </blockquote></dd>
+    </dl>
+
     <h3 id="lexical">Lexical Namespaces</h3>
 
     <dl>
@@ -760,13 +800,14 @@
           <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
         </blockquote><p>Rather than indicating directly the URI of a resource
       in a lexical namespace, the resource may be identified by indicating the
-      type of the resource in parenthesis inside the URI reference, followed
-      by the canonical lexical form of the resource as a string. The integer
-      123 may therefore be represented as either of the following short
-      forms:</p><blockquote>
-          <pre><code>«(«http://urf.name/urf#Integer»)"123"»</code></pre>
+      type of the resource preceded by an asterisk inside the URI reference,
+      followed by the canonical lexical form of the resource as a string
+      inside parentheses. In essence, a type an selector is being used to
+      generate a corresponding URI. The integer 123 may therefore be
+      represented as either of the following short forms:</p><blockquote>
+          <pre><code>«*«http://urf.name/urf#Integer»("123")»</code></pre>
         </blockquote><blockquote>
-          <pre><code>«(urf.Integer)"123"»</code></pre>
+          <pre><code>«*urf.Integer("123")»</code></pre>
         </blockquote><p>The lexical namespaces for several types have
       additional short representations. The examples below assume that the
       label <code>urf</code> has been assigned to the URF namespace.</p><dl>
@@ -785,22 +826,22 @@
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«(urf.Binary)"QD8-PQ=="»</code></pre>
+              <pre><code>«*urf.Binary("QD8-PQ==")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Boolean</code></dt>
 
           <dd><p>An boolean resource may be identified by its lexical form
-          surrounded by matching asterisks (<code>'*'</code>). For example,
-          the following short representation,</p><blockquote>
-              <pre><code>*true*</code></pre>
+          surrounded by matching underscore characters (<code>'_'</code>). For
+          example, the following short representation,</p><blockquote>
+              <pre><code>_true_</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«(urf.Boolean)"true"»</code></pre>
+              <pre><code>«*urf.Boolean("true")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Character</code></dt>
@@ -816,7 +857,7 @@
             </blockquote><p>which is also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«(urf.Character)"x"»</code></pre>
+              <pre><code>«*urf.Character("x")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Number</code></dt>
@@ -835,23 +876,23 @@
             </blockquote><p>which are also equivalent to the following general
           short representations for resources in a lexical namespace,
           respectively:</p><blockquote>
-              <pre><code>«(urf.Integer)"123"»
-«(urf.Real)"123.45"»</code></pre>
+              <pre><code>«*urf.Integer("123")»
+«*urf.Real("123.45")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Ordinal</code></dt>
 
           <dd><p>Ordinal number resources may be identified by their lexical
-          forms preceded by the ordinal character <code>'º'</code>. For
-          example, the following short representation,</p><blockquote>
-              <pre><code>º5</code></pre>
+          forms surrounded by matching ordinal characters <code>'º'</code>.
+          For example, the following short representation,</p><blockquote>
+              <pre><code>º5º</code></pre>
             </blockquote><p>is equivalent to the following long
           representation,</p><blockquote>
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code></pre>
             </blockquote><p>which are also equivalent to the following general
           short representation for resources in a lexical
           namespace:</p><blockquote>
-              <pre><code>«(urf.Ordinal)"5"»</code></pre>
+              <pre><code>«*urf.Ordinal("5")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.RegularExpression</code></dt>
@@ -866,7 +907,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«(urf.RegularExpression)"a?b+c*"»</code></pre>
+              <pre><code>«*urf.RegularExpression("a?b+c*")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.String</code></dt>
@@ -881,7 +922,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«(urf.String)"apple"»</code></pre>
+              <pre><code>«*urf.String("apple")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.Temporal</code></dt>
@@ -909,11 +950,11 @@
 «http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23UTCOffset#-08:00»</code></pre>
             </blockquote><p>which are also equivalent to the general short
           representations for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«(urf.Date)"1980-05-06"»
-«(urf.Time)"16:39:57-08:00"»
-«(urf.DateTime)"1980-05-06T16:39:57-08:00"»
-«(urf.Duration)"P100Y5M3DT8H2M10.5S"»
-«(urf.UTCOffset)"-08:00"»</code></pre>
+              <pre><code>«*urf.Date("1980-05-06")»
+«*urf.Time("16:39:57-08:00")»
+«*urf.DateTime("1980-05-06T16:39:57-08:00")»
+«*urf.Duration("P100Y5M3DT8H2M10.5S")»
+«*urf.UTCOffset("-08:00")»</code></pre>
             </blockquote></dd>
 
           <dt><code>urf.URI</code></dt>
@@ -928,7 +969,7 @@
               <pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
             </blockquote><p>which is also equivalent to the general short
           representation for resources in a lexical namespace:</p><blockquote>
-              <pre><code>«(urf.URI)"http://urf.name/urf#type"»</code></pre>
+              <pre><code>«*urf.URI("http://urf.name/urf#type")»</code></pre>
             </blockquote></dd>
         </dl></dd>
     </dl>
@@ -962,7 +1003,7 @@
   "urf"~&lt;http://urf.name/urf&gt;
 ;
 ¤
-  urf.Boolean(urf.Class):
+  urf.Boolean*urf.Class:
     urf.subClassOf=urf.Enum
   ;
   {
@@ -998,7 +1039,7 @@
 ;
 ¤
   example.john:
-    example.believes=(urf.Proposition):
+    example.believes=*urf.Proposition:
       urf.subject=example.sky,
       urf.predicate=example.color,
       urf.object=example.purple
@@ -1170,15 +1211,15 @@
       for Objects and Properties, or <a href="#ploop">PLOOP</a>. A class can
       be identified as an object's type using a URI that identifies the type,
       such as <code>«java:/com/example/package/ExampleClass»</code> for the
-      Java class <code>com.example.package.ExampleClass</code>. An optional
-      <code>urf.inits</code> property specifies an <code>urf.List</code> of
-      resources to be used for object initialization using a constructor with
-      parameters matching the given values.</p><p>URF properties specify
-      programming language properties, which may be virtual properties using
-      "getter" and "setter" methods such as with JavaBeans. Programming
-      languages usually have properties relative to each class rather than
-      absolute for all classes. For example, the Java property represented by
-      the JavaBean method
+      Java class <code>com.example.package.ExampleClass</code>. The
+      <code>urf.List</code> value of the selector property
+      <code>urf.selector</code> specifies the resources to be used for object
+      initialization using a constructor with parameters matching the given
+      values.</p><p>URF properties specify programming language properties,
+      which may be virtual properties using "getter" and "setter" methods such
+      as with JavaBeans. Programming languages usually have properties
+      relative to each class rather than absolute for all classes. For
+      example, the Java property represented by the JavaBean method
       <code>com.example.package.ExampleClass.setProperty(java.lang.String)</code>
       would be represented by an URF property with the URI
       <code>«java:/com/example/package/ExampleClass#property»</code>. Some
@@ -1188,13 +1229,12 @@
 
       <dt>TURF</dt>
 
-      <dd><p>TURF allows a shorthand notation for the <code>urf.inits</code>
-      property <code>urf.List</code> value by surrounding its elements with
-      inverted and upright exlamation marks. The class
-      <code>com.guiseframework.Category</code> of the Guise Internet
+      <dd><p>The TURF selector shorthand notation specifies constructor
+      arguments for a class instance if a non-default constructor is desired.
+      The class <code>com.guiseframework.Category</code> of the Guise Internet
       application framework [<a href="#guise">Guise</a>], for example, does
       not have a default constructor. The following example provides an
-      <code>urf.inits</code> <code>urf.List</code> property containing a
+      <code>urf.selector</code> <code>urf.List</code> property containing a
       single element of type <code>urf.String</code>, which can be converted
       to a <code>java.lang.String</code> object and used as arguments for the
       <code>com.guiseframework.Category(java.lang.String,
@@ -1206,11 +1246,11 @@
   "guise"~&lt;java:/com/guiseframework/&gt;
 ;
 ¤
-  (guise.Category)¡"category1", "First Category"!:
+  *guise.Category("category1", "First Category"):
     categories=
     [
-      (guise.Category)¡"subcategoryA"!,
-      (guise.Category)¡"subcategoryB"!
+      *guise.Category("subcategoryA"),
+      *guise.Category("subcategoryB")
     ]
   ;
 .</code></pre>
@@ -1221,15 +1261,21 @@
   "guise"~&lt;java:/com/guiseframework/&gt;
 ;
 ¤
-  (guise.Category):
-    urf.inits=["category1", "First Category"],
+  :
+    urf.type=guise.Category:
+      urf.selector`=["category1", "First Category"]
+    ;
     categories=
     [
-      (guise.Category):
-        urf.inits=["subcategoryA"]
+      :
+        urf.type=guise.Category:
+          urf.selector`=["subcategoryA"]
+        ;
       ;,
-      (guise.Category):
-        urf.inits=["subcategoryB"]
+      :
+        urf.type=guise.Category:
+          urf.selector`=["subcategoryB"]
+        ;
       ;
     ]
   ;
@@ -1270,7 +1316,7 @@
 ;
 ¤
   punx.Phil:
-    punx:predicts=punx.weather
+    punx.predicts=punx.weather
   ;
 .</code></pre>
         </blockquote><p>It may instead be asserted that some other community,
@@ -1284,16 +1330,18 @@
       made.) For example, rather than directly asserting that Punxsutawney
       Phil predicts the weather, the following example asserts that <em>the
       community of Punxsutawney</em> asserts (believes or holds) that
-      Punxsutawney Phil predicts the weather:</p><blockquote>
+      Punxsutawney Phil predicts the weather (the <code>urf.Community</code>
+      specification is redundant here, because the community short form
+      implies the <code>urf.Community</code> type):</p><blockquote>
           <pre><code>`URF:
   "urf"~&lt;http://urf.name/urf&gt;,
   "punx"~&lt;http://example.com/punxsutawney&gt;
 ;
 ¤
-  punx.Punxsutawney(urf.Community)
+  punx.Punxsutawney*urf.Community
   ¤
     punx.Phil:
-      punx:predicts=punx.weather
+      punx.predicts=punx.weather
   .
 .</code></pre>
         </blockquote><p>Semantics identical to those the previous example can
@@ -1305,7 +1353,7 @@
   "punx"~&lt;http://example.com/punxsutawney&gt;
 ;
 ¤
-  punx.Punxsutawney(urf.Community)
+  punx.Punxsutawney*urf.Community
   {
     “punx.Phil, punx.predicts, punx.weather”
   }
@@ -1510,17 +1558,16 @@
     <code>'.'</code> and contains zero or more resource descriptions,
     separated by commas. Each resource description must have at least one of
     the following optional components, any may have any or all of them: a
-    label, a reference, a type declaration, a set of property definitions, a
-    community short form, a proposition form, a list short form, and a set
-    short form.</p>
+    label, a reference, one or more type short forms, a set of property
+    definitions, a community short form, a proposition form, a list short
+    form, a set short form, and a map short form.</p>
 
     <blockquote>
       <p><code><var>resource</var> ⇒
-      <strong>[</strong>|<var>label</var>|<strong>]</strong>
+      <strong>[</strong><var>label</var><strong>]</strong>
       <strong>[</strong><var>reference</var><strong>]</strong>
-      <strong>[</strong>(<var>type</var>s)<strong>]</strong>
-      <strong>[</strong>¡<var>inits</var>!<strong>]</strong>
-      <strong>[</strong>:<var>properties</var>;<strong>]</strong>
+      <strong>[</strong><var>type</var>s<strong>]</strong>
+      <strong>[</strong><var>properties</var><strong>]</strong>
       <strong>[</strong><var>communityshort</var><strong>]</strong>
       <strong>[</strong><var>propositionshort</var><strong>]</strong>
       <strong>[</strong><var>listshort</var><strong>]</strong>
@@ -1528,10 +1575,11 @@
       <strong>[</strong>mapshort<strong>]</strong></code></p>
     </blockquote>
 
-    <p>A label consists of a name.</p>
+    <p>A label consists of a name surrounded by matching vertical bars
+    (<code>'|'</code>).</p>
 
     <blockquote>
-      <p><code><var>label</var> ⇒ <var>name</var></code></p>
+      <p><code><var>label</var> ⇒ |<var>name</var>|</code></p>
     </blockquote>
 
     <p>A name is any letter followed by any number of letters, digits, or
@@ -1552,8 +1600,8 @@
       <strong>|</strong> <var>Unicode Connector Punctuation</var></code></p>
     </blockquote>
 
-    <p>A resource reference is a URI reference or one of several short
-    representations.</p>
+    <p>A resource reference is a URI reference, a name reference, or one of
+    several short representations.</p>
 
     <blockquote>
       <p><code><var>reference</var> ⇒ <var>urireference</var>
@@ -1567,22 +1615,26 @@
     </blockquote>
 
     <p>A resource URI reference is enclosed in angle quotes. The contents is
-    either the text of a URI (or relative reference); or a pair of parentheses
-    containing a resource reference to a lexical type, immediately followed by
-    a string containing the lexical representation of a resource. Any URI
+    either the text of a URI (or relative reference); or a resource reference
+    to a lexical type preceded by an asterisk <code>'*'</code>, immediately
+    followed by a string containing the lexical representation of a resource,
+    surrounded by parentheses <code>'('</code> and <code>')'</code>. If a
+    relative reference is provided, it is resolved against the base URI of the
+    TURF document according to the rules specified in [<a
+    href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI
     reference that includes a lexical representation is equivalent to a URI
     reference in the form
     <code>«http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
 
     <blockquote>
       <p><code><var>urireference</var> ⇒
-      «<strong>(</strong>(<var><var>type</var></var>)<var>stringshort</var><strong>)</strong>
+      «<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong>
       <strong>|</strong>
       <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>»</code></p>
     </blockquote>
 
     <blockquote>
-      <p><code><var>type</var> ⇒ <var>resource</var></code></p>
+      <p><code><var>type</var> ⇒ <var>reference</var></code></p>
     </blockquote>
 
     <p>A name reference is a <var>name</var> representing the local name of a
@@ -1690,34 +1742,33 @@
 
     <p>A URI short form is a sequence of character constituting a
     syntactically correct URI or a relative reference, surrounded by the angle
-    brackets <code>'&lt;'</code> and <code>'&gt;'</code>. If a relative
-    reference is provided, it is resolved against the base URI of the TURF
-    document according to the rules specified in [<a
-    href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. If a label
-    appears at the beginning of the URI characters and that label refers to a
-    previously defined URI resource, the remaining characters are interpreted
-    as a relative reference and resolved against the URI to which the label
-    refers. A single relative reference is resolved to the base URI of the
-    interchange document. A URI short form is equivalent to a resource of type
-    <code>urf.URI</code> using the corresponding lexical namespace. The URI
-    short form <code>&lt;http://example.com&gt;</code> is the equivalent of
-    the URI resource <code>«(urf.URI)"http://example.com"»</code>.</p>
+    brackets <code>'&lt;'</code> and <code>'&gt;'</code>. Alternatively, a
+    type and selector may be provided with identical syntax to a resource URI
+    reference. If a relative reference is provided, it is resolved against the
+    base URI of the TURF document according to the rules specified in [<a
+    href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. A URI short
+    form is equivalent to a resource of type <code>urf.URI</code> using the
+    corresponding lexical namespace. The URI short form
+    <code>&lt;http://example.com&gt;</code> is the equivalent of the URI
+    resource <code>«(urf.URI)"http://example.com"»</code>.</p>
 
     <blockquote>
       <p><code><var>urishort</var> ⇒
-      &lt;<strong>[</strong>|<var>label</var>|<strong>]</strong><var>urichar</var><strong>+</strong>&gt;</code></p>
+      &lt;<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong>
+      <strong>|</strong>
+      <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>&gt;</code></p>
     </blockquote>
 
     <p>A boolean short form is the character sequence <code>true</code> or
-    <code>false</code> surrounded by matching asterisks <code>'*'</code>. A
-    boolean short form is equivalent to a resource of type
+    <code>false</code> surrounded by matching underscore characters
+    <code>'_'</code>. A boolean short form is equivalent to a resource of type
     <code>urf.Boolean</code> using the corresponding lexical namespace. The
-    boolean short form <code>*true*</code> is the equivalent of the boolean
+    boolean short form <code>_true_</code> is the equivalent of the boolean
     resource <code>«(urf.Boolean)"true"»</code>.</p>
 
     <blockquote>
       <p><code><var>booleanshort</var> ⇒
-      *true*<strong>|</strong>*false*</code></p>
+      _true_<strong>|</strong>_false_</code></p>
     </blockquote>
 
     <p>A number short form consists of Roman digits, optionally preceded by a
@@ -1796,44 +1847,50 @@
       <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code></p>
     </blockquote>
 
-    <p>The types declaration consists of zero or more resource descriptions
-    between parenthes characters <code>'('</code> and <code>')'</code>, each
-    resource indicating a type of the resource being described. Indicating
-    types in this manner is equivalent to indicating the types as a sequence
-    of values of the <code>urf.type</code> property.</p>
+    <p>The types declaration consists of zero or more resource reference, each
+    preceded by an asterisk <code>'*'</code>. Each type reference may
+    optionally specify comma-separated selector resources between parentheses
+    characters <code>'('</code> and <code>')'</code> following the type
+    reference. The selector resources are equivalent to the values of
+    <code>urf.List</code> value of a scoped <code>urf.selector</code> property
+    in the context of the resource's <code>urf.type</code> property for which
+    the type is a value.</p>
 
     <blockquote>
       <p><code><var>types</var> ⇒
-      (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
+      <strong>[</strong><var>typeshort</var><strong>[,</strong><var>typeshort</var><strong><strong>]*</strong>]</strong></code></p>
     </blockquote>
 
-    <p>The inits declaration consists of zero or more resource descriptions
-    between <code>'¡'</code> and <code>'!'</code>, each resource indicating an
-    initialization argument of the resource being described. Indicating inits
-    in this manner is equivalent to indicating the inits as elements of an
-    <code>urf.List</code> value of the <code>urf.inits</code> property.</p>
+    <blockquote>
+      <p><code><var>typeshort</var> ⇒
+      *<var>typereference</var><strong>[</strong>(<strong>[</strong><var>selectorresource</var><strong>[</strong>,<var>selectorresource</var><strong>]</strong><strong>*</strong><strong>]</strong>)<strong>]</strong></code></p>
+    </blockquote>
 
     <blockquote>
-      <p><code><var>inits</var> ⇒
-      (<strong>[</strong><var>resource</var><strong>[,</strong><var>resource</var><strong><strong>]*</strong>]</strong>)</code></p>
+      <p><code><var>typereference</var> ⇒ <var>reference</var></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>selectorresource</var> ⇒ <var>resource</var></code></p>
     </blockquote>
 
     <p>Properties consist of a comma-separated list of predicate resource and
-    object resource pairs, each separated by the equals sign <code>'='</code>.
-    If the grave character <code>'`'</code> is present before the equals sign,
-    it indicates that the property is scoped in the context of the property's
-    subject resource and its respective predicate resource and subject
-    resource. If a label is provided, it identifies the proposition
-    represented by the reification of the assertion.</p>
+    object resource pairs between the color character <code>':'</code> and the
+    semicolon character <code>';'</code>, each separated by the equals sign
+    <code>'='</code>. If the grave character <code>'`'</code> is present
+    before the equals sign, it indicates that the property is scoped in the
+    context of the property's subject resource and its respective predicate
+    resource and subject resource. If a label is provided, it identifies the
+    proposition represented by the reification of the assertion.</p>
 
     <blockquote>
       <p><code><var>properties</var> ⇒
-      <strong>[</strong><var>property</var><strong>[</strong>,<var>property</var><strong><strong>]*</strong>]</strong></code></p>
+      :<strong>[</strong><var>property</var><strong>[</strong>,<var>property</var><strong><strong>]*</strong>]</strong>;</code></p>
     </blockquote>
 
     <blockquote>
       <p><code><var>property</var> ⇒
-      <var>resource</var><strong>[</strong>|<var>label</var>|<strong>]</strong><strong>[</strong>`<strong>]</strong>=<strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
+      <var>resource</var><strong>[</strong><var>label</var><strong>]</strong><strong>[</strong>`<strong>]</strong>=<strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
     </blockquote>
 
     <p>A sequence short form consists of a sequence of element resources
@@ -1863,8 +1920,9 @@
 
     <p>A proposition short form lists the subject, predicate, and object of a
     proposition inside the open double quotation mark <code>'“'</code> and
-    closed double quotation mark <code>'”'</code> characters. A proposition
-    short form is equivalent to setting the resource <code>urf.Subject</code>,
+    closed double quotation mark <code>'”'</code> characters, separated by
+    comma characters <code>','</code>. A proposition short form is equivalent
+    to setting the resource <code>urf.Subject</code>,
     <code>urf.Predicate</code>, and <code>urf.Object</code> propoerties to the
     three listed resources within the proposition short form. The presence of
     a proposition short form implies a type of <code>urf.Proposition</code> if
@@ -1872,9 +1930,8 @@
     explicitly.</p>
 
     <blockquote>
-      <p><code><var>propositionshort</var> ⇒ “<var>subject</var>
-      <var>separator</var>+ <var>predicate</var>
-      <var>separator</var><strong>+</strong> <var>object</var>”</code></p>
+      <p><code><var>propositionshort</var> ⇒ “<var>subject</var>,
+      <var>predicate</var>, <var>object</var>”</code></p>
     </blockquote>
 
     <blockquote>
@@ -1968,29 +2025,26 @@
     <blockquote>
       <pre><code>`URF
 ¤
-  («java:/com/guiseframework/component/LayoutPanel»)
+  *«java:/com/guiseframework/component/LayoutPanel»
 .</code></pre>
     </blockquote>
 
-    <p>If a resource has an <code>urf.inits</code> property with an
-    <code>urf.List</code> value, a PLOOP processor must use all the
-    corresponding values to locate a constructor with the correct number of
-    parameters for which the URF property values can be converted into
-    constructor arguments. A PLOOP instance would use the following example to
-    indicate that an instance of the Guise class
-    <code>com.guiseframework.Category</code> should be constructed using
-    <code>new Category("category1", "First Category")</code>:</p>
+    <p>If a resource has a scoped <code>urf.selector</code> property with an
+    <code>urf.List</code> value in the context of an <code>urf.type</code>
+    declaration, a PLOOP processor must use all the corresponding values as
+    arguments to the constructor of the specified type, converted the URF
+    selector resources into programming language values as needed. A PLOOP
+    instance would use the following example to indicate that an instance of
+    the Guise class <code>com.guiseframework.Category</code> should be
+    constructed using <code>new Category("category1", "First
+    Category")</code>:</p>
 
     <blockquote>
       <pre><code>`URF
 ¤
-  («java:/com/guiseframework/Category»)¡"category1", "First Category"!
+  *«java:/com/guiseframework/Category»("category1", "First Category")
 .</code></pre>
     </blockquote>
-
-    <p>If there is no <code>urf.inits</code> property but there is a single
-    constructor taking a URI, that constructor must be used to instantiate the
-    class, using the resource URI, if any.</p>
 
     <h3>Properties</h3>
 
@@ -2009,7 +2063,7 @@
     <blockquote>
       <pre><code>`URF
 ¤
-  («java:/com/guiseframework/component/Button»):
+  *«java:/com/guiseframework/component/Button»:
     label="Push Me"
   ;
 .</code></pre>
@@ -2030,7 +2084,7 @@
     enumerated type. In the following example, the Guise Java class
     <code>com.guiseframework.component.layout.FlowLayout</code> has a
     <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The
-    lexical URI <code>«(layout.Flow)"LINE"»</code> indicates a type of
+    lexical URI <code>«*layout.Flow("LINE")»</code> indicates a type of
     <code>com.guiseframework.component.layout.Flow</code>, which is a Java
     enum class. A PLOOP processor must construct a
     <code>com.guiseframework.component.layout.Flow</code> object from the
@@ -2041,8 +2095,8 @@
     <blockquote>
       <pre><code>`URF
 ¤
-  («java:/com/guiseframework/component/layout/FlowLayout»):
-    flow=«(layout.Flow)"LINE"»
+  («java:/com/guiseframework/component/layout/FlowLayout»:
+    flow=«*layout.Flow("LINE")»
   ;
 .</code></pre>
     </blockquote>
@@ -2100,9 +2154,9 @@
 ¤
   :
     "length"=#1234#,
-    "valid"=*true*,
+    "valid"=_true_,
     "status"="processing",
-    "results"=[*false*, #5#, "dog", :"code"=#9.8#;]
+    "results"=[_false_, #5#, "dog", :"code"=#9.8#;]
   ;
 .</code></pre>
     </blockquote>
@@ -2117,7 +2171,9 @@
     URF semantics would most importantly use actual properties rather than
     associative array string key pseudo-properties. An improved formulation
     would also indicate the type of the resources. Such improvements are
-    illustrated in the following reformulation:</p>
+    illustrated in the following reformulation (assuming the
+    <code>"code"</code> string in the list was intended to actually be a key
+    in a map):</p>
 
     <blockquote>
       <pre><code>`URF:
@@ -2125,11 +2181,11 @@
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  (example.Class):
+  *(example.Class:
     example.length=#1234#,
-    example.valid=*true*,
+    example.valid=_true_,
     example.status="processing",
-    example.results=[*false*, #5#, "dog", 〔"code"=#9.8#〕]
+    example.results=[_false_, #5#, "dog", 〔"code"=#9.8#〕]
   ;
 .</code></pre>
     </blockquote>
@@ -2151,61 +2207,61 @@
   "demo"~&lt;java:/com/guiseframework/demo/&gt;
 ;
 ¤
-  (demo.TemperatureConversionPanel2):
+  *demo.TemperatureConversionPanel2:
     label="Guise™ Demonstration: Temperature Conversion",
-    layout=(layout.FlowLayout):
-      flow=«(layout.Flow)"LINE"»
+    layout=*layout.FlowLayout:
+      flow=«*layout.Flow("LINE")»
     ;,
     name="temperatureConversionPanel",
     children=
     [
-      (component.LayoutPanel):
-        layout=(layout.FlowLayout):
-          flow=«(layout.Flow)"PAGE"»
+      *component.LayoutPanel:
+        layout=*layout.FlowLayout:
+          flow=«*layout.Flow("PAGE")»
         ;,
         name="inputPanel",
         children=
         [
-          (component.TextControl)¡«java:/java/lang/Double»!:
+          *component.TextControl(«java:/java/lang/Double»):
             label="Input Temperature",
             name="temperatureInput",
-            validator=(validator.ValueRequiredValidator)
+            validator=*validator.ValueRequiredValidator
           ;,
-          (component.TextControl)¡«java:/java/lang/Double»!:
-            editable=*false*,
+          *component.TextControl(«java:/java/lang/Double»):
+            editable=_false_,
             label="Output Temperature",
             name="temperatureOutput"
           ;
         ]
       ;,
-      (component.LayoutPanel):
-        layout=(layout.FlowLayout):
-          flow=«(layout.Flow)"PAGE"»
+      *component.LayoutPanel:
+        layout=*layout.FlowLayout:
+          flow=«*layout.Flow("PAGE")»
         ;,
         name="conversionPanel",
         children=
         [
-          (component.GroupPanel):
+          *component.GroupPanel:
             label="Input Scale",
-            layout=(layout.FlowLayout):
-              flow=«(layout.Flow)"PAGE"»
+            layout=*layout.FlowLayout:
+              flow=«*layout.Flow("PAGE")»
             ;,
             name="scalePanel",
             children=
             [
-              (component.CheckControl):
+              *component.CheckControl:
                 checkType="ellipse",
                 label="Calsius",
                 name="celsiusCheckControl"
               ;,
-              (component.CheckControl):
+              *component.CheckControl:
                 checkType="ellipse",
                 label="Fahrenheit",
                 name="fahrenheitCheckControl"
               ;
             ]
           ;,
-          (component.Button):
+          *component.Button:
             label="Convert",
             name="conversionButton"
           ;
@@ -2325,7 +2381,7 @@ navigationPanel.add(conversionPanel);
   "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
 ;
 ¤
-  example.janedoe(foaf.Person):
+  example.janedoe*foaf.Person:
     example.age=#23#,
     example.birthdate=@1980-04-05@,
     example.favoriteSites=
@@ -2334,7 +2390,7 @@ navigationPanel.add(conversionPanel);
       «http://www.garretwilson.com/»
     ],
     example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
-      content.type`=«(content.MediaType)"text/xml-external-parsed-entity"»
+      content.type`=«*content.MediaType("text/xml-external-parsed-entity")»
     ;,
     example.possibleVacationDestinations=
     {
@@ -2342,7 +2398,7 @@ navigationPanel.add(conversionPanel);
       "Rome"
     },
     nick="Janinha":
-      dc.language`=«(urf.Language)"pt-BR"»
+      dc.language`=«*urf.Language("pt-BR")»
     ;
   ;
 .</code></pre>
@@ -2350,9 +2406,9 @@ navigationPanel.add(conversionPanel);
 
     <p>Note that, rather than use special literal types or general strings,
     URF promotes the representation of resources by URIs. Thus the language
-    tag "pt-BR" for Brazilian Portuguese is represented as a resource a URI
-    <code>urf.Language</code> lexical namespace, and the integer value
-    <code>23</code> is represented as a resource with a URI in the
+    tag "pt-BR" for Brazilian Portuguese is represented as a resource with a
+    URI in the <code>urf.Language</code> lexical namespace, and the integer
+    value <code>23</code> is represented as a resource with a URI in the
     <code>urf.Integer</code> lexical namespace (shown here in its short form,
     <code>#23#</code>).</p>
 
@@ -2396,7 +2452,7 @@ END:vCard</code></pre>
 ¤
   example.janedoe:
     vcard.fn="Jane Doe",
-    vcard.n=(vcard.Name):
+    vcard.n=*vcard.Name:
       vcard.familyName="Doe",
       vcard.givenName="Jane",
       vcard.additionalName=\"Mary", "Ann"\,
@@ -2405,10 +2461,10 @@ END:vCard</code></pre>
     ;,
     vcard.org=\"Example Corporation", "North American Division", "Business Development"\,
     vcard.title="Directory of Business Development",
-    vcard.adr=(vcard.Adr):
-      vcard.adrType=«(vcard.AdrType)"work"»,
-      vcard.adrType=«(vcard.AdrType)"postal"»,
-      vcard.adrType=«(vcard.AdrType)"parcel"»,
+    vcard.adr=*vcard.Adr:
+      vcard.adrType=«*vcard.AdrType("work")»,
+      vcard.adrType=«*vcard.AdrType("postal")»,
+      vcard.adrType=«*vcard.AdrType("parcel")»,
       vcard.extendedAddress="Suite 45",
       vcard.streetAddress="123 Some Street",
       vcard.locality="Someplace",
@@ -2420,13 +2476,13 @@ END:vCard</code></pre>
     vcard.tel=
     \
       «tel:+1-234-567-8910»:
-        vcard.telType=«(vcard.TelType)"voice"»,
-        vcard.telType=«(vcard.TelType)"work"»
+        vcard.telType=«*vcard.TelType("voice")»,
+        vcard.telType=«*vcard.TelType("work")»
       ;,
       «tel:+1-234-567-8911»:
-        vcard.telType=«(vcard.TelType)"voice"»,
-        vcard.telType=«(vcard.TelType)"home"»,
-        vcard.telType=«(vcard.TelType)"cell"»
+        vcard.telType=«*vcard.TelType("voice")»,
+        vcard.telType=«*vcard.TelType("home")»,
+        vcard.telType=«*vcard.TelType("cell")»
       ;
     \,
     vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
@@ -2660,7 +2716,17 @@ END:vCard</code></pre>
           to distinguish between properties and map key/value
           associations.</li>
 
-          <li>Added delimiters for <code>urf.Map</code> short form.</li>
+          <li>Added delimiters for <code>urf.Map</code> TURF short form.</li>
+
+          <li>Changed delimiter of <code>urf.Boolean</code> TURF short
+          form.</li>
+
+          <li>Modified <code>urf.type</code> TURF short form syntax.</li>
+
+          <li>Introduced <code>urf.selector</code> property with TURF short
+          form.</li>
+
+          <li>Removed <code>urf.inits</code> property.</li>
         </ul></dd>
 
       <dt>2007-12-31</dt>
