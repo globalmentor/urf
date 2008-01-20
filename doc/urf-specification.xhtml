@@ -23,7 +23,7 @@
 
       <dt>Version</dt>
 
-      <dd>2008-01-12</dd>
+      <dd>2008-01-20</dd>
     </dl>
 
     <p>The Uniform Resource Framework (URF) provides a consistent way for
@@ -459,22 +459,28 @@
       all resources are implicitly instances of the class
       <code>urf.Resource</code>. Any resource may be explicitly asserted to be
       an instance of some class by identifying the class resource as a value
-      of the <code>urf.type</code> property.</p></dd>
+      of the <code>urf.type</code> property. A resource that is an instance of
+      the class <code>urf.Class</code> may indicate that it is a subclass of
+      some other class by indicating that class resource as the value of the
+      <code>urf.subClassOf</code> property. A resource that is an instance of
+      the class <code>urf.Class</code> may indicate that it is an
+      implementation of some interface by indicating that interface resource
+      as the value of the <code>urf.implementationOf</code> property.</p></dd>
 
       <dt>TURF</dt>
 
-      <dd><p>It can be asserted that a resource is an instance of a class by
-      normal representation of the <code>urf.type</code> property. In the
-      following example, the resource <code>example.resource</code> is
-      asserted to be an instance of the class
-      <code>example.Class</code>:</p><blockquote>
+      <dd><p>It can be asserted that a resource is an instance of a class and
+      a subclass of some other class by normal representation of the
+      <code>urf.type</code> and urf.subClassOf property. In the following
+      example, the resource <code>example.resource</code> is asserted to be an
+      instance of the class <code>example.MyClass</code>:</p><blockquote>
           <pre><code>`URF:
   "urf"~&lt;http://urf.name/urf&gt;,
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
   example.resource:
-    urf.type=example.Class,
+    urf.type=example.MyClass,
     example.property=example.value
   ;
 .</code></pre>
@@ -487,9 +493,22 @@
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  example.resource*example.Class:
+  example.resource*example.MyClass:
     example.property=example.value
   ;
+.</code></pre>
+        </blockquote><p>There also exists a shorthand representation for the
+      <code>urf.subClassOf</code> and <code>urf.implementationOf</code>
+      properties, using the circumflex accent <code>'^'</code> and the greater
+      than symbol <code>'&gt;'</code>, respectivly. The following example
+      indicates that <code>example.MyClass</code> is a class that is a
+      subclass of <code>example.SuperClass</code> and an implementation of the
+      interface <code>example.MyInterface</code>:</p><blockquote>
+          <pre><code>`URF:
+  "example"~&lt;http://example.com/example&gt;
+;
+¤
+  example.MyClass*urf.Class^example.MySuperClass&gt;example.MyInterface
 .</code></pre>
         </blockquote></dd>
     </dl>
@@ -1003,9 +1022,7 @@
   "urf"~&lt;http://urf.name/urf&gt;
 ;
 ¤
-  urf.Boolean*urf.Class:
-    urf.subClassOf=urf.Enum
-  ;
+  urf.Boolean*urf.Class^urf.Enum
   {
     "false",
     "true"
@@ -1567,6 +1584,8 @@
       <strong>[</strong><var>label</var><strong>]</strong>
       <strong>[</strong><var>reference</var><strong>]</strong>
       <strong>[</strong><var>type</var>s<strong>]</strong>
+      <strong>[</strong><var>superclasses</var><strong>]</strong>
+      <strong>[</strong><var>interfaces</var><strong>]</strong>
       <strong>[</strong><var>properties</var><strong>]</strong>
       <strong>[</strong><var>communityshort</var><strong>]</strong>
       <strong>[</strong><var>propositionshort</var><strong>]</strong>
@@ -1847,18 +1866,20 @@
       <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code></p>
     </blockquote>
 
-    <p>The types declaration consists of zero or more resource reference, each
-    preceded by an asterisk <code>'*'</code>. Each type reference may
-    optionally specify comma-separated selector resources between parentheses
-    characters <code>'('</code> and <code>')'</code> following the type
-    reference. The selector resources are equivalent to the values of
-    <code>urf.List</code> value of a scoped <code>urf.selector</code> property
-    in the context of the resource's <code>urf.type</code> property for which
-    the type is a value.</p>
+    <p>The types declaration consists of one or more resource references, each
+    preceded by an asterisk <code>'*'</code>. Each type reference is
+    equivalent to the reference asserted as the object of the
+    <code>urf.type</code> property. Each type reference may optionally specify
+    comma-separated selector resources between parentheses characters
+    <code>'('</code> and <code>')'</code> following the type reference. The
+    selector resources are equivalent to the values of <code>urf.List</code>
+    value of a scoped <code>urf.selector</code> property in the context of the
+    resource's <code>urf.type</code> property for which the type is a
+    value.</p>
 
     <blockquote>
       <p><code><var>types</var> ⇒
-      <strong>[</strong><var>typeshort</var><strong>[,</strong><var>typeshort</var><strong><strong>]*</strong>]</strong></code></p>
+      <var>typeshort</var><strong>[,</strong><var>typeshort</var><strong><strong>]*</strong></strong></code></p>
     </blockquote>
 
     <blockquote>
@@ -1872,6 +1893,34 @@
 
     <blockquote>
       <p><code><var>selectorresource</var> ⇒ <var>resource</var></code></p>
+    </blockquote>
+
+    <p>The superclasses declaration consists of one or more resource
+    references, each preceded by a circumflex accent <code>'^'</code>. Each
+    superclass reference is equivalent to the reference asserted as the object
+    of the <code>urf.subClassOf</code> property.</p>
+
+    <blockquote>
+      <p><code><var>superclasses</var> ⇒
+      <var>superclassshort</var><strong>[,</strong><var>superclasshort</var><strong><strong>]*</strong></strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>superclassshort</var> ⇒ ^<var>reference</var></code></p>
+    </blockquote>
+
+    <p>The interfaces declaration consists of one or more resource references,
+    each preceded by a greater-than symbol <code>'&gt;'</code>. Each interface
+    reference is equivalent to the reference asserted as the object of the
+    <code>urf.implementationOf</code> property.</p>
+
+    <blockquote>
+      <p><code><var>interfaces</var> ⇒
+      <var>interfaceshort</var><strong>[,</strong><var>interfaceshort</var><strong><strong>]*</strong></strong></code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><code><var>interfaceshort</var> ⇒ *<var>reference</var></code></p>
     </blockquote>
 
     <p>Properties consist of a comma-separated list of predicate resource and
@@ -2727,6 +2776,11 @@ END:vCard</code></pre>
           form.</li>
 
           <li>Removed <code>urf.inits</code> property.</li>
+
+          <li>Documented <code>urf.subClassOf</code> and
+          <code>urf.implementationOf</code> properties.</li>
+
+          <li>Added TURF superclass and interface short forms.</li>
         </ul></dd>
 
       <dt>2007-12-31</dt>
