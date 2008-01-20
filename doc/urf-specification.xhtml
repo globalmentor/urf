@@ -539,16 +539,6 @@
       <dd>Character resources are the Unicode code points, and their lexical
       forms are the Unicode characters represented by those code points.</dd>
 
-      <dt><code>content.CharacterEncoding</code></dt>
-
-      <dd>A character encoding resource is the name of the mapping of integer
-      values to a set of characters. This is equivalent to the
-      <code>charset</code> Internet media type parameter described by [<a
-      href="#rfc2046">RFC 2046</a>]. Internet media types are also known as
-      <dfn>MIME types</dfn> and <dfn>content types</dfn>. The lexical form
-      should include both character encoding form and the character encoding
-      scheme in lowercase form, such as <code>utf-16be</code>.</dd>
-
       <dt><code>urf.Class</code></dt>
 
       <dd>Not every resource used as a class is an instance of the class
@@ -719,6 +709,18 @@
       href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The
       UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must
       be used instead.</dd>
+
+      <dt><code>content.Charset</code></dt>
+
+      <dd>The name of the mapping of integer values to a set of characters.
+      This is equivalent to the <dfn>charset</dfn> Internet media type
+      parameter described by [<a href="#rfc2046">RFC 2046</a>] and further
+      elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset
+      encapsulates both the concept of a <dfn>coded character set</dfn> and a
+      <dfn>character encoding scheme</dfn>, as specified in [<a
+      href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the
+      canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA
+      Charset Registry</a>], such as <code>UTF-16BE</code>.</dd>
 
       <dt><code>content.MediaType</code></dt>
 
@@ -2230,7 +2232,7 @@
   "example"~&lt;http://example.com/example&gt;
 ;
 ¤
-  *(example.Class:
+  *example.Class:
     example.length=#1234#,
     example.valid=_true_,
     example.status="processing",
@@ -2658,6 +2660,11 @@ END:vCard</code></pre>
       <dd><a href="http://www.guiseframework.com/"><cite>Guise™ Internet
       Application Framework</cite></a>. GlobalMentor, Inc.</dd>
 
+      <dt id="ianaCharsetRegistry">IANA Charset Registry</dt>
+
+      <dd><a href="http://www.iana.org/assignments/character-sets"><cite>IANA
+      Charset Registry</cite></a>. Internet Assigned Numbers Authority.</dd>
+
       <dt id="iso8601">ISO 8601</dt>
 
       <dd><cite>ISO 8601:2004(E): Data elements and interchange formats —
@@ -2677,6 +2684,21 @@ END:vCard</code></pre>
       href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose
       Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>.
       Internet Engineering Task Force, 1996.</dd>
+
+      <dt id="rfc2130">RFC 2130</dt>
+
+      <dd>C. Weider, C. Preston, K. Simonsen, H. Alvestrand, R. Atkinson, M.
+      Crispin, and P. Svanberg. <a
+      href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2130: The Report of
+      the IAB Character Set Workshop held 29 February - 1 March,
+      1996</cite></a>. Internet Engineering Task Force, 1997.</dd>
+
+      <dt id="rfc2278">RFC 2278</dt>
+
+      <dd>N. Freed and J. Postel. <a
+      href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2278: IANA Charset
+      Registration Procedures</cite></a>. Internet Engineering Task Force,
+      1998.</dd>
 
       <dt id="rfc2426">RFC 2426</dt>
 
@@ -2781,6 +2803,9 @@ END:vCard</code></pre>
           <code>urf.implementationOf</code> properties.</li>
 
           <li>Added TURF superclass and interface short forms.</li>
+
+          <li>Renamed <code>content.CharacterEncoding</code> to
+          <code>content.Charset</code>.</li>
         </ul></dd>
 
       <dt>2007-12-31</dt>
