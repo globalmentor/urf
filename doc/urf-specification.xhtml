@@ -796,10 +796,15 @@
 		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>&quot;…&quot;</code> for strings, <code>&lt;…&gt;</code> for URIs, <code>#…#</code> for numbers, and <code>º…º</code> for ordinals.</li>
 	</ul>
 	<h3>Internet Media Type</h3>
-	<p>The Internet media type of general URF information encoded as TURF is:</p>
+	<p>The Internet media type [<a href="#rfc2046">RFC 2046</a>] of general URF information encoded as TURF is:</p>
 	<blockquote>
-		<p><code>application/turf</code></p>
+		<p><code>text/urf</code></p>
 	</blockquote>
+	<p>TURF differs from general [<a href="draft.xhtml#rfc2046">RFC 2046</a>] text media types in the following:</p>
+	<ul>
+		<li>The default charset of TURF is UTF-8 rather that US-ASCII.</li>
+		<li>TURF allows any Unicode newline character [<a href="draft.xhtml#utr13">UTR #13</a>] to represent newlines rather than only <code>CRLF</code>.</li>
+	</ul>
 	<p>For any application-specific URF data encoded as TURF should be represented as <code>application/<var>applicationName</var>+turf</code> to allow the data to be recognized as such, where <var>applicationName</var> is the application-specific identifier for the URF information. <em>Note:     These Internet media types have yet to be registered with the     IANA.</em></p>
 	<h3>Encoding</h3>
 	<p>TURF may use any encoding in a closed environment in which all relevant parties are aware of the encoding being used. In situations where the encoding may not be readily known to a processor, such as in a general file stored in a file system, TURF must use the UTF-8 character encoding. TURF interchange document files should use a UTF-8 U+FEFF sequence (the so-called UTF-8 Byte Order Mark or BOM) at their beginning to notify general text processing agents that may not be aware of TURF that UTF-8 encoding is being used [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
@@ -1392,143 +1397,146 @@ END:vCard</code></pre>
 		<dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform       Resource Identifier (URI): Generic Syntax</cite></a>. Internet Engineering Task Force, 2005.</dd> <dt>RFC 4627</dt>
 		<dd>D. Crockford. <a href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The       application/json Media Type for JavaScript Object Notation       (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd> <dt>RFC 4646</dt>
 		<dd>A. Phillips and M. Davis. <a href="http://www.ietf.org/rfc/rfc4646.txt"><cite>RFC 4646: Tags for       Identifying Languages</cite></a>. Internet Engineering Task Force, 2006.</dd> <dt>RFC 4648</dt>
-		<dd>S. Josefsson. <a href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,       Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task Force, 2006.</dd> <dt>Unicode BOM FAQ</dt>
-		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode       Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd> <dt>XML Schema 2</dt>
+		<dd>S. Josefsson. <a href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16,       Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task Force, 2006.</dd><dt>Unicode BOM FAQ</dt>
+		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode       Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd><dt>UTR #13</dt>
+		<dd>Mark Davis. <a href="http://unicode.org/unicode/standard/reports/tr13/tr13-5.html"><cite>Unicode Technical Report #13: Unicode Newline Guidelines</cite><cite /></a>. Unicode, Inc., 1999.</dd> <dt>XML Schema 2</dt>
 		<dd>Paul V. Biron and Ashok Malhotra. <a href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2:       Datatypes Second Edition</cite></a>. World Wide Web Consortium, 2004-10-28.</dd>
 	</dl>
 	<h2>Acknowledgements</h2>
 	<p>Brad Neuberg encouraged the creation of an alternate RDF serialization; Frank Manola made convincing arguments for using ordinals instead of integers as list element predicates.</p>
 	<h2>History</h2>
-	<dl> <dt><dl><dt>2009-08-24</dt>
+	<dl><dt>2009-08-24</dt>
 		<dd>
 			<ul>
 				<li>Updated examples to reflect new syntax allowing newlines as separators.</li>
+				<li>Changed TURF content type to text/urf.</li>
 			</ul>
 		</dd>
-	</dl>2008-01-20</dt>
-	<dd>
-		<ul>
-			<li>Improved semantics of <code>urf.Map</code> by adding map entries to distinguish between properties and map key/value associations.</li>
-			<li>Added delimiters for <code>urf.Map</code> TURF short form.</li>
-			<li>Changed delimiter of <code>urf.Boolean</code> TURF short form.</li>
-			<li>Modified <code>urf.type</code> TURF short form syntax.</li>
-			<li>Introduced <code>urf.selector</code> property with TURF short form.</li>
-			<li>Removed <code>urf.inits</code> property.</li>
-			<li>Documented <code>urf.subClassOf</code> and <code>urf.implementationOf</code> properties.</li>
-			<li>Added TURF superclass and interface short forms.</li>
-			<li>Renamed <code>content.CharacterEncoding</code> to <code>content.Charset</code>.</li>
-		</ul>
-	</dd> <dt>2007-12-31</dt>
-	<dd>
-		<ul>
-			<li>Added <code>content.CharacterEncoding</code> class.</li>
-			<li>Renamed URF reference implementation Java package.</li>
-		</ul>
-	</dd> <dt>2007-12-23</dt>
-	<dd>
-		<ul>
-			<li>Changed TURF preamble delimiters.</li>
-			<li>Changed TURF namespace association delimiter.</li>
-			<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-			<li>Changed order of string and type in TURF lexical form reference.</li>
-			<li>Brought back requirement for ending delimiters for TURF number, temporal, and ordinal short representations to prevent an ambigious grammar.</li>
-		</ul>
-	</dd> <dt>2007-11-22</dt>
-	<dd>
-		<ul>
-			<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-			<li>Changed the TURF preface delimiter.</li>
-		</ul>
-	</dd> <dt>2007-11-18</dt>
-	<dd>
-		<ul>
-			<li>Added TURF preamble.</li>
-			<li>Improved TURF name grammar.</li>
-			<li>Simplified TURF name namespace inheritance rules.</li>
-			<li>Changed <code>urf.MediaType</code> to <code>content.MediaType</code>.</li>
-			<li>Simplified PLOOP processing rules.</li>
-			<li>Addressed merging of ordered properties.</li>
-			<li>Changed syntax for <code>urf.Enum</code> value declarations.</li>
-			<li>Introducted <code>urf.Community</code>.</li>
-			<li>Reframed semantics of scoped properties in terms of URF communities.</li>
-			<li>Added <code>urf.Proposition</code> short form.</li>
-			<li>Changed comment syntax.</li>
-			<li>Expanded rules for URI namespace determination.</li>
-			<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-		</ul>
-	</dd> <dt>2007-10-16</dt>
-	<dd>
-		<ul>
-			<li>Changed order of TURF properties declaration.</li>
-			<li>Added <code>urf.init</code> property.</li>
-			<li>Added PLOOP specification.</li>
-			<li>Improved and clarified TURF namespace inheritance rules.</li>
-			<li>Added list of ontologies along with links to their TURF definitions.</li>
-			<li>Added RDF/XML example.</li>
-			<li>Added PLOOP example.</li>
-			<li>Added reference implementation links.</li>
-			<li>Improved and simplified TURF URI and URI reference lexical form representation.</li>
-			<li>Clarified and extended <code>urf.Temporal</code> types.</li>
-			<li>Changed base lexical namespace URI to <code>&lt;http://urf.name/lexical/&gt;</code>.</li>
-			<li>Added <code>urf.Language</code> type.</li>
-			<li>Added <code>urf.MediaType</code> type.</li>
-			<li>Changed PLOOP example to use <code>java:</code> URIs.</li>
-			<li>Removed trailing delimiter from TURF temporal short forms.</li>
-			<li>Added <code>urf.Enum</code> description.</li>
-		</ul>
-	</dd> <dt>2007-10-05</dt>
-	<dd>
-		<ul>
-			<li>Added TURF Internet media type.</li>
-			<li>Removed requirement that TURF strings must escape control characters.</li>
-			<li>Added period to set of name characters.</li>
-			<li>Added comments to TURF.</li>
-			<li>Clarified and expanded TURF Unicode control escape sequences.</li>
-			<li>Clarified and expanded namespace rules.</li>
-			<li>Added <code>urf.Binary</code> type.</li>
-			<li>Added <code>urf.Ordinal</code> type.</li>
-			<li>Changed arrays to use ordinal indexes.</li>
-			<li>Removed trailing delimiter from TURF number short forms.</li>
-			<li>Removed trailing delimiter from TURF boolean short forms.</li>
-			<li>Changed TURF boolean short form delimiter.</li>
-			<li>Changed TURF name short form prefix delimiter.</li>
-			<li>Changed TURF properties section delimiter.</li>
-			<li>Improved TURF name grammar.</li>
-			<li>Added <code>urf.Set</code> type.</li>
-			<li>Renamed <code>urf.Array</code> to <code>urf.List</code>.</li>
-			<li>Clarified TURF name reference namespace inheritance.</li>
-		</ul>
-	</dd> <dt>2007-09-15</dt>
-	<dd>
-		<ul>
-			<li>Switched to <code>info:lexical</code> lexical namespaces.</li>
-		</ul>
-	</dd> <dt>2007-09-14</dt>
-	<dd>
-		<ul>
-			<li>Added name reference short form.</li>
-			<li>Modified syntax for sequences.</li>
-			<li>Switched to <code>info:lexis</code> lexical namespaces.</li>
-			<li>Changed property type for array indexes.</li>
-			<li>Clarified number types.</li>
-			<li>Added delimiters to boolean and number types.</li>
-			<li>Added the ID namespace.</li>
-			<li>Clarified array grammar.</li>
-			<li>Added URF abstract model grammar.</li>
-			<li>Added JSON example.</li>
-		</ul>
-	</dd> <dt>2007-09-08</dt>
-	<dd>
-		<ul>
-			<li>Modified and simplified syntax for resource URI references and type declarations.</li>
-			<li>Changed <dfn>contextual properties</dfn> to <dfn>scoped           properties</dfn>.</li>
-		</ul>
-	</dd> <dt>2007-09-02</dt>
-	<dd>
-		<ul>
-			<li>First public release of URF.</li>
-		</ul>
-	</dd>
+	</dl>
+	<dl> <dt />2008-01-20
+		<dd>
+			<ul>
+				<li>Improved semantics of <code>urf.Map</code> by adding map entries to distinguish between properties and map key/value associations.</li>
+				<li>Added delimiters for <code>urf.Map</code> TURF short form.</li>
+				<li>Changed delimiter of <code>urf.Boolean</code> TURF short form.</li>
+				<li>Modified <code>urf.type</code> TURF short form syntax.</li>
+				<li>Introduced <code>urf.selector</code> property with TURF short form.</li>
+				<li>Removed <code>urf.inits</code> property.</li>
+				<li>Documented <code>urf.subClassOf</code> and <code>urf.implementationOf</code> properties.</li>
+				<li>Added TURF superclass and interface short forms.</li>
+				<li>Renamed <code>content.CharacterEncoding</code> to <code>content.Charset</code>.</li>
+			</ul>
+		</dd> <dt>2007-12-31</dt>
+		<dd>
+			<ul>
+				<li>Added <code>content.CharacterEncoding</code> class.</li>
+				<li>Renamed URF reference implementation Java package.</li>
+			</ul>
+		</dd> <dt>2007-12-23</dt>
+		<dd>
+			<ul>
+				<li>Changed TURF preamble delimiters.</li>
+				<li>Changed TURF namespace association delimiter.</li>
+				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
+				<li>Changed order of string and type in TURF lexical form reference.</li>
+				<li>Brought back requirement for ending delimiters for TURF number, temporal, and ordinal short representations to prevent an ambigious grammar.</li>
+			</ul>
+		</dd> <dt>2007-11-22</dt>
+		<dd>
+			<ul>
+				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
+				<li>Changed the TURF preface delimiter.</li>
+			</ul>
+		</dd> <dt>2007-11-18</dt>
+		<dd>
+			<ul>
+				<li>Added TURF preamble.</li>
+				<li>Improved TURF name grammar.</li>
+				<li>Simplified TURF name namespace inheritance rules.</li>
+				<li>Changed <code>urf.MediaType</code> to <code>content.MediaType</code>.</li>
+				<li>Simplified PLOOP processing rules.</li>
+				<li>Addressed merging of ordered properties.</li>
+				<li>Changed syntax for <code>urf.Enum</code> value declarations.</li>
+				<li>Introducted <code>urf.Community</code>.</li>
+				<li>Reframed semantics of scoped properties in terms of URF communities.</li>
+				<li>Added <code>urf.Proposition</code> short form.</li>
+				<li>Changed comment syntax.</li>
+				<li>Expanded rules for URI namespace determination.</li>
+				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
+			</ul>
+		</dd> <dt>2007-10-16</dt>
+		<dd>
+			<ul>
+				<li>Changed order of TURF properties declaration.</li>
+				<li>Added <code>urf.init</code> property.</li>
+				<li>Added PLOOP specification.</li>
+				<li>Improved and clarified TURF namespace inheritance rules.</li>
+				<li>Added list of ontologies along with links to their TURF definitions.</li>
+				<li>Added RDF/XML example.</li>
+				<li>Added PLOOP example.</li>
+				<li>Added reference implementation links.</li>
+				<li>Improved and simplified TURF URI and URI reference lexical form representation.</li>
+				<li>Clarified and extended <code>urf.Temporal</code> types.</li>
+				<li>Changed base lexical namespace URI to <code>&lt;http://urf.name/lexical/&gt;</code>.</li>
+				<li>Added <code>urf.Language</code> type.</li>
+				<li>Added <code>urf.MediaType</code> type.</li>
+				<li>Changed PLOOP example to use <code>java:</code> URIs.</li>
+				<li>Removed trailing delimiter from TURF temporal short forms.</li>
+				<li>Added <code>urf.Enum</code> description.</li>
+			</ul>
+		</dd> <dt>2007-10-05</dt>
+		<dd>
+			<ul>
+				<li>Added TURF Internet media type.</li>
+				<li>Removed requirement that TURF strings must escape control characters.</li>
+				<li>Added period to set of name characters.</li>
+				<li>Added comments to TURF.</li>
+				<li>Clarified and expanded TURF Unicode control escape sequences.</li>
+				<li>Clarified and expanded namespace rules.</li>
+				<li>Added <code>urf.Binary</code> type.</li>
+				<li>Added <code>urf.Ordinal</code> type.</li>
+				<li>Changed arrays to use ordinal indexes.</li>
+				<li>Removed trailing delimiter from TURF number short forms.</li>
+				<li>Removed trailing delimiter from TURF boolean short forms.</li>
+				<li>Changed TURF boolean short form delimiter.</li>
+				<li>Changed TURF name short form prefix delimiter.</li>
+				<li>Changed TURF properties section delimiter.</li>
+				<li>Improved TURF name grammar.</li>
+				<li>Added <code>urf.Set</code> type.</li>
+				<li>Renamed <code>urf.Array</code> to <code>urf.List</code>.</li>
+				<li>Clarified TURF name reference namespace inheritance.</li>
+			</ul>
+		</dd> <dt>2007-09-15</dt>
+		<dd>
+			<ul>
+				<li>Switched to <code>info:lexical</code> lexical namespaces.</li>
+			</ul>
+		</dd> <dt>2007-09-14</dt>
+		<dd>
+			<ul>
+				<li>Added name reference short form.</li>
+				<li>Modified syntax for sequences.</li>
+				<li>Switched to <code>info:lexis</code> lexical namespaces.</li>
+				<li>Changed property type for array indexes.</li>
+				<li>Clarified number types.</li>
+				<li>Added delimiters to boolean and number types.</li>
+				<li>Added the ID namespace.</li>
+				<li>Clarified array grammar.</li>
+				<li>Added URF abstract model grammar.</li>
+				<li>Added JSON example.</li>
+			</ul>
+		</dd> <dt>2007-09-08</dt>
+		<dd>
+			<ul>
+				<li>Modified and simplified syntax for resource URI references and type declarations.</li>
+				<li>Changed <dfn>contextual properties</dfn> to <dfn>scoped           properties</dfn>.</li>
+			</ul>
+		</dd> <dt>2007-09-02</dt>
+		<dd>
+			<ul>
+				<li>First public release of URF.</li>
+			</ul>
+		</dd>
 	</dl>
 </body>
 
