@@ -812,12 +812,16 @@
 	<p>Every TURF interchange document must begin with the signature character sequence, <code>`URF</code>, which must appear as the first characters of the document after the Byte Order Mark (BOM), if any [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
 	<h3>Grammar</h3>
 	<p>The following grammar indicates literals in normal style, variables in emphasized text, and grammar symbols in strong text.</p>
-	<p>Any two TURF tokens may be separated by separator or whitespace Unicode characters, or a TURF comment, which is a string surrounded by the dagger <code>&apos;†&apos;</code> and double dagger <code>&apos;‡&apos;</code> characters.</p>
+	<p>Any two TURF tokens may be separated by <dfn>filler</dfn>: Unicode separator or Unicode whitespace characters, or a TURF comment, which is a string surrounded by the dagger <code>&apos;†&apos;</code> and double dagger <code>&apos;‡&apos;</code> characters.</p>
 	<blockquote>
-		<p><code><var>separator</var> ⇒ Unicode Paragraph Separator       <strong>|</strong> Unicode Segment Separator <strong>|</strong> Unicode       Whitespace <strong>|</strong> <var>comment</var></code></p>
+		<p><code><var>filler</var> ⇒ Unicode Paragraph Separator       <strong>|</strong> Unicode Segment Separator <strong>|</strong> Unicode       Whitespace <strong>|</strong> <var>comment</var></code></p>
 	</blockquote>
 	<blockquote>
-		<p><code><var>comment</var> ⇒ †&quot;<strong>[</strong><var>Unicode character       except double dagger and backslash</var> <strong>|</strong> \&quot;       <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>‡</code></p>
+		<p><code><var>comment</var> ⇒ †&quot;<strong>[</strong><var>Unicode character       except double dagger and backslash</var> <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>‡</code></p>
+	</blockquote>
+	<p>Between elements in a list, filler has a caveat: Unicode newline characters [<a href="draft.xhtml#utr13">UTR #13</a>] function as a <dfn>list separator</dfn>, which is at least one newline character and/or at most a single comma character (<code>&apos;,&apos;</code>), optionally surrounded by other filler characters:</p>
+	<blockquote>
+		<p><code><var>listseparator</var> ⇒  Unicode Newline</code><code><strong>+ </strong></code><code><strong>|</strong> ,</code></p>
 	</blockquote>
 	<p>A TURF interchange document is encoded in UTF-8 and begins with the TURF signature <code>`URF</code> followed by the description of the instance community, which consists of optional properties and a required community short representation.</p>
 	<blockquote>
@@ -826,7 +830,7 @@
 	<blockquote>
 		<p><code><var>signature</var> ⇒ `URF</code></p>
 	</blockquote>
-	<p>The community short form, the grammar of which is below, is delimited by the currency character <code>&apos;¤&apos;</code> and the full stop character <code>&apos;.&apos;</code> and contains zero or more resource descriptions, separated by commas. Each resource description must have at least one of the following optional components, any may have any or all of them: a label, a reference, one or more type short forms, a set of property definitions, a community short form, a proposition form, a list short form, a set short form, and a map short form.</p>
+	<p>The community short form, the grammar of which is below, is delimited by the currency character <code>&apos;¤&apos;</code> and the full stop character <code>&apos;.&apos;</code> and contains zero or more resource descriptions, separated by list separators. Each resource description must have at least one of the following optional components, any may have any or all of them: a label, a reference, one or more type short forms, a set of property definitions, a community short form, a proposition form, a list short form, a set short form, and a map short form. <em>No Unicode newline characters are allowed between elements of a resource description.</em></p>
 	<blockquote>
 		<p><code><var>resource</var> ⇒       <strong>[</strong><var>label</var><strong>]</strong> <strong>[</strong><var>reference</var><strong>]</strong> <strong>[</strong><var>type</var>s<strong>]</strong> <strong>[</strong><var>superclasses</var><strong>]</strong> <strong>[</strong><var>interfaces</var><strong>]</strong> <strong>[</strong><var>properties</var><strong>]</strong> <strong>[</strong><var>communityshort</var><strong>]</strong> <strong>[</strong><var>propositionshort</var><strong>]</strong> <strong>[</strong><var>listshort</var><strong>]</strong> <strong>[</strong><var>setshort</var><strong>]</strong> <strong>[</strong>mapshort<strong>]</strong></code></p>
 	</blockquote>
@@ -932,7 +936,7 @@
 	</blockquote>
 	<p>The types declaration consists of one or more resource references, each preceded by an asterisk <code>&apos;*&apos;</code>. Each type reference is equivalent to the reference asserted as the object of the <code>urf.type</code> property. Each type reference may optionally specify comma-separated selector resources between parentheses characters <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code> following the type reference. The selector resources are equivalent to the values of <code>urf.List</code> value of a scoped <code>urf.selector</code> property in the context of the resource&apos;s <code>urf.type</code> property for which the type is a value.</p>
 	<blockquote>
-		<p><code><var>types</var> ⇒       <var>typeshort</var><strong>[,</strong><var>typeshort</var><strong><strong>]*</strong></strong></code></p>
+		<p><code><var>types</var> ⇒       <var>typeshort</var><var /><strong><strong>*</strong></strong></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>typeshort</var> ⇒       *<var>typereference</var><strong>[</strong>(<strong>[</strong><var>selectorresource</var><strong>[</strong>,<var>selectorresource</var><strong>]</strong><strong>*</strong><strong>]</strong>)<strong>]</strong></code></p>
@@ -945,36 +949,36 @@
 	</blockquote>
 	<p>The superclasses declaration consists of one or more resource references, each preceded by a circumflex accent <code>&apos;^&apos;</code>. Each superclass reference is equivalent to the reference asserted as the object of the <code>urf.subClassOf</code> property.</p>
 	<blockquote>
-		<p><code><var>superclasses</var> ⇒       <var>superclassshort</var><strong>[,</strong><var>superclasshort</var><strong><strong>]*</strong></strong></code></p>
+		<p><code><var>superclasses</var> ⇒       <var>superclassshort</var><var /><strong><strong>*</strong></strong></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>superclassshort</var> ⇒ ^<var>reference</var></code></p>
 	</blockquote>
 	<p>The interfaces declaration consists of one or more resource references, each preceded by a greater-than symbol <code>&apos;&gt;&apos;</code>. Each interface reference is equivalent to the reference asserted as the object of the <code>urf.implementationOf</code> property.</p>
 	<blockquote>
-		<p><code><var>interfaces</var> ⇒       <var>interfaceshort</var><strong>[,</strong><var>interfaceshort</var><strong><strong>]*</strong></strong></code></p>
+		<p><code><var>interfaces</var> ⇒       <var>interfaceshort</var><var /><strong><strong>*</strong></strong></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>interfaceshort</var> ⇒ *<var>reference</var></code></p>
 	</blockquote>
-	<p>Properties consist of a comma-separated list of predicate resource and object resource pairs between the color character <code>&apos;:&apos;</code> and the semicolon character <code>&apos;;&apos;</code>, each separated by the equals sign <code>&apos;=&apos;</code>. If the grave character <code>&apos;`&apos;</code> is present before the equals sign, it indicates that the property is scoped in the context of the property&apos;s subject resource and its respective predicate resource and subject resource. If a label is provided, it identifies the proposition represented by the reification of the assertion.</p>
+	<p>Properties consist of a list of predicate resource and object resource pairs between the color character <code>&apos;:&apos;</code> and the semicolon character <code>&apos;;&apos;</code>, each separated by the equals sign <code>&apos;=&apos;</code>. If the grave character <code>&apos;`&apos;</code> is present before the equals sign, it indicates that the property is scoped in the context of the property&apos;s subject resource and its respective predicate resource and subject resource. If a label is provided, it identifies the proposition represented by the reification of the assertion.</p>
 	<blockquote>
-		<p><code><var>properties</var> ⇒       :<strong>[</strong><var>property</var><strong>[</strong>,<var>property</var><strong><strong>]*</strong>]</strong>;</code></p>
+		<p><code><var>properties</var> ⇒       :<strong>[</strong><var>property</var><strong>[</strong></code><code>listseparator</code><code> <var>property</var><strong><strong>]*</strong>]</strong>;</code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>property</var> ⇒       <var>resource</var><strong>[</strong><var>label</var><strong>]</strong><strong>[</strong>`<strong>]</strong>=<strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
 	</blockquote>
-	<p>A sequence short form consists of a sequence of element resources separated by commas and surrounded by the backslash character <code>&apos;\\&apos;</code>. Each listed element resource indicates another assertion of the given predicate with the given element resource as the value, each with a contextual property of <code>urf.order</code> with values starting at <code>#0#</code> and continuing sequentially.</p>
+	<p>A sequence short form consists of a sequence of element resources separated by list separators and surrounded by the backslash character <code>&apos;\\&apos;</code>. Each listed element resource indicates another assertion of the given predicate with the given element resource as the value, each with a contextual property of <code>urf.order</code> with values starting at <code>#0#</code> and continuing sequentially.</p>
 	<blockquote>
-		<p><code><var>sequenceshort</var> ⇒       \<strong>[</strong><var>resource</var><strong>[</strong>,<var>resource</var><strong>]*]</strong>\</code></p>
+		<p><code><var>sequenceshort</var> ⇒       \<strong>[</strong><var>resource</var><strong>[</strong></code><code><var>listseparator</var></code><code> <var>resource</var><strong>]*]</strong>\</code></p>
 	</blockquote>
-	<p>A community short form consists of a sequence of resources surrounded by the currency symbol <code>&apos;¤&apos;</code> and the full stop character <code>&apos;.&apos;</code>, separated by commas. Each listed resource represents an unreified proposition that is a value of the <code>urf.element</code> property. The presence of a community short form implies a type of <code>urf.Community</code> if no other types have yet been specified, either implicitly or explicitly.</p>
+	<p>A community short form consists of a sequence of resources surrounded by the currency symbol <code>&apos;¤&apos;</code> and the full stop character <code>&apos;.&apos;</code>, separated by list separators. Each listed resource represents an unreified proposition that is a value of the <code>urf.element</code> property. The presence of a community short form implies a type of <code>urf.Community</code> if no other types have yet been specified, either implicitly or explicitly.</p>
 	<blockquote>
-		<p><code><var>communityshort</var> ⇒       ¤<strong>[</strong><var>resource</var><strong>[</strong>,<var>resource</var><strong>]*].</strong></code></p>
+		<p><code><var>communityshort</var> ⇒       ¤<strong>[</strong><var>resource</var><strong>[</strong></code><code>listseparator</code><code> <var>resource</var><strong>]*].</strong></code></p>
 	</blockquote>
-	<p>A proposition short form lists the subject, predicate, and object of a proposition inside the open double quotation mark <code>&apos;“&apos;</code> and closed double quotation mark <code>&apos;”&apos;</code> characters, separated by comma characters <code>&apos;,&apos;</code>. A proposition short form is equivalent to setting the resource <code>urf.Subject</code>, <code>urf.Predicate</code>, and <code>urf.Object</code> propoerties to the three listed resources within the proposition short form. The presence of a proposition short form implies a type of <code>urf.Proposition</code> if no other types have yet been specified, either implicitly or explicitly.</p>
+	<p>A proposition short form lists the subject, predicate, and object of a proposition inside the open double quotation mark <code>&apos;“&apos;</code> and closed double quotation mark <code>&apos;”&apos;</code> characters, separated by list separators. A proposition short form is equivalent to setting the resource <code>urf.Subject</code>, <code>urf.Predicate</code>, and <code>urf.Object</code> propoerties to the three listed resources within the proposition short form. The presence of a proposition short form implies a type of <code>urf.Proposition</code> if no other types have yet been specified, either implicitly or explicitly.</p>
 	<blockquote>
-		<p><code><var>propositionshort</var> ⇒ “<var>subject</var>,       <var>predicate</var>, <var>object</var>”</code></p>
+		<p><code><var>propositionshort</var> ⇒ “<var>subject</var> </code><code>listseparator</code><code> <var>predicate</var> </code><code>listseparator</code><code> <var>object</var>”</code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>subject</var> ⇒ <var>resource</var></code></p>
@@ -985,17 +989,17 @@
 	<blockquote>
 		<p><code><var>object</var> ⇒ <var>resource</var></code></p>
 	</blockquote>
-	<p>A list short form consists of a sequence of element resources surrounded by bracket characters <code>&apos;[&apos;</code> and <code>&apos;]&apos;</code> and separated by commas. Each listed element resource represents the value of an ordinal index property, in sequence beginning with the ordinal property <code><code>º0º</code></code>. The presence of a list short form implies a type of <code>urf.List</code> if no other types have yet been specified, either implicitly or explicitly.</p>
+	<p>A list short form consists of a sequence of element resources surrounded by bracket characters <code>&apos;[&apos;</code> and <code>&apos;]&apos;</code> and separated by list separators. Each listed element resource represents the value of an ordinal index property, in sequence beginning with the ordinal property <code><code>º0º</code></code>. The presence of a list short form implies a type of <code>urf.List</code> if no other types have yet been specified, either implicitly or explicitly.</p>
 	<blockquote>
-		<p><code><var>listshort</var> ⇒       [<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>]</code></p>
+		<p><code><var>listshort</var> ⇒       [<strong>[</strong>resource<strong>[</strong></code><code>listseparator</code><code> resource<strong>]*]</strong>]</code></p>
 	</blockquote>
-	<p>A set short form consists of a sequence of element resources surrounded by curly bracket characters <code>&apos;{&apos;</code> and <code>&apos;}&apos;</code> and separated by commas. Each listed element resource represents a value of the <code>urf.element</code> property. The presence of a set short form implies a type of <code>urf.Set</code> if no other types have yet been specified, either implicitly or explicitly.</p>
+	<p>A set short form consists of a sequence of element resources surrounded by curly bracket characters <code>&apos;{&apos;</code> and <code>&apos;}&apos;</code> and separated by list separators. Each listed element resource represents a value of the <code>urf.element</code> property. The presence of a set short form implies a type of <code>urf.Set</code> if no other types have yet been specified, either implicitly or explicitly.</p>
 	<blockquote>
-		<p><code><var>setshort</var> ⇒       {<strong>[</strong>resource<strong>[</strong>,resource<strong>]*]</strong>}</code></p>
+		<p><code><var>setshort</var> ⇒       {<strong>[</strong>resource<strong>[</strong></code><code>listseparator</code><code> resource<strong>]*]</strong>}</code></p>
 	</blockquote>
-	<p>A map short form consists of a sequence of key/value associations surrounded by tortoise shell bracket characters <code>&apos;〔&apos;</code> and <code>&apos;〕&apos;</code>. Each key is separated from its value using the equals sign <code>&apos;=&apos;</code>, and the key/value combinations are separated by commas. Each key/value association represents a resource of type <code>urf.MapEntry</code> as a value of the <code>urf.entry</code> property of the map resource, with key a value of the map entry <code>urf.key</code> property, and the value a value of the map entry <code>urf.value</code> property. The presence of a map short form implies a type of <code>urf.Map</code> if no other types have yet been specified, either implicitly or explicitly.</p>
+	<p>A map short form consists of a sequence of key/value associations surrounded by tortoise shell bracket characters <code>&apos;〔&apos;</code> and <code>&apos;〕&apos;</code>. Each key is separated from its value using the equals sign <code>&apos;=&apos;</code>, and the key/value combinations are separated by list separators. Each key/value association represents a resource of type <code>urf.MapEntry</code> as a value of the <code>urf.entry</code> property of the map resource, with key a value of the map entry <code>urf.key</code> property, and the value a value of the map entry <code>urf.value</code> property. The presence of a map short form implies a type of <code>urf.Map</code> if no other types have yet been specified, either implicitly or explicitly.</p>
 	<blockquote>
-		<p><code><var>mapshort</var> ⇒       〔<strong>[</strong><var>mapentry</var><strong>[</strong>,<var>mapentry</var><strong><strong>]*</strong>]</strong>〕</code></p>
+		<p><code><var>mapshort</var> ⇒       〔<strong>[</strong><var>mapentry</var><strong>[</strong></code><code>listseparator</code><code> <var>mapentry</var><strong><strong>]*</strong>]</strong>〕</code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>mapentry</var> ⇒       <var>key</var>=<var>value</var></code></p>
@@ -1408,12 +1412,12 @@ END:vCard</code></pre>
 	<dl><dt>2009-08-24</dt>
 		<dd>
 			<ul>
-				<li>Updated examples to reflect new syntax allowing newlines as separators.</li>
-				<li>Changed TURF content type to text/urf.</li>
+				<li>Change grammar to allow Unicode newline characters as separators.</li>
+				<li>Changed TURF content type to <code>text/urf</code>.</li>
 			</ul>
 		</dd>
 	</dl>
-	<dl> <dt />2008-01-20
+	<dl> <dt>2008-01-20 </dt>
 		<dd>
 			<ul>
 				<li>Improved semantics of <code>urf.Map</code> by adding map entries to distinguish between properties and map key/value associations.</li>
