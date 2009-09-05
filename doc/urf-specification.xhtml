@@ -220,6 +220,7 @@
 		<dd>An example namespace; used for hypothetical situations.</dd> <dt><code>&quot;urf&quot;~&lt;http://urf.name/urf&gt;</code></dt>
 		<dd>The URF namespace for resource and properties related to the framework abstract model itself.</dd>
 	</dl>
+	<p>The default namespace URI <code>&lt;http://urf.name/default&gt;</code> is not associated with a prefix.</p>
 	<h3>Properties</h3>
 	<dl> <dt>URF</dt>
 		<dd>
@@ -936,7 +937,7 @@
 	</blockquote>
 	<p>The types declaration consists of one or more resource references, each preceded by an asterisk <code>&apos;*&apos;</code>. Each type reference is equivalent to the reference asserted as the object of the <code>urf.type</code> property. Each type reference may optionally specify comma-separated selector resources between parentheses characters <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code> following the type reference. The selector resources are equivalent to the values of <code>urf.List</code> value of a scoped <code>urf.selector</code> property in the context of the resource&apos;s <code>urf.type</code> property for which the type is a value.</p>
 	<blockquote>
-		<p><code><var>types</var> ⇒       <var>typeshort</var><var /><strong><strong>*</strong></strong></code></p>
+		<p><code><var>types</var> ⇒       <var>typeshort</var><var><strong><strong>*</strong></strong></var></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>typeshort</var> ⇒       *<var>typereference</var><strong>[</strong>(<strong>[</strong><var>selectorresource</var><strong>[</strong>,<var>selectorresource</var><strong>]</strong><strong>*</strong><strong>]</strong>)<strong>]</strong></code></p>
@@ -949,14 +950,14 @@
 	</blockquote>
 	<p>The superclasses declaration consists of one or more resource references, each preceded by a circumflex accent <code>&apos;^&apos;</code>. Each superclass reference is equivalent to the reference asserted as the object of the <code>urf.subClassOf</code> property.</p>
 	<blockquote>
-		<p><code><var>superclasses</var> ⇒       <var>superclassshort</var><var /><strong><strong>*</strong></strong></code></p>
+		<p><code><var>superclasses</var> ⇒       <var>superclassshort</var><var><strong><strong>*</strong></strong></var></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>superclassshort</var> ⇒ ^<var>reference</var></code></p>
 	</blockquote>
 	<p>The interfaces declaration consists of one or more resource references, each preceded by a greater-than symbol <code>&apos;&gt;&apos;</code>. Each interface reference is equivalent to the reference asserted as the object of the <code>urf.implementationOf</code> property.</p>
 	<blockquote>
-		<p><code><var>interfaces</var> ⇒       <var>interfaceshort</var><var /><strong><strong>*</strong></strong></code></p>
+		<p><code><var>interfaces</var> ⇒       <var>interfaceshort</var><var><strong><strong>*</strong></strong></var></code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>interfaceshort</var> ⇒ *<var>reference</var></code></p>
@@ -1015,23 +1016,20 @@
 	<h3>Classes</h3>
 	<p>The URI of an URF class must indicate the complete package name and class name of a programming language class to instantiate. In the following example, the Java class <code>com.guiseframework.component.Layoutpanel</code> should be instantiated using its default constructor:</p>
 	<blockquote>
-		<pre><code>`URF
-¤
+		<pre><code>`URF¤
   *«java:/com/guiseframework/component/LayoutPanel»
 .</code></pre>
 	</blockquote>
 	<p>If a resource has a scoped <code>urf.selector</code> property with an <code>urf.List</code> value in the context of an <code>urf.type</code> declaration, a PLOOP processor must use all the corresponding values as arguments to the constructor of the specified type, converted the URF selector resources into programming language values as needed. A PLOOP instance would use the following example to indicate that an instance of the Guise class <code>com.guiseframework.Category</code> should be constructed using <code>new Category(&quot;category1&quot;, &quot;First     Category&quot;)</code>:</p>
 	<blockquote>
-		<pre><code>`URF
-¤
+		<pre><code>`URF¤
   *«java:/com/guiseframework/Category»(&quot;category1&quot;, &quot;First Category&quot;)
 .</code></pre>
 	</blockquote>
 	<h3>Properties</h3>
-	<p>URF allows identification of programming language properties that are relative to the class of the resource being described, and TURF provides a shorthand notation for such properties having URIs with the class URI as their namespace. A PLOOP processor must use normal get/set conventions for the language in question for interpreting the read/write properties available for a particular class. For example, because the property <code>«java:/com/guiseframework/component/Button#label»</code> has theh same namespace as the type <code>«java:/com/guiseframework/component/Button»</code>, its local name, <code>label</code>, is considered a property name for getting or setting a value of an instance of the <code>Button</code> class:</p>
+	<p>URF allows identification of programming language properties through use of the default URF namespace <code>&lt;http://urf.name/default&gt;</code>. A PLOOP processor must use normal get/set conventions for the language in question for interpreting the read/write properties available for a particular class. For example, the local name of the property <code>«http://urf.name/default#label»</code> for a resource of type <code>«java:/com/guiseframework/component/Button»</code> is considered a property name for getting or setting a value of an instance of the <code>Button</code> class:</p>
 	<blockquote>
-		<pre><code>`URF
-¤
+		<pre><code>`URF¤
   *«java:/com/guiseframework/component/Button»:
     label=&quot;Push Me&quot;
   ;
@@ -1040,8 +1038,7 @@
 	<h3>Values</h3>
 	<p>In general, URF resources with URIs that are recognized must be converted to the equivalent type in the programming language. For example, in Java all resources of type <code>urf.Integer</code> must be converted to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>, <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted to <code>java.util.List</code>, <code>java.util.Set</code>, and <code>java.util.Map</code> instances, respectively, with each element or entry recursively instantiated or converted as needed. A resource with a lexical URI must be converted if possible to a programming language type functioning as a lexical identifier, if its lexical type indicates such an enumerated type. In the following example, the Guise Java class <code>com.guiseframework.component.layout.FlowLayout</code> has a <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The lexical URI <code>«*layout.Flow(&quot;LINE&quot;)»</code> indicates a type of <code>com.guiseframework.component.layout.Flow</code>, which is a Java enum class. A PLOOP processor must construct a <code>com.guiseframework.component.layout.Flow</code> object from the string &quot;LINE&quot; and assign it to the instance of <code>com.guiseframework.component.layout.FlowLayout</code> using <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
 	<blockquote>
-		<pre><code>`URF
-¤
+		<pre><code>`URF¤
   («java:/com/guiseframework/component/layout/FlowLayout»:
     flow=«*layout.Flow(&quot;LINE&quot;)»
   ;
@@ -1063,8 +1060,7 @@
 	</blockquote>
 	<p>While this representation has some undesirable traits (e.g. strings are not recommended as general property identifiers except in the case of resources used as maps), the following TURF representation is semantically identical to the JSON example above:</p>
 	<blockquote>
-		<pre><code>`URF
-¤
+		<pre><code>`URF¤
   :
     &quot;length&quot;=#1234#,
     &quot;valid&quot;=_true_,
@@ -1073,18 +1069,18 @@
   ;
 .</code></pre>
 	</blockquote>
+	<p>Note that, unlike JSON, in TURF the commas separating the values are optional if the values appear on separate lines.</p>
 	<p>There is one slight semantic descrepancy between these two examples: URF uses a true ordinal property for each list element, while JSON adds each array element as the value of a string containing the lexical form of an integer.</p>
 	<p>Although the above TURF representation replicates the simple semantics of the given JSON example, a better formulation that takes advantage of URF semantics would most importantly use actual properties rather than associative array string key pseudo-properties. An improved formulation would also indicate the type of the resources. Such improvements are illustrated in the following reformulation (assuming the <code>&quot;code&quot;</code> string in the list was intended to actually be a key in a map):</p>
 	<blockquote>
 		<pre><code>`URF:
-  &quot;urf&quot;~&lt;http://urf.name/urf&gt;,
+  &quot;urf&quot;~&lt;http://urf.name/urf&gt;
   &quot;example&quot;~&lt;http://example.com/example&gt;
-;
-¤
+;¤
   *example.Class:
-    example.length=#1234#,
-    example.valid=_true_,
-    example.status=&quot;processing&quot;,
+    example.length=#1234#
+    example.valid=_true_
+    example.status=&quot;processing&quot;
     example.results=[_false_, #5#, &quot;dog&quot;, 〔&quot;code&quot;=#9.8#〕]
   ;
 .</code></pre>
@@ -1093,35 +1089,32 @@
 	<p>The following TURF example uses URF as <a href="#ploop">PLOOP</a> for the Guise Internet application framework [<a href="#guise">Guise</a>] using the Java programming language. It defines a panel of Guise components that allow temperature to be converted between Celsius and Fahrenheit. (The control listeners and temperature conversion logic would be defined elsewhere.)</p>
 	<blockquote>
 		<pre><code>`URF:
-  &quot;component&quot;~&lt;java:/com/guiseframework/component/&gt;,
-  &quot;layout&quot;~&lt;java:/com/guiseframework/component/layout/&gt;,
-  &quot;validator&quot;~&lt;java:/com/guiseframework/validator/&gt;,
+  &quot;component&quot;~&lt;java:/com/guiseframework/component/&gt;
+  &quot;layout&quot;~&lt;java:/com/guiseframework/component/layout/&gt;
+  &quot;validator&quot;~&lt;java:/com/guiseframework/validator/&gt;
   &quot;demo&quot;~&lt;java:/com/guiseframework/demo/&gt;
-;
-¤
+;¤
   *demo.TemperatureConversionPanel2:
-    label=&quot;Guise™ Demonstration: Temperature Conversion&quot;,
+    label=&quot;Guise™ Demonstration: Temperature Conversion&quot;
     layout=*layout.FlowLayout:
       flow=«*layout.Flow(&quot;LINE&quot;)»
-    ;,
-    name=&quot;temperatureConversionPanel&quot;,
-    children=
-    [
+    ;
+    name=&quot;temperatureConversionPanel&quot;
+    children=[
       *component.LayoutPanel:
         layout=*layout.FlowLayout:
           flow=«*layout.Flow(&quot;PAGE&quot;)»
-        ;,
-        name=&quot;inputPanel&quot;,
-        children=
-        [
+        ;
+        name=&quot;inputPanel&quot;
+        children=[
           *component.TextControl(«java:/java/lang/Double»):
-            label=&quot;Input Temperature&quot;,
-            name=&quot;temperatureInput&quot;,
+            label=&quot;Input Temperature&quot;
+            name=&quot;temperatureInput&quot;
             validator=*validator.ValueRequiredValidator
-          ;,
+          ;
           *component.TextControl(«java:/java/lang/Double»):
-            editable=_false_,
-            label=&quot;Output Temperature&quot;,
+            editable=_false_
+            label=&quot;Output Temperature&quot;
             name=&quot;temperatureOutput&quot;
           ;
         ]
@@ -1129,32 +1122,30 @@
       *component.LayoutPanel:
         layout=*layout.FlowLayout:
           flow=«*layout.Flow(&quot;PAGE&quot;)»
-        ;,
-        name=&quot;conversionPanel&quot;,
-        children=
-        [
+        ;
+        name=&quot;conversionPanel&quot;
+        children=[
           *component.GroupPanel:
-            label=&quot;Input Scale&quot;,
+            label=&quot;Input Scale&quot;
             layout=*layout.FlowLayout:
               flow=«*layout.Flow(&quot;PAGE&quot;)»
-            ;,
-            name=&quot;scalePanel&quot;,
-            children=
-            [
+            ;
+            name=&quot;scalePanel&quot;
+            children=[
               *component.CheckControl:
-                checkType=&quot;ellipse&quot;,
-                label=&quot;Calsius&quot;,
+                checkType=&quot;ellipse&quot;
+                label=&quot;Calsius&quot;
                 name=&quot;celsiusCheckControl&quot;
-              ;,
+              ;
               *component.CheckControl:
-                checkType=&quot;ellipse&quot;,
-                label=&quot;Fahrenheit&quot;,
+                checkType=&quot;ellipse&quot;
+                label=&quot;Fahrenheit&quot;
                 name=&quot;fahrenheitCheckControl&quot;
               ;
             ]
-          ;,
+          ;
           *component.Button:
-            label=&quot;Convert&quot;,
+            label=&quot;Convert&quot;
             name=&quot;conversionButton&quot;
           ;
         ]
@@ -1249,29 +1240,26 @@ navigationPanel.add(conversionPanel);
 	<p>The following URF information represented in TURF is semantically equivalent to the RDF information in the previous example represented in RDF/XML:</p>
 	<blockquote>
 		<pre><code>`URF:
-  &quot;urf&quot;~&lt;http://urf.name/urf&gt;,
-  &quot;content&quot;~&lt;http://urf.name/content&gt;,
-  &quot;dc&quot;~&lt;http://purl.org/dc/elements/1.1/&gt;,
-  &quot;example&quot;~&lt;http://example.com/example&gt;,
+  &quot;urf&quot;~&lt;http://urf.name/urf&gt;
+  &quot;content&quot;~&lt;http://urf.name/content&gt;
+  &quot;dc&quot;~&lt;http://purl.org/dc/elements/1.1/&gt;
+  &quot;example&quot;~&lt;http://example.com/example&gt;
   &quot;foaf&quot;~&lt;http://xmlns.com/foaf/0.1/&gt;
-;
-¤
+;¤
   example.janedoe*foaf.Person:
-    example.age=#23#,
-    example.birthdate=@1980-04-05@,
-    example.favoriteSites=
-    [
-      «http://www.globalmentor.com/»,
+    example.age=#23#
+    example.birthdate=@1980-04-05@
+    example.favoriteSites=[
+      «http://www.globalmentor.com/»
       «http://www.garretwilson.com/»
     ],
     example.motto=&quot;Do it. Do it &lt;xhtml:em xmlns:xhtml=\&quot;http://www.w3.org/1999/xhtml\&quot;&gt;right&lt;/xhtml:em&gt;.&quot;:
       content.type`=«*content.MediaType(&quot;text/xml-external-parsed-entity&quot;)»
-    ;,
-    example.possibleVacationDestinations=
-    {
+    ;
+    example.possibleVacationDestinations={
       &quot;Paris&quot;,
       &quot;Rome&quot;
-    },
+    }
     nick=&quot;Janinha&quot;:
       dc.language`=«*urf.Language(&quot;pt-BR&quot;)»
     ;
@@ -1302,52 +1290,51 @@ END:vCard</code></pre>
 	<p>The same vCard information in its URF VCard formulation is shown below for the resource <code>«http://example.com/example#janedoe»</code>. Note that the URF VCard version provides more semantics by using true classes and properties to describe what [<a href="#rfc2426">RFC 2426</a>] calls <dfn>structured values</dfn>.</p>
 	<blockquote>
 		<pre><code>`URF:
-  &quot;vcard&quot;~&lt;http://urf.com/vcard&gt;,
+  &quot;vcard&quot;~&lt;http://urf.com/vcard&gt;
   &quot;example&quot;~&lt;http://example.com/example&gt;
-;
-¤
+;¤
   example.janedoe:
-    vcard.fn=&quot;Jane Doe&quot;,
+    vcard.fn=&quot;Jane Doe&quot;
     vcard.n=*vcard.Name:
-      vcard.familyName=&quot;Doe&quot;,
-      vcard.givenName=&quot;Jane&quot;,
-      vcard.additionalName=\&quot;Mary&quot;, &quot;Ann&quot;\,
-      vcard.honoraryPrefix=&quot;Dr.&quot;,
+      vcard.familyName=&quot;Doe&quot;
+      vcard.givenName=&quot;Jane&quot;
+      vcard.additionalName=\&quot;Mary&quot;, &quot;Ann&quot;\
+      vcard.honoraryPrefix=&quot;Dr.&quot;
       vcard.honorarySuffix=\&quot;M.D.&quot;, &quot;Ph.D.&quot;\
-    ;,
-    vcard.org=\&quot;Example Corporation&quot;, &quot;North American Division&quot;, &quot;Business Development&quot;\,
-    vcard.title=&quot;Directory of Business Development&quot;,
+    ;
+    vcard.org=\&quot;Example Corporation&quot;, &quot;North American Division&quot;, &quot;Business Development&quot;\
+    vcard.title=&quot;Directory of Business Development&quot;
     vcard.adr=*vcard.Adr:
-      vcard.adrType=«*vcard.AdrType(&quot;work&quot;)»,
-      vcard.adrType=«*vcard.AdrType(&quot;postal&quot;)»,
-      vcard.adrType=«*vcard.AdrType(&quot;parcel&quot;)»,
-      vcard.extendedAddress=&quot;Suite 45&quot;,
-      vcard.streetAddress=&quot;123 Some Street&quot;,
-      vcard.locality=&quot;Someplace&quot;,
-      vcard.region=&quot;CA&quot;,
-      vcard.postalCode=&quot;12345-6789&quot;,
+      vcard.adrType=«*vcard.AdrType(&quot;work&quot;)»
+      vcard.adrType=«*vcard.AdrType(&quot;postal&quot;)»
+      vcard.adrType=«*vcard.AdrType(&quot;parcel&quot;)»
+      vcard.extendedAddress=&quot;Suite 45&quot;
+      vcard.streetAddress=&quot;123 Some Street&quot;
+      vcard.locality=&quot;Someplace&quot;
+      vcard.region=&quot;CA&quot;
+      vcard.postalCode=&quot;12345-6789&quot;
       vcard.countryName=&quot;USA&quot;
-    ;,
-    vcard.label=&quot;123 Some Street\nSuite 45\nSomeplace, CA 12345-6789&quot;,
+    ;
+    vcard.label=&quot;123 Some Street\nSuite 45\nSomeplace, CA 12345-6789&quot;
     vcard.tel=
     \
       «tel:+1-234-567-8910»:
-        vcard.telType=«*vcard.TelType(&quot;voice&quot;)»,
+        vcard.telType=«*vcard.TelType(&quot;voice&quot;)»
         vcard.telType=«*vcard.TelType(&quot;work&quot;)»
-      ;,
+      ;
       «tel:+1-234-567-8911»:
-        vcard.telType=«*vcard.TelType(&quot;voice&quot;)»,
-        vcard.telType=«*vcard.TelType(&quot;home&quot;)»,
+        vcard.telType=«*vcard.TelType(&quot;voice&quot;)»
+        vcard.telType=«*vcard.TelType(&quot;home&quot;)»
         vcard.telType=«*vcard.TelType(&quot;cell&quot;)»
       ;
-    \,
-    vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\,
-    vcard.url=&lt;http://www.example.com/home/jane/&gt;,
-    vcard.bday=@1980-02-02T09:45:00@,
-    vcard.category=&quot;Internet&quot;,
-    vcard.category=&quot;B2B&quot;,
-    vcard.category=&quot;P2P&quot;,
-    vcard.category=&quot;Web2.0&quot;,
+    \
+    vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\
+    vcard.url=&lt;http://www.example.com/home/jane/&gt;
+    vcard.bday=@1980-02-02T09:45:00@
+    vcard.category=&quot;Internet&quot;
+    vcard.category=&quot;B2B&quot;
+    vcard.category=&quot;P2P&quot;
+    vcard.category=&quot;Web2.0&quot;
     vcard.category=&quot;ABCD&quot;
   ;
 .</code></pre>
