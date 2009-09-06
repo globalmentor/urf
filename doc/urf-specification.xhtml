@@ -48,7 +48,7 @@
   example.janedoe
 .</code></pre>
 	</blockquote>
-	<p>The following is the same resource with a type of <code>foaf.Person</code> and with other properties declared. Strings and numbers are resources and can themselves be described. The salary value resource is given a scoped property indicating the currency. The currency resource is identified using a lexical namespace for the <code>example.Currency</code> type. Comments begin with a dagger and end with a double dagger.</p>
+	<p>The following is the same resource with a type of <code>foaf.Person</code> and with other properties declared. Strings and numbers are resources and can themselves be described. The salary value resource is given a scoped property indicating the currency. The currency resource is identified using an inline URI in the inline namespace for the <code>example.Currency</code> type. Comments begin with a dagger and end with a double dagger.</p>
 	<blockquote>
 		<pre><code>`URF:
 
@@ -77,10 +77,10 @@
 		<pre><code>`URF¤
   «http://example.com/example/janedoe»:
     «http://urf.name/urf/type»=«http://xmlns.com/foaf/0.1/Person»
-    «http://example.com/example/name»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#Jane%20Doe»
-    «http://example.com/example/birthday»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Date#1980-01-01»
-    «http://example.com/example/salary»=«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#1000000»:
-      «http://example.com/example/currency»`=«http://urf.name/lexical/http%3A%2F%2Fexample.com%2Fexample%23Currency#usd»
+    «http://example.com/example/name»=«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23String/%22Jane%20Doe%22»
+    «http://example.com/example/birthday»=«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Date/%221980-01-01%22»
+    «http://example.com/example/salary»=«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%221000000%22»:
+      «http://example.com/example/currency»`=«http://urf.name/inline/http%3A%2F%2Fexample.com%2Fexample%23Currency/%22usd%22»
     ;
   ;
 .</code></pre>
@@ -284,30 +284,30 @@
 	<h3>URF Types</h3>
 	<p>URF and its standard ontologies comes with several built-in types, including:</p>
 	<dl> <dt><code>urf.Binary</code></dt>
-		<dd>Binary resources represent arbitrarily long sequences of bytes. Binary resources use the appropriate lexical namespace for their type, with a lexical form of the <dfn>base64url</dfn> encoding of the binary data without line breaks according to [<a href="#rfc4648">RFC       4648</a>].</dd> <dt><code>urf.Boolean</code></dt>
-		<dd>There are two boolean resources, the values <code>true</code> and <code>false</code>. Boolean resources are identified by lexical namespace URIs with lexical representations of <code>&quot;true&quot;</code> and <code>&quot;false&quot;</code>, respectively.</dd> <dt><code>urf.Character</code></dt>
+		<dd>Binary resources represent arbitrarily long sequences of bytes. Binary resources use the appropriate inline namespace for their type, with a lexical form of the <dfn>base64url</dfn> encoding of the binary data without line breaks according to [<a href="#rfc4648">RFC       4648</a>].</dd> <dt><code>urf.Boolean</code></dt>
+		<dd>There are two boolean resources, the values <code>true</code> and <code>false</code>. Boolean resources are identified by URIs in the Boolean inline namespace with lexical representations of <code>&quot;true&quot;</code> and <code>&quot;false&quot;</code>, respectively.</dd> <dt><code>urf.Character</code></dt>
 		<dd>Character resources are the Unicode code points, and their lexical forms are the Unicode characters represented by those code points.</dd> <dt><code>urf.Class</code></dt>
 		<dd>Not every resource used as a class is an instance of the class <code>urf.Class</code>, but a resource may be declared to be of the class type to further specify its semantics. The class <code>urf.Class</code> is a subclass of the class <code>urf.Resource</code>.</dd> <dt><code>urf.Date</code></dt>
-		<dd>Date resources represent calendar dates in terms of calendar year, calendar month, and calendar day of month. They use a lexical namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>YYYY</var>-<var>MM</var>-<var>DD</var></code> as defined in [<a href="#iso8601">ISO 8601</a>].</dd> <dt><code>urf.DateTime</code></dt>
-		<dd>A date time resource represents a time of day on a particular calendar date. They use a lexical namespace with a lexical form combining the lexical forms of <code>urf.Date</code> and <code>urf.Time</code> separated by <code>T</code>: <code><var>YYYY</var>-<var>MM</var>-<var>DD</var>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO       8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>urf.Duration</code></dt>
-		<dd>Duration resources represent lengths of time. They use a lexical namespace with a lexical form consistent with [<a href="#rfc2445">RFC       2445</a>] and [<a href="#iso8601">ISO 8601</a>] of <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>, where <var>n</var> is some positive number of roman digits and at least the date or time section is present.</dd> <dt><code>urf.Enum</code></dt>
-		<dd>The base class of class resources having lexical URIs the lexical forms of which are enumerated as class list elements.</dd> <dt><code>urf.Integer</code></dt>
-		<dd>Integer resources are the positive whole numbers, the negative whole numbers, and zero. They are identified by lexical namespace URIs with a lexical representation in the form <code><strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.Language</code></dt>
-		<dd>Language resources represent human langages and use lexical namespace URIs. The lexical form of each is the corresponding <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC       4646</a>].</dd> <dt><code>urf.List</code></dt>
-		<dd>List resources are resources that contain other <dfn>element</dfn> resources at certain <dfn>indexes</dfn> of the list. A list, like normal resources, may have any property, but the properties representing the elements of the list lie in the ordinal namespace <code>&lt;http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal&gt;</code>, each representing the ordinal index of the element. That is, if a list contains an element at index 5, the element resource will appear as a value of the property <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code> (that is, the property <code>«(urf.Ordinal)&quot;5&quot;»</code>, or simply <code>º5</code>). Although many uses cases will prefer a continuous, unduplicated sequence of index properties beginning with <code>º5</code>, this is not an URF requirement.</dd> <dt><code>urf.Map</code></dt>
+		<dd>Date resources represent calendar dates in terms of calendar year, calendar month, and calendar day of month. They use an inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>YYYY</var>-<var>MM</var>-<var>DD</var></code> as defined in [<a href="#iso8601">ISO 8601</a>].</dd> <dt><code>urf.DateTime</code></dt>
+		<dd>A date time resource represents a time of day on a particular calendar date. They use an inline namespace with a lexical form combining the lexical forms of <code>urf.Date</code> and <code>urf.Time</code> separated by <code>T</code>: <code><var>YYYY</var>-<var>MM</var>-<var>DD</var>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO       8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>urf.Duration</code></dt>
+		<dd>Duration resources represent lengths of time. They use an inline namespace with a lexical form consistent with [<a href="#rfc2445">RFC       2445</a>] and [<a href="#iso8601">ISO 8601</a>] of <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>, where <var>n</var> is some positive number of roman digits and at least the date or time section is present.</dd> <dt><code>urf.Enum</code></dt>
+		<dd>The base class of class resources having inline URIs the lexical forms of which are enumerated as class list elements.</dd> <dt><code>urf.Integer</code></dt>
+		<dd>Integer resources are the positive whole numbers, the negative whole numbers, and zero. They are identified by inline namespace URIs with a lexical representation in the form <code><strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.Language</code></dt>
+		<dd>Language resources represent human langages and use inline namespace URIs. The lexical form of each is the corresponding <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC       4646</a>].</dd> <dt><code>urf.List</code></dt>
+		<dd>List resources are resources that contain other <dfn>element</dfn> resources at certain <dfn>indexes</dfn> of the list. A list, like normal resources, may have any property, but the properties representing the elements of the list lie in the ordinal namespace <code>&lt;http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/&gt;</code>, each representing the ordinal index of the element. That is, if a list contains an element at index 5, the element resource will appear as a value of the property <code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/%225%22»</code> (that is, the property <code>«(urf.Ordinal)&quot;5&quot;»</code>, or simply <code>º5</code>). Although many uses cases will prefer a continuous, unduplicated sequence of index properties beginning with <code>º5</code>, this is not an URF requirement.</dd> <dt><code>urf.Map</code></dt>
 		<dd>A resource containing associations between keys and values. Each association is represented by an instance of <code>urf.MapEntry</code>, which indicates a value for the property <code>urf.key</code> and the property <code>urf.value</code>. Each map entry is the value of an <code>urf.entry</code> property of the map resource.</dd> <dt><code>urf.Ordinal</code></dt>
-		<dd>Ordinal resources are numbers that represent the position of an element in a sequence. URF currently only supports finite ordinals, which means that there will be a corresponding ordinal for every positive whole numbers and zero. Ordinals are identified by lexical namespace URIs with a lexical representation in the form <code><var>romandigit</var><strong>+</strong></code>. The ordinal class is a subclass of the class <code>urf.</code>Number.</dd> <dt><code>urf.Property</code></dt>
+		<dd>Ordinal resources are numbers that represent the position of an element in a sequence. URF currently only supports finite ordinals, which means that there will be a corresponding ordinal for every positive whole numbers and zero. Ordinals are identified by inline namespace URIs with a lexical representation in the form <code><var>romandigit</var><strong>+</strong></code>. The ordinal class is a subclass of the class <code>urf.</code>Number.</dd> <dt><code>urf.Property</code></dt>
 		<dd>Not every resource used as a predicate is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the property type to further specify its semantics and expected domain and range. The class <code>urf.Property</code> is a subclass of the class <code>urf.Class</code>.</dd> <dt><code>urf.Real</code></dt>
-		<dd>Real number are all of the measuring numbers and may include decimal fractional parts. They are identified by lexical namespace URIs with a lexical representation in the form <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.RegularExpression</code></dt>
-		<dd>Regular expression resources are text-based patterns that define rules for the content of strings. These are lexical namespace resources.</dd> <dt><code>urf.Resource</code></dt>
+		<dd>Real number are all of the measuring numbers and may include decimal fractional parts. They are identified by inline namespace URIs with a lexical representation in the form <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.RegularExpression</code></dt>
+		<dd>Regular expression resources are text-based patterns that define rules for the content of strings. These are inline namespace resources.</dd> <dt><code>urf.Resource</code></dt>
 		<dd>Every resource is implicitly an instance of the class <code>urf.Resource</code>. The resources <code>urf.Property</code> and <code>urf.Resource</code> are both instances of the class <code>urf.Resource</code>.</dd> <dt><code>urf.Set</code></dt>
 		<dd>Set resources are resources that contain at most one instance of other <dfn>element</dfn> resources. A set, like normal resources, may have any property, but the properties representing the elements of the set appear as values of the <code>urf.element</code> property.</dd> <dt><code>urf.String</code></dt>
-		<dd>String resources are sequences of Unicode code points or text and lie in the corresponding lexical namespace.</dd> <dt><code>urf.Time</code></dt>
-		<dd>Time resources represent time of day. They use a lexical namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO       8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>urf.URI</code></dt>
-		<dd>URI resources are sequences of Unicode code points that function as resource identifiers and conform to [<a href="#rfc3986">RFC 3986</a>]. They lie in the corresponding lexical namespace with a lexical form specified by [<a href="#rfc3986">RFC 3986</a>].</dd> <dt><code>urf.UTCOffset</code></dt>
-		<dd>UTC offset resources represent an offset from UTC to local time. They use a lexical namespace with a lexical form of <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var> with semantics corresponding to the UTC offset described in [<a href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>content.Charset</code></dt>
+		<dd>String resources are sequences of Unicode code points or text and lie in the corresponding inline namespace.</dd> <dt><code>urf.Time</code></dt>
+		<dd>Time resources represent time of day. They use a inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO       8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>urf.URI</code></dt>
+		<dd>URI resources are sequences of Unicode code points that function as resource identifiers and conform to [<a href="#rfc3986">RFC 3986</a>]. They lie in the corresponding inline namespace with a lexical form specified by [<a href="#rfc3986">RFC 3986</a>].</dd> <dt><code>urf.UTCOffset</code></dt>
+		<dd>UTC offset resources represent an offset from UTC to local time. They use an inline namespace with a lexical form of <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var> with semantics corresponding to the UTC offset described in [<a href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd> <dt><code>content.Charset</code></dt>
 		<dd>The name of the mapping of integer values to a set of characters. This is equivalent to the <dfn>charset</dfn> Internet media type parameter described by [<a href="#rfc2046">RFC 2046</a>] and further elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset encapsulates both the concept of a <dfn>coded character set</dfn> and a <dfn>character encoding scheme</dfn>, as specified in [<a href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA       Charset Registry</a>], such as <code>UTF-16BE</code>.</dd> <dt><code>content.MediaType</code></dt>
-		<dd>A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use lexical namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</dd>
+		<dd>A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use inline namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</dd>
 	</dl>
 	<h3>Selectors</h3>
 	<dl> <dt>URF</dt>
@@ -338,32 +338,33 @@
 			</blockquote>
 		</dd>
 	</dl>
-	<h3>Lexical Namespaces</h3>
+	<h3>Inline Resource URIs</h3>
 	<dl> <dt>URF</dt>
 		<dd>
-			<p>Some resource types contain resource instances that in day-to-day life have customarily been identified by character sequences or <dfn><dfn>lexical representations</dfn></dfn>. For example, the integer <code>123</code> has historically been represented by the character sequence <code>&quot;123&quot;</code>, although the number itself is an abstract concept, not a series of characters. Similarly, the two boolean values are usually represented as the character sequences <code>&quot;true&quot;</code> and <code>&quot;false&quot;</code>. URF provides for a series of namespaces to identify resources that are typically identified by lexical representations. Each lexical namespace URI begins with the general URF lexical namespace URI <code>&lt;http://urf.name/lexical/&gt;</code> and has the following format,</p>
+			<p>Some resource types are singletons that are unambiguously identified by their selectors. These resources are identified by <dfn>inline</dfn> URIs that contain both the resource type and the identifying selector within the URI itself. The most common type of resource that use inline URIs are those that in day-to-day life have customarily been identified by character sequences or <dfn><dfn>lexical representations</dfn></dfn>. For example, the integer <code>123</code> has historically been represented by the character sequence <code>&quot;123&quot;</code>, although the number itself is an abstract concept, not a series of characters. Similarly, the two boolean values are usually represented as the character sequences <code>&quot;true&quot;</code> and <code>&quot;false&quot;</code>.</p>
+			<p>Each inline namespace URI begins with the base URF inline namespace URI <code>&lt;http://urf.name/inline/&gt;</code> and has the following format,</p>
 			<blockquote>
-				<pre><code>http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code></pre>
+				<pre><code>http://urf.name/inline/<var>encodedTypeURI</var>/<var>encodedTURFLexicalForm</var></code></pre>
 			</blockquote>
-			<p>where <var>encodedTypeURI</var> is the URI path segment-encoded form of the full type URI of the resource, and <var>encodedLexicalForm</var> is the URI path segment-encoded canonical lexical form of the resource as defined by the indicated type. For example, the integer 123, which is of the type <code>«http://urf.name/urf#Integer»</code>, is represented in URF using the following URI:</p>
+			<p>where <var>encodedTypeURI</var> is the URI path segment-encoded form of the full type URI of the resource; and <var>encodedTURFLexicalForm</var> is the URI path segment-encoded canonical lexical form of the resource as defined by the indicated type, in its TURF short string form. For example, the integer 123, which is of the type <code>«http://urf.name/urf/Integer»</code>, has a lexical form of <code>&quot;123&quot;</code>. This TURF string representation, encoded for a URI, yields <code>%22123%22</code>, which results in  the following inline URI:</p>
 			<blockquote>
-				<pre><code>http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123</code></pre>
+				<pre><code>http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%22123%22</code></pre>
 			</blockquote>
-			<p>A resource in a lexical namespace is implicitly an instance of the type indicated in the <var>encodedTypeURI</var> section of the URI. In all other aspects resources in lexical namespaces are no different from resources not in a lexical namespace; these resources are <em>not</em> instances of a special resource type solely because their namespaces are lexical namespaces. Lexical namespaces provide a framework for easily and consistently formulating identifying URIs for resources that are traditionally identified in lexical form; lexical namespaces in themselves imply no additional semantics.</p>
+			<p>A resource in an inline namespace is implicitly an instance of the type indicated in the <var>encodedTypeURI</var> section of the URI. In all other aspects resources in inline namespaces are no different from resources not in an inline namespace; these resources are <em>not</em> instances of a special resource type solely because their namespaces are inline namespaces. Inline namespaces provide a framework for easily and consistently formulating identifying URIs for resources that are traditionally identified in lexical form; inline namespaces in themselves imply no additional semantics.</p>
 		</dd> <dt>TURF</dt>
 		<dd>
-			<p>Any representation of a resource in a lexical namespace also implicitly asserts the type of the resource. A resource in a lexical namespace can be identified by its URI as with any other resource. For example, the integer 123 can be identified by its URI <code>&lt;http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123&gt;</code> as in the following example:</p>
+			<p>Any representation of a resource in an inline namespace also implicitly asserts the type of the resource. A resource in an inline namespace can be identified by its URI as with any other resource. For example, the integer 123 can be identified by its URI <code>&lt;http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%22123%22&gt;</code> as in the following example:</p>
 			<blockquote>
-				<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»</code></pre>
+				<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%22123%22»</code></pre>
 			</blockquote>
-			<p>Rather than indicating directly the URI of a resource in a lexical namespace, the resource may be identified by indicating the type of the resource preceded by an asterisk inside the URI reference, followed by the canonical lexical form of the resource as a string inside parentheses. In essence, a type an selector is being used to generate a corresponding URI. The integer 123 may therefore be represented as either of the following short forms:</p>
+			<p>Rather than indicating directly the URI of a resource in an inline namespace, the resource may be identified by indicating the type of the resource preceded by an asterisk inside the URI reference, followed by the canonical lexical form of the resource as a string inside parentheses. In essence, a type an selector is being used to generate a corresponding URI. The integer 123 may therefore be represented as either of the following short forms:</p>
 			<blockquote>
-				<pre><code>«*«http://urf.name/urf#Integer»(&quot;123&quot;)»</code></pre>
+				<pre><code>«*«http://urf.name/urf/Integer»(&quot;123&quot;)»</code></pre>
 			</blockquote>
 			<blockquote>
 				<pre><code>«*urf.Integer(&quot;123&quot;)»</code></pre>
 			</blockquote>
-			<p>The lexical namespaces for several types have additional short representations. The examples below assume that the label <code>urf</code> has been assigned to the URF namespace.</p>
+			<p>The inline namespaces for several types have additional short representations. The examples below assume that the label <code>urf</code> has been assigned to the URF namespace.</p>
 			<dl> <dt><code>urf.Binary</code></dt>
 				<dd>
 					<p>An binary resource may be identified by its [<a href="#rfc4648">RFC 4648</a>] base64url lexical form surrounded by percent signs. For example, the series of bytes <code>64</code>, <code>63</code>, <code>62</code>, <code>61</code> produce the lexical form, <code>&quot;QD8-PQ==&quot;</code>; the corresponding short representation,</p>
@@ -372,9 +373,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Binary#QD8-PQ%3D%3D»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Binary/%22QD8-PQ%3D%3D%22»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the following general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the following general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.Binary(&quot;QD8-PQ==&quot;)»</code></pre>
 					</blockquote>
@@ -386,9 +387,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Boolean/%22true%22»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the following general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the following general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.Boolean(&quot;true&quot;)»</code></pre>
 					</blockquote>
@@ -400,9 +401,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Character#x»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Character/%22x%22»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the following general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the following general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.Character(&quot;x&quot;)»</code></pre>
 					</blockquote>
@@ -415,10 +416,10 @@
 					</blockquote>
 					<p>are equivalent to the following long representations, respectively,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Integer#123»
-«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Real#123.45»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%22123%22»
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Real/%22123.45%22»</code></pre>
 					</blockquote>
-					<p>which are also equivalent to the following general short representations for resources in a lexical namespace, respectively:</p>
+					<p>which are also equivalent to the following general short representations for resources in an inline namespace, respectively:</p>
 					<blockquote>
 						<pre><code>«*urf.Integer(&quot;123&quot;)»
 «*urf.Real(&quot;123.45&quot;)»</code></pre>
@@ -431,9 +432,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Ordinal#5»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/%225%22»</code></pre>
 					</blockquote>
-					<p>which are also equivalent to the following general short representation for resources in a lexical namespace:</p>
+					<p>which are also equivalent to the following general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.Ordinal(&quot;5&quot;)»</code></pre>
 					</blockquote>
@@ -445,9 +446,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23RegularExpression#a%3Fb%2Bc*»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23RegularExpression/%22a%3Fb%2Bc%2a%22»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.RegularExpression(&quot;a?b+c*&quot;)»</code></pre>
 					</blockquote>
@@ -459,9 +460,9 @@
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23String#apple»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23String/%22apple%22»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the general short representation for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.String(&quot;apple&quot;)»</code></pre>
 					</blockquote>
@@ -477,13 +478,13 @@
 					</blockquote>
 					<p>are equivalent to the following long representations, respectively,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Date#1980-05-06»
-«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Time#16%3A39%3A57-08%3A00»
-«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23DateTime#1980-05-06T16%3A39%3A57-08%3A00»
-«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Duration#P100Y5M3DT8H2M10.5S»
-«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23UTCOffset#-08:00»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Date/%221980-05-06%22»
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Time/%2216%3A39%3A57-08%3A00%22»
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23DateTime/%221980-05-06T16%3A39%3A57-08%3A00%22»
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Duration/%22P100Y5M3DT8H2M10.5S%22»
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23UTCOffset/%22-08:00%22»</code></pre>
 					</blockquote>
-					<p>which are also equivalent to the general short representations for resources in a lexical namespace:</p>
+					<p>which are also equivalent to the general short representations for resources in an inline namespace:</p>
 					<blockquote>
 						<pre><code>«*urf.Date(&quot;1980-05-06&quot;)»
 «*urf.Time(&quot;16:39:57-08:00&quot;)»
@@ -495,15 +496,15 @@
 				<dd>
 					<p>A URI resource may be identified by its lexical form with surrounding angle brackets <code>&apos;&lt;&apos;</code> and <code>&apos;&gt;&apos;</code>. For example, the following short representation,</p>
 					<blockquote>
-						<pre><code>&lt;http://urf.name/urf#type&gt;</code></pre>
+						<pre><code>&lt;http://urf.name/urf/type&gt;</code></pre>
 					</blockquote>
 					<p>is equivalent to the following long representation,</p>
 					<blockquote>
-						<pre><code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23URI#http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
+						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23URI/http%3A%2F%2Furf.name%2Furf%23type»</code></pre>
 					</blockquote>
-					<p>which is also equivalent to the general short representation for resources in a lexical namespace:</p>
+					<p>which is also equivalent to the general short representation for resources in an inline namespace:</p>
 					<blockquote>
-						<pre><code>«*urf.URI(&quot;http://urf.name/urf#type&quot;)»</code></pre>
+						<pre><code>«*urf.URI(&quot;http://urf.name/urf/type&quot;)»</code></pre>
 					</blockquote>
 				</dd>
 			</dl>
@@ -512,7 +513,7 @@
 	<h3>Enums</h3>
 	<dl> <dt>URF</dt>
 		<dd>
-			<p>URF provides a special class, <code>urf.Enum</code>, for declaring subclasses that have values from a finite set of lexical forms. The URI of each instance of the enum subclass is a normal lexical URI, made up of the enum type (the <code>urf.Enum</code> subclass) and the lexical form of the enum value. <code>urf.Enum</code> is in turn a subclass of <code>urf.Set</code>, and the lexical form values of the enum type are specified as set elements of the <code>urf.Enum</code> subclass. For example, the URF class <code>urf.Boolean</code> is a subclass of <code>urf.Enum</code>, and its lexical form values are <code>&quot;false&quot;</code> and <code>&quot;true&quot;</code>. The URI of each <code>urf.Boolean</code> instance is formed following normal URF lexical URI rules, resulting in <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#false»</code> and <code>«http://urf.name/lexical/http%3A%2F%2Furf.name%2Furf%23Boolean#true»</code>.</p>
+			<p>URF provides a special class, <code>urf.Enum</code>, for declaring subclasses that have values from a finite set of lexical forms. The URI of each instance of the enum subclass is a normal inline URI, made up of the enum type (the <code>urf.Enum</code> subclass) and the lexical form of the enum value. <code>urf.Enum</code> is in turn a subclass of <code>urf.Set</code>, and the lexical form values of the enum type are specified as set elements of the <code>urf.Enum</code> subclass. For example, the URF class <code>urf.Boolean</code> is a subclass of <code>urf.Enum</code>, and its lexical form values are <code>&quot;false&quot;</code> and <code>&quot;true&quot;</code>. The URI of each <code>urf.Boolean</code> instance is formed following normal URF inline URI rules, resulting in <code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Boolean/%22false%22»</code> and <code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Boolean/%22true%22»</code>.</p>
 		</dd> <dt>TURF</dt>
 		<dd>
 			<p>The following is the definition of the <code>urf.Boolean</code> class, which is a typical enum subclass:</p>
@@ -848,7 +849,7 @@
 	<blockquote>
 		<p><code><var>reference</var> ⇒ <var>urireference</var> <strong>|</strong> <var>namereference</var> <strong>|</strong> <var>urishort</var> <strong>|</strong> <var>stringshort</var> <strong>|</strong> <var>charactershort</var> <strong>|</strong> <var>booleanshort</var> <strong>|</strong> <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var> <strong>|</strong> <var>regexshort</var> <strong>|</strong> <var>temporalshort</var></code></p>
 	</blockquote>
-	<p>A resource URI reference is enclosed in angle quotes. The contents is either the text of a URI (or relative reference); or a resource reference to a lexical type preceded by an asterisk <code>&apos;*&apos;</code>, immediately followed by a string containing the lexical representation of a resource, surrounded by parentheses <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code>. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI reference that includes a lexical representation is equivalent to a URI reference in the form <code>«http://urf.name/lexical/<var>encodedTypeURI</var>#<var>encodedLexicalForm</var></code>».</p>
+	<p>A resource URI reference is enclosed in angle quotes. The contents is either the text of a URI (or relative reference); or a resource reference to an inline type preceded by an asterisk <code>&apos;*&apos;</code>, immediately followed by a string containing the lexical representation of a resource, surrounded by parentheses <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code>. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI reference that includes a lexical representation is equivalent to a URI reference in the form <code>«http://urf.name/inline/<var>encodedTypeURI</var>#<var>encodedTURFLexicalForm</var></code>».</p>
 	<blockquote>
 		<p><code><var>urireference</var> ⇒       «<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong> <strong>|</strong> <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>»</code></p>
 	</blockquote>
@@ -865,7 +866,7 @@
 	<blockquote>
 		<p><code><var>localName</var> ⇒ <var>name</var></code></p>
 	</blockquote>
-	<p>A string short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in double quotes. The double quotation mark (<code>&apos;&quot;&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A string short form is equivalent to a resource of type <code>urf.String</code> using the corresponding lexical namespace. The string short form <code>&quot;example&quot;</code> is the equivalent of the string resource <code>«(urf.String)&quot;example&quot;»</code>.</p>
+	<p>A string short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in double quotes. The double quotation mark (<code>&apos;&quot;&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A string short form is equivalent to a resource of type <code>urf.String</code> using the corresponding inline namespace. The string short form <code>&quot;example&quot;</code> is the equivalent of the string resource <code>«(urf.String)&quot;example&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>stringshort</var> ⇒ &quot;<strong>[</strong><var>Unicode       character except double quote and backslash</var> <strong>|</strong> \&quot;       <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>&quot;</code></p>
 	</blockquote>
@@ -898,30 +899,30 @@
 	<blockquote>
 		<p><code>\” †\\\u201d‡ ⇒ \u009c †string terminator (ST)‡</code></p>
 	</blockquote>
-	<p>A character short form is a single Unicode characters, using the backslash as an escape character, enclosed in a single quote. The single quote (<code>&apos;\&apos;&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A character short form is equivalent to a resource of type <code>urf.Character</code> using the corresponding lexical namespace. The character short form <code>&apos;x&apos;</code> is the equivalent of the character resource <code>«(urf.Character)&quot;x&quot;»</code>.</p>
+	<p>A character short form is a single Unicode characters, using the backslash as an escape character, enclosed in a single quote. The single quote (<code>&apos;\&apos;&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A character short form is equivalent to a resource of type <code>urf.Character</code> using the corresponding inline namespace. The character short form <code>&apos;x&apos;</code> is the equivalent of the character resource <code>«(urf.Character)&quot;x&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>charactershort</var> ⇒ &apos;<strong>[</strong><var>Unicode       character except single quote and backslash</var> <strong>|</strong> \&apos;       <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>&apos;</code></p>
 	</blockquote>
-	<p>A URI short form is a sequence of character constituting a syntactically correct URI or a relative reference, surrounded by the angle brackets <code>&apos;&lt;&apos;</code> and <code>&apos;&gt;&apos;</code>. Alternatively, a type and selector may be provided with identical syntax to a resource URI reference. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. A URI short form is equivalent to a resource of type <code>urf.URI</code> using the corresponding lexical namespace. The URI short form <code>&lt;http://example.com&gt;</code> is the equivalent of the URI resource <code>«(urf.URI)&quot;http://example.com&quot;»</code>.</p>
+	<p>A URI short form is a sequence of character constituting a syntactically correct URI or a relative reference, surrounded by the angle brackets <code>&apos;&lt;&apos;</code> and <code>&apos;&gt;&apos;</code>. Alternatively, a type and selector may be provided with identical syntax to a resource URI reference. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. A URI short form is equivalent to a resource of type <code>urf.URI</code> using the corresponding inline namespace. The URI short form <code>&lt;http://example.com&gt;</code> is the equivalent of the URI resource <code>«(urf.URI)&quot;http://example.com&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>urishort</var> ⇒       &lt;<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong> <strong>|</strong> <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>&gt;</code></p>
 	</blockquote>
-	<p>A boolean short form is the character sequence <code>true</code> or <code>false</code> surrounded by matching underscore characters <code>&apos;_&apos;</code>. A boolean short form is equivalent to a resource of type <code>urf.Boolean</code> using the corresponding lexical namespace. The boolean short form <code>_true_</code> is the equivalent of the boolean resource <code>«(urf.Boolean)&quot;true&quot;»</code>.</p>
+	<p>A boolean short form is the character sequence <code>true</code> or <code>false</code> surrounded by matching underscore characters <code>&apos;_&apos;</code>. A boolean short form is equivalent to a resource of type <code>urf.Boolean</code> using the corresponding inline namespace. The boolean short form <code>_true_</code> is the equivalent of the boolean resource <code>«(urf.Boolean)&quot;true&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>booleanshort</var> ⇒       _true_<strong>|</strong>_false_</code></p>
 	</blockquote>
-	<p>A number short form consists of Roman digits, optionally preceded by a minus sign, with an optional decimal and optional exponent, all surrounded by matching number signs <code>&apos;#&apos;</code>. A number short form is equivalent to a resource of type <code>urf.Integer</code> or <code>urf.Real</code>, depending on the lexical form used, using the corresponding lexical namespace. The number short form <code>#123#</code> is the equivalent of the number resource <code>«(urf.Integer)&quot;123&quot;»</code>, and the number short form <code>#123.45#</code> is the equivalent of the number resource <code>«(urf.Real)&quot;123.45&quot;»</code>.</p>
+	<p>A number short form consists of Roman digits, optionally preceded by a minus sign, with an optional decimal and optional exponent, all surrounded by matching number signs <code>&apos;#&apos;</code>. A number short form is equivalent to a resource of type <code>urf.Integer</code> or <code>urf.Real</code>, depending on the lexical form used, using the corresponding inline namespace. The number short form <code>#123#</code> is the equivalent of the number resource <code>«(urf.Integer)&quot;123&quot;»</code>, and the number short form <code>#123.45#</code> is the equivalent of the number resource <code>«(urf.Real)&quot;123.45&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>numbershort</var> ⇒       #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong>#</code></p>
 	</blockquote>
 	<blockquote>
 		<p><code><var>n</var> ⇒       <var>romandigit</var><strong>+</strong></code></p>
 	</blockquote>
-	<p>An ordinal short form consists of roman digits surrounded by matching ordinal signs <code>&apos;º&apos;</code>. An ordinal short form is equivalent to a resource of type <code>urf.Ordinal</code> using the corresponding lexical namespace. The ordinal short form <code>º27º</code> is the equivalent of the ordinal resource <code>«(urf.Ordinal)&quot;27&quot;»</code>.</p>
+	<p>An ordinal short form consists of roman digits surrounded by matching ordinal signs <code>&apos;º&apos;</code>. An ordinal short form is equivalent to a resource of type <code>urf.Ordinal</code> using the corresponding inline namespace. The ordinal short form <code>º27º</code> is the equivalent of the ordinal resource <code>«(urf.Ordinal)&quot;27&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>ordinalshort</var> ⇒ º<var>n</var>º</code></p>
 	</blockquote>
-	<p>A regular expression short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in forward slash (<code>&apos;/&apos;</code>) characters. The slash (<code>&apos;/&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A regular expression short form is equivalent to a resource of type <code>urf.RegularExpression</code> using the corresponding lexical namespace. The regular expression short form <code>/a?b+c*/</code> is the equivalent of the string resource <code>«(urf.RegularExpression)&quot;a?b+c*&quot;»</code>.</p>
+	<p>A regular expression short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in forward slash (<code>&apos;/&apos;</code>) characters. The slash (<code>&apos;/&apos;</code>) and backslash (<code>&apos;\\&apos;</code>) characters must be escaped. A regular expression short form is equivalent to a resource of type <code>urf.RegularExpression</code> using the corresponding inline namespace. The regular expression short form <code>/a?b+c*/</code> is the equivalent of the string resource <code>«(urf.RegularExpression)&quot;a?b+c*&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode       character except slash and backslash</var> <strong>|</strong> \/       <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>/</code></p>
 	</blockquote>
@@ -1031,7 +1032,7 @@
 .</code></pre>
 	</blockquote>
 	<h3>Values</h3>
-	<p>In general, URF resources with URIs that are recognized must be converted to the equivalent type in the programming language. For example, in Java all resources of type <code>urf.Integer</code> must be converted to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>, <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted to <code>java.util.List</code>, <code>java.util.Set</code>, and <code>java.util.Map</code> instances, respectively, with each element or entry recursively instantiated or converted as needed. A resource with a lexical URI must be converted if possible to a programming language type functioning as a lexical identifier, if its lexical type indicates such an enumerated type. In the following example, the Guise Java class <code>com.guiseframework.component.layout.FlowLayout</code> has a <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The lexical URI <code>«*layout.Flow(&quot;LINE&quot;)»</code> indicates a type of <code>com.guiseframework.component.layout.Flow</code>, which is a Java enum class. A PLOOP processor must construct a <code>com.guiseframework.component.layout.Flow</code> object from the string &quot;LINE&quot; and assign it to the instance of <code>com.guiseframework.component.layout.FlowLayout</code> using <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
+	<p>In general, URF resources with URIs that are recognized must be converted to the equivalent type in the programming language. For example, in Java all resources of type <code>urf.Integer</code> must be converted to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>, <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted to <code>java.util.List</code>, <code>java.util.Set</code>, and <code>java.util.Map</code> instances, respectively, with each element or entry recursively instantiated or converted as needed. A resource with an inline URI must be converted if possible to a programming language type functioning as a lexical identifier, if its inlin type indicates such an enumerated type. In the following example, the Guise Java class <code>com.guiseframework.component.layout.FlowLayout</code> has a <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The inline URI <code>«*layout.Flow(&quot;LINE&quot;)»</code> indicates a type of <code>com.guiseframework.component.layout.Flow</code>, which is a Java enum class. A PLOOP processor must construct a <code>com.guiseframework.component.layout.Flow</code> object from the string &quot;LINE&quot; and assign it to the instance of <code>com.guiseframework.component.layout.FlowLayout</code> using <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
 	<blockquote>
 		<pre><code>`URF¤
   («java:/com/guiseframework/component/layout/FlowLayout»:
@@ -1261,7 +1262,7 @@ navigationPanel.add(conversionPanel);
   ;
 .</code></pre>
 	</blockquote>
-	<p>Note that, rather than use special literal types or general strings, URF promotes the representation of resources by URIs. Thus the language tag &quot;pt-BR&quot; for Brazilian Portuguese is represented as a resource with a URI in the <code>urf.Language</code> lexical namespace, and the integer value <code>23</code> is represented as a resource with a URI in the <code>urf.Integer</code> lexical namespace (shown here in its short form, <code>#23#</code>).</p>
+	<p>Note that, rather than use special literal types or general strings, URF promotes the representation of resources by URIs. Thus the language tag &quot;pt-BR&quot; for Brazilian Portuguese is represented as a resource with a URI in the <code>urf.Language</code> inline namespace, and the integer value <code>23</code> is represented as a resource with a URI in the <code>urf.Integer</code> inline namespace (shown here in its short form, <code>#23#</code>).</p>
 	<h3>VCard</h3>
 	<p>The URF <a href="#vcard">VCard Ontology</a> provides a representation of VCard [<a href="#rfc2426">RFC 2426</a>] within a semantic framework. The following is VCard information in traditional vCard MIME Directory Profile syntax as specified by [<a href="#rfc2426">RFC 2426</a>].</p>
 	<blockquote>
@@ -1363,7 +1364,7 @@ END:vCard</code></pre>
 	</ul>
 	<h3>Differences between TURF and RDF/XML</h3>
 	<ul>
-		<li>TURF allows any resource, including strings and other resources in lexical namespaces, to be labeled for later reference. RDF/XML does not allow so-called RDF literal resources to be labeled.</li>
+		<li>TURF allows any resource, including strings and other resources in inline namespaces, to be labeled for later reference. RDF/XML does not allow so-called RDF literal resources to be labeled.</li>
 		<li>TURF allows any resource to appear in a list. RDF/XML does not allow so-called RDF literal resources to appear in a list.</li>
 	</ul>
 	<h2>References</h2>
@@ -1395,6 +1396,7 @@ END:vCard</code></pre>
 		<dd>
 			<ul>
 				<li>Change namespace URI rules to only allow namespace URIs that are collection URIs.</li>
+				<li>Renamed &quot;lexical namespace/URI&quot; to &quot;inline namespace/URI&quot; and improved the corresponding semantics.</li>
 			</ul>
 		</dd>
 	</dl>
