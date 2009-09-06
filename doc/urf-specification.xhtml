@@ -62,7 +62,7 @@
   &quot;example&quot;~&lt;http://example.com/example/&gt;
   &quot;foaf&quot;~&lt;http://xmlns.com/foaf/0.1/&gt;
 ;¤
-  †describe a FOAF person identified by the URI &lt;http://example.com/example#janedoe&gt;‡
+  †describe a FOAF person identified by the URI &lt;http://example.com/example/janedoe&gt;‡
   example.janedoe*foaf.Person:
     example.name=&quot;Jane Doe&quot;
     example.birthday=@1980-01-01@
@@ -297,8 +297,8 @@
 		<dd>List resources are resources that contain other <dfn>element</dfn> resources at certain <dfn>indexes</dfn> of the list. A list, like normal resources, may have any property, but the properties representing the elements of the list lie in the ordinal namespace <code>&lt;http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/&gt;</code>, each representing the ordinal index of the element. That is, if a list contains an element at index 5, the element resource will appear as a value of the property <code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/%225%22»</code> (that is, the property <code>«(urf.Ordinal)&quot;5&quot;»</code>, or simply <code>º5</code>). Although many uses cases will prefer a continuous, unduplicated sequence of index properties beginning with <code>º5</code>, this is not an URF requirement.</dd> <dt><code>urf.Map</code></dt>
 		<dd>A resource containing associations between keys and values. Each association is represented by an instance of <code>urf.MapEntry</code>, which indicates a value for the property <code>urf.key</code> and the property <code>urf.value</code>. Each map entry is the value of an <code>urf.entry</code> property of the map resource.</dd> <dt><code>urf.Ordinal</code></dt>
 		<dd>Ordinal resources are numbers that represent the position of an element in a sequence. URF currently only supports finite ordinals, which means that there will be a corresponding ordinal for every positive whole numbers and zero. Ordinals are identified by inline namespace URIs with a lexical representation in the form <code><var>romandigit</var><strong>+</strong></code>. The ordinal class is a subclass of the class <code>urf.</code>Number.</dd> <dt><code>urf.Property</code></dt>
-		<dd>Not every resource used as a predicate is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the property type to further specify its semantics and expected domain and range. The class <code>urf.Property</code> is a subclass of the class <code>urf.Class</code>.</dd> <dt><code>urf.Real</code></dt>
-		<dd>Real number are all of the measuring numbers and may include decimal fractional parts. They are identified by inline namespace URIs with a lexical representation in the form <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.RegularExpression</code></dt>
+		<dd>Not every resource used as a predicate is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the property type to further specify its semantics and expected domain and range. The class <code>urf.Property</code> is a subclass of the class <code>urf.Class</code>.</dd> <dt><code>urf.Rational</code></dt>
+		<dd>Rational number are all of the measuring numbers and may include decimal fractional parts. They are identified by inline namespace URIs with a lexical representation in the form <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>. The integer class is a subclass of the class <code>urf.Number</code>.</dd> <dt><code>urf.RegularExpression</code></dt>
 		<dd>Regular expression resources are text-based patterns that define rules for the content of strings. These are inline namespace resources.</dd> <dt><code>urf.Resource</code></dt>
 		<dd>Every resource is implicitly an instance of the class <code>urf.Resource</code>. The resources <code>urf.Property</code> and <code>urf.Resource</code> are both instances of the class <code>urf.Resource</code>.</dd> <dt><code>urf.Set</code></dt>
 		<dd>Set resources are resources that contain at most one instance of other <dfn>element</dfn> resources. A set, like normal resources, may have any property, but the properties representing the elements of the set appear as values of the <code>urf.element</code> property.</dd> <dt><code>urf.String</code></dt>
@@ -409,7 +409,7 @@
 					</blockquote>
 				</dd> <dt><code>urf.Number</code></dt>
 				<dd>
-					<p>Integer and real number resources may be identified by their lexical forms surrounded by matching number signs (<code>&apos;#&apos;</code>). The specific type of number resource yielded depends on the lexical form used. For example, the following short representations,</p>
+					<p>Integer and rational number resources may be identified by their lexical forms surrounded by matching number signs (<code>&apos;#&apos;</code>). The specific type of number resource yielded depends on the lexical form used. For example, the following short representations,</p>
 					<blockquote>
 						<pre><code>#123#
 #123.45#</code></pre>
@@ -417,12 +417,12 @@
 					<p>are equivalent to the following long representations, respectively,</p>
 					<blockquote>
 						<pre><code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Integer/%22123%22»
-«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Real/%22123.45%22»</code></pre>
+«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Rational/%22123.45%22»</code></pre>
 					</blockquote>
 					<p>which are also equivalent to the following general short representations for resources in an inline namespace, respectively:</p>
 					<blockquote>
 						<pre><code>«*urf.Integer(&quot;123&quot;)»
-«*urf.Real(&quot;123.45&quot;)»</code></pre>
+«*urf.Rational(&quot;123.45&quot;)»</code></pre>
 					</blockquote>
 				</dd> <dt><code>urf.Ordinal</code></dt>
 				<dd>
@@ -641,7 +641,7 @@
 	<dl> <dt>URF</dt>
 		<dd>
 			<p>URF provides inherent support for describing how to instantiate objects from programming languages such as Java. When an ontology of a semantic framework such as URF is used to represent programming language objects, the ontology is referred to as a Programming Language Ontology for Objects and Properties, or <a href="#ploop">PLOOP</a>. A class can be identified as an object&apos;s type using a URI that identifies the type, such as <code>«java:/com/example/package/ExampleClass»</code> for the Java class <code>com.example.package.ExampleClass</code>. The <code>urf.List</code> value of the selector property <code>urf.selector</code> specifies the resources to be used for object initialization using a constructor with parameters matching the given values.</p>
-			<p>URF properties specify programming language properties, which may be virtual properties using &quot;getter&quot; and &quot;setter&quot; methods such as with JavaBeans. Programming languages usually have properties relative to each class rather than absolute for all classes. For example, the Java property represented by the JavaBean method <code>com.example.package.ExampleClass.setProperty(java.lang.String)</code> would be represented by an URF property with the URI <code>«java:/com/example/package/ExampleClass#property»</code>. Some values may be language-specific; Java, for example, provides a global <code>null</code> value represented in URF by <code>«java:null»</code>.</p>
+			<p>URF properties specify programming language properties, which may be virtual properties using &quot;getter&quot; and &quot;setter&quot; methods such as with JavaBeans. Programming languages usually have properties relative to each class rather than absolute for all classes. URF uses properties in the default namespace to represent these relative properties. For example, the Java property represented by the JavaBean method <code>com.example.package.ExampleClass.setProperty(java.lang.String)</code> would be represented by an URF property with the URI <code>«http://urf.name/default/property»</code>. Some values may be language-specific; Java, for example, provides a global <code>null</code> value represented in URF by <code>«java:null»</code>.</p>
 		</dd> <dt>TURF</dt>
 		<dd>
 			<p>The TURF selector shorthand notation specifies constructor arguments for a class instance if a non-default constructor is desired. The class <code>com.guiseframework.Category</code> of the Guise Internet application framework [<a href="#guise">Guise</a>], for example, does not have a default constructor. The following example provides an <code>urf.selector</code> <code>urf.List</code> property containing a single element of type <code>urf.String</code>, which can be converted to a <code>java.lang.String</code> object and used as arguments for the <code>com.guiseframework.Category(java.lang.String,       java.lang.String)</code> constructor. Properties of that class will then be set, recursively converting values such as <code>urf.List</code> to the equivalent Java object such as <code>java.util.List</code>.</p>
@@ -849,7 +849,7 @@
 	<blockquote>
 		<p><code><var>reference</var> ⇒ <var>urireference</var> <strong>|</strong> <var>namereference</var> <strong>|</strong> <var>urishort</var> <strong>|</strong> <var>stringshort</var> <strong>|</strong> <var>charactershort</var> <strong>|</strong> <var>booleanshort</var> <strong>|</strong> <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var> <strong>|</strong> <var>regexshort</var> <strong>|</strong> <var>temporalshort</var></code></p>
 	</blockquote>
-	<p>A resource URI reference is enclosed in angle quotes. The contents is either the text of a URI (or relative reference); or a resource reference to an inline type preceded by an asterisk <code>&apos;*&apos;</code>, immediately followed by a string containing the lexical representation of a resource, surrounded by parentheses <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code>. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI reference that includes a lexical representation is equivalent to a URI reference in the form <code>«http://urf.name/inline/<var>encodedTypeURI</var>#<var>encodedTURFLexicalForm</var></code>».</p>
+	<p>A resource URI reference is enclosed in angle quotes. The contents is either the text of a URI (or relative reference); or a resource reference to an inline type preceded by an asterisk <code>&apos;*&apos;</code>, immediately followed by a string containing the lexical representation of a resource, surrounded by parentheses <code>&apos;(&apos;</code> and <code>&apos;)&apos;</code>. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI reference that includes a lexical representation is equivalent to a URI reference in the form <code>«http://urf.name/inline/<var>encodedTypeURI</var>/<var>encodedTURFLexicalForm</var></code>».</p>
 	<blockquote>
 		<p><code><var>urireference</var> ⇒       «<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong> <strong>|</strong> <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>»</code></p>
 	</blockquote>
@@ -911,7 +911,7 @@
 	<blockquote>
 		<p><code><var>booleanshort</var> ⇒       _true_<strong>|</strong>_false_</code></p>
 	</blockquote>
-	<p>A number short form consists of Roman digits, optionally preceded by a minus sign, with an optional decimal and optional exponent, all surrounded by matching number signs <code>&apos;#&apos;</code>. A number short form is equivalent to a resource of type <code>urf.Integer</code> or <code>urf.Real</code>, depending on the lexical form used, using the corresponding inline namespace. The number short form <code>#123#</code> is the equivalent of the number resource <code>«(urf.Integer)&quot;123&quot;»</code>, and the number short form <code>#123.45#</code> is the equivalent of the number resource <code>«(urf.Real)&quot;123.45&quot;»</code>.</p>
+	<p>A number short form consists of Roman digits, optionally preceded by a minus sign, with an optional decimal and optional exponent, all surrounded by matching number signs <code>&apos;#&apos;</code>. A number short form is equivalent to a resource of type <code>urf.Integer</code> or <code>urf.Rational</code>, depending on the lexical form used, using the corresponding inline namespace. The number short form <code>#123#</code> is the equivalent of the number resource <code>«(urf.Integer)&quot;123&quot;»</code>, and the number short form <code>#123.45#</code> is the equivalent of the number resource <code>«(urf.Rational)&quot;123.45&quot;»</code>.</p>
 	<blockquote>
 		<p><code><var>numbershort</var> ⇒       #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong>#</code></p>
 	</blockquote>
@@ -1341,9 +1341,9 @@ END:vCard</code></pre>
 		<li>Any URF resource may be identified by a URI. JSON makes no provision for identifying resources.</li>
 		<li>URF allows globally consistent semantic properties by identifying resources with URIs. JSON properties names are local and may clash with semantically distinct property names among resources.</li>
 		<li>URF provides a system for grouping resources within a common namespace, with the management of control for those namespaces facilitated by the Internet domain name system. JSON properties cannot be so aportioned, making name clashes more likely.</li>
-		<li>URF has a set type, <code>«http://urf.name/urf#Set»</code>. JSON has no set type.</li>
-		<li>URF has three concrete number types, <code>«http://urf.name/urf#Real»</code>, <code>«http://urf.name/urf#Integer»</code>, and <code>«http://urf.name/urf#Real»</code>. JSON has only a single number type.</li>
-		<li>URF has a character type, <code>«http://urf.name/urf#Character»</code>. JSON has no character type.</li>
+		<li>URF has a set type, <code>«http://urf.name/urf/Set»</code>. JSON has no set type.</li>
+		<li>URF has three concrete number types, <code>«http://urf.name/urf/Rational»</code>, <code>«http://urf.name/urf/Integer»</code>, and <code>«http://urf.name/urf/Ordinal»</code>. JSON has only a single number type.</li>
+		<li>URF has a character type, <code>«http://urf.name/urf/Character»</code>. JSON has no character type.</li>
 		<li>URF has several date/time types which are compatible with [<a href="#iso8601">ISO 8601</a>], [<a href="#rfc3339">RFC 3339</a>], and [<a href="#rfc2445">RFC 2445</a>]. JSON has no date or time type.</li>
 	</ul>
 	<h3>Differences between URF and RDF</h3>
@@ -1352,9 +1352,9 @@ END:vCard</code></pre>
 		<li>URF considers all resources equal, providing for consistent identification and property designation of every resource. RDF considers certain resources, such as numbers and strings, to be of special <dfn>literal</dfn> resource types which are not identified by URIs (in contrast to all other non-literal resources) and to which properties cannot be given.</li>
 		<li>URF provides a facility for declaring the order of properties. RDF has no such facility.</li>
 		<li>URF provides for contextual properties. RDF has no such concept.</li>
-		<li>URF has a character type, <code>«http://urf.name/urf#Character»</code>. RDF, which uses XML Schema datatypes [<a href="#xmlSchema2">XML Schema 2</a>], has no character type.</li>
-		<li>URF has a regular expression type, <code>«http://urf.name/urf#RegularExpression»</code>. RDF has no regular expression type.</li>
-		<li>URF has an enumerated type, <code>«http://urf.name/urf#Enum»</code>, as well as a facility for declaring enumerated values. RDF has no dedicated enumerated type. The RDF <dfn>typed literal</dfn> may be used to mimic enumerated types, but RDF provides no built-in facility for creating a new enumerated type or declaring its values.</li>
+		<li>URF has a character type, <code>«http://urf.name/urf/Character»</code>. RDF, which uses XML Schema datatypes [<a href="#xmlSchema2">XML Schema 2</a>], has no character type.</li>
+		<li>URF has a regular expression type, <code>«http://urf.name/urf/RegularExpression»</code>. RDF has no regular expression type.</li>
+		<li>URF has an enumerated type, <code>«http://urf.name/urf/Enum»</code>, as well as a facility for declaring enumerated values. RDF has no dedicated enumerated type. The RDF <dfn>typed literal</dfn> may be used to mimic enumerated types, but RDF provides no built-in facility for creating a new enumerated type or declaring its values.</li>
 		<li>URF allows a knowledge community to be named and described. RDF does not provide such a &quot;named graph&quot; facility.</li>
 	</ul>
 	<h3>Differences between URF and XML</h3>
@@ -1397,6 +1397,7 @@ END:vCard</code></pre>
 			<ul>
 				<li>Change namespace URI rules to only allow namespace URIs that are collection URIs.</li>
 				<li>Renamed &quot;lexical namespace/URI&quot; to &quot;inline namespace/URI&quot; and improved the corresponding semantics.</li>
+				<li>Renamed <code>urf.Real</code> to <code>urf.Rational</code>.</li>
 			</ul>
 		</dd>
 	</dl>
