@@ -13,16 +13,16 @@
 	<h1>Simple URF (SURF) Specification</h1>
 	<h2>Introduction</h2>
 	<p><em>This section is non-normative.</em></p>
-	<p>SURF is a compact, text-based, human-readable persistence format. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with TURF) of the Uniform Resource Format (URF), it is compatible with rigorous semantic frameworks such as the Resource Description Framework (RDF).</p>
+	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it is compatible with rigorous semantic frameworks such as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
 	<h3>Design Constraints</h3>
 	<p>The following considerations were used to guide the creation of this specification:</p>
 	<ul>
-		<li>SURF must support the Unicode character set for text values.</li>
-		<li>SURF should support the Unicode character set for identifiers and comments.</li>
-		<li>SURF must use only ASCII characters for delimiters.</li>
-		<li>All valid SURF documents must also be valid TURF documents, with the exception of introductory elements.</li>
-		<li>SURF must allow for distinctions among vocabularies of identifiers.</li>
-		<li>SURF must not require users to declare namespace URIs.</li>
+		<li>SURF <span class="spec-must">must</span> support the Unicode character set for text values.</li>
+		<li>SURF <span class="spec-should">should</span> support the Unicode character set for identifiers and comments.</li>
+		<li>SURF <span class="spec-must">must</span> use only ASCII characters for delimiters.</li>
+		<li>All valid SURF document body content <span class="spec-must">must</span> also be valid TURF document body content.</li>
+		<li>SURF <span class="spec-must">must</span> allow for distinctions among vocabularies of identifiers.</li>
+		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
 	<footer><small>Copyright © 2016 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2016-08-27.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
