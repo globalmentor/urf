@@ -1,6 +1,0 @@
-~URF$
-	*
-.Everything after the terminator should be ignored,
-including multiple lines.
-
-This line will be ignored as well.
