@@ -12,9 +12,9 @@
 <body>
 	<h1>Simple URF (SURF) Specification</h1>
 	<h2>Introduction</h2>
-	<p><em>This section is non-normative.</em></p>
-	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it is compatible with rigorous semantic frameworks such as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
+	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format for a directed graph of data values. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it is compatible with rigorous semantic frameworks such as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
 	<h3>Design Constraints</h3>
+	<p><em>This section is non-normative.</em></p>
 	<p>The following considerations were used to guide the creation of this specification:</p>
 	<ul>
 		<li>SURF <span class="spec-must">must</span> support the Unicode character set for text values.</li>
@@ -24,6 +24,23 @@
 		<li>SURF <span class="spec-must">must</span> allow for distinctions among vocabularies of identifiers.</li>
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
+	<h3>Conventions Used in this Document</h3>
+	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>.</p>
+	<h2>Internet Media Type</h2>
+	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. Implementations <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding. TODO mention newlines</p>
+	<h2>Structure</h2>
+	<p>SURF content consists of a series of tokens, separated into two sections: a <dfn>signature</dfn> and a <dfn>body</dfn>.</p>
+	<h3>Signature</h3>
+	<p>A SURF document <span class="spec-must">must</span> begin with the SURF signature consisting of the characters <code>~URF</code> (<code class="unicode">U+007E</code>, <code class="unicode">U+0055</code>, <code class="unicode">U+0052</code>, <code class="unicode">U+0046</code>).</p>
+	<h2>References</h2>
+	<dl>
+		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed, Innosoft, N. Borenstein. IETF.</dd>
+		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner, Harvard University. IETF.</dd>
+		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
+	</dl>
 	<footer><small>Copyright © 2016 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2016-08-27.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
