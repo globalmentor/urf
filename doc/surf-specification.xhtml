@@ -26,12 +26,71 @@
 	</ul>
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>.</p>
+	<p>TODO explain SURF processor vs generator</p>
 	<h2>Internet Media Type</h2>
-	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. Implementations <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding. TODO mention newlines</p>
+	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF processors <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
 	<h2>Structure</h2>
 	<p>SURF content consists of a series of tokens, separated into two sections: a <dfn>signature</dfn> and a <dfn>body</dfn>.</p>
 	<h3>Signature</h3>
 	<p>A SURF document <span class="spec-must">must</span> begin with the SURF signature consisting of the characters <code>~URF</code> (<code class="unicode">U+007E</code>, <code class="unicode">U+0055</code>, <code class="unicode">U+0052</code>, <code class="unicode">U+0046</code>).</p>
+	<h3>Body</h3>
+	<p>The body of a SURF document must begin with the dollar sign character <code>$</code> (<code class="unicode">U+0024</code>). The content of the body encodes a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph.</p>
+	<h3>Line Endings</h3>
+	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code> and the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code> as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<p>TODO add ABNF for eol</p>
+	<h3>Filler</h3> <p>Any two SURF tokens <span class="spec-may">may</span> be separated by <dfn>filler</dfn>: one or more POSIX whitespace characters; or line comment, which begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
+	<figure>
+		<ul class="spec-rule">
+			<li><code class="name">filler</code> ⇒ <code class="name">posix_whitespace</code> | <code class="name">line_comment</code></li>
+			<li><code class="name">posix_whitespace</code> ⇒ TODO</li>
+			<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]* <code class="name">eol</code></li>
+		</ul>
+	</figure>
+	<p class="name">Between elements in a list, filler has a caveat: <code>eol</code> functions as a <dfn>list separator</dfn>, which is at least one <code>eol</code> and/or at most a single <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>), optionally surrounded by other filler characters:</p>
+	<figure>
+		<ul class="spec-rule">
+			<li><code class="name">list_separator</code> ⇒ <code class="name">eol</code>+ | ","</li>
+		</ul>
+		<code></code> </figure>
+	<p> TODO fix list_separator regex</p>
+	<h3>Names</h3>
+	<figure class="far side">
+		<figcaption>Example SURF names.</figcaption>
+		<ul>
+			<li><code class="language-surf">foo</code></li>
+			<li><code class="language-surf">fooBar</code></li>
+			<li><code class="language-surf">foo_bar</code></li>
+			<li><code class="language-surf">touché</code></li>
+			<li><code class="language-surf">काम</code></li>
+			<li><code class="language-surf">chem-salt</code></li>
+			<li><code class="language-surf">crypto-salt</code></li>
+			<li><code class="language-surf">User</code></li>
+			<li><code class="language-surf">chem-Molecule</code></li>
+		</ul>
+	</figure>
+	<p>A <dfn>name</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category, or the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>).</p>
+	<ul class="spec-rule">
+		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code> | '-')*</li>
+	</ul>
+	<h2>Resources</h2>
+	<p>The body of a SURF document <span class="spec-must">must</span> contain a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
+	<ul class="spec-rule">
+		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">resource_description</code> | <code class="name">list</code> | <code class="name">set</code> | <code class="name">map</code> | <code class="name">table</code> | <code class="name">iri</code> | <code class="name">string</code> | <code class="name">number</code> | <code class="name">boolean</code> | <code class="name">temporal</code> | <code class="name">regex</code> | <code class="name">binary</code></li>
+	</ul>
+	<h3>Labels</h3>
+	<p> A label consists of an identifier surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>).</p>
+	<ul class="spec-rule">
+		<li><code class="name"> label</code> ⇒ '|' <code class="name">name</code> '|'</li>
+	</ul>
+	<p>The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation.</p>
+	<h3>Resource Descriptions</h3>
+	<ul class="spec-rule">
+		<li><code class="name">resource_description</code> ⇒ '*' [<code class="name">type</code>] <code class="name">properties</code></li>
+		<li><code class="name"> type</code> ⇒ <code class="name">name</code></li>
+		<li>TODO properties</li>
+	</ul>
+	<p>TODO: An <code class="name">eol</code> must not appear between a type and its properties. </p>
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
@@ -41,7 +100,7 @@
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
 	</dl>
-	<footer><small>Copyright © 2016 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2016-08-27.</small></footer>
+	<footer><small>Copyright © 2016 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2016-10-02.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
