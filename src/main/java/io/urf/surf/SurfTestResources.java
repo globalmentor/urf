@@ -16,6 +16,10 @@
 
 package io.urf.surf;
 
+import static com.globalmentor.collections.Sets.*;
+
+import java.util.Set;
+
 /**
  * Defines available SURF test resources.
  * @author Garret Wilson
@@ -24,5 +28,11 @@ public class SurfTestResources {
 
 	public static final String OK_SIMPLE_SURF_RESOURCE_NAME = "ok-simple.surf";
 	public static final String OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME = "ok-simple-comment.surf";
+	public static final String OK_SIMPLE_COMMENT_WHITESPACE_SURF_RESOURCE_NAME = "ok-simple-comment-whitespace.surf";
+	public static final String OK_SIMPLE_MULTILINE_SURF_RESOURCE_NAME = "ok-simple-multiline.surf";
+	public static final String OK_SIMPLE_NO_EOL_SURF_RESOURCE_NAME = "ok-simple-no-eol.surf";
 
+	/** Names of SURF document resources semantically equivalent to {@value #OK_SIMPLE_SURF_RESOURCE_NAME}. */
+	public static Set<String> OK_SIMPLE_RESOURCE_NAMES = immutableSetOf(OK_SIMPLE_SURF_RESOURCE_NAME, OK_SIMPLE_NO_EOL_SURF_RESOURCE_NAME,
+			OK_SIMPLE_MULTILINE_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_WHITESPACE_SURF_RESOURCE_NAME);
 }
