@@ -32,32 +32,19 @@ import io.urf.surf.SurfTestResources;
  */
 public class SurfParserTest {
 
-	/** @see SurfTestResources#OK_SIMPLE_SURF_RESOURCE_NAME */
+	/** @see SurfTestResources#OK_SIMPLE_RESOURCE_NAMES */
 	@Test
-	public void testOkSimple() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_SIMPLE_SURF_RESOURCE_NAME)) {
-			final SurfDocument document = new SurfParser().parse(inputStream);
-			//TODO assert that the document has no metadata
-			assertThat(document.getDocumentObject().isPresent(), is(true));
-			assertThat(document.getDocumentObject().get(), is(instanceOf(SurfResource.class)));
-			final SurfResource resource = (SurfResource)document.getDocumentObject().get();
-			assertThat(resource.getTypeName().isPresent(), is(false));
-			//TODO assert that the object has no properties
+	public void testOkSimpleResources() throws IOException {
+		for(final String okSimpleResourceName : OK_SIMPLE_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSimpleResourceName)) {
+				final SurfDocument document = new SurfParser().parse(inputStream);
+				//TODO assert that the document has no metadata
+				assertThat(document.getDocumentObject().isPresent(), is(true));
+				assertThat(document.getDocumentObject().get(), is(instanceOf(SurfResource.class)));
+				final SurfResource resource = (SurfResource)document.getDocumentObject().get();
+				assertThat(resource.getTypeName().isPresent(), is(false));
+				//TODO assert that the object has no properties
+			}
 		}
 	}
-
-	/** @see SurfTestResources#OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME */
-	@Test
-	public void testOkSimpleComment() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME)) {
-			final SurfDocument document = new SurfParser().parse(inputStream);
-			//TODO assert that the document has no metadata
-			assertThat(document.getDocumentObject().isPresent(), is(true));
-			assertThat(document.getDocumentObject().get(), is(instanceOf(SurfResource.class)));
-			final SurfResource resource = (SurfResource)document.getDocumentObject().get();
-			assertThat(resource.getTypeName().isPresent(), is(false));
-			//TODO assert that the object has no properties
-		}
-	}
-
 }
