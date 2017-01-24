@@ -47,4 +47,27 @@ public class SurfParserTest {
 			}
 		}
 	}
+
+	/** @see SurfTestResources#OK_SINGLE_BOOLEAN_FALSE */
+	@Test
+	public void testOkSingleBooleanFalse() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_SINGLE_BOOLEAN_FALSE)) {
+			final SurfDocument document = new SurfParser().parse(inputStream);
+			//TODO assert that the document has no metadata
+			assertThat(document.getDocumentObject().isPresent(), is(true));
+			assertThat(document.getDocumentObject().get(), is(Boolean.FALSE));
+		}
+	}
+
+	/** @see SurfTestResources#OK_SINGLE_BOOLEAN_FALSE */
+	@Test
+	public void testOkSingleBooleanTrue() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_SINGLE_BOOLEAN_TRUE)) {
+			final SurfDocument document = new SurfParser().parse(inputStream);
+			//TODO assert that the document has no metadata
+			assertThat(document.getDocumentObject().isPresent(), is(true));
+			assertThat(document.getDocumentObject().get(), is(Boolean.TRUE));
+		}
+	}
+
 }

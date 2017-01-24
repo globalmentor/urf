@@ -103,8 +103,12 @@ public class SurfParser {
 			skipFiller(reader);
 			c = peekEnd(reader); //peek the next character after the label
 		}
-		final SurfResource resource;
+		final Object resource;
 		switch(c) {
+			case BOOLEAN_FALSE_BEGIN:
+			case BOOLEAN_TRUE_BEGIN:
+				resource = parseBoolean(reader);
+				break;
 			case OBJECT_BEGIN:
 				resource = parseObject(reader);
 				break;
@@ -112,6 +116,27 @@ public class SurfParser {
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 		}
 		return resource;
+	}
+
+	/**
+	 * Parses a Boolean value.
+	 * @param document The document being parsed. The next character read is expected to be the start of {@link SURF#BOOLEAN_FALSE} or {@link SURF#BOOLEAN_TRUE}.
+	 * @param reader The reader containing SURF data.
+	 * @throws IOException If there was an error reading the SURF data.
+	 */
+	public Object parseBoolean(@Nonnull final Reader reader) throws IOException {
+		int c = peek(reader); //peek the next character
+		switch(c) { //see what the next character is
+			case BOOLEAN_FALSE_BEGIN: //false
+				check(reader, BOOLEAN_FALSE_LEXICAL_FORM); //make sure this is really false
+				return Boolean.FALSE;
+			case BOOLEAN_TRUE_BEGIN: //true
+				check(reader, BOOLEAN_TRUE_LEXICAL_FORM); //make sure this is really true
+				return Boolean.TRUE;
+			default: //if we don't recognize the start of the boolean lexical form
+				checkReaderNotEnd(reader, c); //make sure we're not at the end of the reader
+				throw new ParseIOException(reader, "Unrecognized start of boolean: " + (char)c);
+		}
 	}
 
 	/**
