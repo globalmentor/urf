@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.urf</groupId>
-	<artifactId>urf-test-resources</artifactId>
+	<artifactId>surf-test</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>URF Test Resources</name>
-	<description>Test resources for the Unified Resource Framework (URF).</description>
+	<name>SURF Test</name>
+	<description>Test documents for the Simple URF (SURF) format.</description>
 	<url>http://urf.io/</url>
 	<inceptionYear>2007</inceptionYear>
 
@@ -35,9 +35,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf-test-resources.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-test-resources.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf-test-resources</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf-surf-test.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-surf-test.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf-surf-test</url>
 	</scm>
 
 	<prerequisites>
