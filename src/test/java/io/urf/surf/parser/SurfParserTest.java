@@ -20,11 +20,11 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import static io.urf.surf.SurfTestResources.*;
+import static io.urf.surf.test.SurfTestResources.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.*;
 
-import io.urf.surf.SurfTestResources;
+import io.urf.surf.test.SurfTestResources;
 
 /**
  * Tests of {@link SurfParser}.
