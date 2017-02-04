@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.surf;
+package io.urf.surf.test;
 
 import static com.globalmentor.collections.Sets.*;
 
