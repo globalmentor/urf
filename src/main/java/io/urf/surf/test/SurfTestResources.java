@@ -36,6 +36,6 @@ public class SurfTestResources {
 	public static Set<String> OK_SIMPLE_RESOURCE_NAMES = immutableSetOf(OK_SIMPLE_SURF_RESOURCE_NAME, OK_SIMPLE_NO_EOL_SURF_RESOURCE_NAME,
 			OK_SIMPLE_MULTILINE_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_WHITESPACE_SURF_RESOURCE_NAME);
 
-	public static final String OK_SINGLE_BOOLEAN_FALSE = "ok-single-boolean-false.surf";
-	public static final String OK_SINGLE_BOOLEAN_TRUE = "ok-single-boolean-true.surf";
+	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
+	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 }
