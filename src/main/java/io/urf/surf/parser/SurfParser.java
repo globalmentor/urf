@@ -40,53 +40,26 @@ public class SurfParser {
 	private final Map<String, SurfResource> labeledResources = new HashMap<>();
 
 	/**
-	 * Parses a SURF document from an input stream.
+	 * Parses an URF resource from an input stream.
 	 * @param inputStream The input stream containing SURF data.
-	 * @return A document representing the SURF data.
+	 * @return The root URF resource, which may be empty if the SURF document was empty.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public SurfDocument parse(@Nonnull final InputStream inputStream) throws IOException {
+	public Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
 		return parse(new LineNumberReader(new InputStreamReader(inputStream, CHARSET)));
 	}
 
 	/**
-	 * Parses a SURF document from a reader.
+	 * Parses an URF resource from a reader.
 	 * @param reader The reader containing SURF data.
-	 * @return A document representing the SURF data.
+	 * @return The root URF resource, which may be empty if the SURF document was empty.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public SurfDocument parse(@Nonnull final Reader reader) throws IOException {
-		check(reader, SIGNATURE); //~URF
-		final SurfDocument document = new SurfDocument();
-		skipFiller(reader);
-		parseBody(document, reader);
-		return document;
-	}
-
-	/**
-	 * Parses the body of a SURF document; that is, the part beginning with <code>$</code>. The next character read is expected to be {@value SURF#BODY_BEGIN}.
-	 * @param document The document being parsed.
-	 * @param reader The reader containing SURF data.
-	 * @throws IOException If there was an error reading the SURF data.
-	 */
-	protected void parseBody(@Nonnull final SurfDocument document, @Nonnull final Reader reader) throws IOException {
-		check(reader, BODY_BEGIN); //$
-		skipFiller(reader);
-		//TODO should we allow an empty body?
-		parseBodyContent(document, reader);
-	}
-
-	/**
-	 * Parses the content of the body of a SURF document; that is, the part after <code>$</code>.
-	 * @param document The document being parsed.
-	 * @param reader The reader containing SURF data.
-	 * @throws IOException If there was an error reading the SURF data.
-	 */
-	public SurfDocument parseBodyContent(@Nonnull final SurfDocument document, @Nonnull final Reader reader) throws IOException {
-		skipFiller(reader);
-		final Object object = parseResource(reader);
-		document.setDocumentObject(object);
-		return document;
+	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException {
+		if(skipFiller(reader) < 0) { //skip filler; if we reached the end of the stream
+			return Optional.empty(); //the SURF document is empty
+		}
+		return Optional.of(parseResource(reader));
 	}
 
 	/**
@@ -97,7 +70,7 @@ public class SurfParser {
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
 		String label = null;
-		int c = peekEnd(reader); //peek the next character
+		int c = peekEnd(reader); //peek the next character TODO change to peek()?
 		if(c == LABEL_BEGIN) {
 			//TODO parse label
 			skipFiller(reader);
