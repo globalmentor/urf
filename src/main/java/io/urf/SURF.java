@@ -35,9 +35,6 @@ public class SURF {
 
 	public static final Charset CHARSET = UTF_8;
 
-	/** The signature of a SURF document. */
-	public static final String SIGNATURE = "~URF";
-
 	/** The delimiter separating segments in a name. */
 	public static final char NAME_SEGMENT_DELIMITER = '-';
 
@@ -45,16 +42,11 @@ public class SURF {
 	public static final Pattern NAME_PATTERN = Pattern.compile("\\p{L}[\\p{L}\\p{M}\\p{N}\\p{Pc}\\-]*"); //TODO fix to prevent two hyphens together
 
 	/** Characters recognized by SURF as whitespace. */
-	public static final Characters WHITESPACE_CHARACTERS = Characters.WHITESPACE_CHARACTERS; //TODO fix; maybe use Posix
-
-	/** The SURF general filler characters. */
-	public static final Characters FILLER_CHARACTERS = WHITESPACE_CHARACTERS.add(PARAGRAPH_SEPARATOR_CHARS).add(SEGMENT_SEPARATOR_CHARS);
+	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
+			SPACE_CHAR, NO_BREAK_SPACE_CHAR, ZERO_WIDTH_NO_BREAK_SPACE_CHAR);
 
 	/** The character indicating the start of a Surf single-line comment. */
 	public static final char COMMENT_BEGIN = '!';
-
-	/** The beginning delimiter of a SURF document body. */
-	public static final char BODY_BEGIN = '$';
 
 	/** The delimiter that begins labels. */
 	public static final char LABEL_BEGIN = '|';
@@ -63,6 +55,20 @@ public class SURF {
 
 	/** The indicator of an object (an anonymous resource instance). */
 	public static final char OBJECT_BEGIN = '*';
+
+	/** The lexical representation of the Boolean value <code>false</code>. */
+	public static final String BOOLEAN_FALSE_LEXICAL_FORM = "false";
+	/** The lexical representation of the Boolean <code>true</code>. */
+	public static final String BOOLEAN_TRUE_LEXICAL_FORM = "true";
+	/** The beginning delimiter of the lexical form of the Boolean value <code>false</code>. */
+	public static final char BOOLEAN_FALSE_BEGIN = 'f';
+	/** The beginning delimiter of the lexical form of the Boolean value <code>true</code>. */
+	public static final char BOOLEAN_TRUE_BEGIN = 't';
+
+	/** The delimiter that begins property declarations. */
+	public static final char PROPERTIES_BEGIN = ':';
+	/** The delimiter that ends property declarations. */
+	public static final char PROPERTIES_END = ';';
 
 	/**
 	 * Determines whether the given string conforms to the rules for a SURF name.
@@ -86,6 +92,35 @@ public class SURF {
 	public static String checkArgumentValidSurfName(final String string) {
 		checkArgument(isValidSurfName(string), "Invalid SURF name \"%s\".", string); //TODO verify JAVA-5
 		return string;
+	}
+
+	/**
+	 * Determines if the given character is a SURF name begin character. A name begin character is a Unicode letter.
+	 * @param c The character to check.
+	 * @return <code>true</code> if the character is a SURF name begin character.
+	 */
+	public static final boolean isSurfNameBeginCharacter(final int c) {
+		return Character.isLetter(c); //see if this is a letter
+	}
+
+	/**
+	 * Determines if the given character is a SURF name character. A name character is a Unicode letter, mark, number, or connector punctuation.
+	 * @param c The character to check.
+	 * @return <code>true</code> if the character is a SURF name character.
+	 */
+	public static final boolean isSurfNameCharacter(final int c) {
+		return (((
+		//letter
+		(1 << Character.UPPERCASE_LETTER) | (1 << Character.LOWERCASE_LETTER) | (1 << Character.TITLECASE_LETTER) | (1 << Character.MODIFIER_LETTER)
+				| (1 << Character.OTHER_LETTER) |
+				//mark
+				(1 << Character.NON_SPACING_MARK) | (1 << Character.COMBINING_SPACING_MARK) | (1 << Character.ENCLOSING_MARK) |
+				//digit
+				(1 << Character.DECIMAL_DIGIT_NUMBER) |
+				//connector punctuation
+				(1 << Character.CONNECTOR_PUNCTUATION)) >> Character.getType(c)) & 1) != 0
+				//hyphen-minus
+				|| c == HYPHEN_MINUS_CHAR;
 	}
 
 }
