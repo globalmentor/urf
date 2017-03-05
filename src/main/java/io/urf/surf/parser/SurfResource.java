@@ -17,8 +17,9 @@
 package io.urf.surf.parser;
 
 import static io.urf.SURF.*;
+import static java.util.Objects.*;
 
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
 
@@ -34,6 +35,23 @@ public class SurfResource implements SimpleUrfResource {
 	@Override
 	public Optional<String> getTypeName() {
 		return Optional.ofNullable(typeName);
+	}
+
+	private final Map<String, Object> properties = new HashMap<>();
+
+	@Override
+	public int getPropertyCount() {
+		return properties.size();
+	}
+
+	@Override
+	public Optional<Object> getPropertyValue(final String propertyName) {
+		return Optional.ofNullable(properties.get(requireNonNull(propertyName)));
+	}
+
+	@Override
+	public Optional<Object> setPropertyValue(final String propertyName, final Object value) {
+		return Optional.ofNullable(properties.put(requireNonNull(propertyName), requireNonNull(value)));
 	}
 
 	/** Constructor of a resource with an unknown type. */

@@ -16,7 +16,9 @@
 
 package io.urf.surf.parser;
 
-import java.util.Optional;
+import java.util.*;
+
+import javax.annotation.*;
 
 /**
  * Simple access to an URF resource description.
@@ -27,4 +29,33 @@ public interface SimpleUrfResource { //TODO probably transfer to model package
 	/** @return The name of the resource type if known. */
 	public Optional<String> getTypeName();
 
+	/** @return The number of properties this resource has. */
+	public int getPropertyCount();
+
+	/**
+	 * Retrieves the value of a property by the property name.
+	 * 
+	 * @param propertyName The name of the property.
+	 * @return The value of the property, if any.
+	 */
+	public Optional<Object> getPropertyValue(@Nonnull String propertyName);
+
+	/**
+	 * Sets a property value by the property name.
+	 * 
+	 * @param propertyName The name of the property.
+	 * @param value The new value of the property.
+	 * @return The previous value of the property, if any.
+	 */
+	public Optional<Object> setPropertyValue(@Nonnull String propertyName, @Nonnull Object value);
+
+	/**
+	 * Sets property values from a map of property names and values. Neither <code>null</code> property names nor <code>null</code> property values are allowed.
+	 * 
+	 * @param properties The map of properties and values.
+	 * @throws NullPointerException if one or more of the given property names or values is <code>null</code>.
+	 */
+	public default void setPropertyValues(@Nonnull final Map<String, ?> properties) {
+		properties.forEach(this::setPropertyValue);
+	}
 }
