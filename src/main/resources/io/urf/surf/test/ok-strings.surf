@@ -1,0 +1,13 @@
+*:
+	foo = "bar"
+	quote = "\""
+	backslash = "\\"
+	solidus = "\/"
+	backspace = "\b"
+	ff = "\f"
+	lf = "\n"
+	cr = "\r"
+	tab = "\t"
+	devanagari-ma = "\u092e" !tests lowercase hex
+	tearsOfJoy = "\u1F602" !code point outside BMP; also tests uppercase hex
+;
