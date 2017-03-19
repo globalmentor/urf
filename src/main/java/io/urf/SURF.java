@@ -45,8 +45,14 @@ public class SURF {
 	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
 			SPACE_CHAR, NO_BREAK_SPACE_CHAR, ZERO_WIDTH_NO_BREAK_SPACE_CHAR);
 
+	/** The character that separates items in a sequence. */
+	public static final char SEQUENCE_DELIMITER = ',';
+
+	/** The SURF sequence separator characters, including the {@link #SEQUENCE_DELIMITER} and the EOL characters. */
+	public static final Characters SEQUENCE_SEPARATOR_CHARACTERS = EOL_CHARACTERS.add(SEQUENCE_DELIMITER);
+
 	/** The character indicating the start of a Surf single-line comment. */
-	public static final char COMMENT_BEGIN = '!';
+	public static final char LINE_COMMENT_BEGIN = '!';
 
 	/** The delimiter that begins labels. */
 	public static final char LABEL_BEGIN = '|';
@@ -70,6 +76,24 @@ public class SURF {
 	/** The delimiter that ends property declarations. */
 	public static final char PROPERTIES_END = ';';
 
+	/** The character that separates properties and assigned values. */
+	public static final char PROPERTY_VALUE_DELIMITER = '=';
+
+	/** The delimiter that begins string shorthand declarations. */
+	public static final char STRING_BEGIN = '"';
+	/** The delimiter that ends string shorthand declarations. */
+	public static final char STRING_END = STRING_BEGIN;
+	/** The character used for escaping characters in a string. */
+	public static final char STRING_ESCAPE = '\\';
+	//escaped forms of characters
+	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
+	public static final char ESCAPED_FORM_FEED = 'f'; //f form feed
+	public static final char ESCAPED_LINE_FEED = 'n'; //n line feed
+	public static final char ESCAPED_CARRIAGE_RETURN = 'r'; //r carriage return
+	public static final char ESCAPED_TAB = 't'; //t tab
+	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
+	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
+
 	/**
 	 * Determines whether the given string conforms to the rules for a SURF name.
 	 * @param string The string to test.
@@ -90,7 +114,7 @@ public class SURF {
 	 * @see #NAME_PATTERN
 	 */
 	public static String checkArgumentValidSurfName(final String string) {
-		checkArgument(isValidSurfName(string), "Invalid SURF name \"%s\".", string); //TODO verify JAVA-5
+		checkArgument(isValidSurfName(string), "Invalid SURF name \"%s\".", string);
 		return string;
 	}
 
