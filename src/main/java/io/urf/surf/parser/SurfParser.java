@@ -19,6 +19,7 @@ package io.urf.surf.parser;
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static io.urf.SURF.*;
+import static io.urf.SURF.WHITESPACE_CHARACTERS;
 
 import java.io.*;
 import java.util.*;
@@ -26,6 +27,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.io.ParseIOException;
+import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.java.Characters;
 
 import io.urf.SURF;
@@ -56,7 +58,7 @@ public class SurfParser {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException {
-		if(skipFiller(reader) < 0) { //skip filler; if we reached the end of the stream
+		if(skipWhitespaceLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
 			return Optional.empty(); //the SURF document is empty
 		}
 		return Optional.of(parseResource(reader));
@@ -102,8 +104,7 @@ public class SurfParser {
 		int c = peekEnd(reader); //peek the next character
 		if(c == LABEL_BEGIN) {
 			//TODO parse label
-			skipFiller(reader);
-			c = peekEnd(reader); //peek the next character after the label
+			c = skipWhitespace(reader);
 		}
 		final Object resource;
 		switch(c) {
@@ -152,12 +153,12 @@ public class SurfParser {
 	 */
 	public SurfResource parseObject(@Nonnull final Reader reader) throws IOException {
 		check(reader, OBJECT_BEGIN); //*
-		int c = skipNonListSeparatorFiller(reader);
+		int c = skipWhitespace(reader);
 		//type (optional)
 		final String typeName;
 		if(c >= 0 && c != PROPERTIES_BEGIN && !EOL_CHARACTERS.contains((char)c)) { //if there is something before properties, it must be a type
 			typeName = parseName(reader);
-			c = skipNonListSeparatorFiller(reader);
+			c = skipWhitespace(reader);
 		} else {
 			typeName = null;
 		}
@@ -165,20 +166,49 @@ public class SurfParser {
 		//properties (optional)
 		if(c == PROPERTIES_BEGIN) {
 			check(reader, PROPERTIES_BEGIN); //:
-			c = skipFiller(reader);
-			if(c != PROPERTIES_END) { //if this is not an empty properties section
-				do {
-					final String propertyName = parseName(reader);
-					skipFiller(reader);
-					check(reader, PROPERTY_VALUE_DELIMITER); //=
-					skipFiller(reader);
-					final Object value = parseResource(reader);
-					resource.setPropertyValue(propertyName, value);
-				} while(skipListSeparators(reader, PROPERTIES_END) == LIST_DELIMITER); //skip list separators and see if there should be another list item
-			}
+			parseSequence(reader, PROPERTIES_END, nextChar -> {
+				final String propertyName = parseName(reader);
+				skipWhitespaceLineBreaks(reader);
+				check(reader, PROPERTY_VALUE_DELIMITER); //=
+				skipWhitespaceLineBreaks(reader);
+				final Object value = parseResource(reader);
+				resource.setPropertyValue(propertyName, value);
+			});
 			check(reader, PROPERTIES_END); //;
 		}
 		return resource;
+	}
+
+	/**
+	 * Skips over SURF filler and list separators in a reader. This method skips all filler characters {@link SURF#FILLER_CHARACTERS}, the list delimiter
+	 * character {@link SURF#SEQUENCE_DELIMITER}, as well as any comments. The new position will either be the that of the first non-list separator character or
+	 * the end of the input stream.
+	 * <p>
+	 * If the returned character is {@link SURF#SEQUENCE_DELIMITER}, it indicates that the list delimiter or one or more EOL characters was encountered and, if an
+	 * EOL character was encountered, the next character is not the end of the list; there will be no indication of the next character in the reader. Otherwise,
+	 * the next character that will be returned from the reader will be given.
+	 * </p>
+	 * @param reader The reader the contents of which to be parsed.
+	 * @param sequenceEnd The character expected to end the list.
+	 * @return The next character that will be returned by the reader's {@link Reader#read()} operation; or {@link SURF#SEQUENCE_DELIMITER} if a list separator
+	 *         (the list delimiter or an EOL character) was encountered; or <code>-1</code> if the end of the reader has been reached without encountering a list
+	 *         separator or non-separator character.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 */
+	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Integer> itemParser) throws IOException {
+		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty sequence is possible)
+		int c = skipWhitespaceLineBreaks(reader);
+		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
+			itemParser.accept(c); //parse the item
+			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
+			c = peek(reader); //we'll need to know the next character whatever the case
+			if(!requireItem.isPresent()) { //if there was no item delimiter at all
+				break; //no possibility for a new item
+			}
+			nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
+		}
+		return c;
 	}
 
 	/**
@@ -259,84 +289,71 @@ public class SurfParser {
 	}
 
 	/**
-	 * Skips over SURF fillers in a reader. This method skips all filler characters {@link SURF#FILLER_CHARACTERS as well as any comments. The new position will
-	 * either be the that of the first non-filler character or the end of the input stream.
+	 * Skips over SURF whitespace in a reader. Line comments will be ignored and skipped as well. The new position will either be the that of the first
+	 * non-whitespace character or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipFiller(final Reader reader) throws IOException {
-		int c; //we'll store the next non-filler character here so that it can be returned
-		while((c = skip(reader, FILLER_CHARACTERS)) == COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
-			check(reader, COMMENT_BEGIN); //read the beginning comment delimiter
-			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all filler characters and see if another comment starts
+	protected static int skipWhitespace(final Reader reader) throws IOException {
+		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
+		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
+			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
+			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line or the end of the stream; no need to read more, because EOL characters are not whitespace
+			c = peekEnd(reader); //see what the next character will be so we can return it			
 		}
-		return c; //return the last character read
+		return c; //return the next character to be character read
 	}
 
 	/**
-	 * Skips over SURF non-list-separator fillers in a reader. This method skips all non-list-separator filler characters
-	 * {@link SURF#NON_LIST_SEPARATOR_FILLER_CHARACTERS}, as well as any comments. The new position will either be the that of the first character that is not a
-	 * list separator or a filler character, or the end of the input stream.
+	 * Characters that indicate the start of filler or the end of a line. This includes {@link SURF#WHITESPACE_CHARACTERS}, the start of a line comment
+	 * {@link SURF#LINE_COMMENT_BEGIN}, and {@link Characters#EOL_CHARACTERS}.
+	 */
+	public static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
+
+	/**
+	 * Skips over SURF line breaks in a reader. Whitespace will be ignored and skipped as well. The new position will either be the that of the first
+	 * non-whitespace and non-EOL character; or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipNonListSeparatorFiller(final Reader reader) throws IOException {
-		int c; //we'll store the next non-filler character here so that it can be returned
-		if((c = skip(reader, NON_LIST_SEPARATOR_FILLER_CHARACTERS)) == COMMENT_BEGIN) { //skip all non-list-separator fillers; if the start of a comment was encountered
-			check(reader, COMMENT_BEGIN); //read the beginning comment delimiter
-			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line; no need to read more, because EOL characters are not non-list-separator filler
-			c = peekEnd(reader); //see what the next character will be so we can return it
+	protected static int skipWhitespaceLineBreaks(final Reader reader) throws IOException {
+		int c; //we'll store the next non-line-break-filler character here so that it can be returned
+		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
+			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
+			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
 		}
 		return c; //return the last character read
 	}
 
 	/**
-	 * Skips over SURF filler and list separators in a reader. This method skips all filler characters {@link SURF#FILLER_CHARACTERS}, the list delimiter
-	 * character {@link SURF#LIST_DELIMITER}, as well as any comments. The new position will either be the that of the first non-list separator character or the
-	 * end of the input stream.
-	 * <p>
-	 * If the returned character is {@link SURF#LIST_DELIMITER}, it indicates that the list delimiter or one or more EOL characters was encountered and, if an EOL
-	 * character was encountered, the next character is not the end of the list; there will be no indication of the next character in the reader. Otherwise, the
-	 * next character that will be returned from the reader will be given.
-	 * </p>
+	 * Skips over SURF sequence delimiters in a reader. Whitespace and comments. The new position will either be the that of the first non-whitespace and non-EOL
+	 * character; or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @param listEnd The character expected to end the list.
-	 * @return The next character that will be returned by the reader's {@link Reader#read()} operation; or {@link SURF#LIST_DELIMITER} if a list separator (the
-	 *         list delimiter or an EOL character) was encountered; or <code>-1</code> if the end of the reader has been reached without encountering a list
-	 *         separator or non-separator character.
+	 * @return {@link Boolean#TRUE} if a line delimiter was encountered that requires a following item, {@link Boolean#FALSE} if a line delimiter was encountered
+	 *         for which a following item is optional, or {@link Optional#empty()} if no line ending was encountered.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipListSeparators(final Reader reader, final char listEnd) throws IOException {
-		boolean foundListDelimiter = false;
-		boolean foundEOL = false;
-		int c;
-		while((c = skip(reader, NON_LIST_SEPARATOR_FILLER_CHARACTERS)) >= 0) { //while the end of the data has not been reached, skip fillers that do not delimit lists, and peek the next character
-			if(c == LIST_DELIMITER) { //there can be one list delimiter character
-				checkParseIO(reader, !foundListDelimiter, "Duplicate list delimiter: %s", LIST_DELIMITER);
-				//TODO delete if not appropriate				checkParseIO(reader, !foundEOL, "The list delimiter %s and EOL characters cannot both be used to delimit two list items.", LIST_DELIMITER);
-				foundListDelimiter = true;
-				check(reader, (char)c); //skip the character
-			} else if(EOL_CHARACTERS.contains((char)c)) { //there may be multiple newline characters
-				//TODO delete if not appropriate				checkParseIO(reader, !foundListDelimiter, "The list delimiter %s and EOL characters cannot both be used to delimit two list items.", LIST_DELIMITER);
-				foundEOL = true;
-				check(reader, (char)c); //skip the character
-			} else if(c == COMMENT_BEGIN) { //if the start of a comment was encountered
-				check(reader, COMMENT_BEGIN); //read the beginning comment delimiter
-				reachEnd(reader, EOL_CHARACTERS); //skip past the end of the comment; we'll then skip all separator characters and see if another comment starts
-			} else { //if any other character was found, we've reached the end of the list
-				break; //stop parsing the list separators
+	protected static Optional<Boolean> skipSequenceDelimiters(final Reader reader) throws IOException {
+		int c = skipWhitespace(reader); //skip whitespace (and comments)
+		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
+			return Optional.empty();
+		}
+		boolean requireItem = false;
+		do {
+			if(c == COMMA_CHAR) { //if we found a comma
+				requireItem = true; //note we found a comma
+				check(reader, COMMA_CHAR); //skip the comma
 			}
-		}
-		return foundListDelimiter //if we found the list delimiter, we'll return it
-				|| (foundEOL && c != listEnd) //a newline will also be interpreted as a list delimiter---but only if we didn't encounter the end-of-list character
-						? LIST_DELIMITER : c; //return the list delimiter of a list separator was found, or the next character (which may indicate the end of the data)
+			c = skipWhitespaceLineBreaks(reader); //skip any newlines
+		} while(!requireItem && c >= 0 && SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c));
+		return Optional.of(requireItem);
 	}
 
 }
