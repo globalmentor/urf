@@ -112,6 +112,9 @@ public class SurfParser {
 			case BOOLEAN_TRUE_BEGIN:
 				resource = parseBoolean(reader);
 				break;
+			case LIST_BEGIN:
+				resource = parseList(reader);
+				break;
 			case OBJECT_BEGIN:
 				resource = parseObject(reader);
 				break;
@@ -166,7 +169,7 @@ public class SurfParser {
 		//properties (optional)
 		if(c == PROPERTIES_BEGIN) {
 			check(reader, PROPERTIES_BEGIN); //:
-			parseSequence(reader, PROPERTIES_END, nextChar -> {
+			parseSequence(reader, PROPERTIES_END, r -> {
 				final String propertyName = parseName(reader);
 				skipWhitespaceLineBreaks(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
@@ -180,27 +183,35 @@ public class SurfParser {
 	}
 
 	/**
-	 * Skips over SURF filler and list separators in a reader. This method skips all filler characters {@link SURF#FILLER_CHARACTERS}, the list delimiter
-	 * character {@link SURF#SEQUENCE_DELIMITER}, as well as any comments. The new position will either be the that of the first non-list separator character or
-	 * the end of the input stream.
-	 * <p>
-	 * If the returned character is {@link SURF#SEQUENCE_DELIMITER}, it indicates that the list delimiter or one or more EOL characters was encountered and, if an
-	 * EOL character was encountered, the next character is not the end of the list; there will be no indication of the next character in the reader. Otherwise,
-	 * the next character that will be returned from the reader will be given.
-	 * </p>
-	 * @param reader The reader the contents of which to be parsed.
-	 * @param sequenceEnd The character expected to end the list.
-	 * @return The next character that will be returned by the reader's {@link Reader#read()} operation; or {@link SURF#SEQUENCE_DELIMITER} if a list separator
-	 *         (the list delimiter or an EOL character) was encountered; or <code>-1</code> if the end of the reader has been reached without encountering a list
-	 *         separator or non-separator character.
+	 * Parses an a list. The current position must be for {@value SURF#LIST_BEGIN}. The new position will be that immediately following {@value SURF#LIST_END}.
+	 * @param document The document being parsed.
+	 * @param reader The reader containing SURF data.
+	 * @throws IOException If there was an error reading the SURF data.
+	 */
+	public List<?> parseList(@Nonnull final Reader reader) throws IOException {
+		final List<Object> list = new ArrayList<>();
+		check(reader, LIST_BEGIN); //[
+		parseSequence(reader, LIST_END, r -> list.add(parseResource(r)));
+		check(reader, LIST_END); //]
+		return list;
+	}
+
+	/**
+	 * Parses a general SURF sequence (such as a list). This method skips whitespace, comments, and sequence delimiters. For each sequence item,
+	 * {@link IOConsumer#accept(Object)} is called, passing the {@link Reader}, for the item to be parsed.
+	 * @param reader The reader containing the sequence to parse.
+	 * @param sequenceEnd The character expected to end the sequence.
+	 * @param itemParser The parser strategy, which is passed the {@link Reader} to use for parsing.
+	 * @return The next character that will be returned by the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
+	 *         reached without encountering the end of the sequence.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Integer> itemParser) throws IOException {
+	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Reader> itemParser) throws IOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty sequence is possible)
 		int c = skipWhitespaceLineBreaks(reader);
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
-			itemParser.accept(c); //parse the item
+			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
 			c = peek(reader); //we'll need to know the next character whatever the case
 			if(!requireItem.isPresent()) { //if there was no item delimiter at all

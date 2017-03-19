@@ -19,6 +19,7 @@ package io.urf.surf.parser;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.List;
 import java.util.Optional;
 
 import static io.urf.surf.test.SurfTestResources.*;
@@ -33,7 +34,7 @@ import io.urf.surf.test.SurfTestResources;
  */
 public class SurfParserTest {
 
-	//objects
+	//simple files
 
 	/** @see SurfTestResources#OK_SIMPLE_RESOURCE_NAMES */
 	@Test
@@ -49,6 +50,8 @@ public class SurfParserTest {
 			}
 		}
 	}
+
+	//objects
 
 	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
 	@Test
@@ -103,7 +106,56 @@ public class SurfParserTest {
 		}
 	}
 
+	//lists
+
+	/** @see SurfTestResources#OK_LIST_NO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkListNoItems() throws IOException {
+		for(final String okListNoItemsResourceName : OK_LIST_NO_ITEMS_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListNoItemsResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okListNoItemsResourceName, object.isPresent(), is(true));
+				assertThat(okListNoItemsResourceName, object.get(), is(instanceOf(List.class)));
+				final List<?> list = (List<?>)object.get();
+				assertThat(okListNoItemsResourceName, list, hasSize(0));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_LIST_ONE_ITEM_RESOURCE_NAMES */
+	@Test
+	public void testOkListOneItem() throws IOException {
+		for(final String okListOneItemResourceName : OK_LIST_ONE_ITEM_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListOneItemResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okListOneItemResourceName, object.isPresent(), is(true));
+				assertThat(okListOneItemResourceName, object.get(), is(instanceOf(List.class)));
+				final List<?> list = (List<?>)object.get();
+				assertThat(okListOneItemResourceName, list, hasSize(1));
+				assertThat(okListOneItemResourceName, list.get(0), is("one"));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_LIST_TWO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkListTwoItems() throws IOException {
+		for(final String okListTwoItemsResourceName : OK_LIST_TWO_ITEMS_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListTwoItemsResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okListTwoItemsResourceName, object.isPresent(), is(true));
+				assertThat(okListTwoItemsResourceName, object.get(), is(instanceOf(List.class)));
+				final List<?> list = (List<?>)object.get();
+				assertThat(okListTwoItemsResourceName, list, hasSize(2));
+				assertThat(okListTwoItemsResourceName, list.get(0), is("one"));
+				assertThat(okListTwoItemsResourceName, list.get(1), is("two"));
+			}
+		}
+	}
+
 	//TODO create tests for bad properties, such as double list item separators
+
+	//boolean
 
 	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
 	@Test
@@ -124,6 +176,8 @@ public class SurfParserTest {
 			assertThat(object.get(), is(Boolean.TRUE));
 		}
 	}
+
+	//strings
 
 	/** @see SurfTestResources#OK_STRING_FOOBAR_RESOURCE_NAME */
 	@Test
