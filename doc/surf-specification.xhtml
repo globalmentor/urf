@@ -20,7 +20,8 @@
 		<li>SURF <span class="spec-must">must</span> support the Unicode character set for text values.</li>
 		<li>SURF <span class="spec-should">should</span> support the Unicode character set for identifiers and comments.</li>
 		<li>SURF <span class="spec-must">must</span> use only ASCII characters for delimiters.</li>
-		<li>All valid SURF document body content <span class="spec-must">must</span> also be valid TURF document body content.</li>
+		<li>All valid JSON documents <span class="spec-must">must</span> also be valid SURF documents.</li>
+		<li>All valid SURF documents <span class="spec-must">must</span> also be valid TURF document body content.</li>
 		<li>SURF <span class="spec-must">must</span> allow for distinctions among vocabularies of identifiers.</li>
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
@@ -31,9 +32,6 @@
 	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF processors <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, containing no resources.</p>
-	<h3>Line Endings</h3>
-	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code> and the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code> as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator [TODO define] <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
-	<p>TODO add ABNF for eol</p>
 	<h3>Whitespace</h3>
 	<aside class="note far third">SURF follows the ECMAScript® 2015 definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/6.0/#sec-white-space"><cite>ECMA-262 6<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
@@ -46,21 +44,32 @@
 		<li><code class="name">nbsp</code> ⇒ <code class="unicode">U+00A0</code> <code class="name">NO-BREAK SPACE</code></li>
 		<li><code class="name">zwnbspr</code> ⇒ <code class="unicode">U+FEFF</code> <code class="name">ZERO WIDTH NO-BREAK SPACE</code></li>
 	</ul>
-	<h3>Filler</h3>
-	<p>Any two SURF tokens <span class="spec-may">may</span> be separated by <dfn>filler</dfn>: one or more POSIX whitespace characters; or line comment, which begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
-	<figure>
-		<ul class="spec-rule">
-			<li><code class="name">filler</code> ⇒ <code class="name">whitespace</code> | <code class="name">line_comment</code></li>
-			<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]* <code class="name">eol</code></li>
-		</ul>
-	</figure>
-	<p class="name">Between elements in a list, filler has a caveat: <code>eol</code> functions as a <dfn>list separator</dfn>, which is at least one <code>eol</code> and/or at most a single <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>), optionally surrounded by other filler characters:</p>
-	<figure>
-		<ul class="spec-rule">
-			<li><code class="name">list_separator</code> ⇒ <code class="name">eol</code>+ | ","</li>
-		</ul>
-		<code></code> </figure>
-	<p> TODO fix list_separator regex</p>
+	<h3>Lines</h3>
+	<h4>Line Endings</h4>
+	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code>, the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code>, and any any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator [TODO define] <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<ul>
+		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code></li>
+		<li><code class="name">cr</code> ⇒ <code class="unicode">U+000D</code> <code class="name">CARRIAGE RETURN (CR)</code></li>
+		<li><code class="name">lf</code> ⇒ <code class="unicode">U+000A</code> <code class="name">LINE FEED (LF)</code></li>
+	</ul>
+	<h4>Line Breaks</h4>
+	<aside class="tip far third">A parser may simply discard line comments and parse the SURF document as if they were not present.</aside>
+	<p>A line comment may appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
+	<ul class="spec-rule">
+		<li><code class="name">line_break</code> ⇒ <code class="name">line_comment</code>? <code class="name">eol</code></li>
+		<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]*</li>
+	</ul>
+	<h3>Sequences</h3>
+	<p>Several SURF constructs allow components to be presented in a <dfn>sequence</dfn>. A sequence is indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
+	<aside class="note far third">The list separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
+	<p>Any two items in a sequence are separated by a <dfn>list separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
+	</p>
+	<ul class="spec-rule">
+		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">list_separator_must</code> <code class="name">item</code> | <code class="name">list_separator_may</code> <code class="name">item</code>? ]* ]</li>
+		<li><code class="name">list_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
+		<li><code class="name">list_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
+		<li><code class="name">list_separator</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>* | <code class="name">line_break</code>+</li>
+	</ul>
 	<h3>Names</h3>
 	<figure class="far side">
 		<figcaption>Example SURF names.</figcaption>
@@ -95,13 +104,38 @@
 	<h3>Resource Descriptions</h3>
 	<ul class="spec-rule">
 		<li><code class="name">object_begin</code> ⇒ '*'</li>
-		<li><code class="name">resource_description</code> ⇒ '*' [<code class="name">type</code>] [<code class="name">properties</code>]</li>
+		<li><code class="name">resource_description</code> ⇒ <code class="name">object_begin</code> [<code class="name">type</code>] [<code class="name">properties</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">name</code></li>
-		<li><code class="name">properties</code> ⇒ ':' [ <code class="name">property</code> [ <code class="name">list_separator</code> <code class="name">property</code> ]* ] ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">name</code> = <code class="name">resource</code></li>
+		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
+		<li><code class="name">property</code> ⇒ <code class="name">name</code> <code class="name">line_break</code>* = <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
 	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
+	<h3>Strings</h3>
+	<p>A string represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
+	<dl>
+		<dt><code>\\</code></dt>
+		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
+		<dt><code>\"</code></dt>
+		<dd><code class="name">QUOTATION MARK</code> (<code class="unicode">U+0022</code>)</dd>
+		<dt><code>\'</code></dt>
+		<dd><code class="name">APOSTROPHE</code> (<code class="unicode">U+0027</code>)</dd>
+		<dt><code>\b</code></dt>
+		<dd><code class="name">BACKSPACE</code> (<code class="unicode">U+0008</code>)</dd>
+		<dt><code>\f</code></dt>
+		<dd><code class="name">FORM FEED (FF)</code> (<code class="unicode">U+000C</code>)</dd>
+		<dt><code>\n</code></dt>
+		<dd><code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</dd>
+		<dt><code>\r</code></dt>
+		<dd><code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</dd>
+		<dt><code>\t</code></dt>
+		<dd><code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</dd>
+		<dt><code>\v</code></dt>
+		<dd><code class="name">LINE TABULATION</code> (<code class="unicode">U+000B</code>)</dd>
+		<dt><code>\u<var>XXXX</var></code></dt>
+		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
+	</dl>
+	TODO ABNF<br />
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
@@ -111,7 +145,7 @@
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-02-21.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-03-19.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
