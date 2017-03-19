@@ -55,21 +55,52 @@ public class SurfTestResources {
 			OK_OBJECT_ONE_PROPERTY_1_RESOURCE_NAME, OK_OBJECT_ONE_PROPERTY_2_RESOURCE_NAME);
 
 	public static final String OK_OBJECT_TWO_PROPERTIES_0_RESOURCE_NAME = "ok-object-two-properties-0.surf";
+	public static final String OK_OBJECT_TWO_PROPERTIES_0_WHITESPACE_RESOURCE_NAME = "ok-object-two-properties-0-whitespace.surf";
 	public static final String OK_OBJECT_TWO_PROPERTIES_1_RESOURCE_NAME = "ok-object-two-properties-1.surf";
 	public static final String OK_OBJECT_TWO_PROPERTIES_1_NO_COMMAS_RESOURCE_NAME = "ok-object-two-properties-1-no-commas.surf";
 	public static final String OK_OBJECT_TWO_PROPERTIES_2_RESOURCE_NAME = "ok-object-two-properties-2.surf";
+	public static final String OK_OBJECT_TWO_PROPERTIES_2_NEWLINES_RESOURCE_NAME = "ok-object-two-properties-2-newlines.surf";
 	public static final String OK_OBJECT_TWO_PROPERTIES_2_NO_COMMAS_RESOURCE_NAME = "ok-object-two-properties-2-no-commas.surf";
 
 	/** Names of SURF document resources semantically equivalent to {@value #OK_OBJECT_TWO_PROPERTIES_0_RESOURCE_NAME}. */
 	public static Set<String> OK_OBJECT_TWO_PROPERTIES_RESOURCE_NAMES = immutableSetOf(OK_OBJECT_TWO_PROPERTIES_0_RESOURCE_NAME,
-			OK_OBJECT_TWO_PROPERTIES_1_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_NO_COMMAS_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_RESOURCE_NAME,
-			OK_OBJECT_TWO_PROPERTIES_2_NO_COMMAS_RESOURCE_NAME);
+			OK_OBJECT_TWO_PROPERTIES_0_WHITESPACE_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_NO_COMMAS_RESOURCE_NAME,
+			OK_OBJECT_TWO_PROPERTIES_2_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NEWLINES_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NO_COMMAS_RESOURCE_NAME);
 
-	//urf-Boolean
+	//boolean
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
 
-	//urf-String
+	//lists
+	public static final String OK_LIST_NO_ITEMS_0_RESOURCE_NAME = "ok-list-no-items-0.surf";
+	public static final String OK_LIST_NO_ITEMS_1_RESOURCE_NAME = "ok-list-no-items-1.surf";
+	public static final String OK_LIST_NO_ITEMS_2_RESOURCE_NAME = "ok-list-no-items-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_LIST_NO_ITEMS_0_RESOURCE_NAME}. */
+	public static Set<String> OK_LIST_NO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_NO_ITEMS_0_RESOURCE_NAME, OK_LIST_NO_ITEMS_1_RESOURCE_NAME,
+			OK_LIST_NO_ITEMS_2_RESOURCE_NAME);
+
+	public static final String OK_LIST_ONE_ITEM_0_RESOURCE_NAME = "ok-list-one-item-0.surf";
+	public static final String OK_LIST_ONE_ITEM_1_RESOURCE_NAME = "ok-list-one-item-1.surf";
+	public static final String OK_LIST_ONE_ITEM_2_RESOURCE_NAME = "ok-list-one-item-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_LIST_ONE_ITEM_0_RESOURCE_NAME}. */
+	public static Set<String> OK_LIST_ONE_ITEM_RESOURCE_NAMES = immutableSetOf(OK_LIST_ONE_ITEM_0_RESOURCE_NAME, OK_LIST_ONE_ITEM_1_RESOURCE_NAME,
+			OK_LIST_ONE_ITEM_2_RESOURCE_NAME);
+
+	public static final String OK_LIST_TWO_ITEMS_0_RESOURCE_NAME = "ok-list-two-items-0.surf";
+	public static final String OK_LIST_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME = "ok-list-two-items-0-whitespace.surf";
+	public static final String OK_LIST_TWO_ITEMS_1_RESOURCE_NAME = "ok-list-two-items-1.surf";
+	public static final String OK_LIST_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME = "ok-list-two-items-1-no-commas.surf";
+	public static final String OK_LIST_TWO_ITEMS_2_RESOURCE_NAME = "ok-list-two-items-2.surf";
+	public static final String OK_LIST_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME = "ok-list-two-items-2-no-commas.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_LIST_TWO_ITEMS_0_RESOURCE_NAME}. */
+	public static Set<String> OK_LIST_TWO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_TWO_ITEMS_0_RESOURCE_NAME, OK_LIST_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME,
+			OK_LIST_TWO_ITEMS_1_RESOURCE_NAME, OK_LIST_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_LIST_TWO_ITEMS_2_RESOURCE_NAME,
+			OK_LIST_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
+
+	//strings
 	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
 
 	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
