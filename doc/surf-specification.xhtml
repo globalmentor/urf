@@ -62,13 +62,12 @@
 	<h3>Sequences</h3>
 	<p>Several SURF constructs allow components to be presented in a <dfn>sequence</dfn>. A sequence is indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note far third">The list separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
-	<p>Any two items in a sequence are separated by a <dfn>list separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
+	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
 	</p>
 	<ul class="spec-rule">
-		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">list_separator_must</code> <code class="name">item</code> | <code class="name">list_separator_may</code> <code class="name">item</code>? ]* ]</li>
-		<li><code class="name">list_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
-		<li><code class="name">list_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
-		<li><code class="name">list_separator</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>* | <code class="name">line_break</code>+</li>
+		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
+		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
+		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
 	<h3>Names</h3>
 	<figure class="far side">
@@ -135,7 +134,25 @@
 		<dt><code>\u<var>XXXX</var></code></dt>
 		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
 	</dl>
-	TODO ABNF<br />
+	<p> TODO ABNF</p>
+	<h3>Lists</h3>
+	<aside class="note far third">Examples of list types SURF processors may use include:<br />
+		<dl>
+			<dt>Java</dt>
+			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html"><code class="see">java.util.List&lt;E&gt;</code></a></dd>
+			<dt>JavaScript</dt>
+			<dd><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="see">Array</a></dd>
+			<dt>Python</dt>
+			<dd><a href="https://docs.python.org/3/tutorial/datastructures.html#more-on-lists" class="see">list</a></dd>
+		</dl>
+	</aside>
+	<p>A SURF <dfn>list</dfn> is an ordered sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF processor should represent a SURF list using an corresponding language construct that represents list semantics.</p>
+	<ul class="spec-rule">
+		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
+	</ul>
+	<p><br />
+	</p>
+	<p> </p>
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
