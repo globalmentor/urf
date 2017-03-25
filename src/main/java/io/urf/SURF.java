@@ -71,6 +71,11 @@ public class SURF {
 	/** The beginning delimiter of the lexical form of the Boolean value <code>true</code>. */
 	public static final char BOOLEAN_TRUE_BEGIN = 't';
 
+	/** The delimiter that begins lists. */
+	public static final char LIST_BEGIN = '[';
+	/** The delimiter that ends lists. */
+	public static final char LIST_END = ']';
+
 	/** The delimiter that begins property declarations. */
 	public static final char PROPERTIES_BEGIN = ':';
 	/** The delimiter that ends property declarations. */
