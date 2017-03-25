@@ -8,6 +8,7 @@
 	lf = "\n"
 	cr = "\r"
 	tab = "\t"
+	vtab = "\v"
 	devanagari-ma = "\u092e" !tests lowercase hex
-	tearsOfJoy = "\u1F602" !code point outside BMP; also tests uppercase hex
+	tearsOfJoy = "\uD83D\uDE02" !code point outside BMP; also tests uppercase hex
 ;

@@ -102,6 +102,7 @@ public class SurfTestResources {
 
 	//strings
 	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
+	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
 
 	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
 	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
