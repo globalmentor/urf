@@ -111,14 +111,15 @@
 	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
 	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
 	<h3>Strings</h3>
+	<aside class="note far third"><span class="see">Compare to <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
 	<p>A string represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
 	<dl>
 		<dt><code>\\</code></dt>
 		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
+		<dt><code>\/</code></dt>
+		<dd><code class="name">SOLIDUS</code> (<code class="unicode">U+002F</code>)</dd>
 		<dt><code>\"</code></dt>
 		<dd><code class="name">QUOTATION MARK</code> (<code class="unicode">U+0022</code>)</dd>
-		<dt><code>\'</code></dt>
-		<dd><code class="name">APOSTROPHE</code> (<code class="unicode">U+0027</code>)</dd>
 		<dt><code>\b</code></dt>
 		<dd><code class="name">BACKSPACE</code> (<code class="unicode">U+0008</code>)</dd>
 		<dt><code>\f</code></dt>
@@ -150,9 +151,6 @@
 	<ul class="spec-rule">
 		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
 	</ul>
-	<p><br />
-	</p>
-	<p> </p>
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
@@ -162,7 +160,7 @@
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-03-19.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-03-25.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
