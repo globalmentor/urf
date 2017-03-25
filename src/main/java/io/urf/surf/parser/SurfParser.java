@@ -240,6 +240,9 @@ public class SurfParser {
 	/**
 	 * Parses a string surrounded by the indicated delimiters. The current position must be that of the first string delimiter character. The new position will be
 	 * that immediately after the string number delimiter character.
+	 * <p>
+	 * This method always allows the string beginning character and ending character to be escaped.
+	 * </p>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param stringBegin The beginning string delimiter.
 	 * @param stringEnd The ending string delimiter.
@@ -257,6 +260,7 @@ public class SurfParser {
 				c = readCharacter(reader); //read another a character
 				switch(c) { //see what the next character
 					case STRING_ESCAPE: //\\
+					case '/': //\/ (solidus)
 						break; //use the escaped escape character unmodified
 					case ESCAPED_BACKSPACE: //\b backspace
 						c = BACKSPACE_CHAR;

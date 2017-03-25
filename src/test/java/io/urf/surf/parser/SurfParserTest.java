@@ -24,6 +24,8 @@ import java.util.Optional;
 
 import static io.urf.surf.test.SurfTestResources.*;
 import static org.hamcrest.Matchers.*;
+import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
 import org.junit.*;
 
 import io.urf.surf.test.SurfTestResources;
@@ -42,10 +44,10 @@ public class SurfParserTest {
 		for(final String okSimpleResourceName : OK_SIMPLE_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSimpleResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okSimpleResourceName, object.isPresent(), is(true));
-				assertThat(okSimpleResourceName, object.get(), is(instanceOf(SurfResource.class)));
+				assertThat(okSimpleResourceName, object, isPresent());
+				assertThat(okSimpleResourceName, object, hasValue(instanceOf(SurfResource.class)));
 				final SurfResource resource = (SurfResource)object.get();
-				assertThat(okSimpleResourceName, resource.getTypeName().isPresent(), is(false));
+				assertThat(okSimpleResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okSimpleResourceName, resource.getPropertyCount(), is(0));
 			}
 		}
@@ -59,10 +61,10 @@ public class SurfParserTest {
 		for(final String okObjectNoPropertiesResourceName : OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectNoPropertiesResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okObjectNoPropertiesResourceName, object.isPresent(), is(true));
-				assertThat(okObjectNoPropertiesResourceName, object.get(), is(instanceOf(SurfResource.class)));
+				assertThat(okObjectNoPropertiesResourceName, object, isPresent());
+				assertThat(okObjectNoPropertiesResourceName, object, hasValue(instanceOf(SurfResource.class)));
 				final SurfResource resource = (SurfResource)object.get();
-				assertThat(okObjectNoPropertiesResourceName, resource.getTypeName().isPresent(), is(false));
+				assertThat(okObjectNoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectNoPropertiesResourceName, resource.getPropertyCount(), is(0));
 			}
 		}
@@ -74,14 +76,14 @@ public class SurfParserTest {
 		for(final String okObjectOnePropertyResourceName : OK_OBJECT_ONE_PROPERTY_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectOnePropertyResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okObjectOnePropertyResourceName, object.isPresent(), is(true));
-				assertThat(okObjectOnePropertyResourceName, object.get(), is(instanceOf(SurfResource.class)));
+				assertThat(okObjectOnePropertyResourceName, object, isPresent());
+				assertThat(okObjectOnePropertyResourceName, object, hasValue(instanceOf(SurfResource.class)));
 				final SurfResource resource = (SurfResource)object.get();
-				assertThat(okObjectOnePropertyResourceName, resource.getTypeName().isPresent(), is(false));
+				assertThat(okObjectOnePropertyResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectOnePropertyResourceName, resource.getPropertyCount(), is(1));
-				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one").isPresent(), is(true));
-				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one").get(), is("one"));
-				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("two").isPresent(), is(false));
+				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one"), isPresent());
+				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one"), hasValue("one"));
+				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("two"), not(isPresent()));
 			}
 		}
 	}
@@ -92,16 +94,16 @@ public class SurfParserTest {
 		for(final String okObjectTwoPropertiesResourceName : OK_OBJECT_TWO_PROPERTIES_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectTwoPropertiesResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okObjectTwoPropertiesResourceName, object.isPresent(), is(true));
-				assertThat(okObjectTwoPropertiesResourceName, object.get(), is(instanceOf(SurfResource.class)));
+				assertThat(okObjectTwoPropertiesResourceName, object, isPresent());
+				assertThat(okObjectTwoPropertiesResourceName, object, hasValue(instanceOf(SurfResource.class)));
 				final SurfResource resource = (SurfResource)object.get();
-				assertThat(okObjectTwoPropertiesResourceName, resource.getTypeName().isPresent(), is(false));
+				assertThat(okObjectTwoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyCount(), is(2));
-				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one").isPresent(), is(true));
-				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one").get(), is("one"));
-				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("two").isPresent(), is(true));
-				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("two").get(), is("two"));
-				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("three").isPresent(), is(false));
+				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one"), isPresent());
+				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one"), hasValue("one"));
+				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("two"), isPresent());
+				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("two"), hasValue("two"));
+				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("three"), not(isPresent()));
 			}
 		}
 	}
@@ -114,8 +116,8 @@ public class SurfParserTest {
 		for(final String okListNoItemsResourceName : OK_LIST_NO_ITEMS_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListNoItemsResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okListNoItemsResourceName, object.isPresent(), is(true));
-				assertThat(okListNoItemsResourceName, object.get(), is(instanceOf(List.class)));
+				assertThat(okListNoItemsResourceName, object, isPresent());
+				assertThat(okListNoItemsResourceName, object, hasValue(instanceOf(List.class)));
 				final List<?> list = (List<?>)object.get();
 				assertThat(okListNoItemsResourceName, list, hasSize(0));
 			}
@@ -128,8 +130,8 @@ public class SurfParserTest {
 		for(final String okListOneItemResourceName : OK_LIST_ONE_ITEM_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListOneItemResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okListOneItemResourceName, object.isPresent(), is(true));
-				assertThat(okListOneItemResourceName, object.get(), is(instanceOf(List.class)));
+				assertThat(okListOneItemResourceName, object, isPresent());
+				assertThat(okListOneItemResourceName, object, hasValue(instanceOf(List.class)));
 				final List<?> list = (List<?>)object.get();
 				assertThat(okListOneItemResourceName, list, hasSize(1));
 				assertThat(okListOneItemResourceName, list.get(0), is("one"));
@@ -143,8 +145,8 @@ public class SurfParserTest {
 		for(final String okListTwoItemsResourceName : OK_LIST_TWO_ITEMS_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListTwoItemsResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
-				assertThat(okListTwoItemsResourceName, object.isPresent(), is(true));
-				assertThat(okListTwoItemsResourceName, object.get(), is(instanceOf(List.class)));
+				assertThat(okListTwoItemsResourceName, object, isPresent());
+				assertThat(okListTwoItemsResourceName, object, hasValue(instanceOf(List.class)));
 				final List<?> list = (List<?>)object.get();
 				assertThat(okListTwoItemsResourceName, list, hasSize(2));
 				assertThat(okListTwoItemsResourceName, list.get(0), is("one"));
@@ -162,8 +164,8 @@ public class SurfParserTest {
 	public void testOkBooleanFalse() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_FALSE_RESOURCE_NAME)) {
 			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object.isPresent(), is(true));
-			assertThat(object.get(), is(Boolean.FALSE));
+			assertThat(object, isPresent());
+			assertThat(object, hasValue(Boolean.FALSE));
 		}
 	}
 
@@ -172,8 +174,8 @@ public class SurfParserTest {
 	public void testOkBooleanTrue() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_TRUE_RESOURCE_NAME)) {
 			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object.isPresent(), is(true));
-			assertThat(object.get(), is(Boolean.TRUE));
+			assertThat(object, isPresent());
+			assertThat(object, hasValue(Boolean.TRUE));
 		}
 	}
 
@@ -184,9 +186,31 @@ public class SurfParserTest {
 	public void testOkStringFoobar() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRING_FOOBAR_RESOURCE_NAME)) {
 			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object.isPresent(), is(true));
-			assertThat(object.get(), is("foobar"));
+			assertThat(object, isPresent());
+			assertThat(object, hasValue("foobar"));
 		}
 	}
+
+	/** @see SurfTestResources#OK_STRINGS_RESOURCE_NAME */
+	@Test
+	public void testOkStrings() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRINGS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("foo"), hasValue("bar"));
+			assertThat(resource.getPropertyValue("quote"), hasValue("\""));
+			assertThat(resource.getPropertyValue("backslash"), hasValue("\\"));
+			assertThat(resource.getPropertyValue("solidus"), hasValue("/"));
+			assertThat(resource.getPropertyValue("ff"), hasValue("\f"));
+			assertThat(resource.getPropertyValue("lf"), hasValue("\n"));
+			assertThat(resource.getPropertyValue("cr"), hasValue("\r"));
+			assertThat(resource.getPropertyValue("tab"), hasValue("\t"));
+			assertThat(resource.getPropertyValue("vtab"), hasValue("\u000B"));
+			assertThat(resource.getPropertyValue("devanagari-ma"), hasValue("\u092E"));
+			assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(String.valueOf(Character.toChars(0x1F602))));
+		}
+	}
+
+	//TODO add bad tests to prevent escaping normal characters 
+	//TODO add bad tests with invalid surrogate character sequences 
 
 }
