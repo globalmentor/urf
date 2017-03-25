@@ -33,7 +33,7 @@
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, containing no resources.</p>
 	<h3>Whitespace</h3>
-	<aside class="note far third">SURF follows the ECMAScript® 2015 definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/6.0/#sec-white-space"><cite>ECMA-262 6<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<aside class="note far third">SURF follows the ECMAScript® 2016 definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul>
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> |  <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
@@ -46,9 +46,9 @@
 	</ul>
 	<h3>Lines</h3>
 	<h4>Line Endings</h4>
-	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code>, the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code>, and any any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator [TODO define] <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code>, the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code>, and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator [TODO define] <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul>
-		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code></li>
+		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
 		<li><code class="name">cr</code> ⇒ <code class="unicode">U+000D</code> <code class="name">CARRIAGE RETURN (CR)</code></li>
 		<li><code class="name">lf</code> ⇒ <code class="unicode">U+000A</code> <code class="name">LINE FEED (LF)</code></li>
 	</ul>
@@ -60,7 +60,7 @@
 		<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]*</li>
 	</ul>
 	<h3>Sequences</h3>
-	<p>Several SURF constructs allow components to be presented in a <dfn>sequence</dfn>. A sequence is indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
+	<p>Several SURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note far third">The list separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
 	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
 	</p>
@@ -110,7 +110,15 @@
 	</ul>
 	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
 	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
-	<h3>Strings</h3>
+	<h3>Literals</h3>
+	<aside class="note far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
+	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
+	<h4>Booleans</h4>
+	<p>A Boolean is a either of the tokens <code>true</code> or <code>false</code>.</p>
+	<ul class="spec-rule">
+		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
+	</ul>
+	<h4>Strings</h4>
 	<aside class="note far third"><span class="see">Compare to <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
 	<p>A string represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
 	<dl>
@@ -136,8 +144,10 @@
 		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
 	</dl>
 	<p> TODO ABNF</p>
-	<h3>Lists</h3>
-	<aside class="note far third">Examples of list types SURF processors may use include:<br />
+	<h3>Collections</h3>
+	<p>Collection resources represent abstract data types that can hold other resources.</p>
+	<h4>Lists</h4>
+	<aside class="note far third">Examples of list types SURF processors may use include:
 		<dl>
 			<dt>Java</dt>
 			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html"><code class="see">java.util.List&lt;E&gt;</code></a></dd>
