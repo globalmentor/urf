@@ -33,7 +33,7 @@
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, containing no resources.</p>
 	<h3>Whitespace</h3>
-	<aside class="note far third">SURF follows the ECMAScript® 2016 definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul>
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> |  <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
@@ -92,18 +92,18 @@
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-rule">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
-		<li><code class="name">resource_representation</code> ⇒ <code class="name">resource_description</code> | <code class="name">list</code> | <code class="name">set</code> | <code class="name">map</code> | <code class="name">table</code> | <code class="name">iri</code> | <code class="name">string</code> | <code class="name">number</code> | <code class="name">boolean</code> | <code class="name">temporal</code> | <code class="name">regex</code> | <code class="name">binary</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">list</code> | <code class="name">set</code> | <code class="name">map</code> | <code class="name">table</code> | <code class="name">iri</code> | <code class="name">string</code> | <code class="name">number</code> | <code class="name">boolean</code> | <code class="name">temporal</code> | <code class="name">regex</code> | <code class="name">binary</code></li>
 	</ul>
-	<h3>Labels</h3>
 	<p> A label consists of an identifier surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>).</p>
 	<ul class="spec-rule">
 		<li><code class="name"> label</code> ⇒ '|' <code class="name">name</code> '|'</li>
 	</ul>
 	<p>The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
-	<h3>Resource Descriptions</h3>
+	<h3>Objects</h3>
+	<p>Objects are descriptions of unidentified resources.</p>
 	<ul class="spec-rule">
 		<li><code class="name">object_begin</code> ⇒ '*'</li>
-		<li><code class="name">resource_description</code> ⇒ <code class="name">object_begin</code> [<code class="name">type</code>] [<code class="name">properties</code>]</li>
+		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> [<code class="name">type</code>] [<code class="name">properties</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">name</code></li>
 		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
 		<li><code class="name">property</code> ⇒ <code class="name">name</code> <code class="name">line_break</code>* = <code class="name">line_break</code>* <code class="name">resource</code></li>
@@ -118,6 +118,11 @@
 	<ul class="spec-rule">
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
 	</ul>
+	<h4>Regular Expressions</h4>
+	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
+	<p>A regular expression is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
+	<p>TODO decide on whether and how to allow flags</p>
+	<p>TODO production</p>
 	<h4>Strings</h4>
 	<aside class="note far third"><span class="see">Compare to <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
 	<p>A string represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
@@ -143,7 +148,7 @@
 		<dt><code>\u<var>XXXX</var></code></dt>
 		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
 	</dl>
-	<p> TODO ABNF</p>
+	<p> TODO production</p>
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>Lists</h4>
