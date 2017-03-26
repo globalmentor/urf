@@ -23,6 +23,7 @@ import static io.urf.SURF.WHITESPACE_CHARACTERS;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
@@ -108,18 +109,24 @@ public class SurfParser {
 		}
 		final Object resource;
 		switch(c) {
+			//objects
+			case OBJECT_BEGIN:
+				resource = parseObject(reader);
+				break;
+			//literals
 			case BOOLEAN_FALSE_BEGIN:
 			case BOOLEAN_TRUE_BEGIN:
 				resource = parseBoolean(reader);
 				break;
-			case LIST_BEGIN:
-				resource = parseList(reader);
-				break;
-			case OBJECT_BEGIN:
-				resource = parseObject(reader);
+			case REGULAR_EXPRESSION_DELIMITER:
+				resource = parseRegularExpression(reader);
 				break;
 			case STRING_BEGIN:
-				resource = parseString(reader); //parse the string
+				resource = parseString(reader);
+				break;
+			//collections
+			case LIST_BEGIN:
+				resource = parseList(reader);
 				break;
 			default:
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
@@ -187,6 +194,39 @@ public class SurfParser {
 	}
 
 	/**
+	 * Parses a regular expression surrounded by regular expression delimiters and optionally ending with flags. The current position must be that of the first
+	 * regular expression delimiter character. The new position will be that immediately after the regular expression delimiter character or, if there are flags,
+	 * after the last flag.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return The pattern representing the regular expression parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the regular expressions is not escaped correctly or reader has no more characters before the current regular expression is
+	 *           completely parsed.
+	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
+	 * @see SURF#REGULAR_EXPRESSION_ESCAPE
+	 */
+	public static Pattern parseRegularExpression(final Reader reader) throws IOException, ParseIOException {
+		check(reader, REGULAR_EXPRESSION_DELIMITER);
+		final StringBuilder regexBuilder = new StringBuilder();
+		char c = readCharacter(reader);
+		while(c != REGULAR_EXPRESSION_DELIMITER) {
+			//TODO check for and prevent control characters
+			if(c == REGULAR_EXPRESSION_ESCAPE) { //if this is an escape character
+				final char next = readCharacter(reader); //read the next character (to be valid there must be another character)
+				if(next != REGULAR_EXPRESSION_DELIMITER) { //if the next character is not a regular expression delimiter
+					regexBuilder.append(c); //we can use the escape character that wasn't
+				}
+				c = next; //prepare the next character to be consumed as well (also preventing the second escape in "\\" from being interpreted as an escape)
+			}
+			regexBuilder.append(c); //append the character to the string we are constructing
+			c = readCharacter(reader); //read another a character
+		}
+		//TODO parse flags
+		return Pattern.compile(regexBuilder.toString());
+	}
+
+	/**
 	 * Parses a string surrounded by string delimiters. The current position must be that of the first string delimiter character. The new position will be that
 	 * immediately after the string delimiter character.
 	 * @param reader The reader the contents of which to be parsed.
@@ -198,7 +238,7 @@ public class SurfParser {
 	 * @see SURF#STRING_END
 	 */
 	public static String parseString(final Reader reader) throws IOException, ParseIOException {
-		return parseString(reader, STRING_BEGIN, STRING_END, true);
+		return parseString(reader, STRING_BEGIN, STRING_END);
 	}
 
 	/**
@@ -210,68 +250,56 @@ public class SurfParser {
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param stringBegin The beginning string delimiter.
 	 * @param stringEnd The ending string delimiter.
-	 * @param escapeMode If {@link Boolean#TRUE}, full string escaping is allowed; if {@link Boolean#FALSE}, only escaping of the string delimiters are supported,
-	 *          and the escape character is otherwise treated as normal and does not need to be doubled; otherwise if <code>null</code> no escaping is recognized
-	 *          at all.
 	 * @return The string parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the string is not escaped correctly or reader has no more characters before the current string is completely parsed.
 	 */
-	public static String parseString(final Reader reader, final char stringBegin, final char stringEnd, final Boolean escapeMode)
-			throws IOException, ParseIOException {
+	public static String parseString(final Reader reader, final char stringBegin, final char stringEnd) throws IOException, ParseIOException {
 		check(reader, stringBegin); //read the beginning string delimiter
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the string
 		char c = readCharacter(reader); //read a character
 		while(c != stringEnd) { //keep reading character until we reach the end of the string
-			if(escapeMode != null) { //if we should perform some escaping
-				if(c == STRING_ESCAPE) { //if this is an escape character
-					if(escapeMode.booleanValue()) { //if we support full escape mode					
-						c = readCharacter(reader); //read another a character
-						switch(c) { //see what the next character
-							case STRING_ESCAPE: //\\
-							case '/': //\/ (solidus)
-								break; //use the escaped escape character unmodified
-							case ESCAPED_BACKSPACE: //\b backspace
-								c = BACKSPACE_CHAR;
-								break;
-							case ESCAPED_FORM_FEED: //\f
-								c = FORM_FEED_CHAR;
-								break;
-							case ESCAPED_LINE_FEED: //\n
-								c = LINE_FEED_CHAR;
-								break;
-							case ESCAPED_CARRIAGE_RETURN: //\r
-								c = CARRIAGE_RETURN_CHAR;
-								break;
-							case ESCAPED_TAB: //\t
-								c = CHARACTER_TABULATION_CHAR;
-								break;
-							case ESCAPED_VERTICAL_TAB: //\v
-								c = LINE_TABULATION_CHAR;
-								break;
-							case ESCAPED_UNICODE: //u Unicode
-							{
-								final String unicodeString = readString(reader, 4); //read the four Unicode code point hex characters
-								try {
-									c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
-								} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-									throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
-								}
-							}
-								break;
-							default: //if another character was escaped
-								if(c != stringBegin && c != stringEnd) { //if this is not the delimiter that was escaped
-									throw new ParseIOException(reader, "Unknown escaped character: " + Characters.getLabel(c));
-								}
-								break;
-						}
-					} else { //if we support simple, limited escaping
-						final int next = peekEnd(reader); //see what the next character will be
-						if(next == stringBegin || next == stringEnd) { //if the next character is a string delimiter
-							c = readCharacter(reader); //skip the escape character and read the next one
+			//TODO check for and prevent control characters
+			if(c == STRING_ESCAPE) { //if this is an escape character
+				c = readCharacter(reader); //read another a character
+				switch(c) { //see what the next character
+					case STRING_ESCAPE: //\\
+					case '/': //\/ (solidus)
+						break; //use the escaped escape character unmodified
+					case ESCAPED_BACKSPACE: //\b backspace
+						c = BACKSPACE_CHAR;
+						break;
+					case ESCAPED_FORM_FEED: //\f
+						c = FORM_FEED_CHAR;
+						break;
+					case ESCAPED_LINE_FEED: //\n
+						c = LINE_FEED_CHAR;
+						break;
+					case ESCAPED_CARRIAGE_RETURN: //\r
+						c = CARRIAGE_RETURN_CHAR;
+						break;
+					case ESCAPED_TAB: //\t
+						c = CHARACTER_TABULATION_CHAR;
+						break;
+					case ESCAPED_VERTICAL_TAB: //\v
+						c = LINE_TABULATION_CHAR;
+						break;
+					case ESCAPED_UNICODE: //u Unicode
+					{
+						final String unicodeString = readString(reader, 4); //read the four Unicode code point hex characters
+						try {
+							c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
+						} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
+							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
 						}
 					}
+						break;
+					default: //if another character was escaped
+						if(c != stringBegin && c != stringEnd) { //if this is not the delimiter that was escaped
+							throw new ParseIOException(reader, "Unknown escaped character: " + Characters.getLabel(c));
+						}
+						break;
 				}
 			}
 			stringBuilder.append(c); //append the character to the string we are constructing

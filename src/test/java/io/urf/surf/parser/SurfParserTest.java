@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static io.urf.surf.test.SurfTestResources.*;
 import static org.hamcrest.Matchers.*;
@@ -108,6 +109,80 @@ public class SurfParserTest {
 		}
 	}
 
+	//booleans
+
+	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
+	@Test
+	public void testOkBooleanFalse() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_FALSE_RESOURCE_NAME)) {
+			final Optional<Object> object = new SurfParser().parse(inputStream);
+			assertThat(object, isPresent());
+			assertThat(object, hasValue(Boolean.FALSE));
+		}
+	}
+
+	/** @see SurfTestResources#OK_BOOLEAN_TRUE_RESOURCE_NAME */
+	@Test
+	public void testOkBooleanTrue() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_TRUE_RESOURCE_NAME)) {
+			final Optional<Object> object = new SurfParser().parse(inputStream);
+			assertThat(object, isPresent());
+			assertThat(object, hasValue(Boolean.TRUE));
+		}
+	}
+
+	//regular expressions
+
+	/** @see SurfTestResources#OK_REGULAR_EXPRESSIONS_RESOURCE_NAME */
+	@Test
+	public void testOkRegularExpressions() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_REGULAR_EXPRESSIONS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("empty").map(Pattern.class::cast).map(Pattern::pattern), hasValue(""));
+			assertThat(resource.getPropertyValue("abc").map(Pattern.class::cast).map(Pattern::pattern), hasValue("abc"));
+			assertThat(resource.getPropertyValue("regexEscape").map(Pattern.class::cast).map(Pattern::pattern), hasValue("ab\\.c"));
+			assertThat(resource.getPropertyValue("doubleBackslash").map(Pattern.class::cast).map(Pattern::pattern), hasValue("\\\\"));
+			assertThat(resource.getPropertyValue("slash").map(Pattern.class::cast).map(Pattern::pattern), hasValue("/"));
+		}
+	}
+
+	//TODO add bad tests with control characters
+
+	//strings
+
+	/** @see SurfTestResources#OK_STRING_FOOBAR_RESOURCE_NAME */
+	@Test
+	public void testOkStringFoobar() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRING_FOOBAR_RESOURCE_NAME)) {
+			final Optional<Object> object = new SurfParser().parse(inputStream);
+			assertThat(object, isPresent());
+			assertThat(object, hasValue("foobar"));
+		}
+	}
+
+	/** @see SurfTestResources#OK_STRINGS_RESOURCE_NAME */
+	@Test
+	public void testOkStrings() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRINGS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("foo"), hasValue("bar"));
+			assertThat(resource.getPropertyValue("quote"), hasValue("\""));
+			assertThat(resource.getPropertyValue("backslash"), hasValue("\\"));
+			assertThat(resource.getPropertyValue("solidus"), hasValue("/"));
+			assertThat(resource.getPropertyValue("ff"), hasValue("\f"));
+			assertThat(resource.getPropertyValue("lf"), hasValue("\n"));
+			assertThat(resource.getPropertyValue("cr"), hasValue("\r"));
+			assertThat(resource.getPropertyValue("tab"), hasValue("\t"));
+			assertThat(resource.getPropertyValue("vtab"), hasValue("\u000B"));
+			assertThat(resource.getPropertyValue("devanagari-ma"), hasValue("\u092E"));
+			assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(String.valueOf(Character.toChars(0x1F602))));
+		}
+	}
+
+	//TODO add bad tests with control characters
+	//TODO add bad tests to prevent escaping normal characters 
+	//TODO add bad tests with invalid surrogate character sequences
+
 	//lists
 
 	/** @see SurfTestResources#OK_LIST_NO_ITEMS_RESOURCE_NAMES */
@@ -156,61 +231,5 @@ public class SurfParserTest {
 	}
 
 	//TODO create tests for bad properties, such as double list item separators
-
-	//boolean
-
-	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
-	@Test
-	public void testOkBooleanFalse() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_FALSE_RESOURCE_NAME)) {
-			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object, isPresent());
-			assertThat(object, hasValue(Boolean.FALSE));
-		}
-	}
-
-	/** @see SurfTestResources#OK_BOOLEAN_TRUE_RESOURCE_NAME */
-	@Test
-	public void testOkBooleanTrue() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BOOLEAN_TRUE_RESOURCE_NAME)) {
-			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object, isPresent());
-			assertThat(object, hasValue(Boolean.TRUE));
-		}
-	}
-
-	//strings
-
-	/** @see SurfTestResources#OK_STRING_FOOBAR_RESOURCE_NAME */
-	@Test
-	public void testOkStringFoobar() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRING_FOOBAR_RESOURCE_NAME)) {
-			final Optional<Object> object = new SurfParser().parse(inputStream);
-			assertThat(object, isPresent());
-			assertThat(object, hasValue("foobar"));
-		}
-	}
-
-	/** @see SurfTestResources#OK_STRINGS_RESOURCE_NAME */
-	@Test
-	public void testOkStrings() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRINGS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
-			assertThat(resource.getPropertyValue("foo"), hasValue("bar"));
-			assertThat(resource.getPropertyValue("quote"), hasValue("\""));
-			assertThat(resource.getPropertyValue("backslash"), hasValue("\\"));
-			assertThat(resource.getPropertyValue("solidus"), hasValue("/"));
-			assertThat(resource.getPropertyValue("ff"), hasValue("\f"));
-			assertThat(resource.getPropertyValue("lf"), hasValue("\n"));
-			assertThat(resource.getPropertyValue("cr"), hasValue("\r"));
-			assertThat(resource.getPropertyValue("tab"), hasValue("\t"));
-			assertThat(resource.getPropertyValue("vtab"), hasValue("\u000B"));
-			assertThat(resource.getPropertyValue("devanagari-ma"), hasValue("\u092E"));
-			assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(String.valueOf(Character.toChars(0x1F602))));
-		}
-	}
-
-	//TODO add bad tests to prevent escaping normal characters 
-	//TODO add bad tests with invalid surrogate character sequences 
 
 }
