@@ -84,6 +84,11 @@ public class SURF {
 	/** The character that separates properties and assigned values. */
 	public static final char PROPERTY_VALUE_DELIMITER = '=';
 
+	/** The delimiter that begins and ends a regular expressions. */
+	public static final char REGULAR_EXPRESSION_DELIMITER = '/';
+	/** The character used for escaping characters in a regular expression. */
+	public static final char REGULAR_EXPRESSION_ESCAPE = '\\';
+
 	/** The delimiter that begins string shorthand declarations. */
 	public static final char STRING_BEGIN = '"';
 	/** The delimiter that ends string shorthand declarations. */
