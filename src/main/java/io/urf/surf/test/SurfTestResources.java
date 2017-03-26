@@ -67,9 +67,19 @@ public class SurfTestResources {
 			OK_OBJECT_TWO_PROPERTIES_0_WHITESPACE_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_NO_COMMAS_RESOURCE_NAME,
 			OK_OBJECT_TWO_PROPERTIES_2_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NEWLINES_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NO_COMMAS_RESOURCE_NAME);
 
-	//boolean
+	//booleans
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
+
+	//regular expressions
+	public static final String OK_REGULAR_EXPRESSIONS_RESOURCE_NAME = "ok-regular-expressions.surf";
+
+	//strings
+	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
+	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
+
+	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
+	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 
 	//lists
 	public static final String OK_LIST_NO_ITEMS_0_RESOURCE_NAME = "ok-list-no-items-0.surf";
@@ -99,11 +109,4 @@ public class SurfTestResources {
 	public static Set<String> OK_LIST_TWO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_TWO_ITEMS_0_RESOURCE_NAME, OK_LIST_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_1_RESOURCE_NAME, OK_LIST_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_LIST_TWO_ITEMS_2_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
-
-	//strings
-	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
-	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
-
-	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
-	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 }
