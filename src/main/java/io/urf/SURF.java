@@ -72,6 +72,9 @@ public class SURF {
 
 	//literals
 
+	/** The delimiter that begins and ends binary literal values. */
+	public static final char BINARY_DELIMITER = '%';
+
 	/** The lexical representation of the Boolean value <code>false</code>. */
 	public static final String BOOLEAN_FALSE_LEXICAL_FORM = "false";
 	/** The lexical representation of the Boolean <code>true</code>. */
