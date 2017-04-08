@@ -59,8 +59,18 @@ public class SURF {
 	/** The delimiter that ends labels. */
 	public static final char LABEL_END = LABEL_BEGIN;
 
+	//objects
+
 	/** The indicator of an object (an anonymous resource instance). */
 	public static final char OBJECT_BEGIN = '*';
+	/** The delimiter that begins property declarations. */
+	public static final char PROPERTIES_BEGIN = ':';
+	/** The delimiter that ends property declarations. */
+	public static final char PROPERTIES_END = ';';
+	/** The character that separates properties and assigned values. */
+	public static final char PROPERTY_VALUE_DELIMITER = '=';
+
+	//literals
 
 	/** The lexical representation of the Boolean value <code>false</code>. */
 	public static final String BOOLEAN_FALSE_LEXICAL_FORM = "false";
@@ -71,27 +81,19 @@ public class SURF {
 	/** The beginning delimiter of the lexical form of the Boolean value <code>true</code>. */
 	public static final char BOOLEAN_TRUE_BEGIN = 't';
 
-	/** The delimiter that begins lists. */
-	public static final char LIST_BEGIN = '[';
-	/** The delimiter that ends lists. */
-	public static final char LIST_END = ']';
-
-	/** The delimiter that begins property declarations. */
-	public static final char PROPERTIES_BEGIN = ':';
-	/** The delimiter that ends property declarations. */
-	public static final char PROPERTIES_END = ';';
-
-	/** The character that separates properties and assigned values. */
-	public static final char PROPERTY_VALUE_DELIMITER = '=';
+	/** The delimiter that begins IRI literal representations. */
+	public static final char IRI_BEGIN = '<';
+	/** The delimiter that ends IRI literal representations. */
+	public static final char IRI_END = '>';
 
 	/** The delimiter that begins and ends a regular expressions. */
 	public static final char REGULAR_EXPRESSION_DELIMITER = '/';
 	/** The character used for escaping characters in a regular expression. */
 	public static final char REGULAR_EXPRESSION_ESCAPE = '\\';
 
-	/** The delimiter that begins string shorthand declarations. */
+	/** The delimiter that begins string literal representations. */
 	public static final char STRING_BEGIN = '"';
-	/** The delimiter that ends string shorthand declarations. */
+	/** The delimiter that ends string literal representations. */
 	public static final char STRING_END = STRING_BEGIN;
 	/** The character used for escaping characters in a string. */
 	public static final char STRING_ESCAPE = '\\';
@@ -103,6 +105,13 @@ public class SURF {
 	public static final char ESCAPED_TAB = 't'; //t tab
 	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
 	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
+
+	//collections
+
+	/** The delimiter that begins lists. */
+	public static final char LIST_BEGIN = '[';
+	/** The delimiter that ends lists. */
+	public static final char LIST_END = ']';
 
 	/**
 	 * Determines whether the given string conforms to the rules for a SURF name.
