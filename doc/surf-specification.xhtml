@@ -118,6 +118,11 @@
 	<ul class="spec-rule">
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
 	</ul>
+	<h4>IRIs</h4>
+	<p>An <dfn>Internationalized Resource Identifiers</dfn> (<abbr>IRI</abbr>) is a sequence of Unicode characters for identifying a resource as defined in <a href="https://tools.ietf.org/html/rfc3987"><cite>RFC 3987: Internationalized Resource Identifiers (IRIs)</cite></a>. In SURF an IRI is placed between a <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>) and a <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>).</p>
+	<ul class="spec-rule">
+		<li><code class="name">iri</code> ⇒ '&lt;' rfc-3987-IRI '&gt;'</li>
+	</ul>
 	<h4>Regular Expressions</h4>
 	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
 	<p>A regular expression is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
@@ -175,7 +180,7 @@
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-03-25.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-08.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
