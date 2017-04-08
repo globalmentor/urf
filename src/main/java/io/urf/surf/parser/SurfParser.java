@@ -115,6 +115,9 @@ public class SurfParser {
 				resource = parseObject(reader);
 				break;
 			//literals
+			case BINARY_DELIMITER:
+				resource = parseBinary(reader);
+				break;
 			case BOOLEAN_FALSE_BEGIN:
 			case BOOLEAN_TRUE_BEGIN:
 				resource = parseBoolean(reader);
@@ -167,7 +170,8 @@ public class SurfParser {
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
 				skipWhitespaceLineBreaks(reader);
 				final Object value = parseResource(reader);
-				resource.setPropertyValue(propertyName, value);
+				final Optional<Object> oldValue = resource.setPropertyValue(propertyName, value);
+				checkParseIO(reader, !oldValue.isPresent(), "Object has duplicate definition for property %s.", propertyName);
 			});
 			check(reader, PROPERTIES_END); //;
 		}
@@ -175,6 +179,27 @@ public class SurfParser {
 	}
 
 	//literals
+
+	/**
+	 * Parses binary content. The current position must be that of the beginning binary delimiter character. The new position will be that immediately after the
+	 * ending binary delimiter character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return An array of bytes Java {@link URI} containing the IRI parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the IRI is not in the correct format.
+	 * @see SURF#IRI_BEGIN
+	 * @see SURF#IRI_END
+	 */
+	public static byte[] parseBinary(final Reader reader) throws IOException, ParseIOException {
+		check(reader, BINARY_DELIMITER);
+		final String base64String = reachAfter(reader, BINARY_DELIMITER);
+		try {
+			return Base64.getDecoder().decode(base64String);
+		} catch(final IllegalArgumentException illegalArgumentException) {
+			throw new ParseIOException(reader, "Invalid Base64 encoding: " + base64String, illegalArgumentException);
+		}
+	}
 
 	/**
 	 * Parses a Boolean value.
@@ -210,10 +235,11 @@ public class SurfParser {
 	 */
 	public static URI parseIRI(final Reader reader) throws IOException, ParseIOException {
 		check(reader, IRI_BEGIN);
+		final String iriString = reachAfter(reader, IRI_END);
 		try {
-			return new URI(reachAfter(reader, IRI_END));
+			return new URI(iriString);
 		} catch(final URISyntaxException uriSyntaxException) {
-			throw new ParseIOException(reader, uriSyntaxException);
+			throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
 		}
 	}
 

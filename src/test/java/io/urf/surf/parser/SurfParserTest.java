@@ -25,9 +25,12 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static io.urf.surf.test.SurfTestResources.*;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.Matchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
+import static com.globalmentor.java.Bytes.*;
+
 import org.junit.*;
 
 import io.urf.surf.test.SurfTestResources;
@@ -55,7 +58,7 @@ public class SurfParserTest {
 		}
 	}
 
-	//#objects
+	//#object
 
 	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
 	@Test
@@ -110,7 +113,38 @@ public class SurfParserTest {
 		}
 	}
 
+	//TODO add error tests of duplicated property names
+
 	//#literals
+
+	//##binary
+
+	/** @see SurfTestResources#OK_BINARY_RESOURCE_NAME */
+	@Test
+	public void testOkBinary() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BINARY_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+
+			assertThat(resource.getPropertyValue("count"), hasValue(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
+					(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff}));
+			assertThat(resource.getPropertyValue("count_unpadded"), hasValue(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99,
+					(byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff}));
+
+			assertThat(resource.getPropertyValue("rfc4648Example1"), hasValue(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9, 0x7e}));
+			assertThat(resource.getPropertyValue("rfc4648Example2"), hasValue(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9}));
+			assertThat(resource.getPropertyValue("rfc4648Example2_unpadded"), hasValue(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9}));
+			assertThat(resource.getPropertyValue("rfc4648Example3"), hasValue(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03}));
+			assertThat(resource.getPropertyValue("rfc4648Example3_unpadded"), hasValue(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03}));
+
+			assertThat(resource.getPropertyValue("rfc4648TestVector1"), hasValue(NO_BYTES));
+			assertThat(resource.getPropertyValue("rfc4648TestVector2"), hasValue("f".getBytes(US_ASCII)));
+			assertThat(resource.getPropertyValue("rfc4648TestVector3"), hasValue("fo".getBytes(US_ASCII)));
+			assertThat(resource.getPropertyValue("rfc4648TestVector4"), hasValue("foo".getBytes(US_ASCII)));
+			assertThat(resource.getPropertyValue("rfc4648TestVector5"), hasValue("foob".getBytes(US_ASCII)));
+			assertThat(resource.getPropertyValue("rfc4648TestVector6"), hasValue("fooba".getBytes(US_ASCII)));
+			assertThat(resource.getPropertyValue("rfc4648TestVector7"), hasValue("foobar".getBytes(US_ASCII)));
+		}
+	}
 
 	//##boolean
 
