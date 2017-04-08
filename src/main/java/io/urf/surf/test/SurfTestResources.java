@@ -37,7 +37,7 @@ public class SurfTestResources {
 	public static Set<String> OK_SIMPLE_RESOURCE_NAMES = immutableSetOf(OK_SIMPLE_SURF_RESOURCE_NAME, OK_SIMPLE_NO_EOL_SURF_RESOURCE_NAME,
 			OK_SIMPLE_MULTILINE_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_WHITESPACE_SURF_RESOURCE_NAME);
 
-	//objects
+	//#objects
 	public static final String OK_OBJECT_NO_PROPERTIES_0_RESOURCE_NAME = "ok-object-no-properties-0.surf";
 	public static final String OK_OBJECT_NO_PROPERTIES_1_RESOURCE_NAME = "ok-object-no-properties-1.surf";
 	public static final String OK_OBJECT_NO_PROPERTIES_2_RESOURCE_NAME = "ok-object-no-properties-2.surf";
@@ -67,21 +67,28 @@ public class SurfTestResources {
 			OK_OBJECT_TWO_PROPERTIES_0_WHITESPACE_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_1_NO_COMMAS_RESOURCE_NAME,
 			OK_OBJECT_TWO_PROPERTIES_2_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NEWLINES_RESOURCE_NAME, OK_OBJECT_TWO_PROPERTIES_2_NO_COMMAS_RESOURCE_NAME);
 
-	//booleans
+	//#literals
+
+	//##boolean
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
 
-	//regular expressions
+	//##IRI
+	public static final String OK_IRIS_RESOURCE_NAME = "ok-iris.surf";
+
+	//##regular expression
 	public static final String OK_REGULAR_EXPRESSIONS_RESOURCE_NAME = "ok-regular-expressions.surf";
 
-	//strings
+	//##string
 	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
 	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
 
 	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
 	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 
-	//lists
+	//#collections
+
+	//##list
 	public static final String OK_LIST_NO_ITEMS_0_RESOURCE_NAME = "ok-list-no-items-0.surf";
 	public static final String OK_LIST_NO_ITEMS_1_RESOURCE_NAME = "ok-list-no-items-1.surf";
 	public static final String OK_LIST_NO_ITEMS_2_RESOURCE_NAME = "ok-list-no-items-2.surf";
