@@ -69,6 +69,9 @@ public class SurfTestResources {
 
 	//#literals
 
+	//##binary
+	public static final String OK_BINARY_RESOURCE_NAME = "ok-binary.surf";
+
 	//##boolean
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
