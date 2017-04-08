@@ -19,6 +19,7 @@ package io.urf.surf.parser;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -54,7 +55,7 @@ public class SurfParserTest {
 		}
 	}
 
-	//objects
+	//#objects
 
 	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
 	@Test
@@ -109,7 +110,9 @@ public class SurfParserTest {
 		}
 	}
 
-	//booleans
+	//#literals
+
+	//##boolean
 
 	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
 	@Test
@@ -131,7 +134,22 @@ public class SurfParserTest {
 		}
 	}
 
-	//regular expressions
+	//##IRI
+
+	/** @see SurfTestResources#OK_IRIS_RESOURCE_NAME */
+	@Test
+	public void testOkIris() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_IRIS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("example"), hasValue(URI.create("http://www.example.com/")));
+			assertThat(resource.getPropertyValue("iso_8859_1"), hasValue(URI.create("http://www.example.org/Dürst")));
+			assertThat(resource.getPropertyValue("encodedForbidden"), hasValue(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
+		}
+	}
+
+	//TODO add tests for extended characters; bad IRIs (such as a non-absolute IRI); a test containing U+202E, as described in RFC 3987 3.2.1
+
+	//##regular expression
 
 	/** @see SurfTestResources#OK_REGULAR_EXPRESSIONS_RESOURCE_NAME */
 	@Test
@@ -148,7 +166,7 @@ public class SurfParserTest {
 
 	//TODO add bad tests with control characters
 
-	//strings
+	//##string
 
 	/** @see SurfTestResources#OK_STRING_FOOBAR_RESOURCE_NAME */
 	@Test
@@ -183,7 +201,9 @@ public class SurfParserTest {
 	//TODO add bad tests to prevent escaping normal characters 
 	//TODO add bad tests with invalid surrogate character sequences
 
-	//lists
+	//#collections
+
+	//##list
 
 	/** @see SurfTestResources#OK_LIST_NO_ITEMS_RESOURCE_NAMES */
 	@Test

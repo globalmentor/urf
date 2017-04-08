@@ -22,6 +22,7 @@ import static io.urf.SURF.*;
 import static io.urf.SURF.WHITESPACE_CHARACTERS;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -118,6 +119,9 @@ public class SurfParser {
 			case BOOLEAN_TRUE_BEGIN:
 				resource = parseBoolean(reader);
 				break;
+			case IRI_BEGIN:
+				resource = parseIRI(reader);
+				break;
 			case REGULAR_EXPRESSION_DELIMITER:
 				resource = parseRegularExpression(reader);
 				break;
@@ -190,6 +194,26 @@ public class SurfParser {
 			default: //if we don't recognize the start of the boolean lexical form
 				checkReaderNotEnd(reader, c); //make sure we're not at the end of the reader
 				throw new ParseIOException(reader, "Unrecognized start of boolean: " + (char)c);
+		}
+	}
+
+	/**
+	 * Parses an IRI. The current position must be that of the beginning IRI delimiter character. The new position will be that immediately after the ending IRI
+	 * delimiter character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A Java {@link URI} containing the IRI parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the IRI is not in the correct format.
+	 * @see SURF#IRI_BEGIN
+	 * @see SURF#IRI_END
+	 */
+	public static URI parseIRI(final Reader reader) throws IOException, ParseIOException {
+		check(reader, IRI_BEGIN);
+		try {
+			return new URI(reachAfter(reader, IRI_END));
+		} catch(final URISyntaxException uriSyntaxException) {
+			throw new ParseIOException(reader, uriSyntaxException);
 		}
 	}
 
