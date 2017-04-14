@@ -75,9 +75,13 @@ public class SurfTestResources {
 	//##boolean
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
+	//TODO use or delete public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
 
 	//##IRI
 	public static final String OK_IRIS_RESOURCE_NAME = "ok-iris.surf";
+
+	//##number
+	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 
 	//##regular expression
 	public static final String OK_REGULAR_EXPRESSIONS_RESOURCE_NAME = "ok-regular-expressions.surf";
@@ -85,9 +89,6 @@ public class SurfTestResources {
 	//##string
 	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
 	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
-
-	public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
-	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 
 	//#collections
 
