@@ -89,6 +89,17 @@ public class SURF {
 	/** The delimiter that ends IRI literal representations. */
 	public static final char IRI_END = '>';
 
+	/** The delimiter that begins a decimal number. */
+	public static final char NUMBER_DECIMAL_BEGIN = '$';
+	/** The symbol that delimits the fractional part of a number. */
+	public static final char NUMBER_FRACTION_DELIMITER = '.';
+	/** The symbols that delimits the exponent part of a number. */
+	public static final Characters NUMBER_EXPONENT_DELIMITER_CHARACTERS = Characters.of('e', 'E');
+	/** The symbols that indicate the sign of the exponent part of a number. */
+	public static final Characters NUMBER_EXPONENT_SIGN_CHARACTERS = Characters.of('-', '+');
+	/** The symbol that indicates a negative number. */
+	public static final char NUMBER_NEGATIVE_SYMBOL = '-';
+
 	/** The delimiter that begins and ends a regular expressions. */
 	public static final char REGULAR_EXPRESSION_DELIMITER = '/';
 	/** The character used for escaping characters in a regular expression. */
