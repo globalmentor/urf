@@ -19,6 +19,8 @@ package io.urf.surf.parser;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -182,6 +184,48 @@ public class SurfParserTest {
 	}
 
 	//TODO add tests for extended characters; bad IRIs (such as a non-absolute IRI); a test containing U+202E, as described in RFC 3987 3.2.1
+
+	//##number
+
+	//TODO create several single-number documents to test various number components ending the document, e.g. 123 and 123.456
+
+	/** @see SurfTestResources#OK_NUMBERS_RESOURCE_NAME */
+	@Test
+	public void testOkNumbers() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_NUMBERS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("zero"), hasValue(Integer.valueOf(0)));
+			assertThat(resource.getPropertyValue("zeroFraction"), hasValue(Double.valueOf(0)));
+			assertThat(resource.getPropertyValue("one"), hasValue(Integer.valueOf(1)));
+			assertThat(resource.getPropertyValue("oneFraction"), hasValue(Double.valueOf(1)));
+			assertThat(resource.getPropertyValue("integer"), hasValue(Integer.valueOf(123)));
+			assertThat(resource.getPropertyValue("negative"), hasValue(Integer.valueOf(-123)));
+			assertThat(resource.getPropertyValue("long"), hasValue(Long.valueOf(3456789123L)));
+			assertThat(resource.getPropertyValue("fraction"), hasValue(Double.valueOf(12345.6789)));
+			assertThat(resource.getPropertyValue("scientific1"), hasValue(Double.valueOf(1.23e+4)));
+			assertThat(resource.getPropertyValue("scientific2"), hasValue(Double.valueOf(12.3e-4)));
+			assertThat(resource.getPropertyValue("scientific3"), hasValue(Double.valueOf(-123.4e+5)));
+			assertThat(resource.getPropertyValue("scientific4"), hasValue(Double.valueOf(-321.45e-12)));
+			assertThat(resource.getPropertyValue("scientific5"), hasValue(Double.valueOf(45.67e+89)));
+			//These BigDecimal tests require identical scale, which is why "$0.0" isn't compared to BigDecimal.ZERO.
+			//If value equivalence regardless of scale is desired, use BigDecimal.compare().
+			assertThat(resource.getPropertyValue("decimal"), hasValue(new BigDecimal("0.3")));
+			assertThat(resource.getPropertyValue("money"), hasValue(new BigDecimal("1.23")));
+			assertThat(resource.getPropertyValue("decimalZero"), hasValue(BigInteger.ZERO));
+			assertThat(resource.getPropertyValue("decimalZeroFraction"), hasValue(new BigDecimal("0.0")));
+			assertThat(resource.getPropertyValue("decimalOne"), hasValue(BigInteger.ONE));
+			assertThat(resource.getPropertyValue("decimalOneFraction"), hasValue(new BigDecimal("1.0")));
+			assertThat(resource.getPropertyValue("decimalInteger"), hasValue(new BigInteger("123")));
+			assertThat(resource.getPropertyValue("decimalNegative"), hasValue(new BigInteger("-123")));
+			assertThat(resource.getPropertyValue("decimalLong"), hasValue(new BigInteger("3456789123")));
+			assertThat(resource.getPropertyValue("decimalFraction"), hasValue(new BigDecimal("12345.6789")));
+			assertThat(resource.getPropertyValue("decimalScientific1"), hasValue(new BigDecimal("1.23e+4")));
+			assertThat(resource.getPropertyValue("decimalScientific2"), hasValue(new BigDecimal("12.3e-4")));
+			assertThat(resource.getPropertyValue("decimalScientific3"), hasValue(new BigDecimal("-123.4e+5")));
+			assertThat(resource.getPropertyValue("decimalScientific4"), hasValue(new BigDecimal("-321.45e-12")));
+			assertThat(resource.getPropertyValue("decimalScientific5"), hasValue(new BigDecimal("45.67e+89")));
+		}
+	}
 
 	//##regular expression
 

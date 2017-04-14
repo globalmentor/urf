@@ -22,6 +22,8 @@ import static io.urf.SURF.*;
 import static io.urf.SURF.WHITESPACE_CHARACTERS;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -124,6 +126,20 @@ public class SurfParser {
 				break;
 			case IRI_BEGIN:
 				resource = parseIRI(reader);
+				break;
+			case NUMBER_DECIMAL_BEGIN:
+			case NUMBER_NEGATIVE_SYMBOL:
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				resource = parseNumber(reader);
 				break;
 			case REGULAR_EXPRESSION_DELIMITER:
 				resource = parseRegularExpression(reader);
@@ -240,6 +256,93 @@ public class SurfParser {
 			return new URI(iriString);
 		} catch(final URISyntaxException uriSyntaxException) {
 			throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+		}
+	}
+
+	/**
+	 * Parses a number. The current position must be that of the first character of the number. The new position will be that immediately after the number, or at
+	 * the end of the reader.
+	 * <p>
+	 * This implementation will return one of the following types:
+	 * </p>
+	 * <dl>
+	 * <dt>{@link Integer}</dt>
+	 * <dd>All non-decimal, non-fractional, non-exponent non-decimal numbers that fall within the range of <code>int</code>.</dd>
+	 * <dt>{@link Long}</dt>
+	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>int</code> but within the range of <code>long</code>.</dd>
+	 * <dt>{@link Double}</dt>
+	 * <dd>All non-decimal fractional numbers that fall within the range of <code>double</code>.</dd>
+	 * <dt>{@link BigInteger}</dt>
+	 * <dd>All non-fractional decimal numbers.</dd>
+	 * <dt>{@link BigDecimal}</dt>
+	 * <dd>All fractional decimal numbers.</dd>
+	 * </dl>
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A Java {@link Number} containing the number parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
+	 */
+	public static Number parseNumber(final Reader reader) throws IOException, ParseIOException {
+		int c = peek(reader); //there must be at least one number character
+		//check for decimal: $
+		final boolean isDecimal;
+		if(c == NUMBER_DECIMAL_BEGIN) {
+			isDecimal = true;
+			check(reader, NUMBER_DECIMAL_BEGIN);
+			c = peek(reader);
+		} else {
+			isDecimal = false;
+		}
+		boolean hasFraction = false;
+		boolean hasExponent = false;
+		final StringBuilder stringBuilder = new StringBuilder();
+		if(c == NUMBER_NEGATIVE_SYMBOL) { //-
+			stringBuilder.append(check(reader, NUMBER_NEGATIVE_SYMBOL));
+		}
+		stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all integer digits; there must be at least one
+		c = peekEnd(reader); //peek the next character
+		if(c >= 0) { //if we're not at the end of the reader
+			//check for fraction
+			if(c == NUMBER_FRACTION_DELIMITER) { //if there is a fractional part
+				hasFraction = true; //we found a fraction
+				stringBuilder.append(check(reader, NUMBER_FRACTION_DELIMITER)); //read and append the beginning decimal point
+				stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all digits; there must be at least one
+				c = peekEnd(reader); //peek the next character
+			}
+			//check for exponent
+			if(c >= 0 && NUMBER_EXPONENT_DELIMITER_CHARACTERS.contains((char)c)) { //this is an exponent
+				hasExponent = true; //we found an exponent
+				stringBuilder.append(check(reader, (char)c)); //read and append the exponent character
+				c = peekEnd(reader); //peek the next character
+				if(c >= 0 && NUMBER_EXPONENT_SIGN_CHARACTERS.contains((char)c)) { //if the exponent starts with a sign
+					stringBuilder.append(check(reader, (char)c)); //append the sign
+				}
+				stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all exponent digits; there must be at least one
+			}
+		}
+		final String numberString = stringBuilder.toString(); //convert the number to a string
+		try {
+			if(isDecimal) {
+				if(hasFraction || hasExponent) { //if there was a fraction or exponent
+					return new BigDecimal(numberString);
+				} else { //if there is no fraction or exponent
+					return new BigInteger(numberString);
+				}
+			} else {
+				if(hasFraction || hasExponent) { //if there was a fraction or exponent
+					return Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it
+				} else { //if there is no fraction or exponent
+					final long longValue = Long.parseLong(numberString);
+					if(longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) { //return an Integer if we can
+						return Integer.valueOf((int)longValue);
+					} else { //otherwise return a Long
+						return Long.valueOf(longValue);
+					}
+				}
+			}
+		} catch(final NumberFormatException numberFormatException) { //if the number was not syntactically correct
+			throw new ParseIOException(reader, "Invalid number format: " + numberString, numberFormatException);
 		}
 	}
 
