@@ -98,7 +98,7 @@
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-rule">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
-		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">decimal</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">temporal</code> | <code class="name">uuid</code> | <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">temporal</code> | <code class="name">uuid</code> | <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
 	</ul>
 	<p> A label consists of an identifier surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>).</p>
 	<ul class="spec-rule">
@@ -123,7 +123,7 @@
 	<h4>Binary</h4>
 	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the <q>Base 64 Encoding</q> defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, surrounded on both sides by the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-should">should</span> include Base 64 padding, although a SURF parser <span class="spec-must">must</span> accept binary data that does not include such padding.</p>
 	<ul class="spec-rule">
-		<li><code class="name">binary</code> ⇒ '%' rfc_4648_base_64 '%'</li>
+		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code> '%'</li>
 	</ul>
 	<h4>Boolean</h4>
 	<p>A Boolean is a either of the tokens <code>true</code> or <code>false</code>.</p>
@@ -133,16 +133,36 @@
 	<h4>IRI</h4>
 	<p>An <dfn>Internationalized Resource Identifiers</dfn> (<abbr>IRI</abbr>) is a sequence of Unicode characters for identifying a resource as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. In SURF an IRI is placed between a <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>) and a <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>).</p>
 	<ul class="spec-rule">
-		<li><code class="name">iri</code> ⇒ '&lt;' rfc_3987_IRI '&gt;'</li>
+		<li><code class="name">iri</code> ⇒ '&lt;' <code class="name">rfc_3987_IRI</code> '&gt;'</li>
+	</ul>
+	<h4>Number</h4>
+	<aside class="note far third">Non-decimal SURF numbers are identical to those of JSON, except that SURF allows leading zeros. <span class="see">See <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
+	<aside class="note far third">Examples of decimal types SURF processors <span class="spec-may">may</span> use include:
+		<dl>
+			<dt>C#</dt>
+			<dd><a href="https://msdn.microsoft.com/en-us/library/364x0z75.aspx"><code class="see">decimal</code></a></dd>
+			<dt>Java</dt>
+			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html"><code class="see">java.math.BigDecimal</code></a></dd>
+			<dt>Python</dt>
+			<dd><a href="https://docs.python.org/3/library/decimal.html" class="see"><code>decimal</code></a></dd>
+		</dl>
+	</aside>
+	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>&lt;</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<ul class="spec-rule">
+		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
+		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
+		<li><code class="name">fraction</code> ⇒ '.' <code class="name">digit</code>+</li>
+		<li><code class="name">exponent</code> ⇒ ('e' | 'E') ['-' | '+'] <code class="name">digit</code>+</li>
+		<li><code class="name">digit</code> ⇒ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'</li>
 	</ul>
 	<h4>Regular Expression</h4>
 	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
-	<p>A regular expression is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
+	<p>A <dfn>regular expression</dfn> is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
 	<p>TODO decide on whether and how to allow flags</p>
 	<p>TODO production</p>
 	<h4>String</h4>
 	<aside class="note far third"><span class="see">Compare to <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
-	<p>A string represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
+	<p>A <dfn>string</dfn> represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
 	<dl>
 		<dt><code>\\</code></dt>
 		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
@@ -169,8 +189,10 @@
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>List</h4>
-	<aside class="note far third">Examples of list types SURF processors may use include:
+	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
 		<dl>
+			<dt>C#</dt>
+			<dd><a href="https://msdn.microsoft.com/en-us/library/6sh2ey19.aspx"><code class="see">System.Collections.Generic.List&lt;T&gt;</code></a></dd>
 			<dt>Java</dt>
 			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html"><code class="see">java.util.List&lt;E&gt;</code></a></dd>
 			<dt>JavaScript</dt>
@@ -196,7 +218,7 @@
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-08.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-14.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
