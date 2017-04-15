@@ -147,7 +147,7 @@
 			<dd><a href="https://docs.python.org/3/library/decimal.html" class="see"><code>decimal</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>&lt;</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
 	<ul class="spec-rule">
 		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
@@ -186,6 +186,34 @@
 		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
 	</dl>
 	<p> TODO production</p>
+	<h4>Temporal</h4>
+	<aside class="note far third">Although JSON does not support dates, the SURF <code class="name">instant</code> format  is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="see"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
+	<aside class="note far half">The format for <code class="name">zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="see"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
+	<p>The SURF <dfn>temporal</dfn> representation encodes date and/or time information based on <a href="#ref-iso8601" class="ref">ISO 8601</a>. A temporal starts with the <code class="name">COMMERCIAL AT</code> character <code>@</code> (<code class="unicode">U+0040</code>). Time zone names <code class="name">tz</code> are from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database and are case-sensitive. <span class="info">The format for <code>month_day</code> conforms to an older version of <a href="#ref-iso8601" class="ref">ISO 8601</a>; the most recent version does not mention a month+day format.</span> <span class="info">The format for <code>zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification.</span></p>
+	<ul class="spec-rule">
+		<li><code class="name">temporal</code> ⇒ '@' (<code class="name">instant</code> | <code class="name">zoned_date_time</code> | <code class="name">offset_date_time</code> | <code class="name">offset_date</code> | <code class="name">offset_time</code> | <code class="name">local_date_time</code> | <code class="name">local_date</code> | <code class="name">local_time</code> | <code class="name">year_month</code> | <code class="name">month_day</code> | <code class="name">year</code>)</li>
+		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
+		<li><code class="name">zoned_date_time</code> ⇒ <code class="name">offset_date_time</code> '[' <code class="name">tz</code> ']'</li>
+		<li><code class="name">offset_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> <code class="name">offset</code></li>
+		<li><code class="name">offset_date</code> ⇒ <code class="name">date</code> <code class="name">offset</code></li>
+		<li><code class="name">offset_time</code> ⇒ <code class="name">time</code> <code class="name">offset</code></li>
+		<li><code class="name">local_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code><code class="name"></code></li>
+		<li><code class="name">local_date</code> ⇒ <code class="name">date</code></li>
+		<li><code class="name">local_time</code> ⇒ <code class="name">time</code></li>
+		<li><code class="name">year_month</code> ⇒ <code class="name">YYYY</code> '-' <code class="name">MM</code><code class="name"></code></li>
+		<li><code class="name">month_day</code> ⇒ '-' '-' <code class="name">MM</code> '-' <code class="name">DD</code><code class="name"></code></li>
+		<li><code class="name">date</code> ⇒ <code class="name">YYYY</code> '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
+		<li><code class="name">time</code> ⇒ <code class="name">hh</code> ':' <code class="name">mm</code> ':' <code class="name">ss</code> ['.' <code class="name">s</code>]</li>
+		<li><code class="name">offset</code> ⇒ ('+' | '-') <code class="name">hh</code> ':' <code class="name">mm</code></li>
+		<li><code class="name">YYYY</code> ⇒ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">MM</code> ⇒ <code class="name">digit</code> <code class="name">digit</code><code class="name"></code></li>
+		<li><code class="name">DD</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">hh</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">mm</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">ss</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">s</code> ⇒ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> ] ]</li>
+	</ul>
+	<p><span style="color: #111111;">TODO add support for durations</span></p>
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>List</h4>
@@ -207,6 +235,8 @@
 	</ul>
 	<h2>References</h2>
 	<dl>
+		<dt id="ref-iso8601" class="ref-target">ISO 8601:2004</dt>
+		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed, Innosoft, N. Borenstein. IETF.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
@@ -217,8 +247,10 @@
 		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson, SJD. IETF.</dd>
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
+		<dt id="ref-tz" class="ref-target">TZ</dt>
+		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-14.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-15.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
