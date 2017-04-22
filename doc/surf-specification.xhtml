@@ -188,8 +188,24 @@
 	<p> TODO production</p>
 	<h4>Temporal</h4>
 	<aside class="note far third">Although JSON does not support dates, the SURF <code class="name">instant</code> format  is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="see"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
-	<aside class="note far half">The format for <code class="name">zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="see"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
 	<p>The SURF <dfn>temporal</dfn> representation encodes date and/or time information based on <a href="#ref-iso8601" class="ref">ISO 8601</a>. A temporal starts with the <code class="name">COMMERCIAL AT</code> character <code>@</code> (<code class="unicode">U+0040</code>). Time zone names <code class="name">tz</code> are from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database and are case-sensitive. <span class="info">The format for <code>month_day</code> conforms to an older version of <a href="#ref-iso8601" class="ref">ISO 8601</a>; the most recent version does not mention a month+day format.</span> <span class="info">The format for <code>zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification.</span></p>
+	<aside class="note">The format for <code class="name">zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="see"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
+	<figure class="far half">
+		<figcaption>Example SURF temporal values.</figcaption>
+		<ul>
+			<li><code class="language-surf">@2017-02-12T23:29:18.829Z</code></li>
+			<li><code class="language-surf">@2017-02-12T15:29:18.829-08:00[America/Los_Angeles]</code></li>
+			<li><code class="language-surf">@2017-02-12T15:29:18.829-08:00</code></li>
+			<li><code class="language-surf">@2017-02-12-08:00</code></li>
+			<li><code class="language-surf">@15:29:18.829-08:00</code></li>
+			<li><code class="language-surf">@2017-02-12T15:29:18.829</code></li>
+			<li><code class="language-surf">@2017-02-12</code></li>
+			<li><code class="language-surf">@15:29:18.829</code></li>
+			<li><code class="language-surf">@2017-02</code></li>
+			<li><code class="language-surf">@--02-12</code></li>
+			<li><code class="language-surf">@2017</code></li>
+		</ul>
+	</figure>
 	<ul class="spec-rule">
 		<li><code class="name">temporal</code> ⇒ '@' (<code class="name">instant</code> | <code class="name">zoned_date_time</code> | <code class="name">offset_date_time</code> | <code class="name">offset_date</code> | <code class="name">offset_time</code> | <code class="name">local_date_time</code> | <code class="name">local_date</code> | <code class="name">local_time</code> | <code class="name">year_month</code> | <code class="name">month_day</code> | <code class="name">year</code>)</li>
 		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
@@ -250,7 +266,7 @@
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-15.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-22.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
