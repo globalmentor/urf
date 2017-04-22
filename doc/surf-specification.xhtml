@@ -61,7 +61,7 @@
 	<h4>Line Breaks</h4>
 	<aside class="tip far third">A parser may simply discard line comments and parse the SURF document as if they were not present.</aside>
 	<p>A line comment may appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">line_break</code> ⇒ <code class="name">line_comment</code>? <code class="name">eol</code></li>
 		<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]*</li>
 	</ul>
@@ -70,7 +70,7 @@
 	<aside class="note far third">The list separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
 	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
 	</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
 		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
 		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
@@ -91,23 +91,23 @@
 		</ul>
 	</figure>
 	<p>A <dfn>name</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category, or the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>).</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code> | '-')*</li>
 	</ul>
 	<h2>Resources</h2>
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">temporal</code> | <code class="name">uuid</code> | <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
 	</ul>
 	<p> A label consists of an identifier surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>).</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name"> label</code> ⇒ '|' <code class="name">name</code> '|'</li>
 	</ul>
 	<p>The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
 	<h3>Objects</h3>
 	<p>Objects are descriptions of unidentified resources.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">object_begin</code> ⇒ '*'</li>
 		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> [<code class="name">type</code>] [<code class="name">properties</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">name</code></li>
@@ -122,17 +122,17 @@
 	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
 	<h4>Binary</h4>
 	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the <q>Base 64 Encoding</q> defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, surrounded on both sides by the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-should">should</span> include Base 64 padding, although a SURF parser <span class="spec-must">must</span> accept binary data that does not include such padding.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code> '%'</li>
 	</ul>
 	<h4>Boolean</h4>
 	<p>A Boolean is a either of the tokens <code>true</code> or <code>false</code>.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
 	</ul>
 	<h4>IRI</h4>
 	<p>An <dfn>Internationalized Resource Identifiers</dfn> (<abbr>IRI</abbr>) is a sequence of Unicode characters for identifying a resource as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. In SURF an IRI is placed between a <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>) and a <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>).</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">iri</code> ⇒ '&lt;' <code class="name">rfc_3987_IRI</code> '&gt;'</li>
 	</ul>
 	<h4>Number</h4>
@@ -148,7 +148,7 @@
 		</dl>
 	</aside>
 	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
 		<li><code class="name">fraction</code> ⇒ '.' <code class="name">digit</code>+</li>
@@ -206,7 +206,7 @@
 			<li><code class="language-surf">@2017</code></li>
 		</ul>
 	</figure>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">temporal</code> ⇒ '@' (<code class="name">instant</code> | <code class="name">zoned_date_time</code> | <code class="name">offset_date_time</code> | <code class="name">offset_date</code> | <code class="name">offset_time</code> | <code class="name">local_date_time</code> | <code class="name">local_date</code> | <code class="name">local_time</code> | <code class="name">year_month</code> | <code class="name">month_day</code> | <code class="name">year</code>)</li>
 		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
 		<li><code class="name">zoned_date_time</code> ⇒ <code class="name">offset_date_time</code> '[' <code class="name">tz</code> ']'</li>
@@ -246,7 +246,7 @@
 		</dl>
 	</aside>
 	<p>A SURF <dfn>list</dfn> is an ordered sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF processor should represent a SURF list using an corresponding language construct that represents list semantics.</p>
-	<ul class="spec-rule">
+	<ul class="spec-production">
 		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
 	</ul>
 	<h2>References</h2>
