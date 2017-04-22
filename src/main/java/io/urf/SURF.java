@@ -120,6 +120,13 @@ public class SURF {
 	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
 	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
 
+	/** The delimiter that begins temporal literal representations. */
+	public static final char TEMPORAL_BEGIN = '@';
+	/** The ISO 8601 extension delimiter indicating the start of a time zone designation. */
+	public static final char TEMPORAL_ZONE_BEGIN = '[';
+	/** The ISO 8601 extension delimiter indicating the end of a time zone designation. */
+	public static final char TEMPORAL_ZONE_END = ']';
+
 	//collections
 
 	/** The delimiter that begins lists. */
