@@ -90,6 +90,9 @@ public class SurfTestResources {
 	public static final String OK_STRING_FOOBAR_RESOURCE_NAME = "ok-string-foobar.surf";
 	public static final String OK_STRINGS_RESOURCE_NAME = "ok-strings.surf";
 
+	//##temporal
+	public static final String OK_TEMPORALS_RESOURCE_NAME = "ok-temporals.surf";
+
 	//#collections
 
 	//##list

@@ -1,0 +1,14 @@
+*:
+	instant = @2017-02-12T23:29:18.829Z
+	! TODO add tests for no milliseconds, nanoseconds, etc.
+	zonedDateTime = @2017-02-12T15:29:18.829-08:00[America/Los_Angeles]
+	offsetDateTime = @2017-02-12T15:29:18.829-08:00
+	! TODO under consideration: offsetDate = @2017-02-12-08:00
+	offsetTime = @15:29:18.829-08:00
+	localDateTime = @2017-02-12T15:29:18.829
+	localDate = @2017-02-12
+	localTime = @15:29:18.829
+	yearMonth = @2017-02
+	monthDay = @--02-12
+	year = @2017
+;
