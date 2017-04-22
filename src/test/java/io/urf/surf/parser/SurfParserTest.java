@@ -22,6 +22,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -278,6 +279,26 @@ public class SurfParserTest {
 	//TODO add bad tests with control characters
 	//TODO add bad tests to prevent escaping normal characters 
 	//TODO add bad tests with invalid surrogate character sequences
+
+	//##temporal
+
+	/** @see SurfTestResources#OK_TEMPORALS_RESOURCE_NAME */
+	@Test
+	public void testOkTemporals() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_TEMPORALS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("instant"), hasValue(Instant.parse("2017-02-12T23:29:18.829Z")));
+			assertThat(resource.getPropertyValue("zonedDateTime"), hasValue(ZonedDateTime.parse("2017-02-12T15:29:18.829-08:00[America/Los_Angeles]")));
+			assertThat(resource.getPropertyValue("offsetDateTime"), hasValue(OffsetDateTime.parse("2017-02-12T15:29:18.829-08:00")));
+			assertThat(resource.getPropertyValue("offsetTime"), hasValue(OffsetTime.parse("15:29:18.829-08:00")));
+			assertThat(resource.getPropertyValue("localDateTime"), hasValue(LocalDateTime.parse("2017-02-12T15:29:18.829")));
+			assertThat(resource.getPropertyValue("localDate"), hasValue(LocalDate.parse("2017-02-12")));
+			assertThat(resource.getPropertyValue("localTime"), hasValue(LocalTime.parse("15:29:18.829")));
+			assertThat(resource.getPropertyValue("yearMonth"), hasValue(YearMonth.parse("2017-02")));
+			assertThat(resource.getPropertyValue("monthDay"), hasValue(MonthDay.parse("--02-12")));
+			assertThat(resource.getPropertyValue("year"), hasValue(Year.parse("2017")));
+		}
+	}
 
 	//#collections
 

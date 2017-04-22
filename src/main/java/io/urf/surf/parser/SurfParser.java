@@ -25,6 +25,9 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
+import java.time.*;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -32,6 +35,7 @@ import javax.annotation.*;
 
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.function.IOConsumer;
+import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.java.Characters;
 
 import io.urf.SURF;
@@ -146,6 +150,9 @@ public class SurfParser {
 				break;
 			case STRING_BEGIN:
 				resource = parseString(reader);
+				break;
+			case TEMPORAL_BEGIN:
+				resource = parseTemporal(reader);
 				break;
 			//collections
 			case LIST_BEGIN:
@@ -459,6 +466,142 @@ public class SurfParser {
 			c = readCharacter(reader); //read another a character
 		}
 		return stringBuilder.toString(); //return the string we constructed
+	}
+
+	/**
+	 * Parses a temporal. The current position must be that of the first character of the temporal. The new position will be that immediately after the temporal,
+	 * or at the end of the reader.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A Java representation of the temporal parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the temporal is not in the correct format, or if the temporal is outside the range that can be represented by this parser.
+	 */
+	public static TemporalAccessor parseTemporal(final Reader reader) throws IOException, ParseIOException {
+		check(reader, TEMPORAL_BEGIN);
+
+		int c; //we'll use this to keep track of the next character
+		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the temporal
+		try {
+			//YearMonth, MonthDay, and Year are returned from within the parsing logic; all other types are returned at the end
+			c = peekEnd(reader);
+			//TODO implement duration
+			if(c == ISO8601.DATE_DELIMITER) { //--MM-DD
+				return MonthDay.parse(readString(reader, 7));
+			}
+			String temporalStart = readMinimum(reader, 1, '0', '9'); //read all digits; there should be at least one
+			final int dateTimeStartLength = temporalStart.length(); //get the length of the date time start
+			final boolean hasDate; //determine if there is a date
+			final boolean hasTime; //determine if there is a time
+			if(dateTimeStartLength == 4) { //we've started a date
+				//YYYY
+				hasDate = true;
+				stringBuilder.append(temporalStart); //append the beginning date time characters
+				c = peekEnd(reader); //peek the next character
+				if(c != ISO8601.DATE_DELIMITER) { //if the year is not part of a longer date
+					return Year.parse(stringBuilder.toString());
+				}
+				stringBuilder.append(check(reader, ISO8601.DATE_DELIMITER)); //read and add the date delimiter
+				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the month
+				c = peekEnd(reader); //peek the next character
+				if(c != ISO8601.DATE_DELIMITER) { //if the year and month are not part of a longer date
+					return YearMonth.parse(stringBuilder.toString());
+				}
+				stringBuilder.append(check(reader, ISO8601.DATE_DELIMITER)); //read and add the date delimiter
+				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the day
+				//YYYY-MM-DD
+				c = peekEnd(reader); //peek the next character
+				//TODO consider supporting OffsetDate; see e.g. http://stackoverflow.com/q/7788267/421049
+				hasTime = c == ISO8601.TIME_BEGIN;
+				if(hasTime) { //if this is the beginning of a time
+					//YYYY-MM-DDThh:mm:ss
+					stringBuilder.append(check(reader, ISO8601.TIME_BEGIN)); //read and append the time delimiter
+					temporalStart = readStringCheck(reader, 2, '0', '9'); //read the hour, and then let the time code take over
+				}
+			} else { //if we didn't start a date
+				hasDate = false;
+				if(dateTimeStartLength == 2) { //if we're starting a time
+					hasTime = true; //we need to parse the time
+				} else { //if this is neither the start of a date nor the start of a time
+					throw new ParseIOException(reader, "Incorrect start of a date, time, or date time: " + temporalStart);
+				}
+			}
+			final boolean isUTC; //determine if there is a UTC designation
+			final boolean hasOffset; //determine if there is a zone offset
+			final boolean hasZone; //determine if there is a time zone
+			if(hasTime) { //if we need to parse time
+				//…:mm:ss
+				stringBuilder.append(temporalStart); //append the beginning date time characters
+				stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
+				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the minutes
+				stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
+				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the seconds
+				c = peekEnd(reader); //peek the next character
+				if(c == ISO8601.TIME_SUBSECONDS_DELIMITER) { //if this is a time subseconds delimiter
+					//…:mm:ss.s
+					stringBuilder.append(check(reader, ISO8601.TIME_SUBSECONDS_DELIMITER)); //read and append the time subseconds delimiter
+					stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all subseconds
+				}
+				c = peekEnd(reader); //peek the next character
+				isUTC = c == ISO8601.UTC_DESIGNATOR;
+				hasOffset = !isUTC && c >= 0 && ISO8601.SIGNS.contains((char)c);
+				if(isUTC) {
+					//…:mm:ss…Z
+					hasZone = false;
+					stringBuilder.append(check(reader, ISO8601.UTC_DESIGNATOR)); //read and add the UTC designator
+				} else if(hasOffset) { //if this is the start of a UTC offset
+					//…:mm:ss…±hh:mm
+					stringBuilder.append(check(reader, (char)c)); //read and add the delimiter
+					stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read two digits
+					stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
+					stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read two digits
+					c = peekEnd(reader); //peek the next character
+					hasZone = c == TEMPORAL_ZONE_BEGIN;
+					if(hasZone) {
+						//…:mm:ss…±hh:mm[tz]
+						stringBuilder.append(check(reader, TEMPORAL_ZONE_BEGIN));
+						stringBuilder.append(reach(reader, TEMPORAL_ZONE_END));
+						stringBuilder.append(check(reader, TEMPORAL_ZONE_END));
+					}
+				} else {
+					hasZone = false;
+				}
+			} else {
+				isUTC = false;
+				hasOffset = false;
+				hasZone = false;
+			}
+			//YearMonth, MonthDay, and Year have been handled separately at this point
+			final String temporalString = stringBuilder.toString();
+			if(hasDate) {
+				if(hasTime) {
+					if(isUTC) {
+						assert !hasOffset;
+						return Instant.parse(temporalString);
+					} else if(hasOffset) {
+						if(hasZone) {
+							return ZonedDateTime.parse(temporalString);
+						} else { //offset with no zone
+							return OffsetDateTime.parse(temporalString);
+						}
+					} else { //not UTC, no offset, and no zone
+						return LocalDateTime.parse(temporalString);
+					}
+				} else { //date with no time
+					return LocalDate.parse(temporalString);
+				}
+			} else { //no date
+				assert hasTime;
+				assert !isUTC;
+				if(hasOffset) {
+					return OffsetTime.parse(temporalString);
+				} else { //not UTC, no offset, and no zone
+					return LocalTime.parse(temporalString);
+				}
+			}
+		} catch(final DateTimeParseException dateTimeParseException) {
+			throw new ParseIOException(reader, dateTimeParseException);
+		}
 	}
 
 	//collections
