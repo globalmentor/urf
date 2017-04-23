@@ -134,6 +134,11 @@ public class SURF {
 	/** The delimiter that ends lists. */
 	public static final char LIST_END = ']';
 
+	/** The delimiter that begins sets. */
+	public static final char SET_BEGIN = '(';
+	/** The delimiter that ends sets. */
+	public static final char SET_END = ')';
+
 	/**
 	 * Determines whether the given string conforms to the rules for a SURF name.
 	 * @param string The string to test.
