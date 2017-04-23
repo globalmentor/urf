@@ -123,4 +123,33 @@ public class SurfTestResources {
 	public static Set<String> OK_LIST_TWO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_TWO_ITEMS_0_RESOURCE_NAME, OK_LIST_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_1_RESOURCE_NAME, OK_LIST_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_LIST_TWO_ITEMS_2_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
+
+	//##set
+	public static final String OK_SET_NO_ITEMS_0_RESOURCE_NAME = "ok-set-no-items-0.surf";
+	public static final String OK_SET_NO_ITEMS_1_RESOURCE_NAME = "ok-set-no-items-1.surf";
+	public static final String OK_SET_NO_ITEMS_2_RESOURCE_NAME = "ok-set-no-items-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_SET_NO_ITEMS_0_RESOURCE_NAME}. */
+	public static Set<String> OK_SET_NO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_SET_NO_ITEMS_0_RESOURCE_NAME, OK_SET_NO_ITEMS_1_RESOURCE_NAME,
+			OK_SET_NO_ITEMS_2_RESOURCE_NAME);
+
+	public static final String OK_SET_ONE_ITEM_0_RESOURCE_NAME = "ok-set-one-item-0.surf";
+	public static final String OK_SET_ONE_ITEM_1_RESOURCE_NAME = "ok-set-one-item-1.surf";
+	public static final String OK_SET_ONE_ITEM_2_RESOURCE_NAME = "ok-set-one-item-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_SET_ONE_ITEM_0_RESOURCE_NAME}. */
+	public static Set<String> OK_SET_ONE_ITEM_RESOURCE_NAMES = immutableSetOf(OK_SET_ONE_ITEM_0_RESOURCE_NAME, OK_SET_ONE_ITEM_1_RESOURCE_NAME,
+			OK_SET_ONE_ITEM_2_RESOURCE_NAME);
+
+	public static final String OK_SET_TWO_ITEMS_0_RESOURCE_NAME = "ok-set-two-items-0.surf";
+	public static final String OK_SET_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME = "ok-set-two-items-0-whitespace.surf";
+	public static final String OK_SET_TWO_ITEMS_1_RESOURCE_NAME = "ok-set-two-items-1.surf";
+	public static final String OK_SET_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME = "ok-set-two-items-1-no-commas.surf";
+	public static final String OK_SET_TWO_ITEMS_2_RESOURCE_NAME = "ok-set-two-items-2.surf";
+	public static final String OK_SET_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME = "ok-set-two-items-2-no-commas.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_SET_TWO_ITEMS_0_RESOURCE_NAME}. */
+	public static Set<String> OK_SET_TWO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_SET_TWO_ITEMS_0_RESOURCE_NAME, OK_SET_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME,
+			OK_SET_TWO_ITEMS_1_RESOURCE_NAME, OK_SET_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_SET_TWO_ITEMS_2_RESOURCE_NAME,
+			OK_SET_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
 }
