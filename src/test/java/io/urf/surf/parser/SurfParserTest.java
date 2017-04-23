@@ -23,12 +23,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.time.*;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static io.urf.surf.test.SurfTestResources.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
@@ -350,5 +350,52 @@ public class SurfParserTest {
 	}
 
 	//TODO create tests for bad properties, such as double list item separators
+
+	//##set
+
+	/** @see SurfTestResources#OK_SET_NO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkSetNoItems() throws IOException {
+		for(final String okSetNoItemsResourceName : OK_SET_NO_ITEMS_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSetNoItemsResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okSetNoItemsResourceName, object, isPresent());
+				assertThat(okSetNoItemsResourceName, object, hasValue(instanceOf(Set.class)));
+				final Set<?> set = (Set<?>)object.get();
+				assertThat(okSetNoItemsResourceName, set, hasSize(0));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_SET_ONE_ITEM_RESOURCE_NAMES */
+	@Test
+	public void testOkSetOneItem() throws IOException {
+		for(final String okSetOneItemResourceName : OK_SET_ONE_ITEM_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSetOneItemResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okSetOneItemResourceName, object, isPresent());
+				assertThat(okSetOneItemResourceName, object, hasValue(instanceOf(Set.class)));
+				final Set<?> set = (Set<?>)object.get();
+				assertThat(okSetOneItemResourceName, set, equalTo(new HashSet<Object>(asList("one"))));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_SET_TWO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkSetTwoItems() throws IOException {
+		for(final String okSetTwoItemsResourceName : OK_SET_TWO_ITEMS_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSetTwoItemsResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okSetTwoItemsResourceName, object, isPresent());
+				assertThat(okSetTwoItemsResourceName, object, hasValue(instanceOf(Set.class)));
+				final Set<?> set = (Set<?>)object.get();
+				assertThat(okSetTwoItemsResourceName, set, hasSize(2));
+				assertThat(okSetTwoItemsResourceName, set, equalTo(new HashSet<Object>(asList("one", "two"))));
+			}
+		}
+	}
+
+	//TODO create tests for duplicate items and double list item separators
 
 }

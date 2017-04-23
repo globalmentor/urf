@@ -158,6 +158,9 @@ public class SurfParser {
 			case LIST_BEGIN:
 				resource = parseList(reader);
 				break;
+			case SET_BEGIN:
+				resource = parseSet(reader);
+				break;
 			default:
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 		}
@@ -618,6 +621,20 @@ public class SurfParser {
 		parseSequence(reader, LIST_END, r -> list.add(parseResource(r)));
 		check(reader, LIST_END); //]
 		return list;
+	}
+
+	/**
+	 * Parses an a set. The current position must be for {@value SURF#SET_BEGIN}. The new position will be that immediately following {@value SURF#SET_END}.
+	 * @param document The document being parsed.
+	 * @param reader The reader containing SURF data.
+	 * @throws IOException If there was an error reading the SURF data.
+	 */
+	public Set<?> parseSet(@Nonnull final Reader reader) throws IOException {
+		final Set<Object> set = new HashSet<>();
+		check(reader, SET_BEGIN); //[
+		parseSequence(reader, SET_END, r -> set.add(parseResource(r)));
+		check(reader, SET_END); //]
+		return set;
 	}
 
 	//parsing
