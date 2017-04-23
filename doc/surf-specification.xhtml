@@ -33,9 +33,9 @@
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
-	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Prose and asides marked as <span class="note">note</span> are non-normative.</p>
+	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Prose and asides marked as <span class="note">notes</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
-	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF processors <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
+	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF parsers <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, containing no resources.</p>
 	<h3>Whitespace</h3>
@@ -240,15 +240,34 @@
 			<dt>Java</dt>
 			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html"><code class="see">java.util.List&lt;E&gt;</code></a></dd>
 			<dt>JavaScript</dt>
-			<dd><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="see">Array</a></dd>
+			<dd><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="see"><code>Array</code></a></dd>
 			<dt>Python</dt>
-			<dd><a href="https://docs.python.org/3/tutorial/datastructures.html#more-on-lists" class="see">list</a></dd>
+			<dd><a href="https://docs.python.org/3/library/stdtypes.html#list" class="see"><code>list</code></a></dd>
 		</dl>
 	</aside>
-	<p>A SURF <dfn>list</dfn> is an ordered sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF processor should represent a SURF list using an corresponding language construct that represents list semantics.</p>
+	<p>A SURF <dfn>list</dfn> is an <em>ordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF processor <span class="spec-should">should</span> represent a SURF list using an corresponding language construct that represents list semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
 	</ul>
+	<h4>Set</h4>
+	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
+		<dl>
+			<dt>C#</dt>
+			<dd><a href="https://msdn.microsoft.com/en-us/library/bb359438.aspx"><code class="see">System.Collections.Generic.HashSet&lt;T&gt;</code></a></dd>
+			<dt>Java</dt>
+			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html"><code class="see">java.util.Set&lt;E&gt;</code></a></dd>
+			<dt>JavaScript</dt>
+			<dd><a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Set" class="see"><code>Set</code></a></dd>
+			<dt>Python</dt>
+			<dd><a href="https://docs.python.org/3/library/stdtypes.html#set" class="see"><code>set</code></a></dd>
+		</dl>
+	</aside>
+	<p>A <dfn>set</dfn> in SURF is an <em>unordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set. A SURF processor <span class="spec-should">should</span> represent a SURF set using an corresponding language construct that represents list semantics.</p>
+	<ul class="spec-production">
+		<li><code class="name">set</code> ⇒ '(' <code class="name">resource-sequence</code> ')'</li>
+	</ul>
+	<h2><br />
+    </h2>
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-iso8601" class="ref-target">ISO 8601:2004</dt>
@@ -266,7 +285,7 @@
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-22.</small></footer>
+	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. Version 2017-04-23.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
