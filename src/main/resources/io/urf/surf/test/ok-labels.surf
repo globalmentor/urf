@@ -1,0 +1,21 @@
+|root|*:
+	foo=|number|123
+value = |test|false
+	thing =
+|object|*example-Type:
+		stuff=["one", |number|, "three"]
+	;
+! TODO add map tests after implementing maps
+!	map = {
+!		1: "one"
+!		2: |number|
+!		100: |object|
+!	}
+	set = (
+|number|
+	|test|
+		|object|
+		|new| * :description = "a new thing";
+		|another| *  :description = "yet another thing";
+	)
+;
