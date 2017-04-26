@@ -20,6 +20,7 @@ import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static io.urf.SURF.*;
 import static io.urf.SURF.WHITESPACE_CHARACTERS;
+import static java.util.Objects.*;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -42,12 +43,30 @@ import io.urf.SURF;
 
 /**
  * Simple parser for the Simple URF (SURF) document format.
+ * <p>
+ * This parser is meant to be used once for parsing a single SURF document. It should not be used to parse multiple documents, as it maintains parsing state.
+ * </p>
+ * <p>
+ * The parser should be released after use so as not to leak memory of parsed resources when labeled resources are present.
+ * </p>
+ * <p>
+ * This implementation is not thread safe.
+ * </p>
  * @author Garret Wilson
  */
 public class SurfParser {
 
 	/** The map of resources that have been labeled. */
-	private final Map<String, SurfResource> labeledResources = new HashMap<>();
+	private final Map<String, Object> labeledResources = new HashMap<>();
+
+	/**
+	 * Returns a parsed resource by its label.
+	 * @param label The label of the resource.
+	 * @return The resource associated with the given label, if any.
+	 */
+	public Optional<Object> getResourceByLabel(@Nonnull final String label) {
+		return Optional.ofNullable(labeledResources.get(requireNonNull(label))); //TODO be more rigorous here if/when null can be labeled
+	}
 
 	/**
 	 * Parses an URF resource from an input stream.
@@ -69,7 +88,9 @@ public class SurfParser {
 		if(skipWhitespaceLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
 			return Optional.empty(); //the SURF document is empty
 		}
-		return Optional.of(parseResource(reader));
+		final Object resource = parseResource(reader);
+		checkParseIO(reader, skipWhitespaceLineBreaks(reader) < 0, "No content allowed after root resource.");
+		return Optional.of(resource);
 	}
 
 	/**
@@ -109,10 +130,18 @@ public class SurfParser {
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
 		String label = null;
-		int c = peekEnd(reader); //peek the next character
-		if(c == LABEL_BEGIN) {
-			//TODO parse label
+		int c = peekEnd(reader);
+		if(c == LABEL_DELIMITER) {
+			check(reader, LABEL_DELIMITER);
+			label = parseName(reader);
+			check(reader, LABEL_DELIMITER);
 			c = skipWhitespace(reader);
+		}
+		if(label != null) { //see if this is a resource reference
+			final Object resource = labeledResources.get(label);
+			if(resource != null) { //TODO be more rigorous here if we allow null to be labeled
+				return resource;
+			}
 		}
 		final Object resource;
 		switch(c) {
@@ -148,7 +177,7 @@ public class SurfParser {
 			case REGULAR_EXPRESSION_DELIMITER:
 				resource = parseRegularExpression(reader);
 				break;
-			case STRING_BEGIN:
+			case STRING_DELIMITER:
 				resource = parseString(reader);
 				break;
 			case TEMPORAL_BEGIN:
@@ -163,6 +192,10 @@ public class SurfParser {
 				break;
 			default:
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
+		}
+		if(label != null) { //if a resource was labeled, save it for later
+			checkParseIO(reader, resource != null, "Cannot use label |%s| with null.", label);
+			labeledResources.put(label, resource);
 		}
 		return resource;
 	}
@@ -397,11 +430,10 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the string is not escaped correctly or reader has no more characters before the current string is completely parsed.
-	 * @see SURF#STRING_BEGIN
-	 * @see SURF#STRING_END
+	 * @see SURF#STRING_DELIMITER
 	 */
 	public static String parseString(final Reader reader) throws IOException, ParseIOException {
-		return parseString(reader, STRING_BEGIN, STRING_END);
+		return parseString(reader, STRING_DELIMITER, STRING_DELIMITER);
 	}
 
 	/**

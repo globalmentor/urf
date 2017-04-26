@@ -37,6 +37,7 @@ import static com.globalmentor.java.Bytes.*;
 import org.junit.*;
 
 import io.urf.surf.test.SurfTestResources;
+import junit.framework.AssertionFailedError;
 
 /**
  * Tests of {@link SurfParser}.
@@ -60,6 +61,8 @@ public class SurfParserTest {
 			}
 		}
 	}
+
+	//TODO add test for bad document with content after root resource; make sure this prohibition gets into the spec 
 
 	//#object
 
@@ -398,4 +401,58 @@ public class SurfParserTest {
 
 	//TODO create tests for duplicate items and double list item separators
 
+	//#labels
+
+	/** @see SurfTestResources#OK_LABELS_RESOURCE_NAME */
+	@Test
+	public void testOkLabels() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_LABELS_RESOURCE_NAME)) {
+			final SurfParser surfParser = new SurfParser();
+			final SurfResource root = (SurfResource)surfParser.parse(inputStream).get();
+			//|root|
+			final Optional<Object> rootLabeled = surfParser.getResourceByLabel("root");
+			assertThat(rootLabeled, hasValue(sameInstance(root)));
+			//|number|
+			final Object foo = root.getPropertyValue("foo").orElseThrow(AssertionFailedError::new);
+			assertThat(foo, is(123));
+			final Optional<Object> numberLabeled = surfParser.getResourceByLabel("number");
+			assertThat(numberLabeled, hasValue(sameInstance(foo)));
+			//|test|
+			final Object value = root.getPropertyValue("value").orElseThrow(AssertionFailedError::new);
+			assertThat(value, is(false));
+			final Optional<Object> testLabeled = surfParser.getResourceByLabel("test");
+			assertThat(testLabeled, hasValue(sameInstance(value)));
+			//|object|
+			final SurfResource thing = (SurfResource)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
+			//TODO assert type of thing
+			final Optional<Object> objectLabeled = surfParser.getResourceByLabel("object");
+			assertThat(objectLabeled, hasValue(sameInstance(thing)));
+			//list elements
+			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
+			assertThat(stuff, contains("one", 123, "three"));
+			assertThat(numberLabeled, hasValue(sameInstance(stuff.get(1))));
+			//map values TODO implement map label tests
+			//			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
+			//			assertThat(map.get(1), is)
+			//set members
+			@SuppressWarnings("unchecked")
+			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionFailedError::new);
+			assertThat(set, hasSize(5));
+			assertThat(set, hasItem(123));
+			assertThat(set, hasItem(false));
+			final Optional<Object> newLabeled = surfParser.getResourceByLabel("new");
+			final SurfResource newLabeledResource = (SurfResource)newLabeled.orElseThrow(AssertionFailedError::new);
+			assertThat(newLabeledResource.getPropertyValue("description"), hasValue("a new thing"));
+			final Optional<Object> anotherLabeled = surfParser.getResourceByLabel("another");
+			final SurfResource anotherLabeledResource = (SurfResource)anotherLabeled.orElseThrow(AssertionFailedError::new);
+			assertThat(anotherLabeledResource.getPropertyValue("description"), hasValue("yet another thing"));
+			assertThat(set, hasItem(sameInstance(numberLabeled.get())));
+			assertThat(set, hasItem(sameInstance(testLabeled.get())));
+			assertThat(set, hasItem(sameInstance(objectLabeled.get())));
+			assertThat(set, hasItem(sameInstance(newLabeledResource)));
+			assertThat(set, hasItem(sameInstance(anotherLabeledResource)));
+		}
+	}
+
+	//TODO create test with bad labels, such as labels with whitespace, labels for null, and redefined labels
 }
