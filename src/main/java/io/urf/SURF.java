@@ -54,10 +54,8 @@ public class SURF {
 	/** The character indicating the start of a Surf single-line comment. */
 	public static final char LINE_COMMENT_BEGIN = '!';
 
-	/** The delimiter that begins labels. */
-	public static final char LABEL_BEGIN = '|';
-	/** The delimiter that ends labels. */
-	public static final char LABEL_END = LABEL_BEGIN;
+	/** The delimiter that begins and ends labels. */
+	public static final char LABEL_DELIMITER = '|';
 
 	//objects
 
@@ -105,10 +103,8 @@ public class SURF {
 	/** The character used for escaping characters in a regular expression. */
 	public static final char REGULAR_EXPRESSION_ESCAPE = '\\';
 
-	/** The delimiter that begins string literal representations. */
-	public static final char STRING_BEGIN = '"';
-	/** The delimiter that ends string literal representations. */
-	public static final char STRING_END = STRING_BEGIN;
+	/** The delimiter that begins and ends string literal representations. */
+	public static final char STRING_DELIMITER = '"';
 	/** The character used for escaping characters in a string. */
 	public static final char STRING_ESCAPE = '\\';
 	//escaped forms of characters
