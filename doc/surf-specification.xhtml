@@ -24,9 +24,9 @@
 	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format for a directed graph of data values. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it is compatible with rigorous semantic frameworks such as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
 	<h3>Definitions</h3>
 	<dl>
-		<dt>SURF Parser</dt>
+		<dt>SURF parser</dt>
 		<dd>Any software component that interprets SURF syntax and produces an appropriate data model according to this specification.</dd>
-		<dt>SURF Generator</dt>
+		<dt>SURF generator</dt>
 		<dd>An software that produces SURF syntax complying with this specification to reflect some data model.</dd>
 	</dl>
 	<h3>Design Constraints</h3>
@@ -121,7 +121,7 @@
 		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> [<code class="name">type</code>] [<code class="name">properties</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">name</code></li>
 		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">name</code> <code class="name">line_break</code>* = <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">name</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
 	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
@@ -254,9 +254,29 @@
 			<dd><a href="https://docs.python.org/3/library/stdtypes.html#list" class="see"><code>list</code></a></dd>
 		</dl>
 	</aside>
-	<p>A SURF <dfn>list</dfn> is an <em>ordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF processor <span class="spec-should">should</span> represent a SURF list using an corresponding language construct that represents list semantics.</p>
+	<p>A SURF <dfn>list</dfn> is an <em>ordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF parser <span class="spec-should">should</span> represent a SURF list using an corresponding language construct that represents list semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
+	</ul>
+	<h4>Map</h4>
+	<aside class="note far third">Examples of map types SURF processors <span class="spec-may">may</span> use include:
+		<dl>
+			<dt>C#</dt>
+			<dd><a href="https://msdn.microsoft.com/en-us/library/xfhwa508.aspx"><code class="see">System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;</code></a></dd>
+			<dt>Java</dt>
+			<dd><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html"><code class="see">java.util.Map&lt;K,V&gt;</code></a></dd>
+			<dt>JavaScript</dt>
+			<dd><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="see"><code>Object</code></a></dd>
+			<dt>Python</dt>
+			<dd><a href="https://docs.python.org/3/library/stdtypes.html#dict" class="see"><code>dict</code></a></dd>
+		</dl>
+	</aside>
+	<p>A SURF <dfn>map</dfn> is a sequence of associations between a key and a value. A map begins a <code class="name">LEFT CURLY BRACKET</code> character <code>{</code> (<code class="unicode">U+007B</code>) and ends with a <code class="name">RIGHT CURLY BRACKET</code> character <code>}</code> (<code class="unicode">U+007D</code>). Keys and values can be any resources. The key and value in each association or <dfn>entry</dfn> are separated by a <code class="name">COLON</code> character <code>:</code> (<code class="unicode">U+003A</code>).</p>
+	<p>A map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a SURF generator <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with labels if a duplicate entry is ignored</p>
+	<p>A SURF parser <span class="spec-should">should</span> represent a SURF map using an corresponding language construct that represents map semantics.</p>
+	<ul class="spec-production">
+		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
+		<li><code class="name">entry</code> ⇒ <code class="name">resource</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<h4>Set</h4>
 	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
@@ -271,7 +291,7 @@
 			<dd><a href="https://docs.python.org/3/library/stdtypes.html#set" class="see"><code>set</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>set</dfn> in SURF is an <em>unordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set. A SURF processor <span class="spec-should">should</span> represent a SURF set using an corresponding language construct that represents list semantics.</p>
+	<p>A <dfn>set</dfn> in SURF is an <em>unordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set. A SURF parser <span class="spec-should">should</span> represent a SURF set using an corresponding language construct that represents set semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">set</code> ⇒ '(' <code class="name">resource-sequence</code> ')'</li>
 	</ul>
