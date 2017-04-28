@@ -72,10 +72,13 @@ public class SurfTestResources {
 	//##binary
 	public static final String OK_BINARY_RESOURCE_NAME = "ok-binary.surf";
 
-	//##boolean
+	//##Boolean
 	public static final String OK_BOOLEAN_TRUE_RESOURCE_NAME = "ok-boolean-true.surf";
 	public static final String OK_BOOLEAN_FALSE_RESOURCE_NAME = "ok-boolean-false.surf";
 	//TODO use or delete public static final String OK_BOOLEANS_RESOURCE_NAME = "ok-booleans.surf";
+
+	//##character
+	public static final String OK_CHARACTERS_RESOURCE_NAME = "ok-characters.surf";
 
 	//##IRI
 	public static final String OK_IRIS_RESOURCE_NAME = "ok-iris.surf";
