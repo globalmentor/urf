@@ -82,6 +82,19 @@ public class SURF {
 	/** The beginning delimiter of the lexical form of the Boolean value <code>true</code>. */
 	public static final char BOOLEAN_TRUE_BEGIN = 't';
 
+	/** The delimiter that begins and ends character literal representations. */
+	public static final char CHARACTER_DELIMITER = '\'';
+	/** The character used for escaping a character. */
+	public static final char CHARACTER_ESCAPE = '\\';
+	//escaped forms of characters
+	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
+	public static final char ESCAPED_FORM_FEED = 'f'; //f form feed
+	public static final char ESCAPED_LINE_FEED = 'n'; //n line feed
+	public static final char ESCAPED_CARRIAGE_RETURN = 'r'; //r carriage return
+	public static final char ESCAPED_TAB = 't'; //t tab
+	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
+	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
+
 	/** The delimiter that begins IRI literal representations. */
 	public static final char IRI_BEGIN = '<';
 	/** The delimiter that ends IRI literal representations. */
@@ -105,16 +118,6 @@ public class SURF {
 
 	/** The delimiter that begins and ends string literal representations. */
 	public static final char STRING_DELIMITER = '"';
-	/** The character used for escaping characters in a string. */
-	public static final char STRING_ESCAPE = '\\';
-	//escaped forms of characters
-	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
-	public static final char ESCAPED_FORM_FEED = 'f'; //f form feed
-	public static final char ESCAPED_LINE_FEED = 'n'; //n line feed
-	public static final char ESCAPED_CARRIAGE_RETURN = 'r'; //r carriage return
-	public static final char ESCAPED_TAB = 't'; //t tab
-	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
-	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
 
 	/** The delimiter that begins temporal literal representations. */
 	public static final char TEMPORAL_BEGIN = '@';
