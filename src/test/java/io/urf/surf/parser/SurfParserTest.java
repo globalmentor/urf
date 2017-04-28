@@ -152,7 +152,7 @@ public class SurfParserTest {
 		}
 	}
 
-	//##boolean
+	//##Boolean
 
 	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
 	@Test
@@ -173,6 +173,36 @@ public class SurfParserTest {
 			assertThat(object, hasValue(Boolean.TRUE));
 		}
 	}
+
+	//##character
+
+	/** @see SurfTestResources#OK_CHARACTERS_RESOURCE_NAME */
+	@Test
+	public void testOkCharacters() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_CHARACTERS_RESOURCE_NAME)) {
+			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			assertThat(resource.getPropertyValue("foo"), hasValue('|'));
+			assertThat(resource.getPropertyValue("quote"), hasValue('"'));
+			assertThat(resource.getPropertyValue("apostrophe"), hasValue('\''));
+			assertThat(resource.getPropertyValue("backslash"), hasValue('\\'));
+			assertThat(resource.getPropertyValue("solidus"), hasValue('/'));
+			assertThat(resource.getPropertyValue("ff"), hasValue('\f'));
+			assertThat(resource.getPropertyValue("lf"), hasValue('\n'));
+			assertThat(resource.getPropertyValue("cr"), hasValue('\r'));
+			assertThat(resource.getPropertyValue("tab"), hasValue('\t'));
+			assertThat(resource.getPropertyValue("vtab"), hasValue('\u000B'));
+			assertThat(resource.getPropertyValue("devanagari-ma"), hasValue('\u092E'));
+			assertThat(resource.getPropertyValue("devanagari-maEscaped"), hasValue('\u092E'));
+			/*TODO fix for supplementary characters
+			assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(Character.toChars(0x1F602)));
+			assertThat(resource.getPropertyValue("tearsOfJoyEscaped"), hasValue(Character.toChars(0x1F602)));
+			*/
+		}
+	}
+
+	//TODO add bad tests with control characters
+	//TODO add bad tests to prevent escaping normal characters 
+	//TODO add bad tests with invalid surrogate character sequences
 
 	//##IRI
 
