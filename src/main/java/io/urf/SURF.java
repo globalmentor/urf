@@ -133,6 +133,13 @@ public class SURF {
 	/** The delimiter that ends lists. */
 	public static final char LIST_END = ']';
 
+	/** The delimiter that begins maps. */
+	public static final char MAP_BEGIN = '{';
+	/** The delimiter that ends maps. */
+	public static final char MAP_END = '}';
+	/** The character that separates keys and values in a map entry. */
+	public static final char ENTRY_KEY_VALUE_DELIMITER = ':';
+
 	/** The delimiter that begins sets. */
 	public static final char SET_BEGIN = '(';
 	/** The delimiter that ends sets. */
