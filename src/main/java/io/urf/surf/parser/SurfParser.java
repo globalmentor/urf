@@ -190,6 +190,9 @@ public class SurfParser {
 			case LIST_BEGIN:
 				resource = parseList(reader);
 				break;
+			case MAP_BEGIN:
+				resource = parseMap(reader);
+				break;
 			case SET_BEGIN:
 				resource = parseSet(reader);
 				break;
@@ -704,7 +707,7 @@ public class SurfParser {
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public List<?> parseList(@Nonnull final Reader reader) throws IOException {
+	public List<Object> parseList(@Nonnull final Reader reader) throws IOException {
 		final List<Object> list = new ArrayList<>();
 		check(reader, LIST_BEGIN); //[
 		parseSequence(reader, LIST_END, r -> list.add(parseResource(r)));
@@ -713,12 +716,33 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses an a set. The current position must be for {@value SURF#SET_BEGIN}. The new position will be that immediately following {@value SURF#SET_END}.
+	 * Parses a map. The current position must be for {@value SURF#MAP_BEGIN}. The new position will be that immediately following {@value SURF#MAP_END}.
 	 * @param document The document being parsed.
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public Set<?> parseSet(@Nonnull final Reader reader) throws IOException {
+	public Map<Object, Object> parseMap(@Nonnull final Reader reader) throws IOException {
+		final Map<Object, Object> map = new HashMap<>();
+		check(reader, MAP_BEGIN); //{
+		parseSequence(reader, MAP_END, r -> {
+			final Object key = parseResource(reader);
+			skipWhitespaceLineBreaks(reader);
+			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
+			skipWhitespaceLineBreaks(reader);
+			final Object value = parseResource(reader);
+			map.put(key, value); //put the value in the map, replacing any old value
+		});
+		check(reader, MAP_END); //}
+		return map;
+	}
+
+	/**
+	 * Parses a set. The current position must be for {@value SURF#SET_BEGIN}. The new position will be that immediately following {@value SURF#SET_END}.
+	 * @param document The document being parsed.
+	 * @param reader The reader containing SURF data.
+	 * @throws IOException If there was an error reading the SURF data.
+	 */
+	public Set<Object> parseSet(@Nonnull final Reader reader) throws IOException {
 		final Set<Object> set = new HashSet<>();
 		check(reader, SET_BEGIN); //[
 		parseSequence(reader, SET_END, r -> set.add(parseResource(r)));

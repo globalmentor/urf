@@ -388,6 +388,79 @@ public class SurfParserTest {
 
 	//TODO create tests for bad properties, such as double list item separators
 
+	//#map
+
+	/** @see SurfTestResources#OK_MAPS_RESOURCE_NAME */
+	@Test
+	public void testOkMaps() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_MAPS_RESOURCE_NAME)) {
+			final Optional<Object> object = new SurfParser().parse(inputStream);
+			assertThat(object, isPresent());
+			assertThat(object, hasValue(instanceOf(Map.class)));
+			final Map<?, ?> map = (Map<?, ?>)object.get();
+			assertThat(map.size(), is(7));
+			assertThat(map.get("foo"), is("bar"));
+			assertThat(map.get(123), is("number"));
+			assertThat(map.get(false), is("Boolean"));
+			assertThat(map.get(true), is("Boolean"));
+			assertThat(map.get(Arrays.asList(1, 2, 3)), is(new BigDecimal("1.23")));
+			final Map<Object, Object> pingPong = new HashMap<>();
+			pingPong.put("ping", Arrays.asList('p', 'o', 'n', 'g'));
+			assertThat(map.get("map"), is(pingPong));
+			assertThat(map.get(new HashSet<Object>(Arrays.asList("foo", false))), is(true));
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_EMPTY_RESOURCE_NAMES */
+	@Test
+	public void testOkMapEmpty() throws IOException {
+		for(final String okMapEmptyResourceName : OK_MAP_EMPTY_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okMapEmptyResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okMapEmptyResourceName, object, isPresent());
+				assertThat(okMapEmptyResourceName, object, hasValue(instanceOf(Map.class)));
+				final Map<?, ?> map = (Map<?, ?>)object.get();
+				assertThat(map.size(), is(0));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_ONE_ENTRY_RESOURCE_NAMES */
+	@Test
+	public void testOkMapOneEntry() throws IOException {
+		for(final String okMapOneEntryResourceName : OK_MAP_ONE_ENTRY_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okMapOneEntryResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okMapOneEntryResourceName, object, isPresent());
+				assertThat(okMapOneEntryResourceName, object, hasValue(instanceOf(Map.class)));
+				final Map<?, ?> map = (Map<?, ?>)object.get();
+				assertThat(map.size(), is(1));
+				assertThat(okMapOneEntryResourceName, map.containsKey("I"), is(true));
+				assertThat(okMapOneEntryResourceName, map.get("I"), is("one"));
+				assertThat(okMapOneEntryResourceName, map.containsKey("II"), is(false));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_TWO_ENTRIES_RESOURCE_NAMES */
+	@Test
+	public void testOkMapTwoEntries() throws IOException {
+		for(final String okMapTwoEntriesResourceName : OK_MAP_TWO_ENTRIES_RESOURCE_NAMES) {
+			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okMapTwoEntriesResourceName)) {
+				final Optional<Object> object = new SurfParser().parse(inputStream);
+				assertThat(okMapTwoEntriesResourceName, object, isPresent());
+				assertThat(okMapTwoEntriesResourceName, object, hasValue(instanceOf(Map.class)));
+				final Map<?, ?> map = (Map<?, ?>)object.get();
+				assertThat(map.size(), is(2));
+				assertThat(okMapTwoEntriesResourceName, map.containsKey("I"), is(true));
+				assertThat(okMapTwoEntriesResourceName, map.get("I"), is("one"));
+				assertThat(okMapTwoEntriesResourceName, map.containsKey("II"), is(true));
+				assertThat(okMapTwoEntriesResourceName, map.get("II"), is("two"));
+				assertThat(okMapTwoEntriesResourceName, map.containsKey("III"), is(false));
+			}
+		}
+	}
+
 	//##set
 
 	/** @see SurfTestResources#OK_SET_NO_ITEMS_RESOURCE_NAMES */
