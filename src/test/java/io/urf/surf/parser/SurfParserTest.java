@@ -341,10 +341,10 @@ public class SurfParserTest {
 
 	//##list
 
-	/** @see SurfTestResources#OK_LIST_NO_ITEMS_RESOURCE_NAMES */
+	/** @see SurfTestResources#OK_LIST_EMPTY_RESOURCE_NAMES */
 	@Test
 	public void testOkListNoItems() throws IOException {
-		for(final String okListNoItemsResourceName : OK_LIST_NO_ITEMS_RESOURCE_NAMES) {
+		for(final String okListNoItemsResourceName : OK_LIST_EMPTY_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okListNoItemsResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okListNoItemsResourceName, object, isPresent());
@@ -463,10 +463,10 @@ public class SurfParserTest {
 
 	//##set
 
-	/** @see SurfTestResources#OK_SET_NO_ITEMS_RESOURCE_NAMES */
+	/** @see SurfTestResources#OK_SET_EMPTY_RESOURCE_NAMES */
 	@Test
 	public void testOkSetNoItems() throws IOException {
-		for(final String okSetNoItemsResourceName : OK_SET_NO_ITEMS_RESOURCE_NAMES) {
+		for(final String okSetNoItemsResourceName : OK_SET_EMPTY_RESOURCE_NAMES) {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSetNoItemsResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okSetNoItemsResourceName, object, isPresent());
