@@ -5,12 +5,11 @@ value = |test|false
 |object|*example-Type:
 		stuff=["one", |number|, "three"]
 	;
-! TODO add map tests after implementing maps
-!	map = {
-!		1: "one"
-!		2: |number|
-!		100: |object|
-!	}
+	map = {
+		1: "one"
+		2: |number|
+		100: |object|
+	}
 	set = (
 |number|
 	|test|
