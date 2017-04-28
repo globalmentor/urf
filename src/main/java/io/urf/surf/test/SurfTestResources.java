@@ -99,13 +99,13 @@ public class SurfTestResources {
 	//#collections
 
 	//##list
-	public static final String OK_LIST_NO_ITEMS_0_RESOURCE_NAME = "ok-list-no-items-0.surf";
-	public static final String OK_LIST_NO_ITEMS_1_RESOURCE_NAME = "ok-list-no-items-1.surf";
-	public static final String OK_LIST_NO_ITEMS_2_RESOURCE_NAME = "ok-list-no-items-2.surf";
+	public static final String OK_LIST_EMPTY_0_RESOURCE_NAME = "ok-list-empty-0.surf";
+	public static final String OK_LIST_EMPTY_1_RESOURCE_NAME = "ok-list-empty-1.surf";
+	public static final String OK_LIST_EMPTY_2_RESOURCE_NAME = "ok-list-empty-2.surf";
 
-	/** Names of SURF document resources semantically equivalent to {@value #OK_LIST_NO_ITEMS_0_RESOURCE_NAME}. */
-	public static Set<String> OK_LIST_NO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_NO_ITEMS_0_RESOURCE_NAME, OK_LIST_NO_ITEMS_1_RESOURCE_NAME,
-			OK_LIST_NO_ITEMS_2_RESOURCE_NAME);
+	/** Names of SURF document resources semantically equivalent to {@value #OK_LIST_EMPTY_0_RESOURCE_NAME}. */
+	public static Set<String> OK_LIST_EMPTY_RESOURCE_NAMES = immutableSetOf(OK_LIST_EMPTY_0_RESOURCE_NAME, OK_LIST_EMPTY_1_RESOURCE_NAME,
+			OK_LIST_EMPTY_2_RESOURCE_NAME);
 
 	public static final String OK_LIST_ONE_ITEM_0_RESOURCE_NAME = "ok-list-one-item-0.surf";
 	public static final String OK_LIST_ONE_ITEM_1_RESOURCE_NAME = "ok-list-one-item-1.surf";
@@ -160,13 +160,13 @@ public class SurfTestResources {
 			OK_MAP_TWO_ENTRIES_2_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_2_NEWLINES_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_2_NO_COMMAS_RESOURCE_NAME);
 
 	//##set
-	public static final String OK_SET_NO_ITEMS_0_RESOURCE_NAME = "ok-set-no-items-0.surf";
-	public static final String OK_SET_NO_ITEMS_1_RESOURCE_NAME = "ok-set-no-items-1.surf";
-	public static final String OK_SET_NO_ITEMS_2_RESOURCE_NAME = "ok-set-no-items-2.surf";
+	public static final String OK_SET_EMPTY_0_RESOURCE_NAME = "ok-set-empty-0.surf";
+	public static final String OK_SET_EMPTY_1_RESOURCE_NAME = "ok-set-empty-1.surf";
+	public static final String OK_SET_EMPTY_2_RESOURCE_NAME = "ok-set-empty-2.surf";
 
-	/** Names of SURF document resources semantically equivalent to {@value #OK_SET_NO_ITEMS_0_RESOURCE_NAME}. */
-	public static Set<String> OK_SET_NO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_SET_NO_ITEMS_0_RESOURCE_NAME, OK_SET_NO_ITEMS_1_RESOURCE_NAME,
-			OK_SET_NO_ITEMS_2_RESOURCE_NAME);
+	/** Names of SURF document resources semantically equivalent to {@value #OK_SET_EMPTY_0_RESOURCE_NAME}. */
+	public static Set<String> OK_SET_EMPTY_RESOURCE_NAMES = immutableSetOf(OK_SET_EMPTY_0_RESOURCE_NAME, OK_SET_EMPTY_1_RESOURCE_NAME,
+			OK_SET_EMPTY_2_RESOURCE_NAME);
 
 	public static final String OK_SET_ONE_ITEM_0_RESOURCE_NAME = "ok-set-one-item-0.surf";
 	public static final String OK_SET_ONE_ITEM_1_RESOURCE_NAME = "ok-set-one-item-1.surf";
