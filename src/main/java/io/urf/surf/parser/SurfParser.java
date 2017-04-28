@@ -291,14 +291,16 @@ public class SurfParser {
 	 * @return The character parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
-	 *           current character is completely parsed.
+	 * @throws ParseIOException if the character literal is empty, if a control character was present, if the character is not escaped correctly, or the reader
+	 *           has no more characters before the current character is completely parsed.
+	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
 	public static Character parseCharacter(final Reader reader) throws IOException, ParseIOException {
 		check(reader, CHARACTER_DELIMITER);
 		final int codePoint = parseCharacterCodePoint(reader, CHARACTER_DELIMITER);
+		checkParseIO(reader, codePoint >= 0, "Character literal cannot be empty.");
 		check(reader, CHARACTER_DELIMITER);
-		if(codePoint > 0xFFFF) {
+		if(!Character.isBmpCodePoint(codePoint)) {
 			throw new UnsupportedOperationException("Parsing supplementary character U+" + Long.toHexString(codePoint).toUpperCase() + " not yet supported."); //TODO fix
 		}
 		return Character.valueOf((char)codePoint);
@@ -312,7 +314,7 @@ public class SurfParser {
 	 * </p>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
-	 * @return The code point parsed from the reader.
+	 * @return The code point parsed from the reader, or <code>-1</code> if the unescaped delimiter was encountered.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
@@ -321,7 +323,9 @@ public class SurfParser {
 	public static int parseCharacterCodePoint(final Reader reader, final char delimiter) throws IOException, ParseIOException {
 		char c = readCharacter(reader); //read a character
 		//TODO check for and prevent control characters
-		if(c == CHARACTER_ESCAPE) { //if this is an escape character
+		if(c == delimiter) {
+			return -1;
+		} else if(c == CHARACTER_ESCAPE) { //if this is an escape character
 			c = readCharacter(reader); //read another a character
 			switch(c) { //see what the next character
 				case CHARACTER_ESCAPE: //\\
@@ -380,16 +384,14 @@ public class SurfParser {
 					}
 					break;
 			}
-		}
-		if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another character
+		} else if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another character
 			final char c2 = readCharacter(reader); //read another character
 			if(!Character.isLowSurrogate(c2)) {
 				throw new ParseIOException(reader,
 						"Unicode high surrogate character " + Characters.getLabel(c) + " must be followed by low surrogate character; found " + Characters.getLabel(c2));
 			}
 			return Character.toCodePoint(c, c2); //short-circuit and return the surrogate pair code point
-		}
-		if(Character.isLowSurrogate(c)) {
+		} else if(Character.isLowSurrogate(c)) {
 			throw new ParseIOException(reader, "Unicode character cannot begin with low surrogate character " + Characters.getLabel(c));
 		}
 		return c;
@@ -543,78 +545,19 @@ public class SurfParser {
 	 * @return The string parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if the string is not escaped correctly or the reader has no more characters before the current string is completely parsed.
+	 * @throws ParseIOException if a control character was present, if the string is not escaped correctly, or the reader has no more characters before the
+	 *           current string is completely parsed.
 	 * @see SURF#STRING_DELIMITER
+	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
 	public static String parseString(final Reader reader) throws IOException, ParseIOException {
-		return parseString(reader, STRING_DELIMITER, STRING_DELIMITER);
-	}
-
-	/**
-	 * Parses a string surrounded by the indicated delimiters. The current position must be that of the first string delimiter character. The new position will be
-	 * that immediately after the string delimiter character.
-	 * <p>
-	 * This method always allows the string beginning character and ending character to be escaped.
-	 * </p>
-	 * @param reader The reader the contents of which to be parsed.
-	 * @param stringBegin The beginning string delimiter.
-	 * @param stringEnd The ending string delimiter.
-	 * @return The string parsed from the reader.
-	 * @throws NullPointerException if the given reader is <code>null</code>.
-	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if the string is not escaped correctly or the reader has no more characters before the current string is completely parsed.
-	 */
-	public static String parseString(final Reader reader, final char stringBegin, final char stringEnd) throws IOException, ParseIOException {
-		check(reader, stringBegin); //read the beginning string delimiter
+		check(reader, STRING_DELIMITER); //read the beginning string delimiter
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the string
-		char c = readCharacter(reader); //read a character
-		while(c != stringEnd) { //keep reading character until we reach the end of the string
-			//TODO check for and prevent control characters
-			if(c == CHARACTER_ESCAPE) { //if this is an escape character
-				c = readCharacter(reader); //read another a character
-				switch(c) { //see what the next character
-					case CHARACTER_ESCAPE: //\\
-					case '/': //\/ (solidus)
-						break; //use the escaped escape character unmodified
-					case ESCAPED_BACKSPACE: //\b backspace
-						c = BACKSPACE_CHAR;
-						break;
-					case ESCAPED_FORM_FEED: //\f
-						c = FORM_FEED_CHAR;
-						break;
-					case ESCAPED_LINE_FEED: //\n
-						c = LINE_FEED_CHAR;
-						break;
-					case ESCAPED_CARRIAGE_RETURN: //\r
-						c = CARRIAGE_RETURN_CHAR;
-						break;
-					case ESCAPED_TAB: //\t
-						c = CHARACTER_TABULATION_CHAR;
-						break;
-					case ESCAPED_VERTICAL_TAB: //\v
-						c = LINE_TABULATION_CHAR;
-						break;
-					case ESCAPED_UNICODE: //u Unicode
-					{
-						final String unicodeString = readString(reader, 4); //read the four Unicode code point hex characters
-						try {
-							c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
-						} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
-						}
-					}
-						break;
-					default: //if another character was escaped
-						if(c != stringBegin && c != stringEnd) { //if this is not the delimiter that was escaped
-							throw new ParseIOException(reader, "Unknown escaped character: " + Characters.getLabel(c));
-						}
-						break;
-				}
-			}
-			stringBuilder.append(c); //append the character to the string we are constructing
-			c = readCharacter(reader); //read another a character
+		int codePoint; //keep reading and appending code points until we encounter the end of the string
+		while((codePoint = parseCharacterCodePoint(reader, STRING_DELIMITER)) >= 0) {
+			stringBuilder.appendCodePoint(codePoint);
 		}
-		return stringBuilder.toString(); //return the string we constructed
+		return stringBuilder.toString(); //return the string we constructed; the ending string delimiter will already have been consumed
 	}
 
 	/**
