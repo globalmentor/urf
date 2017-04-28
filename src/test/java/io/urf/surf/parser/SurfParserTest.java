@@ -538,9 +538,11 @@ public class SurfParserTest {
 			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
 			assertThat(stuff, contains("one", 123, "three"));
 			assertThat(numberLabeled, hasValue(sameInstance(stuff.get(1))));
-			//map values TODO implement map label tests
-			//			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
-			//			assertThat(map.get(1), is)
+			//map values
+			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
+			assertThat(map.get(1), is("one"));
+			assertThat(map.get(2), is(sameInstance(numberLabeled.get())));
+			assertThat(map.get(100), is(sameInstance(objectLabeled.get())));
 			//set members
 			@SuppressWarnings("unchecked")
 			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionFailedError::new);
