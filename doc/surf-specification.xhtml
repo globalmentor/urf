@@ -135,9 +135,37 @@
 		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code> '%'</li>
 	</ul>
 	<h4>Boolean</h4>
-	<p>A Boolean is a either of the tokens <code>true</code> or <code>false</code>.</p>
+	<p>A <dfn>Boolean</dfn> is a either of the tokens <code>true</code> or <code>false</code>.</p>
 	<ul class="spec-production">
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
+	</ul>
+	<h4>Character</h4>
+	<p>A SURF <dfn>character</dfn> is a representation of a Unicode code point, delimited on both sides by the <code class="name">APOSTROPHE</code> character <code>'</code> (<code class="unicode">U+0027</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">APOSTROPHE</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a character unless they are escaped. The following escape sequences are allowed </p>
+	<dl>
+		<dt><code>\\</code></dt>
+		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
+		<dt><code>\/</code></dt>
+		<dd><code class="name">SOLIDUS</code> (<code class="unicode">U+002F</code>)</dd>
+		<dt><code>\'</code></dt>
+		<dd><code class="name">APOSTROPHE</code> (<code class="unicode">U+0027</code>)</dd>
+		<dt><code>\b</code></dt>
+		<dd><code class="name">BACKSPACE</code> (<code class="unicode">U+0008</code>)</dd>
+		<dt><code>\f</code></dt>
+		<dd><code class="name">FORM FEED (FF)</code> (<code class="unicode">U+000C</code>)</dd>
+		<dt><code>\n</code></dt>
+		<dd><code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</dd>
+		<dt><code>\r</code></dt>
+		<dd><code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</dd>
+		<dt><code>\t</code></dt>
+		<dd><code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</dd>
+		<dt><code>\v</code></dt>
+		<dd><code class="name">LINE TABULATION</code> (<code class="unicode">U+000B</code>)</dd>
+		<dt><code>\u<var>XXXX</var></code></dt>
+		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
+	</dl>
+	<p>A SURF parser <span class="spec-must">must</span> correctly interpret characters outside the Basic Multilingual Plane, whether represented as a literal character or as an escaped Unicode code point.</p>
+	<p> TODO production</p>
+	<ul class="spec-production">
 	</ul>
 	<h4>IRI</h4>
 	<p>An <dfn>Internationalized Resource Identifiers</dfn> (<abbr>IRI</abbr>) is a sequence of Unicode characters for identifying a resource as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. In SURF an IRI is placed between a <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>) and a <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>).</p>
