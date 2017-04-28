@@ -37,7 +37,7 @@ public class SurfTestResources {
 	public static Set<String> OK_SIMPLE_RESOURCE_NAMES = immutableSetOf(OK_SIMPLE_SURF_RESOURCE_NAME, OK_SIMPLE_NO_EOL_SURF_RESOURCE_NAME,
 			OK_SIMPLE_MULTILINE_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_SURF_RESOURCE_NAME, OK_SIMPLE_COMMENT_WHITESPACE_SURF_RESOURCE_NAME);
 
-	//#objects
+	//#object
 	public static final String OK_OBJECT_NO_PROPERTIES_0_RESOURCE_NAME = "ok-object-no-properties-0.surf";
 	public static final String OK_OBJECT_NO_PROPERTIES_1_RESOURCE_NAME = "ok-object-no-properties-1.surf";
 	public static final String OK_OBJECT_NO_PROPERTIES_2_RESOURCE_NAME = "ok-object-no-properties-2.surf";
@@ -126,6 +126,38 @@ public class SurfTestResources {
 	public static Set<String> OK_LIST_TWO_ITEMS_RESOURCE_NAMES = immutableSetOf(OK_LIST_TWO_ITEMS_0_RESOURCE_NAME, OK_LIST_TWO_ITEMS_0_WHITESPACE_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_1_RESOURCE_NAME, OK_LIST_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_LIST_TWO_ITEMS_2_RESOURCE_NAME,
 			OK_LIST_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
+
+	//#map
+	public static final String OK_MAPS_RESOURCE_NAME = "ok-maps.surf";
+
+	public static final String OK_MAP_EMPTY_0_RESOURCE_NAME = "ok-map-empty-0.surf";
+	public static final String OK_MAP_EMPTY_1_RESOURCE_NAME = "ok-map-empty-1.surf";
+	public static final String OK_MAP_EMPTY_2_RESOURCE_NAME = "ok-map-empty-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_MAP_EMPTY_0_RESOURCE_NAME}. */
+	public static Set<String> OK_MAP_EMPTY_RESOURCE_NAMES = immutableSetOf(OK_MAP_EMPTY_0_RESOURCE_NAME, OK_MAP_EMPTY_1_RESOURCE_NAME,
+			OK_MAP_EMPTY_2_RESOURCE_NAME);
+
+	public static final String OK_MAP_ONE_ENTRY_0_RESOURCE_NAME = "ok-map-one-entry-0.surf";
+	public static final String OK_MAP_ONE_ENTRY_1_RESOURCE_NAME = "ok-map-one-entry-1.surf";
+	public static final String OK_MAP_ONE_ENTRY_2_RESOURCE_NAME = "ok-map-one-entry-2.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_MAP_ONE_ENTRY_0_RESOURCE_NAME}. */
+	public static Set<String> OK_MAP_ONE_ENTRY_RESOURCE_NAMES = immutableSetOf(OK_MAP_ONE_ENTRY_0_RESOURCE_NAME, OK_MAP_ONE_ENTRY_1_RESOURCE_NAME,
+			OK_MAP_ONE_ENTRY_2_RESOURCE_NAME);
+
+	public static final String OK_MAP_TWO_ENTRIES_0_RESOURCE_NAME = "ok-map-two-entries-0.surf";
+	public static final String OK_MAP_TWO_ENTRIES_0_WHITESPACE_RESOURCE_NAME = "ok-map-two-entries-0-whitespace.surf";
+	public static final String OK_MAP_TWO_ENTRIES_1_RESOURCE_NAME = "ok-map-two-entries-1.surf";
+	public static final String OK_MAP_TWO_ENTRIES_1_NO_COMMAS_RESOURCE_NAME = "ok-map-two-entries-1-no-commas.surf";
+	public static final String OK_MAP_TWO_ENTRIES_2_RESOURCE_NAME = "ok-map-two-entries-2.surf";
+	public static final String OK_MAP_TWO_ENTRIES_2_NEWLINES_RESOURCE_NAME = "ok-map-two-entries-2-newlines.surf";
+	public static final String OK_MAP_TWO_ENTRIES_2_NO_COMMAS_RESOURCE_NAME = "ok-map-two-entries-2-no-commas.surf";
+
+	/** Names of SURF document resources semantically equivalent to {@value #OK_MAP_TWO_ENTRIES_0_RESOURCE_NAME}. */
+	public static Set<String> OK_MAP_TWO_ENTRIES_RESOURCE_NAMES = immutableSetOf(OK_MAP_TWO_ENTRIES_0_RESOURCE_NAME,
+			OK_MAP_TWO_ENTRIES_0_WHITESPACE_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_1_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_1_NO_COMMAS_RESOURCE_NAME,
+			OK_MAP_TWO_ENTRIES_2_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_2_NEWLINES_RESOURCE_NAME, OK_MAP_TWO_ENTRIES_2_NO_COMMAS_RESOURCE_NAME);
 
 	//##set
 	public static final String OK_SET_NO_ITEMS_0_RESOURCE_NAME = "ok-set-no-items-0.surf";
