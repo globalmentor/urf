@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-04-27</dd>
+			<dd>Draft 2017-04-28</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -304,7 +304,9 @@
 	<p>A SURF parser <span class="spec-should">should</span> represent a SURF map using an corresponding language construct that represents map semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
-		<li><code class="name">entry</code> ⇒ <code class="name">resource</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">value</code></li>
+		<li><code class="name">key</code> ⇒ <code class="name">resource</code></li>
+		<li><code class="name">value</code> ⇒ <code class="name">resource</code></li>
 	</ul>
 	<h4>Set</h4>
 	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
