@@ -18,6 +18,7 @@ package io.urf.surf.parser;
 
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.java.Objects.*;
 import static io.urf.SURF.*;
 import static io.urf.SURF.WHITESPACE_CHARACTERS;
 import static java.util.Objects.*;
@@ -38,6 +39,7 @@ import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.java.Characters;
+import com.globalmentor.java.Objects;
 
 import io.urf.SURF;
 
@@ -56,16 +58,28 @@ import io.urf.SURF;
  */
 public class SurfParser {
 
-	/** The map of resources that have been labeled. */
-	private final Map<String, Object> labeledResources = new HashMap<>();
+	/**
+	 * The map of resources that have been labeled. Each label is either a name {@link String}, for local labels, or a {@link URI} representing the resource's
+	 * global identifier.
+	 */
+	private final Map<Object, Object> labeledResources = new HashMap<>();
 
 	/**
-	 * Returns a parsed resource by its label.
+	 * Returns a parsed resource by its local label.
 	 * @param label The label of the resource.
 	 * @return The resource associated with the given label, if any.
 	 */
 	public Optional<Object> getResourceByLabel(@Nonnull final String label) {
 		return Optional.ofNullable(labeledResources.get(requireNonNull(label))); //TODO be more rigorous here if/when null can be labeled
+	}
+
+	/**
+	 * Returns a parsed resource by its global identifier.
+	 * @param label The IRI identifier of the resource.
+	 * @return The resource associated with the given label, if any.
+	 */
+	public Optional<Object> getResourceByLabel(@Nonnull final URI label) {
+		return Optional.ofNullable(labeledResources.get(requireNonNull(label)));
 	}
 
 	/**
@@ -94,6 +108,30 @@ public class SurfParser {
 	}
 
 	/**
+	 * Parses a label, which is either a name or a URI with appropriate delimiters, surrounded by label delimiters. The current position must be that of the
+	 * beginning label delimiter character. The new position will be that immediately after the last label delimiter.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return The label parsed from the reader; either a string for a local label or a URI for a global resource identifier.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if there the label is not valid.
+	 * @see SURF#LABEL_DELIMITER
+	 * @see #parseName(Reader)
+	 * @see #parseIRI(Reader)
+	 */
+	public static Object parseLabel(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		check(reader, LABEL_DELIMITER);
+		final Object label;
+		if(peek(reader) == IRI_BEGIN) {
+			label = parseIRI(reader);
+		} else {
+			label = parseName(reader);
+		}
+		check(reader, LABEL_DELIMITER);
+		return label;
+	}
+
+	/**
 	 * Parses a name composed of a name beginning character followed by zero or more name characters. The current position must be that of the first name
 	 * character. The new position will be that immediately after the last name character.
 	 * @param reader The reader the contents of which to be parsed.
@@ -101,8 +139,8 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if there are are no name characters.
-	 * @see TURF#isNameBeginCharacter(int)
-	 * @see TURF#isNameCharacter(int)
+	 * @see SURF#isSurfNameBeginCharacter(int)
+	 * @see SURF#isSurfNameCharacter(int)
 	 */
 	public static String parseName(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder(); //create a string builder for reading the name segment
@@ -124,17 +162,14 @@ public class SurfParser {
 
 	/**
 	 * Parses a resource; either a label or a resource representation. The next character read must be the start of the resource.
-	 * @param document The document being parsed.
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
-		String label = null;
+		Object label = null;
 		int c = peekEnd(reader);
 		if(c == LABEL_DELIMITER) {
-			check(reader, LABEL_DELIMITER);
-			label = parseName(reader);
-			check(reader, LABEL_DELIMITER);
+			label = parseLabel(reader);
 			c = skipWhitespace(reader);
 		}
 		if(label != null) { //see if this is a resource reference
@@ -147,7 +182,7 @@ public class SurfParser {
 		switch(c) {
 			//objects
 			case OBJECT_BEGIN:
-				resource = parseObject(reader);
+				resource = parseObject(label, reader);
 				break;
 			//literals
 			case BINARY_DELIMITER:
@@ -209,12 +244,27 @@ public class SurfParser {
 	//objects
 
 	/**
-	 * Parses an object; that is, an anonymous resource instance indicated by <code>*</code>.
-	 * @param document The document being parsed. The next character read is expected to be {@value SURF#OBJECT_BEGIN}.
+	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
+	 * {@value SURF#OBJECT_BEGIN}.
+	 * @param resourceIri The object resource's global identifier, or <code>null</code> if the object has no Iri.
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
+	 * @see SURF#OBJECT_BEGIN
 	 */
-	public SurfResource parseObject(@Nonnull final Reader reader) throws IOException {
+	public SurfObject parseObject(@Nullable URI resourceIri, @Nonnull final Reader reader) throws IOException {
+		return parseObject((Object)resourceIri, reader);
+	}
+
+	/**
+	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
+	 * {@value SURF#OBJECT_BEGIN}.
+	 * @param label The object label; either a name {@link String}, for local labels, or a {@link URI} representing the resource's global identifier, or
+	 *          <code>null</code> if the object has no label.
+	 * @param reader The reader containing SURF data.
+	 * @throws IOException If there was an error reading the SURF data.
+	 * @see SURF#OBJECT_BEGIN
+	 */
+	protected SurfObject parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
 		check(reader, OBJECT_BEGIN); //*
 		int c = skipWhitespace(reader);
 		//type (optional)
@@ -225,7 +275,11 @@ public class SurfParser {
 		} else {
 			typeName = null;
 		}
-		final SurfResource resource = new SurfResource(typeName);
+		final Optional<URI> resourceIri = asInstance(label, URI.class);
+		final SurfObject resource = new SurfObject(resourceIri.orElse(null), typeName);
+
+		//TODO save the label to allow internal references; do the same for collections 
+
 		//properties (optional)
 		if(c == PROPERTIES_BEGIN) {
 			check(reader, PROPERTIES_BEGIN); //:
@@ -272,7 +326,7 @@ public class SurfParser {
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public Object parseBoolean(@Nonnull final Reader reader) throws IOException {
+	public static Object parseBoolean(@Nonnull final Reader reader) throws IOException {
 		int c = peek(reader); //peek the next character
 		switch(c) { //see what the next character is
 			case BOOLEAN_FALSE_BEGIN: //false
@@ -564,13 +618,14 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a temporal. The current position must be that of the first character of the temporal. The new position will be that immediately after the temporal,
-	 * or at the end of the reader.
+	 * Parses a temporal. The current position must be that of the beginning temporal delimiter. The new position will be that immediately after the temporal, or
+	 * at the end of the reader.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return A Java representation of the temporal parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the temporal is not in the correct format, or if the temporal is outside the range that can be represented by this parser.
+	 * @see SURF#TEMPORAL_BEGIN
 	 */
 	public static TemporalAccessor parseTemporal(final Reader reader) throws IOException, ParseIOException {
 		check(reader, TEMPORAL_BEGIN);

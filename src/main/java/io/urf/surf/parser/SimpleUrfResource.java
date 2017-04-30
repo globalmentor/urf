@@ -24,7 +24,7 @@ import javax.annotation.*;
  * Simple access to an URF resource description.
  * @author Garret Wilson
  */
-public interface SimpleUrfResource { //TODO probably transfer to model package
+public interface SimpleUrfResource extends Resource { //TODO probably transfer to model package
 
 	/** @return The name of the resource type if known. */
 	public Optional<String> getTypeName();

@@ -19,15 +19,24 @@ package io.urf.surf.parser;
 import static io.urf.SURF.*;
 import static java.util.Objects.*;
 
+import java.net.URI;
 import java.util.*;
 
 import javax.annotation.*;
 
 /**
- * Implementation of an URF resource for the simple descriptions that appear in a SURF document.
+ * Implementation of an URF resource for the object descriptions that appear in a SURF document.
  * @author Garret Wilson
  */
-public class SurfResource implements SimpleUrfResource {
+public class SurfObject implements SimpleUrfResource {
+
+	/** The identifying resource IRI, or <code>null</code> if not known. */
+	private final URI iri;
+
+	@Override
+	public Optional<URI> getIri() {
+		return Optional.ofNullable(iri);
+	}
 
 	/** The name of the resource type, or <code>null</code> if not known. */
 	private final String typeName;
@@ -55,7 +64,7 @@ public class SurfResource implements SimpleUrfResource {
 	}
 
 	/** Constructor of a resource with an unknown type. */
-	public SurfResource() {
+	public SurfObject() {
 		this(null);
 	}
 
@@ -64,7 +73,18 @@ public class SurfResource implements SimpleUrfResource {
 	 * @param typeName The name of the resource type, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if the given type name is not a valid SURF name.
 	 */
-	public SurfResource(@Nullable final String typeName) {
+	public SurfObject(@Nullable final String typeName) {
+		this(null, typeName);
+	}
+
+	/**
+	 * Optional IRI and optional type name constructor.
+	 * @param iri The identifying resource IRI, or <code>null</code> if not known.
+	 * @param typeName The name of the resource type, or <code>null</code> if not known.
+	 * @throws IllegalArgumentException if the given type name is not a valid SURF name.
+	 */
+	public SurfObject(@Nullable final URI iri, @Nullable final String typeName) {
+		this.iri = iri;
 		this.typeName = typeName != null ? checkArgumentValidSurfName(typeName) : null;
 	}
 

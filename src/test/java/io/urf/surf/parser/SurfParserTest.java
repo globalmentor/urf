@@ -54,8 +54,8 @@ public class SurfParserTest {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okSimpleResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okSimpleResourceName, object, isPresent());
-				assertThat(okSimpleResourceName, object, hasValue(instanceOf(SurfResource.class)));
-				final SurfResource resource = (SurfResource)object.get();
+				assertThat(okSimpleResourceName, object, hasValue(instanceOf(SurfObject.class)));
+				final SurfObject resource = (SurfObject)object.get();
 				assertThat(okSimpleResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okSimpleResourceName, resource.getPropertyCount(), is(0));
 			}
@@ -73,8 +73,8 @@ public class SurfParserTest {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectNoPropertiesResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okObjectNoPropertiesResourceName, object, isPresent());
-				assertThat(okObjectNoPropertiesResourceName, object, hasValue(instanceOf(SurfResource.class)));
-				final SurfResource resource = (SurfResource)object.get();
+				assertThat(okObjectNoPropertiesResourceName, object, hasValue(instanceOf(SurfObject.class)));
+				final SurfObject resource = (SurfObject)object.get();
 				assertThat(okObjectNoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectNoPropertiesResourceName, resource.getPropertyCount(), is(0));
 			}
@@ -88,8 +88,8 @@ public class SurfParserTest {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectOnePropertyResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okObjectOnePropertyResourceName, object, isPresent());
-				assertThat(okObjectOnePropertyResourceName, object, hasValue(instanceOf(SurfResource.class)));
-				final SurfResource resource = (SurfResource)object.get();
+				assertThat(okObjectOnePropertyResourceName, object, hasValue(instanceOf(SurfObject.class)));
+				final SurfObject resource = (SurfObject)object.get();
 				assertThat(okObjectOnePropertyResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectOnePropertyResourceName, resource.getPropertyCount(), is(1));
 				assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one"), isPresent());
@@ -106,8 +106,8 @@ public class SurfParserTest {
 			try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(okObjectTwoPropertiesResourceName)) {
 				final Optional<Object> object = new SurfParser().parse(inputStream);
 				assertThat(okObjectTwoPropertiesResourceName, object, isPresent());
-				assertThat(okObjectTwoPropertiesResourceName, object, hasValue(instanceOf(SurfResource.class)));
-				final SurfResource resource = (SurfResource)object.get();
+				assertThat(okObjectTwoPropertiesResourceName, object, hasValue(instanceOf(SurfObject.class)));
+				final SurfObject resource = (SurfObject)object.get();
 				assertThat(okObjectTwoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
 				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyCount(), is(2));
 				assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one"), isPresent());
@@ -129,7 +129,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkBinary() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_BINARY_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 
 			assertThat(resource.getPropertyValue("count"), hasValue(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
 					(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff}));
@@ -180,7 +180,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkCharacters() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_CHARACTERS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("foo"), hasValue('|'));
 			assertThat(resource.getPropertyValue("quote"), hasValue('"'));
 			assertThat(resource.getPropertyValue("apostrophe"), hasValue('\''));
@@ -211,7 +211,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkIris() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_IRIS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("example"), hasValue(URI.create("http://www.example.com/")));
 			assertThat(resource.getPropertyValue("iso_8859_1"), hasValue(URI.create("http://www.example.org/Dürst")));
 			assertThat(resource.getPropertyValue("encodedForbidden"), hasValue(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
@@ -228,7 +228,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkNumbers() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_NUMBERS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("zero"), hasValue(Integer.valueOf(0)));
 			assertThat(resource.getPropertyValue("zeroFraction"), hasValue(Double.valueOf(0)));
 			assertThat(resource.getPropertyValue("one"), hasValue(Integer.valueOf(1)));
@@ -268,7 +268,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkRegularExpressions() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_REGULAR_EXPRESSIONS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("empty").map(Pattern.class::cast).map(Pattern::pattern), hasValue(""));
 			assertThat(resource.getPropertyValue("abc").map(Pattern.class::cast).map(Pattern::pattern), hasValue("abc"));
 			assertThat(resource.getPropertyValue("regexEscape").map(Pattern.class::cast).map(Pattern::pattern), hasValue("ab\\.c"));
@@ -295,7 +295,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkStrings() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_STRINGS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("empty"), hasValue(""));
 			assertThat(resource.getPropertyValue("foo"), hasValue("bar"));
 			assertThat(resource.getPropertyValue("quote"), hasValue("\""));
@@ -323,7 +323,7 @@ public class SurfParserTest {
 	@Test
 	public void testOkTemporals() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_TEMPORALS_RESOURCE_NAME)) {
-			final SurfResource resource = (SurfResource)new SurfParser().parse(inputStream).get();
+			final SurfObject resource = (SurfObject)new SurfParser().parse(inputStream).get();
 			assertThat(resource.getPropertyValue("instant"), hasValue(Instant.parse("2017-02-12T23:29:18.829Z")));
 			assertThat(resource.getPropertyValue("zonedDateTime"), hasValue(ZonedDateTime.parse("2017-02-12T15:29:18.829-08:00[America/Los_Angeles]")));
 			assertThat(resource.getPropertyValue("offsetDateTime"), hasValue(OffsetDateTime.parse("2017-02-12T15:29:18.829-08:00")));
@@ -515,7 +515,7 @@ public class SurfParserTest {
 	public void testOkLabels() throws IOException {
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_LABELS_RESOURCE_NAME)) {
 			final SurfParser surfParser = new SurfParser();
-			final SurfResource root = (SurfResource)surfParser.parse(inputStream).get();
+			final SurfObject root = (SurfObject)surfParser.parse(inputStream).get();
 			//|root|
 			final Optional<Object> rootLabeled = surfParser.getResourceByLabel("root");
 			assertThat(rootLabeled, hasValue(sameInstance(root)));
@@ -530,18 +530,30 @@ public class SurfParserTest {
 			final Optional<Object> testLabeled = surfParser.getResourceByLabel("test");
 			assertThat(testLabeled, hasValue(sameInstance(value)));
 			//|object|
-			final SurfResource thing = (SurfResource)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
+			final SurfObject thing = (SurfObject)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
 			//TODO assert type of thing
 			final Optional<Object> objectLabeled = surfParser.getResourceByLabel("object");
 			assertThat(objectLabeled, hasValue(sameInstance(thing)));
 			//list elements
 			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
-			assertThat(stuff, contains("one", 123, "three"));
+			assertThat(stuff, hasSize(4));
+			assertThat(stuff.get(0), is("one"));
+			assertThat(stuff.get(1), is(123));
 			assertThat(numberLabeled, hasValue(sameInstance(stuff.get(1))));
+			assertThat(stuff.get(2), is("three"));
+			final Object stuffElement4 = stuff.get(3);
+			assertThat(stuffElement4, instanceOf(SurfObject.class));
+			final SurfObject exampleThing = (SurfObject)stuffElement4;
+			assertThat(exampleThing.getTypeName(), hasValue("example-Thing"));
+			assertThat(exampleThing.getIri(), hasValue(URI.create("http://example.com/thing")));
+			assertThat(exampleThing.getPropertyValue("name"), hasValue("Example Thing"));
+			final Optional<Object> exampleThingIriLabeled = surfParser.getResourceByLabel(URI.create("http://example.com/thing"));
+			assertThat(exampleThingIriLabeled, hasValue(sameInstance(exampleThing)));
 			//map values
 			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
 			assertThat(map.get(1), is("one"));
 			assertThat(map.get(2), is(sameInstance(numberLabeled.get())));
+			assertThat(map.get(99), is(sameInstance(exampleThingIriLabeled.get())));
 			assertThat(map.get(100), is(sameInstance(objectLabeled.get())));
 			//set members
 			@SuppressWarnings("unchecked")
@@ -550,10 +562,11 @@ public class SurfParserTest {
 			assertThat(set, hasItem(123));
 			assertThat(set, hasItem(false));
 			final Optional<Object> newLabeled = surfParser.getResourceByLabel("new");
-			final SurfResource newLabeledResource = (SurfResource)newLabeled.orElseThrow(AssertionFailedError::new);
+			final SurfObject newLabeledResource = (SurfObject)newLabeled.orElseThrow(AssertionFailedError::new);
+			assertThat(newLabeledResource.getTypeName(), hasValue("example-Thing"));
 			assertThat(newLabeledResource.getPropertyValue("description"), hasValue("a new thing"));
 			final Optional<Object> anotherLabeled = surfParser.getResourceByLabel("another");
-			final SurfResource anotherLabeledResource = (SurfResource)anotherLabeled.orElseThrow(AssertionFailedError::new);
+			final SurfObject anotherLabeledResource = (SurfObject)anotherLabeled.orElseThrow(AssertionFailedError::new);
 			assertThat(anotherLabeledResource.getPropertyValue("description"), hasValue("yet another thing"));
 			assertThat(set, hasItem(sameInstance(numberLabeled.get())));
 			assertThat(set, hasItem(sameInstance(testLabeled.get())));
