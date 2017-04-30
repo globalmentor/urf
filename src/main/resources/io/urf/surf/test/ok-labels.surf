@@ -3,18 +3,23 @@
 value = |test|false
 	thing =
 |object|*example-Type:
-		stuff=["one", |number|, "three"]
+		stuff=["one", |number|, "three"
+			|<http://example.com/thing>|*example-Thing:
+				name="Example Thing"
+			;
+		]
 	;
 	map = {
 		1: "one"
 		2: |number|
+		99: |<http://example.com/thing>|
 		100: |object|
 	}
 	set = (
 |number|
 	|test|
 		|object|
-		|new| * :description = "a new thing";
+		|new| * example-Thing :description = "a new thing";
 		|another| *  :description = "yet another thing";
 	)
 ;
