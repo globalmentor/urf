@@ -33,6 +33,7 @@ import com.globalmentor.java.Characters;
  */
 public class SURF {
 
+	/** The SURF charset. */
 	public static final Charset CHARSET = UTF_8;
 
 	/** The delimiter separating segments in a name. */
@@ -86,6 +87,11 @@ public class SURF {
 	public static final char CHARACTER_DELIMITER = '\'';
 	/** The character used for escaping a character. */
 	public static final char CHARACTER_ESCAPE = '\\';
+	/** SURF characters that must be escaped as characters or in strings. */
+	public static Characters CHARACTER_REQUIRED_ESCAPED_CHARACTERS = Characters.of(CHARACTER_ESCAPE, BACKSPACE_CHAR, FORM_FEED_CHAR, LINE_FEED_CHAR,
+			CARRIAGE_RETURN_CHAR, CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR);
+	/** Additional SURF characters that may be escaped as characters or in strings. */
+	public static Characters CHARACTER_OPTIONAL_ESCAPED_CHARACTERS = Characters.of(SOLIDUS_CHAR);
 	//escaped forms of characters
 	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
 	public static final char ESCAPED_FORM_FEED = 'f'; //f form feed
