@@ -83,22 +83,40 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses an URF resource from an input stream.
-	 * @param inputStream The input stream containing SURF data.
-	 * @return The root URF resource, which may be empty if the SURF document was empty.
+	 * Parses a SURF resource from a string.
+	 * <p>
+	 * This is a convenience method that delegates to {@link #parse(Reader)}.
+	 * </p>
+	 * @param string The string containing SURF data.
+	 * @return The root SURF resource, which may be empty if the SURF document was empty.
 	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
+	public Optional<Object> parse(@Nonnull final String string) throws IOException, ParseIOException {
+		try (final Reader stringReader = new StringReader(string)) {
+			return parse(stringReader);
+		}
+	}
+
+	/**
+	 * Parses a SURF resource from an input stream.
+	 * @param inputStream The input stream containing SURF data.
+	 * @return The root SURF resource, which may be empty if the SURF document was empty.
+	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws ParseIOException if the SURF data was invalid.
+	 */
+	public Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
 		return parse(new LineNumberReader(new InputStreamReader(inputStream, CHARSET)));
 	}
 
 	/**
-	 * Parses an URF resource from a reader.
+	 * Parses a SURF resource from a reader.
 	 * @param reader The reader containing SURF data.
-	 * @return The root URF resource, which may be empty if the SURF document was empty.
+	 * @return The root SURF resource, which may be empty if the SURF document was empty.
 	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException {
+	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		if(skipWhitespaceLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
 			return Optional.empty(); //the SURF document is empty
 		}
@@ -164,6 +182,7 @@ public class SurfParser {
 	 * Parses a resource; either a label or a resource representation. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
 	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
 		Object label = null;
@@ -310,7 +329,7 @@ public class SurfParser {
 	 * @see SURF#IRI_BEGIN
 	 * @see SURF#IRI_END
 	 */
-	public static byte[] parseBinary(final Reader reader) throws IOException, ParseIOException {
+	public static byte[] parseBinary(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, BINARY_DELIMITER);
 		final String base64String = reachAfter(reader, BINARY_DELIMITER);
 		try {
@@ -352,7 +371,7 @@ public class SurfParser {
 	 *           has no more characters before the current character is completely parsed.
 	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
-	public static Character parseCharacter(final Reader reader) throws IOException, ParseIOException {
+	public static Character parseCharacter(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, CHARACTER_DELIMITER);
 		final int codePoint = parseCharacterCodePoint(reader, CHARACTER_DELIMITER);
 		checkParseIO(reader, codePoint >= 0, "Character literal cannot be empty.");
@@ -377,7 +396,7 @@ public class SurfParser {
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
 	 *           current character is completely parsed.
 	 */
-	public static int parseCharacterCodePoint(final Reader reader, final char delimiter) throws IOException, ParseIOException {
+	public static int parseCharacterCodePoint(@Nonnull final Reader reader, final char delimiter) throws IOException, ParseIOException {
 		char c = readCharacter(reader); //read a character
 		//TODO check for and prevent control characters
 		if(c == delimiter) {
@@ -386,7 +405,7 @@ public class SurfParser {
 			c = readCharacter(reader); //read another a character
 			switch(c) { //see what the next character
 				case CHARACTER_ESCAPE: //\\
-				case '/': //\/ (solidus)
+				case SOLIDUS_CHAR: //\/
 					break; //use the escaped escape character unmodified
 				case ESCAPED_BACKSPACE: //\b backspace
 					c = BACKSPACE_CHAR;
@@ -465,7 +484,7 @@ public class SurfParser {
 	 * @see SURF#IRI_BEGIN
 	 * @see SURF#IRI_END
 	 */
-	public static URI parseIRI(final Reader reader) throws IOException, ParseIOException {
+	public static URI parseIRI(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, IRI_BEGIN);
 		final String iriString = reachAfter(reader, IRI_END);
 		try {
@@ -499,7 +518,7 @@ public class SurfParser {
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
 	 */
-	public static Number parseNumber(final Reader reader) throws IOException, ParseIOException {
+	public static Number parseNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		int c = peek(reader); //there must be at least one number character
 		//check for decimal: $
 		final boolean isDecimal;
@@ -575,7 +594,7 @@ public class SurfParser {
 	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
 	 * @see SURF#REGULAR_EXPRESSION_ESCAPE
 	 */
-	public static Pattern parseRegularExpression(final Reader reader) throws IOException, ParseIOException {
+	public static Pattern parseRegularExpression(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, REGULAR_EXPRESSION_DELIMITER);
 		final StringBuilder regexBuilder = new StringBuilder();
 		char c = readCharacter(reader);
@@ -607,7 +626,7 @@ public class SurfParser {
 	 * @see SURF#STRING_DELIMITER
 	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
-	public static String parseString(final Reader reader) throws IOException, ParseIOException {
+	public static String parseString(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, STRING_DELIMITER); //read the beginning string delimiter
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the string
 		int codePoint; //keep reading and appending code points until we encounter the end of the string
@@ -627,7 +646,7 @@ public class SurfParser {
 	 * @throws ParseIOException if the temporal is not in the correct format, or if the temporal is outside the range that can be represented by this parser.
 	 * @see SURF#TEMPORAL_BEGIN
 	 */
-	public static TemporalAccessor parseTemporal(final Reader reader) throws IOException, ParseIOException {
+	public static TemporalAccessor parseTemporal(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, TEMPORAL_BEGIN);
 
 		int c; //we'll use this to keep track of the next character
@@ -842,7 +861,7 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static Optional<Boolean> skipSequenceDelimiters(final Reader reader) throws IOException {
+	protected static Optional<Boolean> skipSequenceDelimiters(@Nonnull final Reader reader) throws IOException {
 		int c = skipWhitespace(reader); //skip whitespace (and comments)
 		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
 			return Optional.empty();
@@ -867,7 +886,7 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipWhitespace(final Reader reader) throws IOException {
+	protected static int skipWhitespace(@Nonnull final Reader reader) throws IOException {
 		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
 		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
@@ -892,7 +911,7 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipWhitespaceLineBreaks(final Reader reader) throws IOException {
+	protected static int skipWhitespaceLineBreaks(@Nonnull final Reader reader) throws IOException {
 		int c; //we'll store the next non-line-break-filler character here so that it can be returned
 		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
