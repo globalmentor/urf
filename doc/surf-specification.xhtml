@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-04-29</dd>
+			<dd>Draft 2017-05-05</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -42,7 +42,7 @@
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
-	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Prose and asides marked as <span class="note">notes</span> are non-normative.</p>
+	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
 	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF parsers <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
 	<h2>Structure</h2>
@@ -127,12 +127,13 @@
 	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
 	<p>An object <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">name</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
 	<h3>Literals</h3>
-	<aside class="note far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
+	<aside class="info far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
 	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
+	<aside class="annotation far side">SURF uses the binary delimiter <code>%</code> because it resembles <code>0</code> and <code>1</code>.</aside>
 	<h4>Binary</h4>
-	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the <q>Base 64 Encoding</q> defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, surrounded on both sides by the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-should">should</span> include Base 64 padding, although a SURF parser <span class="spec-must">must</span> accept binary data that does not include such padding.</p>
+	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the <q>Base 64 Encoding</q> defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-must-not">must not</span> include Base 64 padding.</p>
 	<ul class="spec-production">
-		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code> '%'</li>
+		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code></li>
 	</ul>
 	<h4>Boolean</h4>
 	<p>A <dfn>Boolean</dfn> is a either of the tokens <code>true</code> or <code>false</code>.</p>
@@ -266,7 +267,7 @@
 		<li><code class="name">ss</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
 		<li><code class="name">s</code> ⇒ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> ] ]</li>
 	</ul>
-	<p><span style="color: #111111;">TODO add support for durations</span></p>
+	<p>TODO add support for durations</p>
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>List</h4>
