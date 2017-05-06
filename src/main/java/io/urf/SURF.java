@@ -71,8 +71,11 @@ public class SURF {
 
 	//literals
 
-	/** The delimiter that begins and ends binary literal values. */
-	public static final char BINARY_DELIMITER = '%';
+	/** The delimiter that begins binary literal values. */
+	public static final char BINARY_BEGIN = '%';
+	/** The <cite>RFC 4648</cite> base64 alphabet, without padding characters, used by SURF binary literals. */
+	public static final Characters BINARY_BASE64_CHARACTERS = Characters.of(Characters.ofRange('A', 'Z'), Characters.ofRange('a', 'z'),
+			Characters.ofRange('0', '9'), Characters.of('+', '/'));
 
 	/** The lexical representation of the Boolean value <code>false</code>. */
 	public static final String BOOLEAN_FALSE_LEXICAL_FORM = "false";
