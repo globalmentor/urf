@@ -38,6 +38,8 @@ import static com.globalmentor.java.Bytes.*;
 
 import org.junit.*;
 
+import com.globalmentor.itu.TelephoneNumber;
+
 import io.urf.surf.test.SurfTestResources;
 import junit.framework.AssertionFailedError;
 
@@ -302,6 +304,19 @@ public class SurfParserTest {
 	//TODO add bad tests with control characters
 	//TODO add bad tests to prevent escaping normal characters 
 	//TODO add bad tests with invalid surrogate character sequences
+
+	//##telephone number
+
+	/** @see SurfTestResources#OK_TELEPHONE_NUMBERS_RESOURCE_NAME */
+	@Test
+	public void testOkTelephoneNumbers() throws IOException {
+		final SurfObject resource = (SurfObject)parseTestResource(OK_TELEPHONE_NUMBERS_RESOURCE_NAME).get();
+		assertThat(resource.getPropertyValue("rfc3966Example"), hasValue(TelephoneNumber.parse("+12015550123")));
+		assertThat(resource.getPropertyValue("brazil"), hasValue(TelephoneNumber.parse("+552187654321")));
+	}
+
+	//TODO add bad tests with no digits
+	//TODO add bad tests with visual separators 
 
 	//##temporal
 

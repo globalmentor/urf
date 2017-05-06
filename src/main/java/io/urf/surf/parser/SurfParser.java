@@ -38,7 +38,9 @@ import javax.annotation.*;
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.iso.datetime.ISO8601;
+import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
+import com.globalmentor.text.ASCII;
 
 import io.urf.SURF;
 
@@ -235,6 +237,9 @@ public class SurfParser {
 				break;
 			case STRING_DELIMITER:
 				resource = parseString(reader);
+				break;
+			case TELEPHONE_NUMBER_BEGIN:
+				resource = parseTelephoneNumber(reader);
 				break;
 			case TEMPORAL_BEGIN:
 				resource = parseTemporal(reader);
@@ -632,6 +637,28 @@ public class SurfParser {
 			stringBuilder.appendCodePoint(codePoint);
 		}
 		return stringBuilder.toString(); //return the string we constructed; the ending string delimiter will already have been consumed
+	}
+
+	/**
+	 * Parses a telephone number. The current position must be that of the beginning telephone number delimiter character. The new position will be that
+	 * immediately after the last character in the telephone number.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return An instance of {@link TelephoneNumber} representing the SURF telephone number parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the telephone number is not in the correct format.
+	 * @see SURF#BINARY_BEGIN
+	 */
+	public static TelephoneNumber parseTelephoneNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the string
+		stringBuilder.append(check(reader, TELEPHONE_NUMBER_BEGIN)); //+
+		stringBuilder.append(check(reader, ASCII.DIGIT_CHARACTERS)); //at least one digit is required
+		final String telephoneNumberDigits = read(reader, ASCII.DIGIT_CHARACTERS, stringBuilder).toString(); //read the remaining digits
+		try {
+			return TelephoneNumber.parse(telephoneNumberDigits);
+		} catch(final IllegalArgumentException illegalArgumentException) { //this should never happen with the manual parsing logic above
+			throw new ParseIOException(reader, "Invalid SURF telephone number digits: " + telephoneNumberDigits, illegalArgumentException);
+		}
 	}
 
 	/**
