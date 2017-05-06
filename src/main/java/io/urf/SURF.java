@@ -128,6 +128,9 @@ public class SURF {
 	/** The delimiter that begins and ends string literal representations. */
 	public static final char STRING_DELIMITER = '"';
 
+	/** The delimiter that begins telephone number literal values. */
+	public static final char TELEPHONE_NUMBER_BEGIN = '+';
+
 	/** The delimiter that begins temporal literal representations. */
 	public static final char TEMPORAL_BEGIN = '@';
 	/** The ISO 8601 extension delimiter indicating the start of a time zone designation. */
