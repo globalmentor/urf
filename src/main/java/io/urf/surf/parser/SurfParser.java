@@ -39,7 +39,6 @@ import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.java.Characters;
-import com.globalmentor.java.Objects;
 
 import io.urf.SURF;
 
@@ -204,7 +203,7 @@ public class SurfParser {
 				resource = parseObject(label, reader);
 				break;
 			//literals
-			case BINARY_DELIMITER:
+			case BINARY_BEGIN:
 				resource = parseBinary(reader);
 				break;
 			case CHARACTER_DELIMITER:
@@ -320,22 +319,21 @@ public class SurfParser {
 
 	/**
 	 * Parses a binary literal. The current position must be that of the beginning binary delimiter character. The new position will be that immediately after the
-	 * ending binary delimiter character.
+	 * last character in the base64 alphabet.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return An array of bytes Java {@link URI} containing the IRI parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the IRI is not in the correct format.
-	 * @see SURF#IRI_BEGIN
-	 * @see SURF#IRI_END
+	 * @see SURF#BINARY_BEGIN
 	 */
 	public static byte[] parseBinary(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		check(reader, BINARY_DELIMITER);
-		final String base64String = reachAfter(reader, BINARY_DELIMITER);
+		check(reader, BINARY_BEGIN);
+		final String base64String = read(reader, BINARY_BASE64_CHARACTERS);
 		try {
 			return Base64.getDecoder().decode(base64String);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader, "Invalid Base64 encoding: " + base64String, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid SURF binary Base64 encoding: " + base64String, illegalArgumentException);
 		}
 	}
 
