@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-05-05</dd>
+			<dd>Draft 2017-05-06</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -107,7 +107,7 @@
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
-		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">temporal</code> | <code class="name">uuid</code> | <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code> | <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
 	</ul>
 	<p> A label consists of an identifier surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>).</p>
 	<ul class="spec-production">
@@ -174,7 +174,7 @@
 		<li><code class="name">iri</code> ⇒ '&lt;' <code class="name">rfc_3987_IRI</code> '&gt;'</li>
 	</ul>
 	<h4>Number</h4>
-	<aside class="note far third">Non-decimal SURF numbers are identical to those of JSON, except that SURF allows leading zeros. <span class="see">See <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
+	<aside class="note far third">Non-decimal SURF numbers are identical to those of JSON, except that SURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
 	<aside class="note far third">Examples of decimal types SURF processors <span class="spec-may">may</span> use include:
 		<dl>
 			<dt>C#</dt>
@@ -199,7 +199,7 @@
 	<p>TODO decide on whether and how to allow flags</p>
 	<p>TODO production</p>
 	<h4>String</h4>
-	<aside class="note far third"><span class="see">Compare to <a href="https://tools.ietf.org/html/rfc7159"><cite>RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.</span></aside>
+	<aside class="note far third">Compare to <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</aside>
 	<p>A <dfn>string</dfn> represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
 	<dl>
 		<dt><code>\\</code></dt>
@@ -224,6 +224,18 @@
 		<dd>Any 16-bit Unicode code point encoding, where <var><code>XXXX</code></var> is four hexadecimal digits in any case. Escaped Unicode code points outside the Basic Multilingual Plane <span class="spec-must">must</span> be represented as two UTF-16 surrogate characters.</dd>
 	</dl>
 	<p> TODO production</p>
+	<h4>Telephone</h4>
+	<aside class="annotation far half"><cite>RFC 3966</cite> allows visual separators as an aid to remembering URIs. SURF's focus is representing information and thus forgoes separators in the interest of simplicity.</aside>
+	<p>In SURF the representation of a <dfn>telephone</dfn> number follows the <q>global number</q> format prescribed by <a href="#ref-rfc3966" class="ref">RFC 3966</a>, which is a <code class="name">PLUS SIGN</code> <code>+</code> (<code class="unicode">U+002B</code>) followed by at least one digit. The representation <span class="spec-must-not">must not</span> include any <q>visual separators</q> as defined by <cite>RFC 3966</cite>.</p>
+	<figure class="far half">
+		<figcaption>Example SURF telephone number.</figcaption>
+		<ul>
+			<li><code class="language-surf">+12015550123</code></li>
+		</ul>
+	</figure>
+	<ul class="spec-production">
+		<li><code class="name">binary</code> ⇒ '+' <code class="name">digit</code>+</li>
+	</ul>
 	<h4>Temporal</h4>
 	<aside class="note far third">Although JSON does not support dates, the SURF <code class="name">instant</code> format  is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="see"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
 	<p>The SURF <dfn>temporal</dfn> representation encodes date and/or time information based on <a href="#ref-iso8601" class="ref">ISO 8601</a>. A temporal starts with the <code class="name">COMMERCIAL AT</code> character <code>@</code> (<code class="unicode">U+0040</code>). Time zone names <code class="name">tz</code> are from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database and are case-sensitive. <span class="info">The format for <code>month_day</code> conforms to an older version of <a href="#ref-iso8601" class="ref">ISO 8601</a>; the most recent version does not mention a month+day format.</span> <span class="info">The format for <code>zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification.</span></p>
@@ -334,12 +346,16 @@
 		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed, Innosoft, N. Borenstein. IETF.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner, Harvard University. IETF.</dd>
+		<dt id="ref-rfc3966" class="ref-target">RFC 3966</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc3966"><cite>The tel URI for Telephone Numbers</cite></a>, H. Schulzrinne, Columbia University. IETF.</dd>
 		<dt id="ref-rfc3987" class="ref-target">RFC 3987</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc3987"><cite>Internationalized Resource Identifiers (IRIs)</cite></a>, M. Duerst, W3C, M. Suignard, Microsoft Corporation. IETF.</dd>
 		<dt id="ref-rfc4648" class="ref-target">RFC 4648</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson, SJD. IETF.</dd>
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
+		<dt id="ref-rfc7159" class="ref-target">RFC 7159</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray, Google, Inc. IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 	</dl>
