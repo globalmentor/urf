@@ -20,6 +20,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.model.NameValuePair;
+
 /**
  * Simple access to an URF resource description.
  * @author Garret Wilson
@@ -48,6 +50,9 @@ public interface SimpleUrfResource extends Resource { //TODO probably transfer t
 	 * @return The previous value of the property, if any.
 	 */
 	public Optional<Object> setPropertyValue(@Nonnull String propertyName, @Nonnull Object value);
+
+	/** @return An iterable to the object's named properties and their values. */
+	public Iterable<NameValuePair<String, Object>> getPropertyNameValuePairs();
 
 	/**
 	 * Sets property values from a map of property names and values. Neither <code>null</code> property names nor <code>null</code> property values are allowed.

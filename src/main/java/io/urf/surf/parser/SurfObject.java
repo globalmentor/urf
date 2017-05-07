@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2016-2017 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,17 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.collections.iterables.ConverterIterable;
+import com.globalmentor.model.NameValuePair;
+
 /**
  * Implementation of an URF resource for the object descriptions that appear in a SURF document.
+ * <p>
+ * SURF objects are considered equal if their IRIs, type names, and property names and values are equal.
+ * </p>
+ * <p>
+ * This implementation does not consider another object equal unless it is an implementation of {@link SurfObject}.
+ * </p>
  * @author Garret Wilson
  */
 public class SurfObject implements SimpleUrfResource {
@@ -63,9 +72,22 @@ public class SurfObject implements SimpleUrfResource {
 		return Optional.ofNullable(properties.put(requireNonNull(propertyName), requireNonNull(value)));
 	}
 
-	/** Constructor of a resource with an unknown type. */
+	@Override
+	public Iterable<NameValuePair<String, Object>> getPropertyNameValuePairs() {
+		return new ConverterIterable<>(properties.entrySet(), NameValuePair::fromMapEntry);
+	}
+
+	/** Constructor of a resource with no IRI and an unknown type. */
 	public SurfObject() {
-		this(null);
+		this(null, null);
+	}
+
+	/**
+	 * Optional IRI constructor.
+	 * @param iri The identifying resource IRI, or <code>null</code> if not known.
+	 */
+	public SurfObject(@Nullable final URI iri) {
+		this(iri, null);
 	}
 
 	/**
@@ -88,4 +110,20 @@ public class SurfObject implements SimpleUrfResource {
 		this.typeName = typeName != null ? checkArgumentValidSurfName(typeName) : null;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(iri, typeName, properties);
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if(this == object) {
+			return true;
+		}
+		if(!(object instanceof SurfObject)) {
+			return false;
+		}
+		final SurfObject surfObject = (SurfObject)object;
+		return getIri().equals(surfObject.getIri()) && getTypeName().equals(surfObject.getTypeName()) && properties.equals(surfObject.properties);
+	}
 }
