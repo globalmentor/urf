@@ -16,16 +16,19 @@
 
 package io.urf.surf.serializer;
 
+import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static io.urf.SURF.*;
+import static java.util.Objects.*;
 
 import java.io.*;
 import java.util.*;
 
 import javax.annotation.*;
 
-import com.globalmentor.io.ParseIOException;
+import com.globalmentor.io.*;
+import com.globalmentor.io.function.IOConsumer;
 
 import io.urf.SURF;
 import io.urf.surf.parser.SurfObject;
@@ -67,6 +70,145 @@ public class SurfSerializer {
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
 
+	private boolean formatted = false;
+
+	/**
+	 * Returns whether this serializer will format the document with additional whitespace and newlines.
+	 * <p>
+	 * This implementation defaults to no formatting.
+	 * </p>
+	 * @return Whether serialization output should be formatted.
+	 */
+	public boolean isFormatted() {
+		return formatted;
+	}
+
+	/**
+	 * Sets whether the serialization should be formatted.
+	 * @param formatted Whether this serializer will format the document with additional whitespace and newlines.
+	 */
+	public void setFormatted(final boolean formatted) {
+		this.formatted = formatted;
+	}
+
+	private CharSequence indentSequence = String.valueOf(CHARACTER_TABULATION_CHAR);
+
+	/**
+	 * Returns the sequence of characters used for each indention level.
+	 * <p>
+	 * This implementation defaults to the horizontal tab character.
+	 * </p>
+	 * @return The character(s) used for indention.
+	 */
+	public CharSequence getIndentSequence() {
+		return indentSequence;
+	}
+
+	/**
+	 * Set the sequence of characters used for each indention level.
+	 * @param indentSequence The character(s) to use for indention.
+	 */
+	public void setIndentSequence(@Nonnull final CharSequence indentSequence) {
+		this.indentSequence = requireNonNull(indentSequence);
+	}
+
+	/** The zero-based indention level. */
+	private int indentLevel = 0;
+
+	/**
+	 * Increases the indention level. No information is appended.
+	 * @return An object that will automatically unindent when {@link Closeable#close()} is called.
+	 */
+	protected Closeable increaseIndentLevel() {
+		indentLevel++;
+		return Close.by(this::decreaseIndentLevel);
+	}
+
+	/**
+	 * Appends indention characters at the appropriate level if formatting is enabled.
+	 * <p>
+	 * If formatting is turned off, no content will be added.
+	 * </p>
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @see #isFormatted()
+	 * @see #getIndentSequence()
+	 */
+	protected void formatIndent(@Nonnull final Appendable appendable) throws IOException {
+		if(isFormatted()) {
+			final CharSequence indentSequence = getIndentSequence();
+			for(int i = 0; i < indentLevel; ++i) {
+				appendable.append(indentSequence);
+			}
+		}
+	}
+
+	/** Decreases the indention level. No information is appended. */
+	protected void decreaseIndentLevel() {
+		indentLevel--;
+	}
+
+	private CharSequence lineSeparator = System.lineSeparator();
+
+	/**
+	 * Returns the sequence of characters used to separate lines.
+	 * <p>
+	 * This implementation defaults to the platform-dependent line separator for the current system.
+	 * </p>
+	 * @return The character(s) used for line endings.
+	 * @see System#lineSeparator()
+	 */
+	public CharSequence getLineSeparator() {
+		return lineSeparator;
+	}
+
+	/**
+	 * Sets the sequence of characters used to separate lines.
+	 * @param lineSeparator The character(s) to use for line endings.
+	 * @see System#lineSeparator()
+	 */
+	public void setLineSeparator(@Nonnull final CharSequence lineSeparator) {
+		this.lineSeparator = requireNonNull(lineSeparator);
+	}
+
+	/**
+	 * Separates lines by adding a line separation character sequence if formatting is enabled.
+	 * <p>
+	 * If formatting is turned off, no content will be added.
+	 * </p>
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @return Whether or not a line separator sequence was actually appended.
+	 * @see #isFormatted()
+	 * @see #getLineSeparator()
+	 */
+	protected boolean formatNewLine(@Nonnull final Appendable appendable) throws IOException {
+		final boolean isNewlineAppended = isFormatted();
+		if(isNewlineAppended) {
+			appendable.append(lineSeparator);
+		}
+		return isNewlineAppended;
+	}
+
+	private boolean sequenceSeparatorRequired = false;
+
+	/**
+	 * Whether separators will always be added between sequence items even if newlines are present.
+	 * <p>
+	 * This implementation defaults to not adding sequence separators if not needed.
+	 * </p>
+	 * @return Whether sequence separators will always be added even when options.
+	 */
+	public boolean isSequenceSeparatorRequired() {
+		return sequenceSeparatorRequired;
+	}
+
+	/**
+	 * Sets whether separators will always be added between sequence items even if newlines are present.
+	 * @param sequenceSeparatorRequired Whether sequence separators will always be added even when options.
+	 */
+	public void setSequenceSeparatorRequired(final boolean sequenceSeparatorRequired) {
+		this.sequenceSeparatorRequired = sequenceSeparatorRequired;
+	}
+
 	/**
 	 * Serializes a SURF resource graph to a string.
 	 * <p>
@@ -98,16 +240,16 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF resource graph to a writer.
-	 * @param writer The writer to receive SURF data.
+	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException If there was an error writing the SURF data.
 	 */
-	public void serialize(@Nonnull final Writer writer, @Nullable Object root) throws IOException {
+	public void serialize(@Nonnull final Appendable appendable, @Nullable Object root) throws IOException {
 		if(root == null) {
 			return;
 		}
-		serializeResource(writer, root);
+		serializeResource(appendable, root);
 	}
 
 	/**
@@ -119,7 +261,7 @@ public class SurfSerializer {
 	 */
 	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
 		if(resource instanceof SurfObject) { //objects
-			throw new UnsupportedOperationException(); //TODO
+			serializeObject(appendable, (SurfObject)resource);
 		} else if(resource instanceof List) { //collections
 			throw new UnsupportedOperationException(); //TODO
 		} else { //literals
@@ -138,6 +280,44 @@ public class SurfSerializer {
 			}
 		}
 	}
+
+	//objects
+
+	/**
+	 * Serializes a SURF object.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param surfObject The information to be serialized as a SURF string.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#OBJECT_BEGIN
+	 * @see SURF#PROPERTIES_BEGIN
+	 * @see SURF#PROPERTIES_END
+	 * @see #parseCharacterCodePoint(Reader, char)
+	 */
+	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
+		appendable.append(OBJECT_BEGIN); //*
+		ifPresent(surfObject.getTypeName(), appendable::append); //typeName
+		appendable.append(PROPERTIES_BEGIN); //:
+		formatNewLine(appendable);
+		try (final Closeable indention = increaseIndentLevel()) {
+			serializeSequence(appendable, surfObject.getPropertyNameValuePairs(), property -> {
+				formatIndent(appendable);
+				appendable.append(property.getName());
+				if(formatted) {
+					appendable.append(SPACE_CHAR);
+				}
+				appendable.append(PROPERTY_VALUE_DELIMITER); //=
+				if(formatted) {
+					appendable.append(SPACE_CHAR);
+				}
+				serializeResource(appendable, property.getValue());
+			});
+			formatIndent(appendable);
+		}
+		appendable.append(PROPERTIES_END); //;
+	}
+
+	//literals
 
 	/**
 	 * Serializes a string surrounded by string delimiters.
@@ -176,7 +356,7 @@ public class SurfSerializer {
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
 	 * @param codePoint The code point to serialize.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
-	 * @throws IOException if there is an error reading from the reader.
+	 * @throws IOException if there is an error appending to the appender.
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
 	 *           current character is completely parsed.
 	 * @see SURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
@@ -225,4 +405,37 @@ public class SurfSerializer {
 		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
 		appendable.append((char)codePoint);
 	}
+
+	/**
+	 * Serializes a general SURF sequence (such as a list). For each sequence item, {@link IOConsumer#accept(Object)} is called, passing the {@link Appendable},
+	 * for the item to be serialized. The item serialization strategy will return <code>false</code> to indicate that there are no further items.
+	 * @param <I> The type of item in the sequence.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization.
+	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appender.
+	 */
+	protected <I> void serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence, @Nonnull final IOConsumer<I> itemSerializer)
+			throws IOException {
+		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
+		final Iterator<I> iterator = sequence.iterator();
+		//boolean hasNext = true;
+		while(iterator.hasNext()) {
+			formatIndent(appendable);
+			final I item = iterator.next();
+			itemSerializer.accept(item); //serialize the item
+			final boolean hasNext = iterator.hasNext(); //see if there is another item after this one
+			if(sequenceSeparatorRequired && hasNext) { //add a separator if one is required
+				appendable.append(SEQUENCE_DELIMITER);
+			}
+			//skip to the next line, if formatting;
+			//if none was added (and we didn't already add a separator) and there is another item,
+			//add a separator
+			if(!formatNewLine(appendable) && !sequenceSeparatorRequired && hasNext) {
+				appendable.append(SEQUENCE_DELIMITER);
+			}
+		}
+		;
+	}
+
 }

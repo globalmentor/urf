@@ -19,16 +19,19 @@ package io.urf.surf.serializer;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 import javax.annotation.*;
 
 import static io.urf.surf.test.SurfTestResources.*;
+import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.*;
 
-import io.urf.surf.parser.SurfParser;
+import io.clogr.Clogged;
+import io.urf.surf.parser.*;
 import io.urf.surf.test.SurfTestResources;
 
 /**
@@ -39,7 +42,7 @@ import io.urf.surf.test.SurfTestResources;
  * </p>
  * @author Garret Wilson
  */
-public class SurfSerializerTest {
+public class SurfSerializerTest implements Clogged {
 
 	/**
 	 * Loads and parses a Java resource using {@link SurfParser}.
@@ -54,18 +57,102 @@ public class SurfSerializerTest {
 		}
 	}
 
+	/** General test currently for manual verification of formatted serialization. */
+	@Ignore
+	@Test
+	public void testSerialize() throws IOException {
+		final SurfObject surfObject = new SurfObject(URI.create("urn:uuid:bb8e7dbe-f0b4-4d94-a1cf-46ed0e920832"), "User");
+		surfObject.setPropertyValue("firstName", "Jane");
+		surfObject.setPropertyValue("lastName", "Doe");
+		surfObject.setPropertyValue("fullName", "Jane Doe");
+		final SurfObject name = new SurfObject();
+		name.setPropertyValue("first", "Jane");
+		name.setPropertyValue("last", "Doe");
+		surfObject.setPropertyValue("name", name);
+		//TODO finish
+
+		final SurfSerializer serializer = new SurfSerializer();
+		serializer.setFormatted(true);
+
+		getLogger().debug(serializer.serialize(surfObject)); //currently for manual, visual inspection
+	}
+
+	//#objects
+
+	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
+	@Test
+	public void testOkObjectNoProperties() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			for(final String okObjectNoPropertiesResourceName : OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES) {
+				assertThat(okObjectNoPropertiesResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okObjectNoPropertiesResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_OBJECT_ONE_PROPERTY_RESOURCE_NAMES */
+	@Test
+	public void testOkObjectOneProperty() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("one", "one");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			for(final String okObjectOnePropertyResourceName : OK_OBJECT_ONE_PROPERTY_RESOURCE_NAMES) {
+				assertThat(okObjectOnePropertyResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okObjectOnePropertyResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_OBJECT_TWO_PROPERTIES_RESOURCE_NAMES */
+	@Test
+	public void testOkObjectTwoProperties() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("one", "one");
+		surfObject.setPropertyValue("two", "two");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			for(final String okObjectTwoPropertiesResourceName : OK_OBJECT_TWO_PROPERTIES_RESOURCE_NAMES) {
+				assertThat(okObjectTwoPropertiesResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okObjectTwoPropertiesResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_OBJECT_TYPE_RESOURCE_NAMES */
+	@Test
+	public void testOkObjectType() throws IOException {
+		final SurfObject surfObject = new SurfObject("example-FooBar");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			for(final String okObjectTypeResourceName : OK_OBJECT_TYPE_RESOURCE_NAMES) {
+				assertThat(okObjectTypeResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okObjectTypeResourceName)));
+			}
+		}
+	}
+
 	//#literals
 
 	//##string
 
 	/**
 	 * @see SurfTestResources#OK_STRING_FOOBAR_RESOURCE_NAME
-	 * @see SurfParserTest#testOkStringFoobar()
 	 */
 	@Test
-	public void testSerializeStringFoobar() throws IOException {
-		final String serialization = new SurfSerializer().serialize("foobar");
-		assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_STRING_FOOBAR_RESOURCE_NAME)));
+	public void testOkStringFoobar() throws IOException {
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize("foobar");
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_STRING_FOOBAR_RESOURCE_NAME)));
+		}
 	}
 
 	//TODO implement OK_STRINGS_RESOURCE_NAME
