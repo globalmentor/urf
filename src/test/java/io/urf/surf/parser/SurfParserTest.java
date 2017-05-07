@@ -127,6 +127,19 @@ public class SurfParserTest {
 		}
 	}
 
+	/** @see SurfTestResources#OK_OBJECT_TYPE_RESOURCE_NAMES */
+	@Test
+	public void testOkObjectType() throws IOException {
+		for(final String okObjectTypeResourceName : OK_OBJECT_TYPE_RESOURCE_NAMES) {
+			final Optional<Object> object = parseTestResource(okObjectTypeResourceName);
+			assertThat(okObjectTypeResourceName, object, isPresent());
+			assertThat(okObjectTypeResourceName, object, hasValue(instanceOf(SurfObject.class)));
+			final SurfObject resource = (SurfObject)object.get();
+			assertThat(okObjectTypeResourceName, resource.getTypeName(), hasValue("example-FooBar"));
+			assertThat(okObjectTypeResourceName, resource.getPropertyCount(), is(0));
+		}
+	}
+
 	//TODO add error tests of duplicated property names
 
 	//#literals
