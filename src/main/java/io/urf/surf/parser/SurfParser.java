@@ -244,6 +244,9 @@ public class SurfParser {
 			case TEMPORAL_BEGIN:
 				resource = parseTemporal(reader);
 				break;
+			case UUID_BEGIN:
+				resource = parseUuid(reader);
+				break;
 			//collections
 			case LIST_BEGIN:
 				resource = parseList(reader);
@@ -647,10 +650,10 @@ public class SurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the telephone number is not in the correct format.
-	 * @see SURF#BINARY_BEGIN
+	 * @see SURF#TELEPHONE_NUMBER_BEGIN
 	 */
 	public static TelephoneNumber parseTelephoneNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the string
+		final StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(check(reader, TELEPHONE_NUMBER_BEGIN)); //+
 		stringBuilder.append(check(reader, ASCII.DIGIT_CHARACTERS)); //at least one digit is required
 		final String telephoneNumberDigits = read(reader, ASCII.DIGIT_CHARACTERS, stringBuilder).toString(); //read the remaining digits
@@ -795,6 +798,35 @@ public class SurfParser {
 			}
 		} catch(final DateTimeParseException dateTimeParseException) {
 			throw new ParseIOException(reader, dateTimeParseException);
+		}
+	}
+
+	/**
+	 * Parses a UUID. The current position must be that of the beginning UUID delimiter character. The new position will be that immediately after the last
+	 * character in the UUID.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return An instance of {@link UUID} representing the SURF UUID parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the UUID is not in the correct format.
+	 * @see SURF#UUID_BEGIN
+	 */
+	public static UUID parseUuid(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		check(reader, UUID_BEGIN); //&
+		final StringBuilder stringBuilder = new StringBuilder();
+		check(reader, ASCII.HEX_CHARACTERS, 8, stringBuilder);
+		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
+		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
+		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
+		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
+		check(reader, ASCII.HEX_CHARACTERS, 12, stringBuilder);
+		try {
+			return UUID.fromString(stringBuilder.toString());
+		} catch(final IllegalArgumentException illegalArgumentException) {
+			throw new ParseIOException(reader, "Invalid SURF UUID contents: " + stringBuilder, illegalArgumentException);
 		}
 	}
 

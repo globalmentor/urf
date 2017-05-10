@@ -78,7 +78,7 @@ public class SurfParserTest {
 
 	//TODO add test for bad document with content after root resource; make sure this prohibition gets into the spec 
 
-	//#object
+	//#objects
 
 	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
 	@Test
@@ -347,6 +347,16 @@ public class SurfParserTest {
 		assertThat(resource.getPropertyValue("yearMonth"), hasValue(YearMonth.parse("2017-02")));
 		assertThat(resource.getPropertyValue("monthDay"), hasValue(MonthDay.parse("--02-12")));
 		assertThat(resource.getPropertyValue("year"), hasValue(Year.parse("2017")));
+	}
+
+	//##UUID
+
+	/** @see SurfTestResources#OK_UUID_RESOURCE_NAME */
+	@Test
+	public void testOkUuid() throws IOException {
+		final Optional<Object> object = parseTestResource(OK_UUID_RESOURCE_NAME);
+		assertThat(object, isPresent());
+		assertThat(object, hasValue(UUID.fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")));
 	}
 
 	//#collections
