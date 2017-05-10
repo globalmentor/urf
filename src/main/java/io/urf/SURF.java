@@ -138,6 +138,11 @@ public class SURF {
 	/** The ISO 8601 extension delimiter indicating the end of a time zone designation. */
 	public static final char TEMPORAL_ZONE_END = ']';
 
+	/** The delimiter that begins UUID literal representations. */
+	public static final char UUID_BEGIN = '&';
+	/** The delimiter that separates internal groups of UUID hexadecimal digits. */
+	public static final char UUID_GROUP_DELIMITER = '-';
+
 	//collections
 
 	/** The delimiter that begins lists. */
