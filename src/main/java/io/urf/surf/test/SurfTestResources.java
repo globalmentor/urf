@@ -105,6 +105,9 @@ public class SurfTestResources {
 	//##temporal
 	public static final String OK_TEMPORALS_RESOURCE_NAME = "ok-temporals.surf";
 
+	//##UUID
+	public static final String OK_UUID_RESOURCE_NAME = "ok-uuid.surf";
+
 	//#collections
 
 	//##list
