@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-05-07</dd>
+			<dd>Draft 2017-05-10</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -136,7 +136,7 @@
 		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code></li>
 	</ul>
 	<h4>Boolean</h4>
-	<p>A <dfn>Boolean</dfn> is a either of the tokens <code>true</code> or <code>false</code>.</p>
+	<p>A <dfn>Boolean</dfn> is either of the tokens <code>true</code> or <code>false</code>.</p>
 	<ul class="spec-production">
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
 	</ul>
@@ -283,7 +283,17 @@
 	</ul>
 	<p>TODO add support for durations</p>
 	<h4>UUID</h4>
-	<p>TODO</p>
+	<aside class="annotation far side">The ampersand character &amp; was chosen for UUIDs because it recalls the address-of operator of C/C++.</aside>
+	<p>A <dfn>Universally Unique IDentifier</dfn> (<abbr>UUID</abbr>) <span class="spec-must">must</span> adhere to the requirements of <a href="#ref-rfc4122" class="ref">RFC 4122</a>. The SURF representation of a UUID be <span class="spec-must">must</span> be introduced by the <code class="name">AMPERSAND</code> character <code>&amp;</code> (<code class="unicode">U+0026</code>) and be followed by the <q>UUID</q> production given in <cite>RFC 4122</cite>.</p>
+	<figure class="far half">
+		<figcaption>Example SURF UUID.</figcaption>
+		<ul>
+			<li><code class="language-surf">&amp;f81d4fae-7dec-11d0-a765-00a0c91e6bf6</code></li>
+		</ul>
+	</figure>
+	<ul class="spec-production">
+		<li><code class="name">uuid</code> ⇒ '&amp;' <code class="name">hex</code>*8 '-' <code class="name">hex</code>*4 '-' <code class="name">hex</code>*4 '-' <code class="name">hex</code>*4 '-' <code class="name">hex</code>*12</li>
+	</ul>
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>List</h4>
@@ -349,19 +359,21 @@
 		<dt id="ref-iso8601" class="ref-target">ISO 8601:2004</dt>
 		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed, Innosoft, N. Borenstein. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed (Innosoft), N. Borenstein. IETF.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner, Harvard University. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt id="ref-rfc3966" class="ref-target">RFC 3966</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc3966"><cite>The tel URI for Telephone Numbers</cite></a>, H. Schulzrinne, Columbia University. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc3966"><cite>The tel URI for Telephone Numbers</cite></a>, H. Schulzrinne (Columbia University). IETF.</dd>
 		<dt id="ref-rfc3987" class="ref-target">RFC 3987</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc3987"><cite>Internationalized Resource Identifiers (IRIs)</cite></a>, M. Duerst, W3C, M. Suignard, Microsoft Corporation. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc3987"><cite>Internationalized Resource Identifiers (IRIs)</cite></a>, M. Duerst (W3C), M. Suignard (Microsoft Corporation). IETF.</dd>
+		<dt id="ref-rfc4122" class="ref-target">RFC 4122</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc4122"><cite>A Universally Unique IDentifier (UUID) URN Namespace</cite></a>, P. Leach (Microsoft Corporation), M. Mealling (Refactored Networks, LLC), R. Salz (DataPower Technology, Inc.). IETF.</dd>
 		<dt id="ref-rfc4648" class="ref-target">RFC 4648</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson, SJD. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson (SJD). IETF.</dd>
 		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov, Isode Limited, J. Reschke, greenbytes. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov (Isode Limited), J. Reschke (greenbytes). IETF.</dd>
 		<dt id="ref-rfc7159" class="ref-target">RFC 7159</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray, Google, Inc. IETF.</dd>
+		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray (Google, Inc.). IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 	</dl>
