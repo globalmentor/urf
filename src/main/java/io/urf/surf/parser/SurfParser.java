@@ -40,6 +40,7 @@ import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
+import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.text.ASCII;
 
 import io.urf.SURF;
@@ -370,22 +371,19 @@ public class SurfParser {
 	 * Parses a character literal. The current position must be that of the beginning character delimiter character. The new position will be that immediately
 	 * after the ending character delimiter character.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return The character parsed from the reader.
+	 * @return The code point character parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the character literal is empty, if a control character was present, if the character is not escaped correctly, or the reader
 	 *           has no more characters before the current character is completely parsed.
 	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
-	public static Character parseCharacter(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	public static CodePointCharacter parseCharacter(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, CHARACTER_DELIMITER);
 		final int codePoint = parseCharacterCodePoint(reader, CHARACTER_DELIMITER);
 		checkParseIO(reader, codePoint >= 0, "Character literal cannot be empty.");
 		check(reader, CHARACTER_DELIMITER);
-		if(!Character.isBmpCodePoint(codePoint)) {
-			throw new UnsupportedOperationException("Parsing supplementary character U+" + Long.toHexString(codePoint).toUpperCase() + " not yet supported."); //TODO fix
-		}
-		return Character.valueOf((char)codePoint);
+		return CodePointCharacter.of(codePoint);
 	}
 
 	/**

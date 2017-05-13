@@ -39,6 +39,7 @@ import static com.globalmentor.java.Bytes.*;
 import org.junit.*;
 
 import com.globalmentor.itu.TelephoneNumber;
+import com.globalmentor.java.CodePointCharacter;
 
 import io.urf.surf.test.SurfTestResources;
 import junit.framework.AssertionFailedError;
@@ -193,22 +194,21 @@ public class SurfParserTest {
 	@Test
 	public void testOkCharacters() throws IOException {
 		final SurfObject resource = (SurfObject)parseTestResource(OK_CHARACTERS_RESOURCE_NAME).get();
-		assertThat(resource.getPropertyValue("foo"), hasValue('|'));
-		assertThat(resource.getPropertyValue("quote"), hasValue('"'));
-		assertThat(resource.getPropertyValue("apostrophe"), hasValue('\''));
-		assertThat(resource.getPropertyValue("backslash"), hasValue('\\'));
-		assertThat(resource.getPropertyValue("solidus"), hasValue('/'));
-		assertThat(resource.getPropertyValue("ff"), hasValue('\f'));
-		assertThat(resource.getPropertyValue("lf"), hasValue('\n'));
-		assertThat(resource.getPropertyValue("cr"), hasValue('\r'));
-		assertThat(resource.getPropertyValue("tab"), hasValue('\t'));
-		assertThat(resource.getPropertyValue("vtab"), hasValue('\u000B'));
-		assertThat(resource.getPropertyValue("devanagari-ma"), hasValue('\u092E'));
-		assertThat(resource.getPropertyValue("devanagari-maEscaped"), hasValue('\u092E'));
-		/*TODO fix for supplementary characters
-		assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(Character.toChars(0x1F602)));
-		assertThat(resource.getPropertyValue("tearsOfJoyEscaped"), hasValue(Character.toChars(0x1F602)));
-		*/
+		assertThat(resource.getPropertyValue("foo"), hasValue(CodePointCharacter.of('|')));
+		assertThat(resource.getPropertyValue("quote"), hasValue(CodePointCharacter.of('"')));
+		assertThat(resource.getPropertyValue("apostrophe"), hasValue(CodePointCharacter.of('\'')));
+		assertThat(resource.getPropertyValue("backslash"), hasValue(CodePointCharacter.of('\\')));
+		assertThat(resource.getPropertyValue("solidus"), hasValue(CodePointCharacter.of('/')));
+		assertThat(resource.getPropertyValue("backspace"), hasValue(CodePointCharacter.of('\b')));
+		assertThat(resource.getPropertyValue("ff"), hasValue(CodePointCharacter.of('\f')));
+		assertThat(resource.getPropertyValue("lf"), hasValue(CodePointCharacter.of('\n')));
+		assertThat(resource.getPropertyValue("cr"), hasValue(CodePointCharacter.of('\r')));
+		assertThat(resource.getPropertyValue("tab"), hasValue(CodePointCharacter.of('\t')));
+		assertThat(resource.getPropertyValue("vtab"), hasValue(CodePointCharacter.of('\u000B')));
+		assertThat(resource.getPropertyValue("devanagari-ma"), hasValue(CodePointCharacter.of('\u092E')));
+		assertThat(resource.getPropertyValue("devanagari-maEscaped"), hasValue(CodePointCharacter.of('\u092E')));
+		assertThat(resource.getPropertyValue("tearsOfJoy"), hasValue(CodePointCharacter.of(0x1F602)));
+		assertThat(resource.getPropertyValue("tearsOfJoyEscaped"), hasValue(CodePointCharacter.of(0x1F602)));
 	}
 
 	//TODO add bad tests with empty character
@@ -420,7 +420,7 @@ public class SurfParserTest {
 		assertThat(map.get(true), is("Boolean"));
 		assertThat(map.get(Arrays.asList(1, 2, 3)), is(new BigDecimal("1.23")));
 		final Map<Object, Object> pingPong = new HashMap<>();
-		pingPong.put("ping", Arrays.asList('p', 'o', 'n', 'g'));
+		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		assertThat(map.get("map"), is(pingPong));
 		assertThat(map.get(new HashSet<Object>(Arrays.asList("foo", false))), is(true));
 	}
