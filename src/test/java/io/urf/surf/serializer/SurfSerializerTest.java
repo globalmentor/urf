@@ -30,6 +30,8 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.*;
 
+import com.globalmentor.java.CodePointCharacter;
+
 import io.clogr.Clogged;
 import io.urf.surf.parser.*;
 import io.urf.surf.test.SurfTestResources;
@@ -139,6 +141,37 @@ public class SurfSerializerTest implements Clogged {
 	}
 
 	//#literals
+
+	//##character
+
+	/** @see SurfTestResources#OK_CHARACTERS_RESOURCE_NAME */
+	@Test
+	public void testOkCharacters() throws IOException {
+		//test serializing java.lang.Character separately, because the parser never sends that back
+		assertThat(new SurfSerializer().serialize('X'), equalTo("'X'"));
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("foo", CodePointCharacter.of('|'));
+		surfObject.setPropertyValue("quote", CodePointCharacter.of('"'));
+		surfObject.setPropertyValue("apostrophe", CodePointCharacter.of('\''));
+		surfObject.setPropertyValue("backslash", CodePointCharacter.of('\\'));
+		surfObject.setPropertyValue("solidus", CodePointCharacter.of('/'));
+		surfObject.setPropertyValue("backspace", CodePointCharacter.of('\b'));
+		surfObject.setPropertyValue("ff", CodePointCharacter.of('\f'));
+		surfObject.setPropertyValue("lf", CodePointCharacter.of('\n'));
+		surfObject.setPropertyValue("cr", CodePointCharacter.of('\r'));
+		surfObject.setPropertyValue("tab", CodePointCharacter.of('\t'));
+		surfObject.setPropertyValue("vtab", CodePointCharacter.of('\u000B'));
+		surfObject.setPropertyValue("devanagari-ma", CodePointCharacter.of('\u092E'));
+		surfObject.setPropertyValue("devanagari-maEscaped", CodePointCharacter.of('\u092E'));
+		surfObject.setPropertyValue("tearsOfJoy", CodePointCharacter.of(0x1F602));
+		surfObject.setPropertyValue("tearsOfJoyEscaped", CodePointCharacter.of(0x1F602));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_CHARACTERS_RESOURCE_NAME)));
+		}
+	}
 
 	//##string
 

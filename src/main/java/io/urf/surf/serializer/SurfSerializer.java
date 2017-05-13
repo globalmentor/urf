@@ -29,6 +29,7 @@ import javax.annotation.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.io.function.IOConsumer;
+import com.globalmentor.java.CodePointCharacter;
 
 import io.urf.SURF;
 import io.urf.surf.parser.SurfObject;
@@ -43,7 +44,12 @@ import io.urf.surf.parser.SurfObject;
  * <li>{@link SurfObject}</li>
  * </ul>
  * <h2>Literals</h2>
- * <h3>String</h3>
+ * <h3>character</h3>
+ * <ul>
+ * <li>{@link Character}</li>
+ * <li>{@link CodePointCharacter}</li>
+ * </ul>
+ * <h3>string</h3>
  * <ul>
  * <li>{@link CharSequence} (including {@link String})</li>
  * </ul>
@@ -67,6 +73,8 @@ import io.urf.surf.parser.SurfObject;
  */
 public class SurfSerializer {
 
+	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
+	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
 
@@ -265,8 +273,14 @@ public class SurfSerializer {
 		} else if(resource instanceof List) { //collections
 			throw new UnsupportedOperationException(); //TODO
 		} else { //literals
-
-			switch(resource.getClass().toString()) { //use shortcut for final classes for efficiency
+			switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
+				//character
+				case CHARACTER_CLASS_NAME:
+					serializeCharacter(appendable, ((Character)resource).charValue());
+					break;
+				case CODE_POINT_CHARACTER_CLASS_NAME:
+					serializeCharacter(appendable, ((CodePointCharacter)resource).getCodePoint());
+					break;
 				//string
 				case STRING_CLASS_NAME:
 				case STRING_BUILDER_CLASS_NAME:
@@ -275,6 +289,8 @@ public class SurfSerializer {
 				default:
 					if(resource instanceof CharSequence) { //catch any other character sequence
 						serializeString(appendable, (CharSequence)resource);
+					} else {
+						throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
 					}
 					break;
 			}
@@ -320,13 +336,30 @@ public class SurfSerializer {
 	//literals
 
 	/**
+	 * Serializes a character surrounded by character delimiters.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param codePoint The Unicode code point to be serialized as a SURF character.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#CHARACTER_DELIMITER
+	 * @see #serializeCharacterCodePoint(Appendable, char, int)
+	 */
+	public static void serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
+		checkArgument(Character.isValidCodePoint(codePoint), "The value %d does not represent is not a valid code point.", codePoint);
+		appendable.append(CHARACTER_DELIMITER);
+		serializeCharacterCodePoint(appendable, CHARACTER_DELIMITER, codePoint);
+		appendable.append(CHARACTER_DELIMITER);
+	}
+
+	/**
 	 * Serializes a string surrounded by string delimiters.
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param charSequence The information to be serialized as a SURF string.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#STRING_DELIMITER
-	 * @see #parseCharacterCodePoint(Reader, char)
+	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
 	public static void serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
 		appendable.append(STRING_DELIMITER);
@@ -394,14 +427,15 @@ public class SurfSerializer {
 					escapeChar = delimiter;
 					break;
 			}
-
 			appendable.append(escapeChar);
 			return;
 		}
 		//code points outside the BMP
 		if(Character.isSupplementaryCodePoint(codePoint)) {
 			appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
+			return;
 		}
+		//code points within the BMP
 		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
 		appendable.append((char)codePoint);
 	}
