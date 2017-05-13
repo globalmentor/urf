@@ -86,6 +86,9 @@ public class SurfTestResources {
 	//##character
 	public static final String OK_CHARACTERS_RESOURCE_NAME = "ok-characters.surf";
 
+	//##email address
+	public static final String OK_EMAIL_ADDRESSES_RESOURCE_NAME = "ok-email-addresses.surf";
+
 	//##IRI
 	public static final String OK_IRIS_RESOURCE_NAME = "ok-iris.surf";
 

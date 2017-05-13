@@ -1,0 +1,23 @@
+*:
+	! some examples are from <https://en.wikipedia.org/wiki/Email_address>
+	example = ^jdoe@example.com
+	dot = ^jane.doe@example.com
+	tag = ^jane.doe+tag@example.com
+	dash = ^jane.doe-foo@example.com
+!TODO verify; probably invalid	endDot = ^fully-qualified-domain@example.com.
+	x = ^x@example.com
+!TODO fix	quoted = "much.more unusual"@example.com
+!TODO fix	quotedAt = ^"very.unusual.@.unusual.com"@example.com
+!TODO fix	quotedComplex = ^"very.(),:;<>[]\".VERY.\"very@\\ \"very\".unusual"@strange.example.com
+	dashedDomain = ^foo-bar@strange-example.com
+!TODO fix after clarification	noTLD = ^foo@example
+!TODO fix	characters = ^#!$%&'*+-/=?^_`{}|~@example.org
+!TODO fix	quotedCharacters =^ "()<>[]:,;@\\\"!#$%&'-/=?^_`{}| ~.a"@example.org
+!TODO fix	quotedSpace = ^" "@example.org (space between the quotes)
+!TODO fix after clarification	localhost = ^example@localhost
+	longTLD = ^example@s.solutions
+!TODO fix after clarification	localserver = ^user@localserver
+!TODO fix after clarification	dotlessDomain = ^user@tt
+!TODO verify and fix	ip = ^user@[IPv6:2001:DB8::1]
+!TODO bring back	list = [^jdoe@example.com, ^user@[IPv6:2001:DB8::1]]
+;
