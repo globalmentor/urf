@@ -24,6 +24,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
 import static io.urf.surf.test.SurfTestResources.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
@@ -31,6 +32,7 @@ import static org.hamcrest.Matchers.*;
 import org.junit.*;
 
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
 import io.urf.surf.parser.*;
@@ -170,6 +172,27 @@ public class SurfSerializerTest implements Clogged {
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serialize(surfObject);
 			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_CHARACTERS_RESOURCE_NAME)));
+		}
+	}
+
+	//##email address
+
+	/** @see SurfTestResources#OK_EMAIL_ADDRESSES_RESOURCE_NAME */
+	@Test
+	public void testOkEmailAddresses() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("example", EmailAddress.fromString("jdoe@example.com"));
+		surfObject.setPropertyValue("dot", EmailAddress.fromString("jane.doe@example.com"));
+		surfObject.setPropertyValue("tag", EmailAddress.fromString("jane.doe+tag@example.com"));
+		surfObject.setPropertyValue("dash", EmailAddress.fromString("jane.doe-foo@example.com"));
+		surfObject.setPropertyValue("x", EmailAddress.fromString("x@example.com"));
+		surfObject.setPropertyValue("dashedDomain", EmailAddress.fromString("foo-bar@strange-example.com"));
+		surfObject.setPropertyValue("longTLD", EmailAddress.fromString("example@s.solutions"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_EMAIL_ADDRESSES_RESOURCE_NAME)));
 		}
 	}
 

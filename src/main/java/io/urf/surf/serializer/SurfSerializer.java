@@ -30,6 +30,7 @@ import javax.annotation.*;
 import com.globalmentor.io.*;
 import com.globalmentor.io.function.IOConsumer;
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.net.EmailAddress;
 
 import io.urf.SURF;
 import io.urf.surf.parser.SurfObject;
@@ -48,6 +49,10 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li>{@link Character}</li>
  * <li>{@link CodePointCharacter}</li>
+ * </ul>
+ * <h3>email address</h3>
+ * <ul>
+ * <li>{@link EmailAddress}</li>
  * </ul>
  * <h3>string</h3>
  * <ul>
@@ -75,6 +80,7 @@ public class SurfSerializer {
 
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
+	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
 
@@ -281,6 +287,9 @@ public class SurfSerializer {
 				case CODE_POINT_CHARACTER_CLASS_NAME:
 					serializeCharacter(appendable, ((CodePointCharacter)resource).getCodePoint());
 					break;
+				case EMAIL_ADDRESS_CLASS_NAME:
+					serializeEmailAddress(appendable, (EmailAddress)resource);
+					break;
 				//string
 				case STRING_CLASS_NAME:
 				case STRING_BUILDER_CLASS_NAME:
@@ -349,6 +358,19 @@ public class SurfSerializer {
 		appendable.append(CHARACTER_DELIMITER);
 		serializeCharacterCodePoint(appendable, CHARACTER_DELIMITER, codePoint);
 		appendable.append(CHARACTER_DELIMITER);
+	}
+
+	/**
+	 * Serializes an email address along with its delimiter.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param emailAddress The information to be serialized as a SURF email address.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#EMAIL_ADDRESS_BEGIN
+	 */
+	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
+		appendable.append(EMAIL_ADDRESS_BEGIN);
+		appendable.append(emailAddress.toString());
 	}
 
 	/**
