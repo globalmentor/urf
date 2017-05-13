@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2016-2017 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,9 @@ public class SURF {
 	public static final char ESCAPED_TAB = 't'; //t tab
 	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
 	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
+
+	/** The delimiter that begins email address literal values. */
+	public static final char EMAIL_ADDRESS_BEGIN = '^';
 
 	/** The delimiter that begins IRI literal representations. */
 	public static final char IRI_BEGIN = '<';
