@@ -41,7 +41,8 @@ import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
-import com.globalmentor.text.ASCII;
+import com.globalmentor.net.EmailAddress;
+import com.globalmentor.text.*;
 
 import io.urf.SURF;
 
@@ -215,6 +216,9 @@ public class SurfParser {
 			case BOOLEAN_FALSE_BEGIN:
 			case BOOLEAN_TRUE_BEGIN:
 				resource = parseBoolean(reader);
+				break;
+			case EMAIL_ADDRESS_BEGIN:
+				resource = parseEmailAddress(reader);
 				break;
 			case IRI_BEGIN:
 				resource = parseIRI(reader);
@@ -478,6 +482,47 @@ public class SurfParser {
 	}
 
 	/**
+	 * Parses an email address. The current position must be that of the beginning email delimiter character. The new position will be that immediately after the
+	 * last character in the email address.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return An instance of {@link EmailAddress} representing the SURF email addresses parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the email address is not in the correct format.
+	 * @see SURF#EMAIL_ADDRESS_BEGIN
+	 */
+	public static EmailAddress parseEmailAddress(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		check(reader, EMAIL_ADDRESS_BEGIN); //^
+		//TODO improve for dot-atom | quoted-string, verify characters, etc.
+		final String localPart = reachAfter(reader, EmailAddress.LOCAL_PART_DOMAIN_DELIMITER); //@
+		final String domain;
+		final StringBuilder domainStringBuilder = new StringBuilder();
+		//TODO maybe add readIf() method
+		if(peekEnd(reader) == EmailAddress.DOMAIN_LITERAL_BEGIN) { //domain-literal
+			domainStringBuilder.append(check(reader, EmailAddress.DOMAIN_LITERAL_BEGIN)); //[
+			read(reader, EmailAddress.DTEXT_CHARACTERS, domainStringBuilder); //dtext*
+			domainStringBuilder.append(check(reader, EmailAddress.DOMAIN_LITERAL_END)); //]
+		} else { //dot-atom
+			boolean hasAText;
+			do {
+				domainStringBuilder.append(check(reader, EmailAddress.ATEXT_CHARACTERS)); //at least one "atext" character is required
+				read(reader, EmailAddress.ATEXT_CHARACTERS, domainStringBuilder); //read the remaining "atext" characters
+				hasAText = peekEnd(reader) == '.';
+				if(hasAText) { //if we have another dot section
+					domainStringBuilder.append(check(reader, '.')); //read the dot
+				}
+			} while(hasAText); //read all the "dot-atom" sections
+		}
+		domain = domainStringBuilder.toString();
+		try {
+			return EmailAddress.of(localPart, domain);
+		} catch(final IllegalArgumentException illegalArgumentException) {
+			throw new ParseIOException(reader, "Invalid SURF email address format: " + localPart + EmailAddress.LOCAL_PART_DOMAIN_DELIMITER + domain,
+					illegalArgumentException);
+		}
+	}
+
+	/**
 	 * Parses an IRI. The current position must be that of the beginning IRI delimiter character. The new position will be that immediately after the ending IRI
 	 * delimiter character.
 	 * @param reader The reader the contents of which to be parsed.
@@ -653,8 +698,8 @@ public class SurfParser {
 	public static TelephoneNumber parseTelephoneNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(check(reader, TELEPHONE_NUMBER_BEGIN)); //+
-		stringBuilder.append(check(reader, ASCII.DIGIT_CHARACTERS)); //at least one digit is required
-		final String telephoneNumberDigits = read(reader, ASCII.DIGIT_CHARACTERS, stringBuilder).toString(); //read the remaining digits
+		stringBuilder.append(check(reader, ABNF.DIGIT_CHARACTERS)); //at least one digit is required
+		final String telephoneNumberDigits = read(reader, ABNF.DIGIT_CHARACTERS, stringBuilder).toString(); //read the remaining digits
 		try {
 			return TelephoneNumber.parse(telephoneNumberDigits);
 		} catch(final IllegalArgumentException illegalArgumentException) { //this should never happen with the manual parsing logic above

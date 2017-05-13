@@ -40,6 +40,7 @@ import org.junit.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.net.EmailAddress;
 
 import io.urf.surf.test.SurfTestResources;
 import junit.framework.AssertionFailedError;
@@ -215,6 +216,27 @@ public class SurfParserTest {
 	//TODO add bad tests with control characters
 	//TODO add bad tests to prevent escaping normal characters 
 	//TODO add bad tests with invalid surrogate character sequences
+
+	//##telephone number
+
+	/** @see SurfTestResources#OK_EMAIL_ADDRESSES_RESOURCE_NAME */
+	@Test
+	public void testOkEmailAddresses() throws IOException {
+		final SurfObject resource = (SurfObject)parseTestResource(OK_EMAIL_ADDRESSES_RESOURCE_NAME).get();
+		assertThat(resource.getPropertyValue("example"), hasValue(EmailAddress.fromString("jdoe@example.com")));
+		assertThat(resource.getPropertyValue("dot"), hasValue(EmailAddress.fromString("jane.doe@example.com")));
+		assertThat(resource.getPropertyValue("tag"), hasValue(EmailAddress.fromString("jane.doe+tag@example.com")));
+		assertThat(resource.getPropertyValue("dash"), hasValue(EmailAddress.fromString("jane.doe-foo@example.com")));
+		assertThat(resource.getPropertyValue("x"), hasValue(EmailAddress.fromString("x@example.com")));
+		assertThat(resource.getPropertyValue("dashedDomain"), hasValue(EmailAddress.fromString("foo-bar@strange-example.com")));
+		assertThat(resource.getPropertyValue("longTLD"), hasValue(EmailAddress.fromString("example@s.solutions")));
+	}
+
+	//TODO add bad test with no content
+	//TODO add bad test with ending dot (after clarifying whether this is allowed; it doesn't seem to be in RFC 5322)
+	//TODO add bad test with comments
+	//TODO add bad test with folding whitespace
+	//TODO add bad tests from https://en.wikipedia.org/wiki/Email_address
 
 	//##IRI
 
