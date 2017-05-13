@@ -317,7 +317,6 @@ public class SurfSerializer {
 		formatNewLine(appendable);
 		try (final Closeable indention = increaseIndentLevel()) {
 			serializeSequence(appendable, surfObject.getPropertyNameValuePairs(), property -> {
-				formatIndent(appendable);
 				appendable.append(property.getName());
 				if(formatted) {
 					appendable.append(SPACE_CHAR);
@@ -328,8 +327,8 @@ public class SurfSerializer {
 				}
 				serializeResource(appendable, property.getValue());
 			});
-			formatIndent(appendable);
 		}
+		formatIndent(appendable);
 		appendable.append(PROPERTIES_END); //;
 	}
 
@@ -453,7 +452,6 @@ public class SurfSerializer {
 			throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		final Iterator<I> iterator = sequence.iterator();
-		//boolean hasNext = true;
 		while(iterator.hasNext()) {
 			formatIndent(appendable);
 			final I item = iterator.next();
