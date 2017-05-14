@@ -1,10 +1,10 @@
-# URF Specification
+# SURF Specification
 
-URF, SURF and TURF specification documents and definition classes.
+Java definitions for the Simple URF (SURF) document format.
 
 ## Download
 
-SURF Parser is available in the Maven Central Repository as [io.urf:urf-spec](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22urf-spec%22).
+SURF Specification is available in the Maven Central Repository as [io.urf:surf-spec](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf-spec%22).
 
 ## Issues
 

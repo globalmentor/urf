@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.urf</groupId>
-	<artifactId>urf-spec</artifactId>
+	<artifactId>surf-spec</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>URF Specification</name>
-	<description>Java definitions for URF specification.</description>
+	<name>SURF Specification</name>
+	<description>Java definitions for the Simple URF (SURF) document format.</description>
 	<url>http://urf.io/</url>
 	<inceptionYear>2007</inceptionYear>
 
@@ -36,9 +36,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf-spec.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-spec.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf-spec</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf-surf-spec.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-surf-spec.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf-surf-spec</url>
 	</scm>
 
 	<prerequisites>
