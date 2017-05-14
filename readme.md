@@ -4,7 +4,7 @@ Simple serializer for the Simple URF (SURF) document format.
 
 ## Download
 
-SURF Serializer is available in the Maven Central Repository as [io.urf:surf-serializer](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf-serializer%22).
+SURF Serializer is available in the Maven Central Repository as [io.urf:surf-serializer](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf-serializer%22).
 
 ## Issues
 
