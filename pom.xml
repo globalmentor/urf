@@ -58,7 +58,7 @@
 
 		<dependency>
 			<groupId>io.urf</groupId>
-			<artifactId>urf-spec</artifactId>
+			<artifactId>surf-spec</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
