@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-itu</artifactId>
-			<version>0.5.1-SNAPSHOT</version>
+			<version>0.5.1</version>
 		</dependency>
 
 		<dependency>
