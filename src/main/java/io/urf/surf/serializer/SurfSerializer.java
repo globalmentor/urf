@@ -20,10 +20,12 @@ import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static io.urf.SURF.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
 import java.io.*;
 import java.math.*;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import javax.annotation.*;
@@ -46,6 +48,10 @@ import io.urf.surf.parser.SurfObject;
  * <li>{@link SurfObject}</li>
  * </ul>
  * <h2>Literals</h2>
+ * <h3>binary</h3>
+ * <ul>
+ * <li><code>byte[]</code></li>
+ * <li>{@link ByteBuffer}</li>
  * <h3>Boolean</h3>
  * <ul>
  * <li>{@link Boolean}</li>
@@ -93,6 +99,7 @@ public class SurfSerializer {
 	private final static String BIG_INTEGER_CLASS_NAME = "java.math.BigInteger";
 	private final static String BOOLEAN_CLASS_NAME = "java.lang.Boolean";
 	private final static String BYTE_CLASS_NAME = "java.lang.Byte";
+	private final static String BYTE_ARRAY_CLASS_NAME = "[B";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
@@ -300,6 +307,10 @@ public class SurfSerializer {
 			throw new UnsupportedOperationException(); //TODO
 		} else { //literals
 			switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
+				//binary
+				case BYTE_ARRAY_CLASS_NAME:
+					serializeBinary(appendable, ((byte[])resource));
+					break;
 				//Boolean
 				case BOOLEAN_CLASS_NAME:
 					serializeBoolean(appendable, ((Boolean)resource).booleanValue());
@@ -333,9 +344,11 @@ public class SurfSerializer {
 					break;
 				default:
 					//handle general base types and interfaces
-					if(resource instanceof Number) { //number
+					if(resource instanceof ByteBuffer) { //binary
+						serializeBinary(appendable, (ByteBuffer)resource);
+					} else if(resource instanceof Number) { //number
 						serializeNumber(appendable, (Number)resource);
-					} else if(resource instanceof CharSequence) {
+					} else if(resource instanceof CharSequence) { //string
 						serializeString(appendable, (CharSequence)resource);
 					} else {
 						throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
@@ -381,6 +394,40 @@ public class SurfSerializer {
 	}
 
 	//literals
+
+	/**
+	 * Serializes a binary literal along with its delimiter from an array of bytes.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param bytes The information to be serialized as a SURF binary literal.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#BINARY_BEGIN
+	 */
+	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
+		appendable.append(BINARY_BEGIN);
+		appendable.append(Base64.getEncoder().withoutPadding().encodeToString(bytes));
+	}
+
+	/**
+	 * Serializes a binary literal along with its delimiter from a byte buffer.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param byteBuffer The information to be serialized as a SURF binary literal.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#BINARY_BEGIN
+	 */
+	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
+		appendable.append(BINARY_BEGIN);
+		final ByteBuffer base64ByteBuffer = Base64.getEncoder().withoutPadding().encode(byteBuffer);
+		final byte[] base64Bytes;
+		if(base64ByteBuffer.hasArray()) { //use the underlying array directly if there is one
+			base64Bytes = base64ByteBuffer.array();
+		} else {
+			base64Bytes = new byte[base64ByteBuffer.remaining()];
+			base64ByteBuffer.get(base64Bytes);
+		}
+		appendable.append(new String(base64Bytes, US_ASCII));
+	}
 
 	/**
 	 * Serializes a Boolean.

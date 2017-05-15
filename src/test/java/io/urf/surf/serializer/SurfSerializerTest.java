@@ -21,11 +21,14 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.math.*;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import javax.annotation.*;
 
+import static com.globalmentor.java.Bytes.*;
 import static io.urf.surf.test.SurfTestResources.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
 
@@ -143,6 +146,44 @@ public class SurfSerializerTest implements Clogged {
 	}
 
 	//#literals
+
+	//##binary
+
+	/** @see SurfTestResources#OK_BINARY_RESOURCE_NAME */
+	@Test
+	public void testOkBinary() throws IOException {
+
+		//test serializing java.nio.ByteByffer separately, because the parser never sends that back
+		final ByteBuffer countByteBuffer = ByteBuffer.wrap(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
+				(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff});
+		assertThat(new SurfSerializer().serialize(countByteBuffer), equalTo("%ABEiM0RVZneImaq7zN3u/w"));
+
+		final SurfObject surfObject = new SurfObject();
+
+		surfObject.setPropertyValue("count", new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
+				(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff});
+
+		surfObject.setPropertyValue("rfc4648Example1", new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9, 0x7e});
+		surfObject.setPropertyValue("rfc4648Example2", new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9});
+		surfObject.setPropertyValue("rfc4648Example3", new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03});
+
+		surfObject.setPropertyValue("rfc4648TestVector1", NO_BYTES);
+		surfObject.setPropertyValue("rfc4648TestVector2", "f".getBytes(US_ASCII));
+		surfObject.setPropertyValue("rfc4648TestVector3", "fo".getBytes(US_ASCII));
+		surfObject.setPropertyValue("rfc4648TestVector4", "foo".getBytes(US_ASCII));
+		surfObject.setPropertyValue("rfc4648TestVector5", "foob".getBytes(US_ASCII));
+		surfObject.setPropertyValue("rfc4648TestVector6", "fooba".getBytes(US_ASCII));
+		surfObject.setPropertyValue("rfc4648TestVector7", "foobar".getBytes(US_ASCII));
+
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			/*TODO fix SurfObject equals() to take byte arrays into consideration 
+			* final String serialization = serializer.serialize(surfObject);
+			* assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_BINARY_RESOURCE_NAME)));
+			*/
+		}
+	}
 
 	//##Boolean
 
