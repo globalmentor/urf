@@ -19,12 +19,12 @@ package io.urf.surf.serializer;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.math.*;
 import java.net.URI;
 import java.util.*;
 
 import javax.annotation.*;
 
-import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
 import static io.urf.surf.test.SurfTestResources.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
@@ -193,6 +193,49 @@ public class SurfSerializerTest implements Clogged {
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serialize(surfObject);
 			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_EMAIL_ADDRESSES_RESOURCE_NAME)));
+		}
+	}
+
+	//##number
+
+	/** @see SurfTestResources#OK_NUMBERS_RESOURCE_NAME */
+	@Test
+	public void testOkNumbers() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("zero", Integer.valueOf(0));
+		surfObject.setPropertyValue("zeroFraction", Double.valueOf(0));
+		surfObject.setPropertyValue("one", Integer.valueOf(1));
+		surfObject.setPropertyValue("oneFraction", Double.valueOf(1));
+		surfObject.setPropertyValue("integer", Integer.valueOf(123));
+		surfObject.setPropertyValue("negative", Integer.valueOf(-123));
+		surfObject.setPropertyValue("long", Long.valueOf(3456789123L));
+		surfObject.setPropertyValue("fraction", Double.valueOf(12345.6789));
+		surfObject.setPropertyValue("scientific1", Double.valueOf(1.23e+4));
+		surfObject.setPropertyValue("scientific2", Double.valueOf(12.3e-4));
+		surfObject.setPropertyValue("scientific3", Double.valueOf(-123.4e+5));
+		surfObject.setPropertyValue("scientific4", Double.valueOf(-321.45e-12));
+		surfObject.setPropertyValue("scientific5", Double.valueOf(45.67e+89));
+		//These BigDecimal tests require identical scale, which is why "$0.0" isn't compared to BigDecimal.ZERO.
+		surfObject.setPropertyValue("decimal", new BigDecimal("0.3"));
+		surfObject.setPropertyValue("money", new BigDecimal("1.23"));
+		surfObject.setPropertyValue("decimalZero", BigInteger.ZERO);
+		surfObject.setPropertyValue("decimalZeroFraction", new BigDecimal("0.0"));
+		surfObject.setPropertyValue("decimalOne", BigInteger.ONE);
+		surfObject.setPropertyValue("decimalOneFraction", new BigDecimal("1.0"));
+		surfObject.setPropertyValue("decimalInteger", new BigInteger("123"));
+		surfObject.setPropertyValue("decimalNegative", new BigInteger("-123"));
+		surfObject.setPropertyValue("decimalLong", new BigInteger("3456789123"));
+		surfObject.setPropertyValue("decimalFraction", new BigDecimal("12345.6789"));
+		surfObject.setPropertyValue("decimalScientific1", new BigDecimal("1.23e+4"));
+		surfObject.setPropertyValue("decimalScientific2", new BigDecimal("12.3e-4"));
+		surfObject.setPropertyValue("decimalScientific3", new BigDecimal("-123.4e+5"));
+		surfObject.setPropertyValue("decimalScientific4", new BigDecimal("-321.45e-12"));
+		surfObject.setPropertyValue("decimalScientific5", new BigDecimal("45.67e+89"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_NUMBERS_RESOURCE_NAME)));
 		}
 	}
 

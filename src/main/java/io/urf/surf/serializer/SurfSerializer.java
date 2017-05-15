@@ -23,6 +23,7 @@ import static io.urf.SURF.*;
 import static java.util.Objects.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import javax.annotation.*;
@@ -54,6 +55,12 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li>{@link EmailAddress}</li>
  * </ul>
+ * <h3>number</h3>
+ * <ul>
+ * <li>{@link BigInteger} (serialized as decimal)</li>
+ * <li>{@link BigDecimal} (serialized as decimal)</li>
+ * <li>{@link Number} (including {@link Integer}, {@link Long}, and {@link Double})</li>
+ * </ul>
  * <h3>string</h3>
  * <ul>
  * <li>{@link CharSequence} (including {@link String})</li>
@@ -78,9 +85,17 @@ import io.urf.surf.parser.SurfObject;
  */
 public class SurfSerializer {
 
+	private final static String BIG_DECIMAL_CLASS_NAME = "java.math.BigDecimal";
+	private final static String BIG_INTEGER_CLASS_NAME = "java.math.BigInteger";
+	private final static String BYTE_CLASS_NAME = "java.lang.Byte";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
+	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
+	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
+	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
+	private final static String LONG_CLASS_NAME = "java.lang.Long";
+	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
 
@@ -287,8 +302,20 @@ public class SurfSerializer {
 				case CODE_POINT_CHARACTER_CLASS_NAME:
 					serializeCharacter(appendable, ((CodePointCharacter)resource).getCodePoint());
 					break;
+				//email address
 				case EMAIL_ADDRESS_CLASS_NAME:
 					serializeEmailAddress(appendable, (EmailAddress)resource);
+					break;
+				//number
+				case BIG_DECIMAL_CLASS_NAME:
+				case BIG_INTEGER_CLASS_NAME:
+				case BYTE_CLASS_NAME:
+				case DOUBLE_CLASS_NAME:
+				case FLOAT_CLASS_NAME:
+				case INTEGER_CLASS_NAME:
+				case LONG_CLASS_NAME:
+				case SHORT_CLASS_NAME:
+					serializeNumber(appendable, (Number)resource);
 					break;
 				//string
 				case STRING_CLASS_NAME:
@@ -296,7 +323,10 @@ public class SurfSerializer {
 					serializeString(appendable, (CharSequence)resource);
 					break;
 				default:
-					if(resource instanceof CharSequence) { //catch any other character sequence
+					//handle general base types and interfaces
+					if(resource instanceof Number) { //number
+						serializeNumber(appendable, (Number)resource);
+					} else if(resource instanceof CharSequence) {
 						serializeString(appendable, (CharSequence)resource);
 					} else {
 						throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
@@ -371,6 +401,29 @@ public class SurfSerializer {
 	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
 		appendable.append(EMAIL_ADDRESS_BEGIN);
 		appendable.append(emailAddress.toString());
+	}
+
+	/**
+	 * Serializes a number along with its delimiter if should be represented as a decimal.
+	 * <p>
+	 * This implementation represents the following types as SURF decimal:
+	 * </p>
+	 * <ul>
+	 * <li>{@link BigDecimal}</li>
+	 * <li>{@link BigInteger}</li>
+	 * </ul>
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param number The information to be serialized as a SURF number.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#NUMBER_DECIMAL_BEGIN
+	 */
+	public static void serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
+		final boolean isDecimal = (number instanceof BigDecimal) || (number instanceof BigInteger);
+		if(isDecimal) {
+			appendable.append(NUMBER_DECIMAL_BEGIN);
+		}
+		appendable.append(number.toString());
 	}
 
 	/**
@@ -489,7 +542,6 @@ public class SurfSerializer {
 				appendable.append(SEQUENCE_DELIMITER);
 			}
 		}
-		;
 	}
 
 }
