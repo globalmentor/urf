@@ -31,7 +31,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.io.*;
-import com.globalmentor.io.function.IOConsumer;
+import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
@@ -95,6 +95,7 @@ import io.urf.surf.parser.SurfObject;
  */
 public class SurfSerializer {
 
+	private final static String ARRAY_LIST_CLASS_NAME = "java.util.ArrayList";
 	private final static String BIG_DECIMAL_CLASS_NAME = "java.math.BigDecimal";
 	private final static String BIG_INTEGER_CLASS_NAME = "java.math.BigInteger";
 	private final static String BOOLEAN_CLASS_NAME = "java.lang.Boolean";
@@ -106,6 +107,7 @@ public class SurfSerializer {
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
 	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
 	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
+	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
@@ -301,60 +303,65 @@ public class SurfSerializer {
 	 * @throws IOException If there was an error appending the SURF data.
 	 */
 	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
-		if(resource instanceof SurfObject) { //objects
-			serializeObject(appendable, (SurfObject)resource);
-		} else if(resource instanceof List) { //collections
-			throw new UnsupportedOperationException(); //TODO
-		} else { //literals
-			switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
-				//binary
-				case BYTE_ARRAY_CLASS_NAME:
-					serializeBinary(appendable, ((byte[])resource));
-					break;
-				//Boolean
-				case BOOLEAN_CLASS_NAME:
-					serializeBoolean(appendable, ((Boolean)resource).booleanValue());
-					break;
-				//character
-				case CHARACTER_CLASS_NAME:
-					serializeCharacter(appendable, ((Character)resource).charValue());
-					break;
-				case CODE_POINT_CHARACTER_CLASS_NAME:
-					serializeCharacter(appendable, ((CodePointCharacter)resource).getCodePoint());
-					break;
-				//email address
-				case EMAIL_ADDRESS_CLASS_NAME:
-					serializeEmailAddress(appendable, (EmailAddress)resource);
-					break;
-				//number
-				case BIG_DECIMAL_CLASS_NAME:
-				case BIG_INTEGER_CLASS_NAME:
-				case BYTE_CLASS_NAME:
-				case DOUBLE_CLASS_NAME:
-				case FLOAT_CLASS_NAME:
-				case INTEGER_CLASS_NAME:
-				case LONG_CLASS_NAME:
-				case SHORT_CLASS_NAME:
+		switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
+			//#literals
+			//##binary
+			case BYTE_ARRAY_CLASS_NAME:
+				serializeBinary(appendable, ((byte[])resource));
+				break;
+			//##Boolean
+			case BOOLEAN_CLASS_NAME:
+				serializeBoolean(appendable, ((Boolean)resource).booleanValue());
+				break;
+			//##character
+			case CHARACTER_CLASS_NAME:
+				serializeCharacter(appendable, ((Character)resource).charValue());
+				break;
+			case CODE_POINT_CHARACTER_CLASS_NAME:
+				serializeCharacter(appendable, ((CodePointCharacter)resource).getCodePoint());
+				break;
+			//##email address
+			case EMAIL_ADDRESS_CLASS_NAME:
+				serializeEmailAddress(appendable, (EmailAddress)resource);
+				break;
+			//##number
+			case BIG_DECIMAL_CLASS_NAME:
+			case BIG_INTEGER_CLASS_NAME:
+			case BYTE_CLASS_NAME:
+			case DOUBLE_CLASS_NAME:
+			case FLOAT_CLASS_NAME:
+			case INTEGER_CLASS_NAME:
+			case LONG_CLASS_NAME:
+			case SHORT_CLASS_NAME:
+				serializeNumber(appendable, (Number)resource);
+				break;
+			//##string
+			case STRING_CLASS_NAME:
+			case STRING_BUILDER_CLASS_NAME:
+				serializeString(appendable, (CharSequence)resource);
+				break;
+			//#collections
+			//#list
+			case ARRAY_LIST_CLASS_NAME:
+			case LINKED_LIST_CLASS_NAME:
+				serializeList(appendable, (List<?>)resource);
+				break;
+			default:
+				//handle general base types and interfaces
+				if(resource instanceof SurfObject) { //objects TODO additionally create class name constant when package stabilizes
+					serializeObject(appendable, (SurfObject)resource);
+				} else if(resource instanceof List) { //list
+					serializeList(appendable, (List<?>)resource);
+				} else if(resource instanceof ByteBuffer) { //binary
+					serializeBinary(appendable, (ByteBuffer)resource);
+				} else if(resource instanceof Number) { //number
 					serializeNumber(appendable, (Number)resource);
-					break;
-				//string
-				case STRING_CLASS_NAME:
-				case STRING_BUILDER_CLASS_NAME:
+				} else if(resource instanceof CharSequence) { //string
 					serializeString(appendable, (CharSequence)resource);
-					break;
-				default:
-					//handle general base types and interfaces
-					if(resource instanceof ByteBuffer) { //binary
-						serializeBinary(appendable, (ByteBuffer)resource);
-					} else if(resource instanceof Number) { //number
-						serializeNumber(appendable, (Number)resource);
-					} else if(resource instanceof CharSequence) { //string
-						serializeString(appendable, (CharSequence)resource);
-					} else {
-						throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
-					}
-					break;
-			}
+				} else {
+					throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
+				}
+				break;
 		}
 	}
 
@@ -363,7 +370,7 @@ public class SurfSerializer {
 	/**
 	 * Serializes a SURF object.
 	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param surfObject The information to be serialized as a SURF string.
+	 * @param surfObject The information to be serialized as a SURF object.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#OBJECT_BEGIN
@@ -374,23 +381,25 @@ public class SurfSerializer {
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
 		ifPresent(surfObject.getTypeName(), appendable::append); //typeName
-		appendable.append(PROPERTIES_BEGIN); //:
-		formatNewLine(appendable);
-		try (final Closeable indention = increaseIndentLevel()) {
-			serializeSequence(appendable, surfObject.getPropertyNameValuePairs(), property -> {
-				appendable.append(property.getName());
-				if(formatted) {
-					appendable.append(SPACE_CHAR);
-				}
-				appendable.append(PROPERTY_VALUE_DELIMITER); //=
-				if(formatted) {
-					appendable.append(SPACE_CHAR);
-				}
-				serializeResource(appendable, property.getValue());
-			});
+		if(surfObject.getPropertyCount() > 0) { //if there are properties (otherwise skip the {} altogether)
+			appendable.append(PROPERTIES_BEGIN); //:
+			formatNewLine(appendable);
+			try (final Closeable indention = increaseIndentLevel()) {
+				serializeSequence(appendable, surfObject.getPropertyNameValuePairs(), (out, property) -> { //TODO make serializeProperty() method
+					out.append(property.getName());
+					if(formatted) {
+						out.append(SPACE_CHAR);
+					}
+					out.append(PROPERTY_VALUE_DELIMITER); //=
+					if(formatted) {
+						out.append(SPACE_CHAR);
+					}
+					serializeResource(out, property.getValue());
+				});
+			}
+			formatIndent(appendable);
+			appendable.append(PROPERTIES_END); //;
 		}
-		formatIndent(appendable);
-		appendable.append(PROPERTIES_END); //;
 	}
 
 	//literals
@@ -582,23 +591,47 @@ public class SurfSerializer {
 		appendable.append((char)codePoint);
 	}
 
+	//collections
+
 	/**
-	 * Serializes a general SURF sequence (such as a list). For each sequence item, {@link IOConsumer#accept(Object)} is called, passing the {@link Appendable},
-	 * for the item to be serialized. The item serialization strategy will return <code>false</code> to indicate that there are no further items.
+	 * Serializes a SURF list.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param list he information to be serialized as a SURF list.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#LIST_BEGIN
+	 * @see SURF#LIST_END
+	 */
+	public void serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
+		appendable.append(LIST_BEGIN); //[
+		if(!list.isEmpty()) {
+			formatNewLine(appendable);
+			try (final Closeable indention = increaseIndentLevel()) { //TODO allow configurable indent for small collections
+				serializeSequence(appendable, list, this::serializeResource);
+			}
+			formatIndent(appendable);
+		}
+		appendable.append(LIST_END); //]
+	}
+
+	/**
+	 * Serializes a general SURF sequence (such as a list). For each sequence item, {@link IOBiConsumer#accept(Object, Object)} is called, passing the output
+	 * {@link Appendable} along with the item to be serialized. The item serialization strategy will return <code>false</code> to indicate that there are no
+	 * further items.
 	 * @param <I> The type of item in the sequence.
 	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization.
+	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization, along with each item to serialize.
 	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
 	 */
-	protected <I> void serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence, @Nonnull final IOConsumer<I> itemSerializer)
-			throws IOException {
+	protected <I> void serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence,
+			@Nonnull final IOBiConsumer<Appendable, I> itemSerializer) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		final Iterator<I> iterator = sequence.iterator();
 		while(iterator.hasNext()) {
 			formatIndent(appendable);
 			final I item = iterator.next();
-			itemSerializer.accept(item); //serialize the item
+			itemSerializer.accept(appendable, item); //serialize the item
 			final boolean hasNext = iterator.hasNext(); //see if there is another item after this one
 			if(sequenceSeparatorRequired && hasNext) { //add a separator if one is required
 				appendable.append(SEQUENCE_DELIMITER);

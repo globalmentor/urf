@@ -86,6 +86,12 @@ public class SurfSerializerTest implements Clogged {
 
 	//#objects
 
+	@Test
+	public void testOkEmptyObjects() throws IOException {
+		assertThat(new SurfSerializer().serialize(new SurfObject()), equalTo("*"));
+		assertThat(new SurfSerializer().serialize(new SurfObject("FooBar")), equalTo("*FooBar"));
+	}
+
 	/** @see SurfTestResources#OK_OBJECT_NO_PROPERTIES_RESOURCE_NAMES */
 	@Test
 	public void testOkObjectNoProperties() throws IOException {
@@ -326,5 +332,51 @@ public class SurfSerializerTest implements Clogged {
 	}
 
 	//TODO implement OK_STRINGS_RESOURCE_NAME
+
+	//#collections
+
+	//##list
+
+	/** @see SurfTestResources#OK_LIST_EMPTY_RESOURCE_NAMES */
+	@Test
+	public void testOkListNoItems() throws IOException {
+		final List<?> list = new ArrayList<>();
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(list);
+			for(final String okListEmptyResourceName : OK_LIST_EMPTY_RESOURCE_NAMES) {
+				assertThat(okListEmptyResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okListEmptyResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_LIST_ONE_ITEM_RESOURCE_NAMES */
+	@Test
+	public void testOkListOneItem() throws IOException {
+		final List<?> list = asList("one");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(list);
+			for(final String okListOneItemResourceName : OK_LIST_ONE_ITEM_RESOURCE_NAMES) {
+				assertThat(okListOneItemResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okListOneItemResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_LIST_TWO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkListTwoItems() throws IOException {
+		final List<?> list = asList("one", "two");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(list);
+			for(final String okListTwoItemsResourceName : OK_LIST_TWO_ITEMS_RESOURCE_NAMES) {
+				assertThat(okListTwoItemsResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okListTwoItemsResourceName)));
+			}
+		}
+	}
 
 }
