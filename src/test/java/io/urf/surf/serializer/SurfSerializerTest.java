@@ -144,6 +144,36 @@ public class SurfSerializerTest implements Clogged {
 
 	//#literals
 
+	//##Boolean
+
+	@Test
+	public void testOkBooleans() throws IOException {
+		assertThat(new SurfSerializer().serialize(true), equalTo("true"));
+		assertThat(new SurfSerializer().serialize(false), equalTo("false"));
+	}
+
+	/** @see SurfTestResources#OK_BOOLEAN_FALSE_RESOURCE_NAME */
+	@Test
+	public void testOkBooleanFalse() throws IOException {
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(Boolean.FALSE);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_BOOLEAN_FALSE_RESOURCE_NAME)));
+		}
+	}
+
+	/** @see SurfTestResources#OK_BOOLEAN_TRUE_RESOURCE_NAME */
+	@Test
+	public void testOkBooleanTrue() throws IOException {
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(Boolean.TRUE);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_BOOLEAN_TRUE_RESOURCE_NAME)));
+		}
+	}
+
 	//##character
 
 	/** @see SurfTestResources#OK_CHARACTERS_RESOURCE_NAME */

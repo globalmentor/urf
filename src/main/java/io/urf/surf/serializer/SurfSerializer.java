@@ -46,6 +46,10 @@ import io.urf.surf.parser.SurfObject;
  * <li>{@link SurfObject}</li>
  * </ul>
  * <h2>Literals</h2>
+ * <h3>Boolean</h3>
+ * <ul>
+ * <li>{@link Boolean}</li>
+ * </ul>
  * <h3>character</h3>
  * <ul>
  * <li>{@link Character}</li>
@@ -87,6 +91,7 @@ public class SurfSerializer {
 
 	private final static String BIG_DECIMAL_CLASS_NAME = "java.math.BigDecimal";
 	private final static String BIG_INTEGER_CLASS_NAME = "java.math.BigInteger";
+	private final static String BOOLEAN_CLASS_NAME = "java.lang.Boolean";
 	private final static String BYTE_CLASS_NAME = "java.lang.Byte";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
@@ -295,6 +300,10 @@ public class SurfSerializer {
 			throw new UnsupportedOperationException(); //TODO
 		} else { //literals
 			switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
+				//Boolean
+				case BOOLEAN_CLASS_NAME:
+					serializeBoolean(appendable, ((Boolean)resource).booleanValue());
+					break;
 				//character
 				case CHARACTER_CLASS_NAME:
 					serializeCharacter(appendable, ((Character)resource).charValue());
@@ -372,6 +381,18 @@ public class SurfSerializer {
 	}
 
 	//literals
+
+	/**
+	 * Serializes a Boolean.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param codePoint The Unicode code point to be serialized as a SURF Boolean.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
+	 * @throws IOException if there is an error appending to the appendable.
+	 */
+	public static void serializeBoolean(@Nonnull final Appendable appendable, @Nonnull final boolean bool) throws IOException {
+		appendable.append(bool ? BOOLEAN_TRUE_LEXICAL_FORM : BOOLEAN_FALSE_LEXICAL_FORM);
+	}
 
 	/**
 	 * Serializes a character surrounded by character delimiters.
