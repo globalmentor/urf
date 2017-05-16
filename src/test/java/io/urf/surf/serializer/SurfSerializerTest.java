@@ -379,4 +379,48 @@ public class SurfSerializerTest implements Clogged {
 		}
 	}
 
+	//##set
+
+	/** @see SurfTestResources#OK_SET_EMPTY_RESOURCE_NAMES */
+	@Test
+	public void testOkSetNoItems() throws IOException {
+		final Set<?> set = new HashSet<>();
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(set);
+			for(final String okSetEmptyResourceName : OK_SET_EMPTY_RESOURCE_NAMES) {
+				assertThat(okSetEmptyResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okSetEmptyResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_SET_ONE_ITEM_RESOURCE_NAMES */
+	@Test
+	public void testOkSetOneItem() throws IOException {
+		final Set<?> set = new HashSet<>(asList("one"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(set);
+			for(final String okSetOneItemResourceName : OK_SET_ONE_ITEM_RESOURCE_NAMES) {
+				assertThat(okSetOneItemResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okSetOneItemResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_SET_TWO_ITEMS_RESOURCE_NAMES */
+	@Test
+	public void testOkSetTwoItems() throws IOException {
+		final Set<?> set = new HashSet<>(asList("one", "two"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(set);
+			for(final String okSetTwoItemsResourceName : OK_SET_TWO_ITEMS_RESOURCE_NAMES) {
+				assertThat(okSetTwoItemsResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okSetTwoItemsResourceName)));
+			}
+		}
+	}
+
 }

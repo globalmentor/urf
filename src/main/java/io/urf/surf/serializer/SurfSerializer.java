@@ -106,6 +106,7 @@ public class SurfSerializer {
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
 	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
+	private final static String HASH_SET_CLASS_NAME = "java.util.HashSet";
 	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
 	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
@@ -346,12 +347,18 @@ public class SurfSerializer {
 			case LINKED_LIST_CLASS_NAME:
 				serializeList(appendable, (List<?>)resource);
 				break;
+			//#set
+			case HASH_SET_CLASS_NAME:
+				serializeSet(appendable, (Set<?>)resource);
+				break;
 			default:
 				//handle general base types and interfaces
 				if(resource instanceof SurfObject) { //objects TODO additionally create class name constant when package stabilizes
 					serializeObject(appendable, (SurfObject)resource);
 				} else if(resource instanceof List) { //list
 					serializeList(appendable, (List<?>)resource);
+				} else if(resource instanceof Set) { //set
+					serializeSet(appendable, (Set<?>)resource);
 				} else if(resource instanceof ByteBuffer) { //binary
 					serializeBinary(appendable, (ByteBuffer)resource);
 				} else if(resource instanceof Number) { //number
@@ -596,7 +603,7 @@ public class SurfSerializer {
 	/**
 	 * Serializes a SURF list.
 	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param list he information to be serialized as a SURF list.
+	 * @param list The information to be serialized as a SURF list.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#LIST_BEGIN
@@ -612,6 +619,27 @@ public class SurfSerializer {
 			formatIndent(appendable);
 		}
 		appendable.append(LIST_END); //]
+	}
+
+	/**
+	 * Serializes a SURF set.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param set The information to be serialized as a SURF set.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#SET_BEGIN
+	 * @see SURF#SET_END
+	 */
+	public void serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
+		appendable.append(SET_BEGIN); //(
+		if(!set.isEmpty()) {
+			formatNewLine(appendable);
+			try (final Closeable indention = increaseIndentLevel()) { //TODO allow configurable indent for small collections
+				serializeSequence(appendable, set, this::serializeResource);
+			}
+			formatIndent(appendable);
+		}
+		appendable.append(SET_END); //)
 	}
 
 	/**
