@@ -91,6 +91,10 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li>{@link TelephoneNumber}</li>
  * </ul>
+ * <h3>UUID</h3>
+ * <ul>
+ * <li>{@link UUID}</li>
+ * </ul>
  * <h2>Collections</h2>
  * <ul>
  * <li>{@link List}</li>
@@ -138,6 +142,7 @@ public class SurfSerializer {
 	private final static String TREE_SET_CLASS_NAME = "java.util.TreeSet";
 	private final static String URI_CLASS_NAME = "java.net.URI";
 	private final static String URL_CLASS_NAME = "java.net.URL";
+	private final static String UUID_CLASS_NAME = "java.util.UUID";
 
 	private boolean formatted = false;
 
@@ -384,6 +389,10 @@ public class SurfSerializer {
 			//##telephone number
 			case TELEPHONE_NUMBER_CLASS_NAME:
 				serializeTelephoneNumber(appendable, (TelephoneNumber)resource);
+				break;
+			//##UUID
+			case UUID_CLASS_NAME:
+				serializeUuid(appendable, (UUID)resource);
 				break;
 			//#collections
 			//#list
@@ -712,6 +721,19 @@ public class SurfSerializer {
 	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
 		checkArgument(telephoneNumber.isGlobal(), "Telephone number %s not in global form.", telephoneNumber);
 		appendable.append(telephoneNumber.toString());
+	}
+
+	/**
+	 * Serializes a UUID along with its delimiter.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param uuid The information to be serialized as a SURF UUID.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#UUID_BEGIN
+	 */
+	public static void serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
+		appendable.append(UUID_BEGIN);
+		appendable.append(uuid.toString());
 	}
 
 	//collections

@@ -395,6 +395,20 @@ public class SurfSerializerTest implements Clogged {
 
 	//TODO add IllegalArgumentException test for telephone number not in global form 
 
+	//##UUID
+
+	/** @see SurfTestResources#OK_UUID_RESOURCE_NAME */
+	@Test
+	public void testOkUuid() throws IOException {
+		final UUID uuid = UUID.fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(uuid);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_UUID_RESOURCE_NAME)));
+		}
+	}
+
 	//#collections
 
 	//##list
