@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import static io.urf.surf.test.SurfTestResources.*;
-import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
@@ -217,7 +217,7 @@ public class SurfParserTest {
 	//TODO add bad tests to prevent escaping normal characters 
 	//TODO add bad tests with invalid surrogate character sequences
 
-	//##telephone number
+	//##email address
 
 	/** @see SurfTestResources#OK_EMAIL_ADDRESSES_RESOURCE_NAME */
 	@Test
@@ -387,13 +387,13 @@ public class SurfParserTest {
 
 	/** @see SurfTestResources#OK_LIST_EMPTY_RESOURCE_NAMES */
 	@Test
-	public void testOkListNoItems() throws IOException {
-		for(final String okListNoItemsResourceName : OK_LIST_EMPTY_RESOURCE_NAMES) {
-			final Optional<Object> object = parseTestResource(okListNoItemsResourceName);
-			assertThat(okListNoItemsResourceName, object, isPresent());
-			assertThat(okListNoItemsResourceName, object, hasValue(instanceOf(List.class)));
+	public void testOkListEmpty() throws IOException {
+		for(final String okListEmptyResourceName : OK_LIST_EMPTY_RESOURCE_NAMES) {
+			final Optional<Object> object = parseTestResource(okListEmptyResourceName);
+			assertThat(okListEmptyResourceName, object, isPresent());
+			assertThat(okListEmptyResourceName, object, hasValue(instanceOf(List.class)));
 			final List<?> list = (List<?>)object.get();
-			assertThat(okListNoItemsResourceName, list, hasSize(0));
+			assertThat(okListEmptyResourceName, list, hasSize(0));
 		}
 	}
 
@@ -495,13 +495,13 @@ public class SurfParserTest {
 
 	/** @see SurfTestResources#OK_SET_EMPTY_RESOURCE_NAMES */
 	@Test
-	public void testOkSetNoItems() throws IOException {
-		for(final String okSetNoItemsResourceName : OK_SET_EMPTY_RESOURCE_NAMES) {
-			final Optional<Object> object = parseTestResource(okSetNoItemsResourceName);
-			assertThat(okSetNoItemsResourceName, object, isPresent());
-			assertThat(okSetNoItemsResourceName, object, hasValue(instanceOf(Set.class)));
+	public void testOkSetEmpty() throws IOException {
+		for(final String okSetEmptyResourceName : OK_SET_EMPTY_RESOURCE_NAMES) {
+			final Optional<Object> object = parseTestResource(okSetEmptyResourceName);
+			assertThat(okSetEmptyResourceName, object, isPresent());
+			assertThat(okSetEmptyResourceName, object, hasValue(instanceOf(Set.class)));
 			final Set<?> set = (Set<?>)object.get();
-			assertThat(okSetNoItemsResourceName, set, hasSize(0));
+			assertThat(okSetEmptyResourceName, set, hasSize(0));
 		}
 	}
 

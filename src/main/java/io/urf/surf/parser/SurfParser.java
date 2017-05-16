@@ -584,6 +584,7 @@ public class SurfParser {
 		if(c == NUMBER_NEGATIVE_SYMBOL) { //-
 			stringBuilder.append(check(reader, NUMBER_NEGATIVE_SYMBOL));
 		}
+		//TODO check for beginning zero and follow final SURF octal rules
 		stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all integer digits; there must be at least one
 		c = peekEnd(reader); //peek the next character
 		if(c >= 0) { //if we're not at the end of the reader
