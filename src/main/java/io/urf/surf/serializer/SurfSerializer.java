@@ -34,6 +34,7 @@ import javax.annotation.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.io.function.IOBiConsumer;
+import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
@@ -86,6 +87,10 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li>{@link CharSequence} (including {@link String})</li>
  * </ul>
+ * <h3>telephone number</h3>
+ * <ul>
+ * <li>{@link TelephoneNumber}</li>
+ * </ul>
  * <h2>Collections</h2>
  * <ul>
  * <li>{@link List}</li>
@@ -128,6 +133,7 @@ public class SurfSerializer {
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
+	private final static String TELEPHONE_NUMBER_CLASS_NAME = "com.globalmentor.itu.TelephoneNumber";
 	private final static String TREE_MAP_CLASS_NAME = "java.util.TreeMap";
 	private final static String TREE_SET_CLASS_NAME = "java.util.TreeSet";
 	private final static String URI_CLASS_NAME = "java.net.URI";
@@ -352,7 +358,7 @@ public class SurfSerializer {
 				try {
 					serializeIri(appendable, ((URL)resource).toURI());
 				} catch(final URISyntaxException uriURISyntaxException) {
-					throw new IOException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
+					throw new IllegalArgumentException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
 				}
 				break;
 			//##number
@@ -374,6 +380,10 @@ public class SurfSerializer {
 			case STRING_CLASS_NAME:
 			case STRING_BUILDER_CLASS_NAME:
 				serializeString(appendable, (CharSequence)resource);
+				break;
+			//##telephone number
+			case TELEPHONE_NUMBER_CLASS_NAME:
+				serializeTelephoneNumber(appendable, (TelephoneNumber)resource);
 				break;
 			//#collections
 			//#list
@@ -409,6 +419,9 @@ public class SurfSerializer {
 					serializeNumber(appendable, (Number)resource);
 				} else if(resource instanceof CharSequence) { //string
 					serializeString(appendable, (CharSequence)resource);
+					//TODO remove instanceof check and only use name lookup after making TelephoneNumber final
+				} else if(resource instanceof TelephoneNumber) { //telephone number
+					serializeTelephoneNumber(appendable, (TelephoneNumber)resource);
 				} else {
 					throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
 				}
@@ -516,6 +529,66 @@ public class SurfSerializer {
 		appendable.append(CHARACTER_DELIMITER);
 		serializeCharacterCodePoint(appendable, CHARACTER_DELIMITER, codePoint);
 		appendable.append(CHARACTER_DELIMITER);
+	}
+
+	/**
+	 * Serializes a character as content, without any delimiters.
+	 * <p>
+	 * This implementation does not escape the solidus (slash) character <code>'/'</code>, which is not required to be escaped.
+	 * </p>
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
+	 * @param codePoint The code point to serialize.
+	 * @throws NullPointerException if the given appendable is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appender.
+	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
+	 *           current character is completely parsed.
+	 * @see SURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
+	 */
+	public static void serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
+			throws IOException, ParseIOException {
+		//TODO check for control characters
+		if(codePoint == delimiter || (codePoint <= Character.MAX_VALUE && CHARACTER_REQUIRED_ESCAPED_CHARACTERS.contains((char)codePoint))) {
+			appendable.append(CHARACTER_ESCAPE);
+			final char escapeChar;
+			switch(codePoint) {
+				case CHARACTER_ESCAPE: //\\
+					escapeChar = CHARACTER_ESCAPE;
+					break;
+				case BACKSPACE_CHAR: //\b backspace
+					escapeChar = ESCAPED_BACKSPACE;
+					break;
+				case FORM_FEED_CHAR: //\f
+					escapeChar = ESCAPED_FORM_FEED;
+					break;
+				case LINE_FEED_CHAR: //\n
+					escapeChar = ESCAPED_LINE_FEED;
+					break;
+				case CARRIAGE_RETURN_CHAR: //\r
+					escapeChar = ESCAPED_CARRIAGE_RETURN;
+					break;
+				case CHARACTER_TABULATION_CHAR: //\t
+					escapeChar = ESCAPED_TAB;
+					break;
+				case LINE_TABULATION_CHAR: //\v
+					escapeChar = ESCAPED_VERTICAL_TAB;
+					break;
+				default:
+					assert codePoint == delimiter; //we should have covered everything else up to this point
+					escapeChar = delimiter;
+					break;
+			}
+			appendable.append(escapeChar);
+			return;
+		}
+		//code points outside the BMP
+		if(Character.isSupplementaryCodePoint(codePoint)) {
+			appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
+			return;
+		}
+		//code points within the BMP
+		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
+		appendable.append((char)codePoint);
 	}
 
 	/**
@@ -627,63 +700,18 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a character as content, without any delimiters.
-	 * <p>
-	 * This implementation does not escape the solidus (slash) character <code>'/'</code>, which is not required to be escaped.
-	 * </p>
+	 * Serializes a telephone number along with its delimiter.
 	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
-	 * @param codePoint The code point to serialize.
-	 * @throws NullPointerException if the given appendable is <code>null</code>.
-	 * @throws IOException if there is an error appending to the appender.
-	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
-	 *           current character is completely parsed.
-	 * @see SURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
+	 * @param telephoneNumber The information to be serialized as a SURF telephone number.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @throws IllegalArgumentException if the given telephone number is not in global form.
+	 * @see SURF#TELEPHONE_NUMBER_BEGIN
+	 * @see TelephoneNumber#isGlobal()
 	 */
-	public static void serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
-			throws IOException, ParseIOException {
-		//TODO check for control characters
-		if(codePoint == delimiter || (codePoint <= Character.MAX_VALUE && CHARACTER_REQUIRED_ESCAPED_CHARACTERS.contains((char)codePoint))) {
-			appendable.append(CHARACTER_ESCAPE);
-			final char escapeChar;
-			switch(codePoint) {
-				case CHARACTER_ESCAPE: //\\
-					escapeChar = CHARACTER_ESCAPE;
-					break;
-				case BACKSPACE_CHAR: //\b backspace
-					escapeChar = ESCAPED_BACKSPACE;
-					break;
-				case FORM_FEED_CHAR: //\f
-					escapeChar = ESCAPED_FORM_FEED;
-					break;
-				case LINE_FEED_CHAR: //\n
-					escapeChar = ESCAPED_LINE_FEED;
-					break;
-				case CARRIAGE_RETURN_CHAR: //\r
-					escapeChar = ESCAPED_CARRIAGE_RETURN;
-					break;
-				case CHARACTER_TABULATION_CHAR: //\t
-					escapeChar = ESCAPED_TAB;
-					break;
-				case LINE_TABULATION_CHAR: //\v
-					escapeChar = ESCAPED_VERTICAL_TAB;
-					break;
-				default:
-					assert codePoint == delimiter; //we should have covered everything else up to this point
-					escapeChar = delimiter;
-					break;
-			}
-			appendable.append(escapeChar);
-			return;
-		}
-		//code points outside the BMP
-		if(Character.isSupplementaryCodePoint(codePoint)) {
-			appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
-			return;
-		}
-		//code points within the BMP
-		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
-		appendable.append((char)codePoint);
+	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
+		checkArgument(telephoneNumber.isGlobal(), "Telephone number %s not in global form.", telephoneNumber);
+		appendable.append(telephoneNumber.toString());
 	}
 
 	//collections
