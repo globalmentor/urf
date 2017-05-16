@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.math.*;
-import java.net.URI;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -271,6 +271,25 @@ public class SurfSerializerTest implements Clogged {
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serialize(surfObject);
 			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_EMAIL_ADDRESSES_RESOURCE_NAME)));
+		}
+	}
+
+	//##IRI
+
+	/** @see SurfTestResources#OK_IRIS_RESOURCE_NAME */
+	@Test
+	public void testOkIris() throws IOException {
+		//test serializing java.netURL separately, because the parser never sends that back
+		assertThat(new SurfSerializer().serialize(new URL("http://www.example.com/")), equalTo("<http://www.example.com/>"));
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("example", URI.create("http://www.example.com/"));
+		surfObject.setPropertyValue("iso_8859_1", URI.create("http://www.example.org/Dürst"));
+		surfObject.setPropertyValue("encodedForbidden", URI.create("http://xn--99zt52a.example.org/%E2%80%AE"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_IRIS_RESOURCE_NAME)));
 		}
 	}
 

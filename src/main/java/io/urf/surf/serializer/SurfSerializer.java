@@ -25,6 +25,7 @@ import static java.util.Objects.*;
 
 import java.io.*;
 import java.math.*;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -64,6 +65,11 @@ import io.urf.surf.parser.SurfObject;
  * <h3>email address</h3>
  * <ul>
  * <li>{@link EmailAddress}</li>
+ * </ul>
+ * <h3>IRI</h3>
+ * <ul>
+ * <li>{@link URI}</li>
+ * <li>{@link URL}</li>
  * </ul>
  * <h3>number</h3>
  * <ul>
@@ -118,6 +124,8 @@ public class SurfSerializer {
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
 	private final static String TREE_MAP_CLASS_NAME = "java.util.TreeMap";
 	private final static String TREE_SET_CLASS_NAME = "java.util.TreeSet";
+	private final static String URI_CLASS_NAME = "java.net.URI";
+	private final static String URL_CLASS_NAME = "java.net.URL";
 
 	private boolean formatted = false;
 
@@ -330,6 +338,17 @@ public class SurfSerializer {
 			case EMAIL_ADDRESS_CLASS_NAME:
 				serializeEmailAddress(appendable, (EmailAddress)resource);
 				break;
+			//##IRI
+			case URI_CLASS_NAME:
+				serializeIri(appendable, ((URI)resource));
+				break;
+			case URL_CLASS_NAME:
+				try {
+					serializeIri(appendable, ((URL)resource).toURI());
+				} catch(final URISyntaxException uriURISyntaxException) {
+					throw new IOException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
+				}
+				break;
 			//##number
 			case BIG_DECIMAL_CLASS_NAME:
 			case BIG_INTEGER_CLASS_NAME:
@@ -500,6 +519,20 @@ public class SurfSerializer {
 	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
 		appendable.append(EMAIL_ADDRESS_BEGIN);
 		appendable.append(emailAddress.toString());
+	}
+
+	/**
+	 * Serializes an IRI along with its delimiter.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param iri The information to be serialized as a SURF IRI.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#IRI_BEGIN
+	 */
+	public static void serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
+		appendable.append(IRI_BEGIN);
+		appendable.append(iri.toString());
+		appendable.append(IRI_END);
 	}
 
 	/**
