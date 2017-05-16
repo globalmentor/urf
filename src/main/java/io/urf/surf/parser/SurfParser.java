@@ -184,6 +184,7 @@ public class SurfParser {
 	/**
 	 * Parses a resource; either a label or a resource representation. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
+	 * @return An object representing the SURF resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
@@ -277,8 +278,9 @@ public class SurfParser {
 	/**
 	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value SURF#OBJECT_BEGIN}.
-	 * @param resourceIri The object resource's global identifier, or <code>null</code> if the object has no Iri.
+	 * @param resourceIri The object resource's global identifier, or <code>null</code> if the object has no IRI.
 	 * @param reader The reader containing SURF data.
+	 * @return The SURF object read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see SURF#OBJECT_BEGIN
 	 */
@@ -292,6 +294,7 @@ public class SurfParser {
 	 * @param label The object label; either a name {@link String}, for local labels, or a {@link URI} representing the resource's global identifier, or
 	 *          <code>null</code> if the object has no label.
 	 * @param reader The reader containing SURF data.
+	 * @return The SURF object read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see SURF#OBJECT_BEGIN
 	 */
@@ -351,12 +354,13 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a Boolean value.
-	 * @param document The document being parsed. The next character read is expected to be the start of {@link SURF#BOOLEAN_FALSE} or {@link SURF#BOOLEAN_TRUE}.
+	 * Parses a Boolean value. The next character read is expected to be the start of {@link SURF#BOOLEAN_FALSE_LEXICAL_FORM} or
+	 * {@link SURF#BOOLEAN_TRUE_LEXICAL_FORM}.
 	 * @param reader The reader containing SURF data.
+	 * @return A {@link Boolean} representing the SURF boolean literal read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
-	public static Object parseBoolean(@Nonnull final Reader reader) throws IOException {
+	public static Boolean parseBoolean(@Nonnull final Reader reader) throws IOException {
 		int c = peek(reader); //peek the next character
 		switch(c) { //see what the next character is
 			case BOOLEAN_FALSE_BEGIN: //false
@@ -878,8 +882,8 @@ public class SurfParser {
 
 	/**
 	 * Parses an a list. The current position must be for {@value SURF#LIST_BEGIN}. The new position will be that immediately following {@value SURF#LIST_END}.
-	 * @param document The document being parsed.
 	 * @param reader The reader containing SURF data.
+	 * @return The list read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public List<Object> parseList(@Nonnull final Reader reader) throws IOException {
@@ -892,8 +896,8 @@ public class SurfParser {
 
 	/**
 	 * Parses a map. The current position must be for {@value SURF#MAP_BEGIN}. The new position will be that immediately following {@value SURF#MAP_END}.
-	 * @param document The document being parsed.
 	 * @param reader The reader containing SURF data.
+	 * @return The map read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public Map<Object, Object> parseMap(@Nonnull final Reader reader) throws IOException {
@@ -913,8 +917,8 @@ public class SurfParser {
 
 	/**
 	 * Parses a set. The current position must be for {@value SURF#SET_BEGIN}. The new position will be that immediately following {@value SURF#SET_END}.
-	 * @param document The document being parsed.
 	 * @param reader The reader containing SURF data.
+	 * @return The set read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public Set<Object> parseSet(@Nonnull final Reader reader) throws IOException {
