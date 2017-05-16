@@ -22,6 +22,7 @@ import java.io.*;
 import java.math.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.time.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -394,6 +395,33 @@ public class SurfSerializerTest implements Clogged {
 	}
 
 	//TODO add IllegalArgumentException test for telephone number not in global form 
+
+	//##temporal
+
+	/** @see SurfTestResources#OK_TEMPORALS_RESOURCE_NAME */
+	@Test
+	public void testOkTemporals() throws IOException {
+		//test serializing java.util.Date separately, because the parser never sends that back
+		final Date nowDate = new Date();
+		assertThat(new SurfSerializer().serialize(nowDate), equalTo("@" + nowDate.toInstant().toString()));
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("instant", Instant.parse("2017-02-12T23:29:18.829Z"));
+		surfObject.setPropertyValue("zonedDateTime", ZonedDateTime.parse("2017-02-12T15:29:18.829-08:00[America/Los_Angeles]"));
+		surfObject.setPropertyValue("offsetDateTime", OffsetDateTime.parse("2017-02-12T15:29:18.829-08:00"));
+		surfObject.setPropertyValue("offsetTime", OffsetTime.parse("15:29:18.829-08:00"));
+		surfObject.setPropertyValue("localDateTime", LocalDateTime.parse("2017-02-12T15:29:18.829"));
+		surfObject.setPropertyValue("localDate", LocalDate.parse("2017-02-12"));
+		surfObject.setPropertyValue("localTime", LocalTime.parse("15:29:18.829"));
+		surfObject.setPropertyValue("yearMonth", YearMonth.parse("2017-02"));
+		surfObject.setPropertyValue("monthDay", MonthDay.parse("--02-12"));
+		surfObject.setPropertyValue("year", Year.parse("2017"));
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_TEMPORALS_RESOURCE_NAME)));
+		}
+	}
 
 	//##UUID
 

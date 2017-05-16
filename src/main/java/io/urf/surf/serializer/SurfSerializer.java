@@ -27,6 +27,8 @@ import java.io.*;
 import java.math.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.time.*;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -91,6 +93,20 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li>{@link TelephoneNumber}</li>
  * </ul>
+ * <h3>temporal</h3>
+ * <ul>
+ * <li>{@link Date} (serialized as instant)</li>
+ * <li>{@link Instant}</li>
+ * <li>{@link MonthDay}</li>
+ * <li>{@link LocalDate}</li>
+ * <li>{@link LocalDateTime}</li>
+ * <li>{@link LocalTime}</li>
+ * <li>{@link OffsetDateTime}</li>
+ * <li>{@link OffsetTime}</li>
+ * <li>{@link Year}</li>
+ * <li>{@link YearMonth}</li>
+ * <li>{@link ZonedDateTime}</li>
+ * </ul>
  * <h3>UUID</h3>
  * <ul>
  * <li>{@link UUID}</li>
@@ -123,16 +139,24 @@ public class SurfSerializer {
 	private final static String BYTE_ARRAY_CLASS_NAME = "[B";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
+	private final static String DATE_CLASS_NAME = "java.util.Date";
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
 	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
 	private final static String HASH_MAP_CLASS_NAME = "java.util.HashMap";
 	private final static String HASH_SET_CLASS_NAME = "java.util.HashSet";
+	private final static String INSTANT_CLASS_NAME = "java.time.Instant";
 	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
 	private final static String LINKED_HASH_MAP_CLASS_NAME = "java.util.LinkedHashMap";
 	private final static String LINKED_HASH_SET_CLASS_NAME = "java.util.LinkedHashSet";
 	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
+	private final static String LOCAL_DATE_CLASS_NAME = "java.time.LocalDate";
+	private final static String LOCAL_DATE_TIME_CLASS_NAME = "java.time.LocalDateTime";
+	private final static String LOCAL_TIME_CLASS_NAME = "java.time.LocalTime";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
+	private final static String MONTH_DAY_CLASS_NAME = "java.time.MonthDay";
+	private final static String OFFSET_DATE_TIME_CLASS_NAME = "java.time.OffsetDateTime";
+	private final static String OFFSET_TIME_CLASS_NAME = "java.time.OffsetTime";
 	private final static String PATTERN_CLASS_NAME = "java.util.regex.Pattern";
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
@@ -143,6 +167,9 @@ public class SurfSerializer {
 	private final static String URI_CLASS_NAME = "java.net.URI";
 	private final static String URL_CLASS_NAME = "java.net.URL";
 	private final static String UUID_CLASS_NAME = "java.util.UUID";
+	private final static String YEAR__CLASS_NAME = "java.time.Year";
+	private final static String YEAR_MONTH_CLASS_NAME = "java.time.YearMonth";
+	private final static String ZONED_DATE_TIME_CLASS_NAME = "java.time.ZonedDateTime";
 
 	private boolean formatted = false;
 
@@ -390,6 +417,23 @@ public class SurfSerializer {
 			case TELEPHONE_NUMBER_CLASS_NAME:
 				serializeTelephoneNumber(appendable, (TelephoneNumber)resource);
 				break;
+			//##temporal
+			case DATE_CLASS_NAME:
+				serializeTemporal(appendable, ((Date)resource).toInstant());
+				break;
+			case INSTANT_CLASS_NAME:
+			case MONTH_DAY_CLASS_NAME:
+			case LOCAL_DATE_CLASS_NAME:
+			case LOCAL_DATE_TIME_CLASS_NAME:
+			case LOCAL_TIME_CLASS_NAME:
+				//TODO consider supporting OffsetDate; see e.g. http://stackoverflow.com/q/7788267/421049
+			case OFFSET_DATE_TIME_CLASS_NAME:
+			case OFFSET_TIME_CLASS_NAME:
+			case YEAR__CLASS_NAME:
+			case YEAR_MONTH_CLASS_NAME:
+			case ZONED_DATE_TIME_CLASS_NAME:
+				serializeTemporal(appendable, (TemporalAccessor)resource);
+				break;
 			//##UUID
 			case UUID_CLASS_NAME:
 				serializeUuid(appendable, (UUID)resource);
@@ -431,6 +475,8 @@ public class SurfSerializer {
 					//TODO remove instanceof check and only use name lookup after making TelephoneNumber final
 				} else if(resource instanceof TelephoneNumber) { //telephone number
 					serializeTelephoneNumber(appendable, (TelephoneNumber)resource);
+				} else if(resource instanceof Date) { //temporal
+					serializeTemporal(appendable, (TemporalAccessor)resource);
 				} else {
 					throw new UnsupportedOperationException("Unsupported SURF serialization type: " + resource.getClass().getName());
 				}
@@ -721,6 +767,19 @@ public class SurfSerializer {
 	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
 		checkArgument(telephoneNumber.isGlobal(), "Telephone number %s not in global form.", telephoneNumber);
 		appendable.append(telephoneNumber.toString());
+	}
+
+	/**
+	 * Serializes a temporal literal along with its delimiter.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param temporal The information to be serialized as a SURF temporal.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#TEMPORAL_BEGIN
+	 */
+	public static void serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
+		appendable.append(TEMPORAL_BEGIN);
+		appendable.append(temporal.toString());
 	}
 
 	/**
