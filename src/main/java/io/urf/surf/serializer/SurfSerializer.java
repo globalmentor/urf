@@ -57,6 +57,7 @@ import io.urf.surf.parser.SurfObject;
  * <ul>
  * <li><code>byte[]</code></li>
  * <li>{@link ByteBuffer}</li>
+ * </ul>
  * <h3>Boolean</h3>
  * <ul>
  * <li>{@link Boolean}</li>
@@ -231,6 +232,7 @@ public class SurfSerializer {
 	 * If formatting is turned off, no content will be added.
 	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
+	 * @throws IOException If there was an error writing the indent.
 	 * @see #isFormatted()
 	 * @see #getIndentSequence()
 	 */
@@ -278,6 +280,7 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @return Whether or not a line separator sequence was actually appended.
+	 * @throws IOException If there was an error writing the line separator.
 	 * @see #isFormatted()
 	 * @see #getLineSeparator()
 	 */
@@ -313,7 +316,7 @@ public class SurfSerializer {
 	/**
 	 * Serializes a SURF resource graph to a string.
 	 * <p>
-	 * This is a convenience method that delegates to {@link #serialize(Writer, Object)}.
+	 * This is a convenience method that delegates to {@link #serialize(Appendable, Object)}.
 	 * </p>
 	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws IOException If there was an error writing the SURF data.
@@ -355,7 +358,7 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF resource to a writer.
-	 * @param writer The writer to receive SURF data.
+	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param resource The SURF resource to serialize to serialize.
 	 * @throws NullPointerException if the given appendable and/or resource is <code>null</code>.
 	 * @throws IOException If there was an error appending the SURF data.
@@ -495,7 +498,6 @@ public class SurfSerializer {
 	 * @see SURF#OBJECT_BEGIN
 	 * @see SURF#PROPERTIES_BEGIN
 	 * @see SURF#PROPERTIES_END
-	 * @see #parseCharacterCodePoint(Reader, char)
 	 */
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
@@ -560,7 +562,7 @@ public class SurfSerializer {
 	/**
 	 * Serializes a Boolean.
 	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param codePoint The Unicode code point to be serialized as a SURF Boolean.
+	 * @param bool The Boolean value to be serialized as a SURF Boolean.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -874,6 +876,7 @@ public class SurfSerializer {
 	 * further items.
 	 * @param <I> The type of item in the sequence.
 	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param sequence An iterable representing the sequence to serialize.
 	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization, along with each item to serialize.
 	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
