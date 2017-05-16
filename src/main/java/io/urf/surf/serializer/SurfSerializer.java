@@ -108,11 +108,13 @@ public class SurfSerializer {
 	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
 	private final static String HASH_SET_CLASS_NAME = "java.util.HashSet";
 	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
+	private final static String LINKED_HASH_SET_CLASS_NAME = "java.util.LinkedHashSet";
 	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
+	private final static String TREE_SET_CLASS_NAME = "java.util.TreeSet";
 
 	private boolean formatted = false;
 
@@ -349,6 +351,8 @@ public class SurfSerializer {
 				break;
 			//#set
 			case HASH_SET_CLASS_NAME:
+			case LINKED_HASH_SET_CLASS_NAME:
+			case TREE_SET_CLASS_NAME:
 				serializeSet(appendable, (Set<?>)resource);
 				break;
 			default:
