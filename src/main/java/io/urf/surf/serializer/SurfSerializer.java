@@ -28,6 +28,7 @@ import java.math.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
@@ -77,6 +78,10 @@ import io.urf.surf.parser.SurfObject;
  * <li>{@link BigDecimal} (serialized as decimal)</li>
  * <li>{@link Number} (including {@link Integer}, {@link Long}, and {@link Double})</li>
  * </ul>
+ * <h3>regular expression</h3>
+ * <ul>
+ * <li>{@link Pattern}</li>
+ * </ul>
  * <h3>string</h3>
  * <ul>
  * <li>{@link CharSequence} (including {@link String})</li>
@@ -119,6 +124,7 @@ public class SurfSerializer {
 	private final static String LINKED_HASH_SET_CLASS_NAME = "java.util.LinkedHashSet";
 	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
+	private final static String PATTERN_CLASS_NAME = "java.util.regex.Pattern";
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
@@ -360,6 +366,10 @@ public class SurfSerializer {
 			case SHORT_CLASS_NAME:
 				serializeNumber(appendable, (Number)resource);
 				break;
+			//##regular expression
+			case PATTERN_CLASS_NAME:
+				serializeRegularExpression(appendable, (Pattern)resource);
+				break;
 			//##string
 			case STRING_CLASS_NAME:
 			case STRING_BUILDER_CLASS_NAME:
@@ -522,7 +532,7 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes an IRI along with its delimiter.
+	 * Serializes an IRI along with its delimiters.
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param iri The information to be serialized as a SURF IRI.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
@@ -556,6 +566,36 @@ public class SurfSerializer {
 			appendable.append(NUMBER_DECIMAL_BEGIN);
 		}
 		appendable.append(number.toString());
+	}
+
+	/**
+	 * Serializes a regular expression along with its delimiters.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param regularExpression The information to be serialized as a SURF regular expression.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
+	 * @see SURF#REGULAR_EXPRESSION_ESCAPE
+	 */
+	public static void serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
+		appendable.append(REGULAR_EXPRESSION_DELIMITER);
+		final String regexString = regularExpression.toString();
+		//See if there is anything we need to escape; checking ahead of time will usually be faster than appending each character,
+		//as the String.indexOf() is optimized by using internal data, and most regular expressions will not need to be escaped.
+		if(regexString.indexOf(REGULAR_EXPRESSION_DELIMITER) >= 0) {
+			final int regexLength = regexString.length();
+			for(int i = 0; i < regexLength; i++) {
+				final char c = regexString.charAt(i); //TODO provide better checks of valid surrogate pair sequences
+				if(c == REGULAR_EXPRESSION_DELIMITER) { //escape the '/' character
+					appendable.append(REGULAR_EXPRESSION_ESCAPE);
+				}
+				appendable.append(c);
+			}
+		} else { //no escaping needed
+			appendable.append(regexString);
+		}
+		appendable.append(REGULAR_EXPRESSION_DELIMITER);
+		//TODO add support for flags
 	}
 
 	/**

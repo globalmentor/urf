@@ -23,6 +23,7 @@ import java.math.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
@@ -333,6 +334,27 @@ public class SurfSerializerTest implements Clogged {
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serialize(surfObject);
 			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_NUMBERS_RESOURCE_NAME)));
+		}
+	}
+
+	//##regular expression
+
+	/** @see SurfTestResources#OK_REGULAR_EXPRESSIONS_RESOURCE_NAME */
+	@Ignore //TODO enable when SurfObject support comparing pattern property values; see https://bugs.openjdk.java.net/browse/JDK-7163589
+	@Test
+	public void testOkRegularExpressions() throws IOException {
+		final SurfObject surfObject = new SurfObject();
+		surfObject.setPropertyValue("empty", Pattern.compile(""));
+		surfObject.setPropertyValue("abc", Pattern.compile("abc"));
+		surfObject.setPropertyValue("regexEscape", Pattern.compile("ab\\.c"));
+		surfObject.setPropertyValue("doubleBackslash", Pattern.compile("\\\\"));
+		surfObject.setPropertyValue("slash", Pattern.compile("/"));
+		for(final boolean formatted : asList(true, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(surfObject);
+			System.out.println(serialization);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_REGULAR_EXPRESSIONS_RESOURCE_NAME)));
 		}
 	}
 
