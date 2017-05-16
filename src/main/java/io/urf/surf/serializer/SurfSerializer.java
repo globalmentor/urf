@@ -106,14 +106,17 @@ public class SurfSerializer {
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
 	private final static String FLOAT_CLASS_NAME = "java.lang.Float";
+	private final static String HASH_MAP_CLASS_NAME = "java.util.HashMap";
 	private final static String HASH_SET_CLASS_NAME = "java.util.HashSet";
 	private final static String INTEGER_CLASS_NAME = "java.lang.Integer";
+	private final static String LINKED_HASH_MAP_CLASS_NAME = "java.util.LinkedHashMap";
 	private final static String LINKED_HASH_SET_CLASS_NAME = "java.util.LinkedHashSet";
 	private final static String LINKED_LIST_CLASS_NAME = "java.util.LinkedList";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
 	private final static String SHORT_CLASS_NAME = "java.lang.Short";
 	private final static String STRING_CLASS_NAME = "java.lang.String";
 	private final static String STRING_BUILDER_CLASS_NAME = "java.lang.StringBuilder";
+	private final static String TREE_MAP_CLASS_NAME = "java.util.TreeMap";
 	private final static String TREE_SET_CLASS_NAME = "java.util.TreeSet";
 
 	private boolean formatted = false;
@@ -349,6 +352,12 @@ public class SurfSerializer {
 			case LINKED_LIST_CLASS_NAME:
 				serializeList(appendable, (List<?>)resource);
 				break;
+			//#map
+			case HASH_MAP_CLASS_NAME:
+			case LINKED_HASH_MAP_CLASS_NAME:
+			case TREE_MAP_CLASS_NAME:
+				serializeMap(appendable, (Map<?, ?>)resource);
+				break;
 			//#set
 			case HASH_SET_CLASS_NAME:
 			case LINKED_HASH_SET_CLASS_NAME:
@@ -361,6 +370,8 @@ public class SurfSerializer {
 					serializeObject(appendable, (SurfObject)resource);
 				} else if(resource instanceof List) { //list
 					serializeList(appendable, (List<?>)resource);
+				} else if(resource instanceof Map) { //map
+					serializeMap(appendable, (Map<?, ?>)resource);
 				} else if(resource instanceof Set) { //set
 					serializeSet(appendable, (Set<?>)resource);
 				} else if(resource instanceof ByteBuffer) { //binary
@@ -623,6 +634,35 @@ public class SurfSerializer {
 			formatIndent(appendable);
 		}
 		appendable.append(LIST_END); //]
+	}
+
+	/**
+	 * Serializes a SURF map.
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param map The information to be serialized as a SURF map.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#MAP_BEGIN
+	 * @see SURF#MAP_END
+	 * @see SURF#ENTRY_KEY_VALUE_DELIMITER
+	 */
+	public void serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
+		appendable.append(MAP_BEGIN); //{
+		if(!map.isEmpty()) {
+			formatNewLine(appendable);
+			try (final Closeable indention = increaseIndentLevel()) { //TODO allow configurable indent for small maps
+				serializeSequence(appendable, map.entrySet(), (out, entry) -> { //TODO make serializeMapEntry() method
+					serializeResource(out, entry.getKey());
+					out.append(ENTRY_KEY_VALUE_DELIMITER); //:
+					if(formatted) {
+						out.append(SPACE_CHAR);
+					}
+					serializeResource(out, entry.getValue());
+				});
+			}
+			formatIndent(appendable);
+		}
+		appendable.append(MAP_END); //}
 	}
 
 	/**

@@ -30,6 +30,7 @@ import static com.globalmentor.java.Bytes.*;
 import static io.urf.surf.test.SurfTestResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
+import static java.util.Collections.*;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.*;
@@ -339,8 +340,8 @@ public class SurfSerializerTest implements Clogged {
 
 	/** @see SurfTestResources#OK_LIST_EMPTY_RESOURCE_NAMES */
 	@Test
-	public void testOkListNoItems() throws IOException {
-		final List<?> list = new ArrayList<>();
+	public void testOkListEmpty() throws IOException {
+		final List<?> list = emptyList();
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -379,12 +380,80 @@ public class SurfSerializerTest implements Clogged {
 		}
 	}
 
+	//#map
+
+	/** @see SurfTestResources#OK_MAPS_RESOURCE_NAME */
+	@Test
+	public void testOkMaps() throws IOException {
+		final Map<Object, Object> map = new HashMap<>();
+		map.put("foo", "bar");
+		map.put(123, "number");
+		map.put(false, "Boolean");
+		map.put(true, "Boolean");
+		map.put(Arrays.asList(1, 2, 3), new BigDecimal("1.23"));
+		final Map<Object, Object> pingPong = new HashMap<>();
+		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
+		map.put("map", pingPong);
+		map.put(new HashSet<Object>(Arrays.asList("foo", false)), true);
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(map);
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_MAPS_RESOURCE_NAME)));
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_EMPTY_RESOURCE_NAMES */
+	@Test
+	public void testOkMapEmpty() throws IOException {
+		final Map<?, ?> map = emptyMap();
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(map);
+			for(final String okMapEmptyResourceName : OK_MAP_EMPTY_RESOURCE_NAMES) {
+				assertThat(okMapEmptyResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okMapEmptyResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_ONE_ENTRY_RESOURCE_NAMES */
+	@Test
+	public void testOkMapOneEntry() throws IOException {
+		final Map<String, String> map = new HashMap<>();
+		map.put("I", "one");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(map);
+			for(final String okMapOneEntryResourceName : OK_MAP_ONE_ENTRY_RESOURCE_NAMES) {
+				assertThat(okMapOneEntryResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okMapOneEntryResourceName)));
+			}
+		}
+	}
+
+	/** @see SurfTestResources#OK_MAP_TWO_ENTRIES_RESOURCE_NAMES */
+	@Test
+	public void testOkMapTwoEntries() throws IOException {
+		final Map<String, String> map = new HashMap<>();
+		map.put("I", "one");
+		map.put("II", "two");
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(map);
+			for(final String okMapTwoEntriesResourceName : OK_MAP_TWO_ENTRIES_RESOURCE_NAMES) {
+				assertThat(okMapTwoEntriesResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okMapTwoEntriesResourceName)));
+			}
+		}
+	}
+
 	//##set
 
 	/** @see SurfTestResources#OK_SET_EMPTY_RESOURCE_NAMES */
 	@Test
-	public void testOkSetNoItems() throws IOException {
-		final Set<?> set = new HashSet<>();
+	public void testOkSetEmpty() throws IOException {
+		final Set<?> set = emptySet();
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
