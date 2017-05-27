@@ -4,7 +4,7 @@
 
 	<groupId>io.urf</groupId>
 	<artifactId>surf-serializer</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>SURF Serializer</name>
@@ -59,19 +59,19 @@
 		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>surf-spec</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>surf-parser</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>surf-test</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 
