@@ -50,7 +50,7 @@
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
 	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
-	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category. This specification uses the <code class="name">MIDDLE DOT</code> character · to indicate a sequence of zero or more whitespace characters.</p>
+	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul>
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
 		<li><code class="name">tab</code> ⇒ <code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</li>
@@ -59,25 +59,33 @@
 		<li><code class="name">sp</code> ⇒ <code class="name">SPACE</code> (<code class="unicode">U+0020</code>)</li>
 		<li><code class="name">nbsp</code> ⇒ <code class="name">NO-BREAK SPACE</code> (<code class="unicode">U+00A0</code>)</li>
 		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
-		<li>· ⇒ <code class="name">whitespace</code>*</li>
 	</ul>
-	<h3>Lines</h3>
-	<h4>Line Endings</h4>
+	<h3>Line Endings</h3>
 	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul>
 		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
 		<li><code class="name">cr</code> ⇒ <code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</li>
 		<li><code class="name">lf</code> ⇒ <code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</li>
 	</ul>
-	<h4>Line Breaks</h4>
-	<aside class="tip far third">A parser <span class="spec-may">may</span> simply discard line comments and parse the SURF document as if they were not present.</aside>
-	<p>A line comment <span class="spec-may">may</span> appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character. The optional line comment and line ending is referred to as a <dfn>line terminator</dfn>. A <dfn>line break</dfn> is any line terminator optionally surrounded on either side by whitespace.</p>
+	<h3>Comments</h3>
+	<h4>Line Comments</h4>
+	<p>A line comment <span class="spec-may">may</span> appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
 	<ul class="spec-production">
-		<li><code class="name">line_break</code> ⇒ · <code class="name">line_terminator</code> ·</li>
-		<li><code class="name">line_terminator</code> ⇒ <code class="name">line_comment</code>? <code class="name">eol</code></li>
-		<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]*</li>
+		<li><code class="name">line_comment</code> ⇒ '!' [^<code class="name">eol</code>]*</li>
 	</ul>
-	<h3>Sequences</h3>
+	<h3>Filler</h3>
+	<aside class="note far third">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
+	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
+	<ul>
+		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
+	</ul>
+	<h3>Line Breaks</h3>
+	<aside class="tip far third">A parser <span class="spec-may">may</span> simply discard line comments and parse the SURF document as if they were not present.</aside>
+	<p>A <dfn>line break</dfn> is any end of line surrounded on either side by filler.</p>
+	<ul class="spec-production">
+		<li><code class="name">line_break</code> ⇒ · <code class="name">eol</code> ·</li>
+	</ul>
+	<h3 id="sequence">Sequences</h3>
 	<p>Several SURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note far third">The sequence separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
 	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
@@ -87,7 +95,7 @@
 		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
 		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
-	<h3>Names</h3>
+	<h2>Names</h2>
 	<figure class="far side">
 		<figcaption>Example SURF names.</figcaption>
 		<ul>
