@@ -120,11 +120,11 @@ public class SurfParser {
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		if(skipWhitespaceLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
+		if(skipLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
 			return Optional.empty(); //the SURF document is empty
 		}
 		final Object resource = parseResource(reader);
-		checkParseIO(reader, skipWhitespaceLineBreaks(reader) < 0, "No content allowed after root resource.");
+		checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
 		return Optional.of(resource);
 	}
 
@@ -193,7 +193,7 @@ public class SurfParser {
 		int c = peekEnd(reader);
 		if(c == LABEL_DELIMITER) {
 			label = parseLabel(reader);
-			c = skipWhitespace(reader);
+			c = skipFiller(reader);
 		}
 		if(label != null) { //see if this is a resource reference
 			final Object resource = labeledResources.get(label);
@@ -300,12 +300,12 @@ public class SurfParser {
 	 */
 	protected SurfObject parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
 		check(reader, OBJECT_BEGIN); //*
-		int c = skipWhitespace(reader);
+		int c = skipFiller(reader);
 		//type (optional)
 		final String typeName;
 		if(c >= 0 && c != PROPERTIES_BEGIN && !EOL_CHARACTERS.contains((char)c)) { //if there is something before properties, it must be a type
 			typeName = parseName(reader);
-			c = skipWhitespace(reader);
+			c = skipFiller(reader);
 		} else {
 			typeName = null;
 		}
@@ -319,9 +319,9 @@ public class SurfParser {
 			check(reader, PROPERTIES_BEGIN); //:
 			parseSequence(reader, PROPERTIES_END, r -> {
 				final String propertyName = parseName(reader);
-				skipWhitespaceLineBreaks(reader);
+				skipLineBreaks(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipWhitespaceLineBreaks(reader);
+				skipLineBreaks(reader);
 				final Object value = parseResource(reader);
 				final Optional<Object> oldValue = resource.setPropertyValue(propertyName, value);
 				checkParseIO(reader, !oldValue.isPresent(), "Object has duplicate definition for property %s.", propertyName);
@@ -905,9 +905,9 @@ public class SurfParser {
 		check(reader, MAP_BEGIN); //{
 		parseSequence(reader, MAP_END, r -> {
 			final Object key = parseResource(reader);
-			skipWhitespaceLineBreaks(reader);
+			skipLineBreaks(reader);
 			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
-			skipWhitespaceLineBreaks(reader);
+			skipLineBreaks(reader);
 			final Object value = parseResource(reader);
 			map.put(key, value); //put the value in the map, replacing any old value
 		});
@@ -944,7 +944,7 @@ public class SurfParser {
 	 */
 	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Reader> itemParser) throws IOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty sequence is possible)
-		int c = skipWhitespaceLineBreaks(reader);
+		int c = skipLineBreaks(reader);
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
 			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
@@ -967,7 +967,7 @@ public class SurfParser {
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static Optional<Boolean> skipSequenceDelimiters(@Nonnull final Reader reader) throws IOException {
-		int c = skipWhitespace(reader); //skip whitespace (and comments)
+		int c = skipFiller(reader); //skip whitespace (and comments)
 		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
 			return Optional.empty();
 		}
@@ -977,21 +977,21 @@ public class SurfParser {
 				requireItem = true; //note we found a comma
 				check(reader, COMMA_CHAR); //skip the comma
 			}
-			c = skipWhitespaceLineBreaks(reader); //skip any newlines
+			c = skipLineBreaks(reader);
 		} while(!requireItem && c >= 0 && SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c));
 		return Optional.of(requireItem);
 	}
 
 	/**
-	 * Skips over SURF whitespace in a reader. Line comments will be ignored and skipped as well. The new position will either be the that of the first
-	 * non-whitespace character or the end of the input stream.
+	 * Skips over SURF filler in a reader, including whitespace and line comments.The new position will either be the that of the first non-whitespace character
+	 * or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipWhitespace(@Nonnull final Reader reader) throws IOException {
+	protected static int skipFiller(@Nonnull final Reader reader) throws IOException {
 		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
 		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
@@ -1001,23 +1001,20 @@ public class SurfParser {
 		return c; //return the next character to be character read
 	}
 
-	/**
-	 * Characters that indicate the start of filler or the end of a line. This includes {@link SURF#WHITESPACE_CHARACTERS}, the start of a line comment
-	 * {@link SURF#LINE_COMMENT_BEGIN}, and {@link Characters#EOL_CHARACTERS}.
-	 */
-	public static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
+	/** Whitespace and end-of-line characters. */
+	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
 
 	/**
-	 * Skips over SURF line breaks in a reader. Whitespace will be ignored and skipped as well. The new position will either be the that of the first
-	 * non-whitespace and non-EOL character; or the end of the input stream.
+	 * Skips over SURF line breaks in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace and
+	 * non-EOL character; or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
-	protected static int skipWhitespaceLineBreaks(@Nonnull final Reader reader) throws IOException {
-		int c; //we'll store the next non-line-break-filler character here so that it can be returned
+	protected static int skipLineBreaks(@Nonnull final Reader reader) throws IOException {
+		int c; //we'll store the next non-line-break character here so that it can be returned
 		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
 			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
