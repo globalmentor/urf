@@ -221,7 +221,7 @@
 			<dd><a href="https://docs.python.org/3/library/decimal.html" class="see"><code>decimal</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<p>A <dfn>number</dfn> represents a numerical value in base 10 that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
 	<ul class="spec-production">
 		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
@@ -229,6 +229,14 @@
 		<li><code class="name">exponent</code> ⇒ ('e' | 'E') ['-' | '+'] <code class="name">digit</code>+</li>
 		<li><code class="name">digit</code> ⇒ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'</li>
 	</ul>
+	<p>A number <span class="spec-should">should</span> be in its canonical form:</p>
+	<ul>
+		<li>No leading zeros in the <code class="name">integer</code> component except to meet the requirement of at least one digit.</li>
+		<li>No trailing zeros in the digit(s) in the <code class="name">fraction</code> component except to meet the requirement of at least one digit.</li>
+		<li>o leading zeros in the digit(s) in the <code class="name">exponent</code> component.</li>
+		<li>A lowercase <code>'e'</code> in the <code class="name">exponent</code> component.</li>
+	</ul>
+	<p>Nevertheless the presence of any leading zero(s) in the <code class="name">integer</code> component <span class="spec-must-not">shall not</span> be interpreted as indicating any other number base other than base 10.</p>
 	<h4>Regular Expression</h4>
 	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
 	<p>A <dfn>regular expression</dfn> is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
