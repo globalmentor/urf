@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-05-13</dd>
+			<dd>Draft 2017-06-04</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -26,7 +26,7 @@
 	<dl>
 		<dt>SURF parser</dt>
 		<dd>Any software component that interprets SURF syntax and produces an appropriate data model according to this specification.</dd>
-		<dt>SURF generator</dt>
+		<dt>SURF serializer</dt>
 		<dd>An software that produces SURF syntax complying with this specification to reflect some data model.</dd>
 	</dl>
 	<h3>Design Constraints</h3>
@@ -37,52 +37,53 @@
 		<li>SURF <span class="spec-should">should</span> support the Unicode character set for identifiers and comments.</li>
 		<li>SURF <span class="spec-must">must</span> use only ASCII characters for delimiters.</li>
 		<li>All valid JSON documents <span class="spec-must">must</span> also be valid SURF documents.</li>
-		<li>All valid SURF documents <span class="spec-must">must</span> also be valid TURF document body content.</li>
+		<li>All valid SURF documents <span class="spec-must">must</span> also be valid TURF documents.</li>
 		<li>SURF <span class="spec-must">must</span> allow for distinctions among vocabularies of identifiers.</li>
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
-	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">shall</span> be encoded in UTF-8, UTF-16, or UTF-32. SURF parsers <span class="spec-must">must</span> support UTF-8. Implementations <span class="must not">must not</span> add a byte order mark to the beginning of content, but <span class="spec-may">may</span> use any byte order mark to determine the encoding.</p>
+	<aside class="note far third">The separate TURF format allows other encodings such as UTF-16 and UTF-32.</aside>
+	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
 	<h2>Structure</h2>
-	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (TODO reference) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, containing no resources.</p>
+	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
-	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul>
-		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
-		<li><code class="name">tab</code> ⇒ <code class="unicode">U+0009</code> <code class="name">CHARACTER TABULATION</code></li>
-		<li><code class="name">vtab</code> ⇒ <code class="unicode">U+000B</code> <code class="name">LINE TABULATION</code></li>
-		<li><code class="name">ff</code> ⇒ <code class="unicode">U+000C</code> <code class="name">FORM FEED (FF)</code></li>
-		<li><code class="name">sp</code> ⇒ <code class="unicode">U+0020</code> <code class="name">SPACE</code></li>
-		<li><code class="name">nbsp</code> ⇒ <code class="unicode">U+00A0</code> <code class="name">NO-BREAK SPACE</code></li>
-		<li><code class="name">zwnbspr</code> ⇒ <code class="unicode">U+FEFF</code> <code class="name">ZERO WIDTH NO-BREAK SPACE</code></li>
+		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
+		<li><code class="name">tab</code> ⇒ <code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</li>
+		<li><code class="name">vtab</code> ⇒ <code class="name">LINE TABULATION</code> (<code class="unicode">U+000B</code>)</li>
+		<li><code class="name">ff</code> ⇒ <code class="name">FORM FEED (FF)</code> (<code class="unicode">U+000C</code>)</li>
+		<li><code class="name">sp</code> ⇒ <code class="name">SPACE</code> (<code class="unicode">U+0020</code>)</li>
+		<li><code class="name">nbsp</code> ⇒ <code class="name">NO-BREAK SPACE</code> (<code class="unicode">U+00A0</code>)</li>
+		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
 	</ul>
 	<h3>Lines</h3>
 	<h4>Line Endings</h4>
-	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character <code class="unicode">U+000D</code>, the <code class="name">LINE FEED (LF)</code> character <code>U+000A</code>, and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF generator <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul>
 		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
-		<li><code class="name">cr</code> ⇒ <code class="unicode">U+000D</code> <code class="name">CARRIAGE RETURN (CR)</code></li>
-		<li><code class="name">lf</code> ⇒ <code class="unicode">U+000A</code> <code class="name">LINE FEED (LF)</code></li>
+		<li><code class="name">cr</code> ⇒ <code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</li>
+		<li><code class="name">lf</code> ⇒ <code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</li>
 	</ul>
 	<h4>Line Breaks</h4>
-	<aside class="tip far third">A parser may simply discard line comments and parse the SURF document as if they were not present.</aside>
-	<p>A line comment may appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
+	<aside class="tip far third">A parser <span class="spec-may">may</span> simply discard line comments and parse the SURF document as if they were not present.</aside>
+	<p>A line comment <span class="spec-may">may</span> appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
 	<ul class="spec-production">
-		<li><code class="name">line_break</code> ⇒ <code class="name">line_comment</code>? <code class="name">eol</code></li>
+		<li><code class="name">line_break</code> ⇒ <code class="name">line_comment</code>? <code class="name">eol</code></li>
 		<li><code class="name">line_comment</code> ⇒ ! [^<code>eol</code>]*</li>
 	</ul>
 	<h3>Sequences</h3>
 	<p>Several SURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
-	<aside class="note far third">The list separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
+	<aside class="note far third">The sequence separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
 	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
 	</p>
 	<ul class="spec-production">
 		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
-		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
-		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
+		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
+		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
 	<h3>Names</h3>
 	<figure class="far side">
@@ -104,15 +105,18 @@
 		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code> | '-')*</li>
 	</ul>
 	<aside class="annotation far half">The SURF namespace delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF namespace mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
-	<p>The components delimited by hyphen-minus characters, with the exception of the last component which is referred to as the <dfn>local name</dfn>, represent a hierarchy of tokens for grouping names into namespaces. If no hypen-minus characters are present, the name is considered to be in the <dfn>default namespace</dfn>. The namespace tokens and local names represent a series of IRI components relative to the IRI <code>https://urf.name/</code>. Thus for example the name <code>foo-bar-Example</code> represents a local name of <code>Example</code>, inside a namespace identified by <code>bar</code>,  itself inside a namespace identified by <code>bar</code>, with the entire name itself representing the IRI <code>https://urf.name/foo/bar/Example</code>. Nevertheless a SURF parser <span class="spec-may">may</span> treat names as opaque identifiers.</p>
-	<p>Authors of SURF documents <span class="spec-should">should</span> use namespace tokens corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the example.com domain, for example, might create a name <code>com-example-FooBar</code> or <code>example-FooBar</code>. There are no restrictions on using identifiers in the default namespace, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
+	<p>The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<h5>Namespaces</h5>
+	<p>The components delimited by hyphen-minus characters, with the exception of the last component which is referred to as the <dfn>local name</dfn>, represent a hierarchy of tokens for grouping names into namespaces. If no hypen-minus characters are present, the name is considered to be in the <dfn>default namespace</dfn>. The namespace tokens and local names represent a series of IRI components relative to the IRI <code>https://urf.name/</code>. Thus for example the name <code>foo-bar-Example</code> represents a local name of <code>Example</code>, inside a namespace identified by <code>bar</code>,  itself inside a namespace identified by <code>bar</code>, with the entire name itself representing the IRI <code>https://urf.name/foo/bar/Example</code>. Nevertheless a SURF parser <span class="spec-may">may</span> treat names as opaque identifiers.</p>
+	<p>Authors of SURF documents <span class="spec-should">should</span> use namespace tokens corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the example.com domain, for example, might create a name <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
+	<p>SURF documents <span class="spec-must-not">must not</span> use names beginning with the <code>urf-</code> prefex unless defined by one of the URF specifications. The <code>example-</code> prefix is reserved for use as examples in documentation for private testing. There are no restrictions on using identifiers in the default namespace, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
 	<h2>Resources</h2>
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] <code class="name">resource_representation</code> | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code><code class="name"></code></li>
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code><code class="name"></code></li>
-		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
+		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
 	</ul>
 	<p> A label consists of an identifier, which is either a SURF name or an IRI, a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). A label with a SURF name as its identifier is a <dfn>local label</dfn>, while a label with an IRI as its identifier is a <dfn>global label</dfn>.</p>
 	<ul class="spec-production">
@@ -120,7 +124,7 @@
 		<li><code class="name">label_identifier</code> ⇒ <code class="name">name</code> | <code class="name">iri</code></li>
 	</ul>
 	<p>The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
-	<p>A <em>local label</em> is merely part of the SURF document syntax, providing an identifier for referencing resources only within the confines of the SURF document. A <em>global label</em> <span class="spec-must">must</span> appear in front of an object resource representation, and provides an IRI identifier that remains associated with that object outside of the SUF document. A SURF parser <span class="spec-must">must</span> provide global identifiers as part of the parsed data.</p>
+	<p>A <em>local label</em> is merely part of the SURF document syntax, providing an identifier for referencing resources only within the confines of the SURF document. A <em>global label</em> <span class="spec-must">must</span> appear in front of an object resource representation, and provides an IRI identifier that remains associated with that object outside of the SUF document. A SURF parser <span class="spec-must">must</span> provide global identifiers as part of the parsed data.</p>
 	<h3>Objects</h3>
 	<p>Objects are descriptions of unidentified resources.</p>
 	<ul class="spec-production">
@@ -148,7 +152,7 @@
 		<li><code class="name">boolean</code> ⇒ "false" | "true"</li>
 	</ul>
 	<h4>Character</h4>
-	<p>A SURF <dfn>character</dfn> is a representation of a Unicode code point, delimited on both sides by the <code class="name">APOSTROPHE</code> character <code>'</code> (<code class="unicode">U+0027</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">APOSTROPHE</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a character unless they are escaped. The following escape sequences are allowed </p>
+	<p>A SURF <dfn>character</dfn> is a representation of a Unicode code point, delimited on both sides by the <code class="name">APOSTROPHE</code> character <code>'</code> (<code class="unicode">U+0027</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">APOSTROPHE</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a character unless they are escaped. The following escape sequences are allowed:</p>
 	<dl>
 		<dt><code>\\</code></dt>
 		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
@@ -207,22 +211,22 @@
 			<dd><a href="https://docs.python.org/3/library/decimal.html" class="see"><code>decimal</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<p>A <dfn>number</dfn> represents a numerical value that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. Values <span class="spec-may">may</span> include leading zeros. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
 	<ul class="spec-production">
 		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
 		<li><code class="name">fraction</code> ⇒ '.' <code class="name">digit</code>+</li>
 		<li><code class="name">exponent</code> ⇒ ('e' | 'E') ['-' | '+'] <code class="name">digit</code>+</li>
-		<li><code class="name">digit</code> ⇒ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'</li>
+		<li><code class="name">digit</code> ⇒ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'</li>
 	</ul>
 	<h4>Regular Expression</h4>
-	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
+	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
 	<p>A <dfn>regular expression</dfn> is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
 	<p>TODO decide on whether and how to allow flags</p>
 	<p>TODO production</p>
 	<h4>String</h4>
 	<aside class="note far third">Compare to <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</aside>
-	<p>A <dfn>string</dfn> represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed</p>
+	<p>A <dfn>string</dfn> represents a sequence of Unicode code points, delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The sequence of Unicode code points in a string <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>. The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed:</p>
 	<dl>
 		<dt><code>\\</code></dt>
 		<dd><code class="name">REVERSE SOLIDUS</code> (<code class="unicode">U+005C</code>)</dd>
@@ -259,7 +263,7 @@
 		<li><code class="name">telephone</code> ⇒ '+' <code class="name">digit</code>+</li>
 	</ul>
 	<h4>Temporal</h4>
-	<aside class="note far third">Although JSON does not support dates, the SURF <code class="name">instant</code> format  is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="see"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
+	<aside class="note far third">Although JSON does not support dates, the SURF <code class="name">instant</code> format  is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="see"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
 	<p>The SURF <dfn>temporal</dfn> representation encodes date and/or time information based on <a href="#ref-iso8601" class="ref">ISO 8601</a>. A temporal starts with the <code class="name">COMMERCIAL AT</code> character <code>@</code> (<code class="unicode">U+0040</code>). Time zone names <code class="name">tz</code> are from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database and are case-sensitive. <span class="info">The format for <code>month_day</code> conforms to an older version of <a href="#ref-iso8601" class="ref">ISO 8601</a>; the most recent version does not mention a month+day format.</span> <span class="info">The format for <code>zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification.</span></p>
 	<aside class="note">The format for <code class="name">zoned_date_time</code> is an extension to the <a href="#ref-iso8601" class="ref">ISO 8601</a> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="see"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
 	<figure class="far half">
@@ -283,8 +287,8 @@
 		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
 		<li><code class="name">zoned_date_time</code> ⇒ <code class="name">offset_date_time</code> '[' <code class="name">tz</code> ']'</li>
 		<li><code class="name">offset_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> <code class="name">offset</code></li>
-		<li><code class="name">offset_date</code> ⇒ <code class="name">date</code> <code class="name">offset</code></li>
-		<li><code class="name">offset_time</code> ⇒ <code class="name">time</code> <code class="name">offset</code></li>
+		<li><code class="name">offset_date</code> ⇒ <code class="name">date</code> <code class="name">offset</code></li>
+		<li><code class="name">offset_time</code> ⇒ <code class="name">time</code> <code class="name">offset</code></li>
 		<li><code class="name">local_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code><code class="name"></code></li>
 		<li><code class="name">local_date</code> ⇒ <code class="name">date</code></li>
 		<li><code class="name">local_time</code> ⇒ <code class="name">time</code></li>
@@ -347,7 +351,7 @@
 		</dl>
 	</aside>
 	<p>A SURF <dfn>map</dfn> is a sequence of associations between a key and a value. A map begins a <code class="name">LEFT CURLY BRACKET</code> character <code>{</code> (<code class="unicode">U+007B</code>) and ends with a <code class="name">RIGHT CURLY BRACKET</code> character <code>}</code> (<code class="unicode">U+007D</code>). Keys and values can be any resources. The key and value in each association or <dfn>entry</dfn> are separated by a <code class="name">COLON</code> character <code>:</code> (<code class="unicode">U+003A</code>).</p>
-	<p>A map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a SURF generator <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with labels if a duplicate entry is ignored</p>
+	<p>A map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a SURF serializer <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with labels if a duplicate entry is ignored</p>
 	<p>A SURF parser <span class="spec-should">should</span> represent a SURF map using an corresponding language construct that represents map semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
@@ -400,6 +404,8 @@
 		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray (Google, Inc.). IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
+		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
+		<dd><a href="http://unicode.org/reports/tr15/"><cite>Unicode® Standard Annex #15: Unicode Normalization Forms</cite></a>, Mark Davis, Ken Whistler. The Unicode Consortium.</dd>
 	</dl>
 	<footer><small>Copyright © 2016–2017 GlobalMentor, Inc. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
