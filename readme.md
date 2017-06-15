@@ -12,4 +12,4 @@ Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF/).
 
 ## Changelog
 
-- 1.0.0: First public release.
+- 0.1.0: (2017-05-15) First public release.
