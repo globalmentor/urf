@@ -143,7 +143,7 @@ public class SurfParser {
 	public static Object parseLabel(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, LABEL_DELIMITER);
 		final Object label;
-		if(peek(reader) == IRI_BEGIN) {
+		if(peekRequired(reader) == IRI_BEGIN) {
 			label = parseIRI(reader);
 		} else {
 			label = parseName(reader);
@@ -190,7 +190,7 @@ public class SurfParser {
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
 		Object label = null;
-		int c = peekEnd(reader);
+		int c = peek(reader);
 		if(c == LABEL_DELIMITER) {
 			label = parseLabel(reader);
 			c = skipFiller(reader);
@@ -345,7 +345,7 @@ public class SurfParser {
 	 */
 	public static byte[] parseBinary(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, BINARY_BEGIN);
-		final String base64String = read(reader, BINARY_BASE64_CHARACTERS);
+		final String base64String = readWhile(reader, BINARY_BASE64_CHARACTERS);
 		try {
 			return Base64.getDecoder().decode(base64String);
 		} catch(final IllegalArgumentException illegalArgumentException) {
@@ -361,7 +361,7 @@ public class SurfParser {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public static Boolean parseBoolean(@Nonnull final Reader reader) throws IOException {
-		int c = peek(reader); //peek the next character
+		int c = peekRequired(reader); //peek the next character
 		switch(c) { //see what the next character is
 			case BOOLEAN_FALSE_BEGIN: //false
 				check(reader, BOOLEAN_FALSE_LEXICAL_FORM); //make sure this is really false
@@ -409,12 +409,12 @@ public class SurfParser {
 	 *           current character is completely parsed.
 	 */
 	public static int parseCharacterCodePoint(@Nonnull final Reader reader, final char delimiter) throws IOException, ParseIOException {
-		char c = readCharacter(reader); //read a character
+		char c = readRequired(reader); //read a character
 		//TODO check for and prevent control characters
 		if(c == delimiter) {
 			return -1;
 		} else if(c == CHARACTER_ESCAPE) { //if this is an escape character
-			c = readCharacter(reader); //read another a character
+			c = readRequired(reader); //read another a character
 			switch(c) { //see what the next character
 				case CHARACTER_ESCAPE: //\\
 				case SOLIDUS_CHAR: //\/
@@ -439,7 +439,7 @@ public class SurfParser {
 					break;
 				case ESCAPED_UNICODE: //u Unicode
 				{
-					final String unicodeString = readString(reader, 4); //read the four Unicode code point hex characters
+					final String unicodeString = readRequiredCount(reader, 4); //read the four Unicode code point hex characters
 					try {
 						c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
 					} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
@@ -448,7 +448,7 @@ public class SurfParser {
 					if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another Unicode escape sequence
 						check(reader, CHARACTER_ESCAPE); //\
 						check(reader, ESCAPED_UNICODE); //u
-						final String unicodeString2 = readString(reader, 4);
+						final String unicodeString2 = readRequiredCount(reader, 4);
 						final char c2;
 						try {
 							c2 = (char)Integer.parseInt(unicodeString2, 16);
@@ -473,7 +473,7 @@ public class SurfParser {
 					break;
 			}
 		} else if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another character
-			final char c2 = readCharacter(reader); //read another character
+			final char c2 = readRequired(reader); //read another character
 			if(!Character.isLowSurrogate(c2)) {
 				throw new ParseIOException(reader,
 						"Unicode high surrogate character " + Characters.getLabel(c) + " must be followed by low surrogate character; found " + Characters.getLabel(c2));
@@ -498,20 +498,20 @@ public class SurfParser {
 	public static EmailAddress parseEmailAddress(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, EMAIL_ADDRESS_BEGIN); //^
 		//TODO improve for dot-atom | quoted-string, verify characters, etc.
-		final String localPart = reachAfter(reader, EmailAddress.LOCAL_PART_DOMAIN_DELIMITER); //@
+		final String localPart = readUntilRequired(reader, EmailAddress.LOCAL_PART_DOMAIN_DELIMITER); //@
+		check(reader, EmailAddress.LOCAL_PART_DOMAIN_DELIMITER);
 		final String domain;
 		final StringBuilder domainStringBuilder = new StringBuilder();
 		//TODO maybe add readIf() method
-		if(peekEnd(reader) == EmailAddress.DOMAIN_LITERAL_BEGIN) { //domain-literal
+		if(peek(reader) == EmailAddress.DOMAIN_LITERAL_BEGIN) { //domain-literal
 			domainStringBuilder.append(check(reader, EmailAddress.DOMAIN_LITERAL_BEGIN)); //[
-			read(reader, EmailAddress.DTEXT_CHARACTERS, domainStringBuilder); //dtext*
+			readWhile(reader, EmailAddress.DTEXT_CHARACTERS, domainStringBuilder); //dtext*
 			domainStringBuilder.append(check(reader, EmailAddress.DOMAIN_LITERAL_END)); //]
 		} else { //dot-atom
 			boolean hasAText;
 			do {
-				domainStringBuilder.append(check(reader, EmailAddress.ATEXT_CHARACTERS)); //at least one "atext" character is required
-				read(reader, EmailAddress.ATEXT_CHARACTERS, domainStringBuilder); //read the remaining "atext" characters
-				hasAText = peekEnd(reader) == '.';
+				readRequiredMinimumCount(reader, EmailAddress.ATEXT_CHARACTERS, 1, domainStringBuilder); //at least one "atext" character is required
+				hasAText = peek(reader) == '.';
 				if(hasAText) { //if we have another dot section
 					domainStringBuilder.append(check(reader, '.')); //read the dot
 				}
@@ -539,7 +539,8 @@ public class SurfParser {
 	 */
 	public static URI parseIRI(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, IRI_BEGIN);
-		final String iriString = reachAfter(reader, IRI_END);
+		final String iriString = readUntilRequired(reader, IRI_END);
+		check(reader, IRI_END);
 		try {
 			return new URI(iriString);
 		} catch(final URISyntaxException uriSyntaxException) {
@@ -572,13 +573,13 @@ public class SurfParser {
 	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
 	 */
 	public static Number parseNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		int c = peek(reader); //there must be at least one number character
+		int c = peekRequired(reader); //there must be at least one number character
 		//check for decimal: $
 		final boolean isDecimal;
 		if(c == NUMBER_DECIMAL_BEGIN) {
 			isDecimal = true;
 			check(reader, NUMBER_DECIMAL_BEGIN);
-			c = peek(reader);
+			c = peekRequired(reader);
 		} else {
 			isDecimal = false;
 		}
@@ -589,25 +590,25 @@ public class SurfParser {
 			stringBuilder.append(check(reader, NUMBER_NEGATIVE_SYMBOL));
 		}
 		//TODO check for beginning zero and follow final SURF octal rules
-		stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all integer digits; there must be at least one
-		c = peekEnd(reader); //peek the next character
+		readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1, stringBuilder); //read all integer digits; there must be at least one
+		c = peek(reader); //peek the next character
 		if(c >= 0) { //if we're not at the end of the reader
 			//check for fraction
 			if(c == NUMBER_FRACTION_DELIMITER) { //if there is a fractional part
 				hasFraction = true; //we found a fraction
 				stringBuilder.append(check(reader, NUMBER_FRACTION_DELIMITER)); //read and append the beginning decimal point
-				stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all digits; there must be at least one
-				c = peekEnd(reader); //peek the next character
+				readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1, stringBuilder); //read all digits; there must be at least one
+				c = peek(reader); //peek the next character
 			}
 			//check for exponent
 			if(c >= 0 && NUMBER_EXPONENT_DELIMITER_CHARACTERS.contains((char)c)) { //this is an exponent
 				hasExponent = true; //we found an exponent
 				stringBuilder.append(check(reader, (char)c)); //read and append the exponent character
-				c = peekEnd(reader); //peek the next character
+				c = peek(reader); //peek the next character
 				if(c >= 0 && NUMBER_EXPONENT_SIGN_CHARACTERS.contains((char)c)) { //if the exponent starts with a sign
 					stringBuilder.append(check(reader, (char)c)); //append the sign
 				}
-				stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all exponent digits; there must be at least one
+				readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1, stringBuilder); //read all exponent digits; there must be at least one
 			}
 		}
 		final String numberString = stringBuilder.toString(); //convert the number to a string
@@ -651,18 +652,18 @@ public class SurfParser {
 	public static Pattern parseRegularExpression(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, REGULAR_EXPRESSION_DELIMITER);
 		final StringBuilder regexBuilder = new StringBuilder();
-		char c = readCharacter(reader);
+		char c = readRequired(reader);
 		while(c != REGULAR_EXPRESSION_DELIMITER) {
 			//TODO check for and prevent control characters
 			if(c == REGULAR_EXPRESSION_ESCAPE) { //if this is an escape character
-				final char next = readCharacter(reader); //read the next character (to be valid there must be another character)
+				final char next = readRequired(reader); //read the next character (to be valid there must be another character)
 				if(next != REGULAR_EXPRESSION_DELIMITER) { //if the next character is not a regular expression delimiter
 					regexBuilder.append(c); //we can use the escape character that wasn't
 				}
 				c = next; //prepare the next character to be consumed as well (also preventing the second escape in "\\" from being interpreted as an escape)
 			}
 			regexBuilder.append(c); //append the character to the string we are constructing
-			c = readCharacter(reader); //read another a character
+			c = readRequired(reader); //read another a character
 		}
 		//TODO parse flags
 		return Pattern.compile(regexBuilder.toString());
@@ -703,8 +704,7 @@ public class SurfParser {
 	public static TelephoneNumber parseTelephoneNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(check(reader, TELEPHONE_NUMBER_BEGIN)); //+
-		stringBuilder.append(check(reader, ABNF.DIGIT_CHARACTERS)); //at least one digit is required
-		final String telephoneNumberDigits = read(reader, ABNF.DIGIT_CHARACTERS, stringBuilder).toString(); //read the remaining digits
+		final String telephoneNumberDigits = readRequiredMinimumCount(reader, ABNF.DIGIT_CHARACTERS, 1, stringBuilder).toString(); //at least one digit is required
 		try {
 			return TelephoneNumber.parse(telephoneNumberDigits);
 		} catch(final IllegalArgumentException illegalArgumentException) { //this should never happen with the manual parsing logic above
@@ -729,12 +729,12 @@ public class SurfParser {
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder to use when reading the temporal
 		try {
 			//YearMonth, MonthDay, and Year are returned from within the parsing logic; all other types are returned at the end
-			c = peekEnd(reader);
+			c = peek(reader);
 			//TODO implement duration
 			if(c == ISO8601.DATE_DELIMITER) { //--MM-DD
-				return MonthDay.parse(readString(reader, 7));
+				return MonthDay.parse(readRequiredCount(reader, 7));
 			}
-			String temporalStart = readMinimum(reader, 1, '0', '9'); //read all digits; there should be at least one
+			String temporalStart = readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1); //read all digits; there should be at least one
 			final int dateTimeStartLength = temporalStart.length(); //get the length of the date time start
 			final boolean hasDate; //determine if there is a date
 			final boolean hasTime; //determine if there is a time
@@ -742,26 +742,26 @@ public class SurfParser {
 				//YYYY
 				hasDate = true;
 				stringBuilder.append(temporalStart); //append the beginning date time characters
-				c = peekEnd(reader); //peek the next character
+				c = peek(reader); //peek the next character
 				if(c != ISO8601.DATE_DELIMITER) { //if the year is not part of a longer date
 					return Year.parse(stringBuilder.toString());
 				}
 				stringBuilder.append(check(reader, ISO8601.DATE_DELIMITER)); //read and add the date delimiter
-				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the month
-				c = peekEnd(reader); //peek the next character
+				stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read the month
+				c = peek(reader); //peek the next character
 				if(c != ISO8601.DATE_DELIMITER) { //if the year and month are not part of a longer date
 					return YearMonth.parse(stringBuilder.toString());
 				}
 				stringBuilder.append(check(reader, ISO8601.DATE_DELIMITER)); //read and add the date delimiter
-				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the day
+				stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read the day
 				//YYYY-MM-DD
-				c = peekEnd(reader); //peek the next character
+				c = peek(reader); //peek the next character
 				//TODO consider supporting OffsetDate; see e.g. http://stackoverflow.com/q/7788267/421049
 				hasTime = c == ISO8601.TIME_BEGIN;
 				if(hasTime) { //if this is the beginning of a time
 					//YYYY-MM-DDThh:mm:ss
 					stringBuilder.append(check(reader, ISO8601.TIME_BEGIN)); //read and append the time delimiter
-					temporalStart = readStringCheck(reader, 2, '0', '9'); //read the hour, and then let the time code take over
+					temporalStart = readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2); //read the hour, and then let the time code take over
 				}
 			} else { //if we didn't start a date
 				hasDate = false;
@@ -778,16 +778,16 @@ public class SurfParser {
 				//…:mm:ss
 				stringBuilder.append(temporalStart); //append the beginning date time characters
 				stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
-				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the minutes
+				stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read the minutes
 				stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
-				stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read the seconds
-				c = peekEnd(reader); //peek the next character
+				stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read the seconds
+				c = peek(reader); //peek the next character
 				if(c == ISO8601.TIME_SUBSECONDS_DELIMITER) { //if this is a time subseconds delimiter
 					//…:mm:ss.s
 					stringBuilder.append(check(reader, ISO8601.TIME_SUBSECONDS_DELIMITER)); //read and append the time subseconds delimiter
-					stringBuilder.append(readMinimum(reader, 1, '0', '9')); //read all subseconds
+					readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1, stringBuilder); //read all subseconds
 				}
-				c = peekEnd(reader); //peek the next character
+				c = peek(reader); //peek the next character
 				isUTC = c == ISO8601.UTC_DESIGNATOR;
 				hasOffset = !isUTC && c >= 0 && ISO8601.SIGNS.contains((char)c);
 				if(isUTC) {
@@ -797,15 +797,16 @@ public class SurfParser {
 				} else if(hasOffset) { //if this is the start of a UTC offset
 					//…:mm:ss…±hh:mm
 					stringBuilder.append(check(reader, (char)c)); //read and add the delimiter
-					stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read two digits
+					stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read two digits
 					stringBuilder.append(check(reader, ISO8601.TIME_DELIMITER)); //read and add the time delimiter
-					stringBuilder.append(readStringCheck(reader, 2, '0', '9')); //read two digits
-					c = peekEnd(reader); //peek the next character
+					stringBuilder.append(readRequiredCount(reader, ASCII.DIGIT_CHARACTERS, 2)); //read two digits
+					c = peek(reader); //peek the next character
 					hasZone = c == TEMPORAL_ZONE_BEGIN;
 					if(hasZone) {
 						//…:mm:ss…±hh:mm[tz]
 						stringBuilder.append(check(reader, TEMPORAL_ZONE_BEGIN));
-						stringBuilder.append(reach(reader, TEMPORAL_ZONE_END));
+						//TODO add some check to verify that there is tz content
+						stringBuilder.append(readUntilRequired(reader, TEMPORAL_ZONE_END));
 						stringBuilder.append(check(reader, TEMPORAL_ZONE_END));
 					}
 				} else {
@@ -862,15 +863,15 @@ public class SurfParser {
 	public static UUID parseUuid(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, UUID_BEGIN); //&
 		final StringBuilder stringBuilder = new StringBuilder();
-		check(reader, ASCII.HEX_CHARACTERS, 8, stringBuilder);
+		checkCount(reader, ASCII.HEX_CHARACTERS, 8, stringBuilder);
 		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
-		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		checkCount(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
 		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
-		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		checkCount(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
 		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
-		check(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
+		checkCount(reader, ASCII.HEX_CHARACTERS, 4, stringBuilder);
 		stringBuilder.append(check(reader, UUID_GROUP_DELIMITER)); //-
-		check(reader, ASCII.HEX_CHARACTERS, 12, stringBuilder);
+		checkCount(reader, ASCII.HEX_CHARACTERS, 12, stringBuilder);
 		try {
 			return UUID.fromString(stringBuilder.toString());
 		} catch(final IllegalArgumentException illegalArgumentException) {
@@ -948,7 +949,7 @@ public class SurfParser {
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
 			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
-			c = peek(reader); //we'll need to know the next character whatever the case
+			c = peekRequired(reader); //we'll need to know the next character whatever the case
 			if(!requireItem.isPresent()) { //if there was no item delimiter at all
 				break; //no possibility for a new item
 			}
@@ -995,8 +996,8 @@ public class SurfParser {
 		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
 		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
-			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line or the end of the stream; no need to read more, because EOL characters are not whitespace
-			c = peekEnd(reader); //see what the next character will be so we can return it			
+			reach(reader, EOL_CHARACTERS); //skip to the end of the line or the end of the stream; no need to read more, because EOL characters are not whitespace
+			c = peek(reader); //see what the next character will be so we can return it			
 		}
 		return c; //return the next character to be character read
 	}
@@ -1017,7 +1018,7 @@ public class SurfParser {
 		int c; //we'll store the next non-line-break character here so that it can be returned
 		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
-			reachEnd(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
+			reach(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
 		}
 		return c; //return the last character read
 	}
