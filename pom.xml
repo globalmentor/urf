@@ -10,7 +10,7 @@
 
 	<name>SURF Specification</name>
 	<description>Java definitions for the Simple URF (SURF) document format.</description>
-	<url>http://urf.io/</url>
+	<url>https://urf.io/surf/</url>
 	<inceptionYear>2007</inceptionYear>
 
 	<licenses>
