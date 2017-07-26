@@ -55,8 +55,8 @@ public class SURF {
 	/** The character indicating the start of a Surf single-line comment. */
 	public static final char LINE_COMMENT_BEGIN = '!';
 
-	/** The delimiter that begins and ends labels. */
-	public static final char LABEL_DELIMITER = '|';
+	/** The delimiter that begins and ends tags. */
+	public static final char TAG_DELIMITER = '|';
 
 	//objects
 
