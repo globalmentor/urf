@@ -123,7 +123,7 @@ import io.urf.surf.parser.SurfObject;
  * serialization state.
  * </p>
  * <p>
- * The serializer should be released after use so as not to leak memory of parsed resources when labeled resources are present.
+ * The serializer should be released after use so as not to leak memory of parsed resources when tagged resources are present.
  * </p>
  * <p>
  * This implementation is not thread safe.
