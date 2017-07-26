@@ -532,73 +532,73 @@ public class SurfParserTest {
 
 	//TODO create tests for duplicate items and double list item separators
 
-	//#labels
+	//#tags
 
-	/** @see SurfTestResources#OK_LABELS_RESOURCE_NAME */
+	/** @see SurfTestResources#OK_TAGS_RESOURCE_NAME */
 	@Test
-	public void testOkLabels() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_LABELS_RESOURCE_NAME)) {
+	public void testOkTags() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_TAGS_RESOURCE_NAME)) {
 			final SurfParser surfParser = new SurfParser();
 			final SurfObject root = (SurfObject)surfParser.parse(inputStream).get();
 			//|root|
-			final Optional<Object> rootLabeled = surfParser.getResourceByLabel("root");
-			assertThat(rootLabeled, hasValue(sameInstance(root)));
+			final Optional<Object> rootTagged = surfParser.getResourceByTag("root");
+			assertThat(rootTagged, hasValue(sameInstance(root)));
 			//|number|
 			final Object foo = root.getPropertyValue("foo").orElseThrow(AssertionFailedError::new);
 			assertThat(foo, is(123));
-			final Optional<Object> numberLabeled = surfParser.getResourceByLabel("number");
-			assertThat(numberLabeled, hasValue(sameInstance(foo)));
+			final Optional<Object> numberTagged = surfParser.getResourceByTag("number");
+			assertThat(numberTagged, hasValue(sameInstance(foo)));
 			//|test|
 			final Object value = root.getPropertyValue("value").orElseThrow(AssertionFailedError::new);
 			assertThat(value, is(false));
-			final Optional<Object> testLabeled = surfParser.getResourceByLabel("test");
-			assertThat(testLabeled, hasValue(sameInstance(value)));
+			final Optional<Object> testTagged = surfParser.getResourceByTag("test");
+			assertThat(testTagged, hasValue(sameInstance(value)));
 			//|object|
 			final SurfObject thing = (SurfObject)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
 			//TODO assert type of thing
-			final Optional<Object> objectLabeled = surfParser.getResourceByLabel("object");
-			assertThat(objectLabeled, hasValue(sameInstance(thing)));
+			final Optional<Object> objectTagged = surfParser.getResourceByTag("object");
+			assertThat(objectTagged, hasValue(sameInstance(thing)));
 			//list elements
 			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
 			assertThat(stuff, hasSize(4));
 			assertThat(stuff.get(0), is("one"));
 			assertThat(stuff.get(1), is(123));
-			assertThat(numberLabeled, hasValue(sameInstance(stuff.get(1))));
+			assertThat(numberTagged, hasValue(sameInstance(stuff.get(1))));
 			assertThat(stuff.get(2), is("three"));
 			final Object stuffElement4 = stuff.get(3);
 			assertThat(stuffElement4, instanceOf(SurfObject.class));
 			final SurfObject exampleThing = (SurfObject)stuffElement4;
 			assertThat(exampleThing.getTypeName(), hasValue("example-Thing"));
-			assertThat(exampleThing.getIri(), hasValue(URI.create("http://example.com/thing")));
+			assertThat(exampleThing.getTag(), hasValue(URI.create("http://example.com/thing")));
 			assertThat(exampleThing.getPropertyValue("name"), hasValue("Example Thing"));
-			final Optional<Object> exampleThingIriLabeled = surfParser.getResourceByLabel(URI.create("http://example.com/thing"));
-			assertThat(exampleThingIriLabeled, hasValue(sameInstance(exampleThing)));
+			final Optional<Object> exampleThingIriTagged = surfParser.getResourceByTag(URI.create("http://example.com/thing"));
+			assertThat(exampleThingIriTagged, hasValue(sameInstance(exampleThing)));
 			//map values
 			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
 			assertThat(map.get(1), is("one"));
-			assertThat(map.get(2), is(sameInstance(numberLabeled.get())));
-			assertThat(map.get(99), is(sameInstance(exampleThingIriLabeled.get())));
-			assertThat(map.get(100), is(sameInstance(objectLabeled.get())));
+			assertThat(map.get(2), is(sameInstance(numberTagged.get())));
+			assertThat(map.get(99), is(sameInstance(exampleThingIriTagged.get())));
+			assertThat(map.get(100), is(sameInstance(objectTagged.get())));
 			//set members
 			@SuppressWarnings("unchecked")
 			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionFailedError::new);
 			assertThat(set, hasSize(5));
 			assertThat(set, hasItem(123));
 			assertThat(set, hasItem(false));
-			final Optional<Object> newLabeled = surfParser.getResourceByLabel("new");
-			final SurfObject newLabeledResource = (SurfObject)newLabeled.orElseThrow(AssertionFailedError::new);
-			assertThat(newLabeledResource.getTypeName(), hasValue("example-Thing"));
-			assertThat(newLabeledResource.getPropertyValue("description"), hasValue("a new thing"));
-			final Optional<Object> anotherLabeled = surfParser.getResourceByLabel("another");
-			final SurfObject anotherLabeledResource = (SurfObject)anotherLabeled.orElseThrow(AssertionFailedError::new);
-			assertThat(anotherLabeledResource.getPropertyValue("description"), hasValue("yet another thing"));
-			assertThat(set, hasItem(sameInstance(numberLabeled.get())));
-			assertThat(set, hasItem(sameInstance(testLabeled.get())));
-			assertThat(set, hasItem(sameInstance(objectLabeled.get())));
-			assertThat(set, hasItem(sameInstance(newLabeledResource)));
-			assertThat(set, hasItem(sameInstance(anotherLabeledResource)));
+			final Optional<Object> newTagged = surfParser.getResourceByTag("new");
+			final SurfObject newTaggedResource = (SurfObject)newTagged.orElseThrow(AssertionFailedError::new);
+			assertThat(newTaggedResource.getTypeName(), hasValue("example-Thing"));
+			assertThat(newTaggedResource.getPropertyValue("description"), hasValue("a new thing"));
+			final Optional<Object> anotherTagged = surfParser.getResourceByTag("another");
+			final SurfObject anotherTaggedResource = (SurfObject)anotherTagged.orElseThrow(AssertionFailedError::new);
+			assertThat(anotherTaggedResource.getPropertyValue("description"), hasValue("yet another thing"));
+			assertThat(set, hasItem(sameInstance(numberTagged.get())));
+			assertThat(set, hasItem(sameInstance(testTagged.get())));
+			assertThat(set, hasItem(sameInstance(objectTagged.get())));
+			assertThat(set, hasItem(sameInstance(newTaggedResource)));
+			assertThat(set, hasItem(sameInstance(anotherTaggedResource)));
 		}
 	}
 
-	//TODO create test with bad labels, such as labels with whitespace, labels for null, and redefined labels
+	//TODO create test with bad tags, such as tags with whitespace, tags for null, and redefined tags
 }
