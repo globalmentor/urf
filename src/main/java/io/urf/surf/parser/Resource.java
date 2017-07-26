@@ -20,12 +20,12 @@ import java.net.URI;
 import java.util.Optional;
 
 /**
- * Represents a resource with an optional identifying IRI.
+ * Represents a resource with an optional identifying tag.
  * @author Garret Wilson
  */
 public interface Resource { //TODO transfer to URF model package
 
-	/** @return The resource identifier IRI. */
-	public Optional<URI> getIri();
+	/** @return The resource identifier tag. */
+	public Optional<URI> getTag();
 
 }

@@ -52,7 +52,7 @@ import io.urf.SURF;
  * This parser is meant to be used once for parsing a single SURF document. It should not be used to parse multiple documents, as it maintains parsing state.
  * </p>
  * <p>
- * The parser should be released after use so as not to leak memory of parsed resources when labeled resources are present.
+ * The parser should be released after use so as not to leak memory of parsed resources when tagged resources are present.
  * </p>
  * <p>
  * This implementation is not thread safe.
@@ -62,27 +62,27 @@ import io.urf.SURF;
 public class SurfParser {
 
 	/**
-	 * The map of resources that have been labeled. Each label is either a name {@link String}, for local labels, or a {@link URI} representing the resource's
-	 * global identifier.
+	 * The map of resources that have been tagged. Each tag is either a name {@link String}, for local tags, or a {@link URI} representing the resource's global
+	 * identifier tag.
 	 */
-	private final Map<Object, Object> labeledResources = new HashMap<>();
+	private final Map<Object, Object> taggedResources = new HashMap<>();
 
 	/**
-	 * Returns a parsed resource by its local label.
-	 * @param label The label of the resource.
-	 * @return The resource associated with the given label, if any.
+	 * Returns a parsed resource by its local tag.
+	 * @param tag The legal tag of the resource.
+	 * @return The resource associated with the given tag, if any.
 	 */
-	public Optional<Object> getResourceByLabel(@Nonnull final String label) {
-		return Optional.ofNullable(labeledResources.get(requireNonNull(label))); //TODO be more rigorous here if/when null can be labeled
+	public Optional<Object> getResourceByTag(@Nonnull final String tag) {
+		return Optional.ofNullable(taggedResources.get(requireNonNull(tag))); //TODO be more rigorous here if/when null can be tagged
 	}
 
 	/**
 	 * Returns a parsed resource by its global identifier.
-	 * @param label The IRI identifier of the resource.
-	 * @return The resource associated with the given label, if any.
+	 * @param tag The global IRI identifier tag of the resource.
+	 * @return The resource associated with the given tag, if any.
 	 */
-	public Optional<Object> getResourceByLabel(@Nonnull final URI label) {
-		return Optional.ofNullable(labeledResources.get(requireNonNull(label)));
+	public Optional<Object> getResourceByTag(@Nonnull final URI tag) {
+		return Optional.ofNullable(taggedResources.get(requireNonNull(tag)));
 	}
 
 	/**
@@ -129,27 +129,27 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a label, which is either a name or a URI with appropriate delimiters, surrounded by label delimiters. The current position must be that of the
-	 * beginning label delimiter character. The new position will be that immediately after the last label delimiter.
+	 * Parses a tag, which is either a name or an IRI with appropriate delimiters, surrounded by tag delimiters. The current position must be that of the
+	 * beginning tag delimiter character. The new position will be that immediately after the last tag delimiter.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return The label parsed from the reader; either a string for a local label or a URI for a global resource identifier.
+	 * @return The tag parsed from the reader; either a {@link String} for a local tag or a {@link URI} for a global resource identifier tag.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if there the label is not valid.
-	 * @see SURF#LABEL_DELIMITER
+	 * @throws ParseIOException if there the tag is not valid.
+	 * @see SURF#TAG_DELIMITER
 	 * @see #parseName(Reader)
 	 * @see #parseIRI(Reader)
 	 */
-	public static Object parseLabel(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		check(reader, LABEL_DELIMITER);
-		final Object label;
+	public static Object parseTag(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		check(reader, TAG_DELIMITER);
+		final Object tag;
 		if(peekRequired(reader) == IRI_BEGIN) {
-			label = parseIRI(reader);
+			tag = parseIRI(reader);
 		} else {
-			label = parseName(reader);
+			tag = parseName(reader);
 		}
-		check(reader, LABEL_DELIMITER);
-		return label;
+		check(reader, TAG_DELIMITER);
+		return tag;
 	}
 
 	/**
@@ -182,22 +182,22 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a resource; either a label or a resource representation. The next character read must be the start of the resource.
+	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
 	 * @return An object representing the SURF resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
-		Object label = null;
+		Object tag = null;
 		int c = peek(reader);
-		if(c == LABEL_DELIMITER) {
-			label = parseLabel(reader);
+		if(c == TAG_DELIMITER) {
+			tag = parseTag(reader);
 			c = skipFiller(reader);
 		}
-		if(label != null) { //see if this is a resource reference
-			final Object resource = labeledResources.get(label);
-			if(resource != null) { //TODO be more rigorous here if we allow null to be labeled
+		if(tag != null) { //see if this is a resource reference
+			final Object resource = taggedResources.get(tag);
+			if(resource != null) { //TODO be more rigorous here if we allow null to be tagged
 				return resource;
 			}
 		}
@@ -205,7 +205,7 @@ public class SurfParser {
 		switch(c) {
 			//objects
 			case OBJECT_BEGIN:
-				resource = parseObject(label, reader);
+				resource = parseObject(tag, reader);
 				break;
 			//literals
 			case BINARY_BEGIN:
@@ -264,11 +264,13 @@ public class SurfParser {
 				resource = parseSet(reader);
 				break;
 			default:
+				//TODO the spec currently says a tag MAY have a resource representation; should we create an object if there is none?
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 		}
-		if(label != null) { //if a resource was labeled, save it for later
-			checkParseIO(reader, resource != null, "Cannot use label |%s| with null.", label);
-			labeledResources.put(label, resource);
+		if(tag != null) { //if a resource was tagged, save it for later
+			checkParseIO(reader, resource != null, "Cannot use tag |%s| with null.", tag);
+			//TODO prevent tags for non-objects, as the spec says
+			taggedResources.put(tag, resource);
 		}
 		return resource;
 	}
@@ -291,14 +293,14 @@ public class SurfParser {
 	/**
 	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value SURF#OBJECT_BEGIN}.
-	 * @param label The object label; either a name {@link String}, for local labels, or a {@link URI} representing the resource's global identifier, or
-	 *          <code>null</code> if the object has no label.
+	 * @param tag The object tag; either a name {@link String}, for local tags, or a {@link URI} representing the resource's global identifier, or
+	 *          <code>null</code> if the object has no tag.
 	 * @param reader The reader containing SURF data.
 	 * @return The SURF object read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see SURF#OBJECT_BEGIN
 	 */
-	protected SurfObject parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
+	protected SurfObject parseObject(@Nullable Object tag, @Nonnull final Reader reader) throws IOException {
 		check(reader, OBJECT_BEGIN); //*
 		int c = skipFiller(reader);
 		//type (optional)
@@ -309,10 +311,10 @@ public class SurfParser {
 		} else {
 			typeName = null;
 		}
-		final Optional<URI> resourceIri = asInstance(label, URI.class);
+		final Optional<URI> resourceIri = asInstance(tag, URI.class);
 		final SurfObject resource = new SurfObject(resourceIri.orElse(null), typeName);
 
-		//TODO save the label to allow internal references; do the same for collections 
+		//TODO save the tag to allow internal references; do the same for collections 
 
 		//properties (optional)
 		if(c == PROPERTIES_BEGIN) {
