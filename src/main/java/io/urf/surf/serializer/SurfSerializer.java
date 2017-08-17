@@ -333,13 +333,15 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource graph to an output stream..
+	 * Serializes a SURF resource graph to an output stream.
 	 * @param outputStream The output stream to receive SURF data.
 	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws IOException If there was an error writing the SURF data.
 	 */
 	public void serialize(@Nonnull final OutputStream outputStream, @Nullable Object root) throws IOException {
-		serialize(new BufferedWriter(new OutputStreamWriter(outputStream, CHARSET)), root);
+		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, CHARSET));
+		serialize(writer, root);
+		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
 	}
 
 	/**
