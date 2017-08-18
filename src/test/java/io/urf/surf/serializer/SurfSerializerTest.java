@@ -42,6 +42,7 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
+import io.urf.SURF;
 import io.urf.surf.parser.*;
 import io.urf.surf.test.SurfTestResources;
 
@@ -86,6 +87,23 @@ public class SurfSerializerTest implements Clogged {
 		serializer.setFormatted(true);
 
 		getLogger().debug(serializer.serialize(surfObject)); //currently for manual, visual inspection
+	}
+
+	/**
+	 * Ensures that serializing to an output stream works correctly, and that the output is flushed to the output stream after serialization.
+	 * @see SurfSerializer#serialize(OutputStream, Object)
+	 */
+	@Test
+	public void testSerializeOutputStream() throws IOException {
+		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		try {
+			//The SURF serializers internally may create a buffered writer which the caller does not have access to.
+			//If the serializer does not flush this writer, the caller will never see the bytes appear in the original output stream.  
+			new SurfSerializer().serialize(byteArrayOutputStream, new SurfObject());
+		} finally {
+			byteArrayOutputStream.close();
+		}
+		assertThat(byteArrayOutputStream.toString(SURF.CHARSET.name()), equalTo("*"));
 	}
 
 	//#objects
@@ -170,8 +188,8 @@ public class SurfSerializerTest implements Clogged {
 
 		final SurfObject surfObject = new SurfObject();
 
-		surfObject.setPropertyValue("count", new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
-				(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff});
+		surfObject.setPropertyValue("count", new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb, (byte)0xcc,
+				(byte)0xdd, (byte)0xee, (byte)0xff});
 
 		surfObject.setPropertyValue("rfc4648Example1", new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9, 0x7e});
 		surfObject.setPropertyValue("rfc4648Example2", new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9});
