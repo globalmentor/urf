@@ -5,37 +5,24 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="author" content="Garret Wilson" />
-	<title>URF Specification Draft</title>
+	<title>URF Primer</title>
 	<link type="text/css" rel="stylesheet" href="../../pub/css/globalmentor-doc.css" />
 </head>
 
 <body>
-	<h1>Uniform Resource Framework (URF) Specification</h1>
-	<p>Copyright © 2007-2009 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a> This specification may be freely used but only in unmodifed form.</p>
-	<dl>
-		<dt>Author</dt>
-		<dd><a href="http://www.garretwilson.com/">Garret Wilson</a></dd>
-		<dt>Version</dt>
-		<dd>2009-09-06</dd>
-	</dl>
+	<header>
+		<h1>Uniform Resource Framework (URF) Primer</h1>
+		<aside class="important far side">Draft version.</aside>
+		<dl>
+			<dt>Author</dt>
+			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
+			<dt>Version</dt>
+			<dd>Draft 2017-09-25</dd>
+		</dl>
+	</header>
 	<p>The Uniform Resource Framework (URF) provides a consistent way for representing resources and their relationships. URF and its interchange formats are useful for data storage, data interchange, data querying, and logical inferences. URF together with its interchange formats provides a more powerful yet in many ways simpler and more consistent replacement for data-oriented XML, RDF, and JSON.</p>
 	<p>This document defines the Uniform Resource Framework (URF) as an abstract model, and also defines a text-based representation format, Text URF (TURF). This document does not yet provide a description of the binary representation format Serial URF (SURF), or the XML-based format XML URF (XMURF).</p>
-	<h2>Conventions</h2>
-	<p>When this document refers to "URF", it indicates a model for representing a community of knowledge abstract from any representation format. When this document refers to "TURF", it indicates the textual representation of URF. Because abstract concepts must be textualized to be communicated in a text-based specification, at times a description of the URF abstract model will use TURF notation for clarification of the model.</p>
-	<h2>Ontologies</h2>
-	<p>The following are official URF ontologies sanctioned by this specification, with links to their formal definitions in TURF:</p>
-	<dl>
-		<dt><a href="urf.turf">URF</a></dt>
-		<dd>The core URF ontology for defining resources.</dd>
-		<dt><a href="content.turf">Content</a></dt>
-		<dd>The URF ontology for describing the content of a resource, such as content type, size, and actual content bytes.</dd>
-		<dt><a href="select.turf">Select</a></dt>
-		<dd>The URF ontology for selecting resources and other objects.</dd>
-		<dt><a href="vcard.turf">VCard</a></dt>
-		<dd>The URF ontology for describing person resource or white-pages type of directory information as described in [<a href="#rfc2426">RFC 2426</a>].</dd>
-	</dl>
-	<h2>Primer</h2>
-	<h3>Resources</h3>
+	<h2>Resources</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -53,7 +40,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Resource Identification</h3>
+	<h2>Resource Identification</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -79,7 +66,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Ontologies and Namespaces</h3>
+	<h2>Ontologies and Namespaces</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -116,7 +103,7 @@
 		<dd>The URF namespace for resource and properties related to the framework abstract model itself.</dd>
 	</dl>
 	<p>The default namespace URI <code>&lt;http://urf.name/default/&gt;</code> is associated with no prefix (that is, the absense of a prefix).</p>
-	<h3>Properties</h3>
+	<h2>Properties</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -145,7 +132,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Classes</h3>
+	<h2>Classes</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -185,7 +172,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>URF Types</h3>
+	<h2>URF Types</h2>
 	<p>URF and its standard ontologies comes with several built-in types, including:</p>
 	<dl>
 		<dt><code>urf.Binary</code></dt>
@@ -237,7 +224,7 @@
 		<dt><code>content.MediaType</code></dt>
 		<dd>A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use inline namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</dd>
 	</dl>
-	<h3>Selectors</h3>
+	<h2>Selectors</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -268,7 +255,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Inline Resource URIs</h3>
+	<h2>Inline Resource URIs</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -449,7 +436,7 @@
 			</dl>
 		</dd>
 	</dl>
-	<h3>Enums</h3>
+	<h2>Enums</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -470,7 +457,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Reification</h3>
+	<h2>Reification</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -519,7 +506,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Proposition Scope</h3>
+	<h2>Proposition Scope</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -546,7 +533,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Ordered Properties</h3>
+	<h2>Ordered Properties</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -584,7 +571,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Programming Languages</h3>
+	<h2>Programming Languages</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -633,7 +620,7 @@
 			</figure>
 		</dd>
 	</dl>
-	<h3>Knowledge Communities</h3>
+	<h2>Knowledge Communities</h2>
 	<dl>
 		<dt>URF</dt>
 		<dd>
@@ -732,505 +719,6 @@
 			<p>Note that <code>example.name="John"</code> and <code>example.weight=#72#</code> are listed separately as assertions of John's name and weight; those two propositions are later explicitly reified as propositions and serve as separate knowledge communities containing other assertions about the name <code>"John"</code> and the weight <code>#72#</code>.</p>
 		</dd>
 	</dl>
-	<h2>URF</h2>
-	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. For purposes of description within URF, each resource may be identified using a URI [<a href="#rfc3986">RFC 3986</a>]. Resources are described by a set of <dfn>assertions</dfn>, each of which is a proposition, an instance of <code>urf.Proposition</code>. Each proposition contains a <dfn>subject</dfn>, a <dfn>predicate</dfn>, and an <dfn>object</dfn>.</p>
-	<p>A particular group of assertions is called an <dfn>URF instance</dfn>. Each asserted proposition exists in some URF <dfn>knowledge community</dfn> as an element of <code>urf.Community</code>. Each <code>urf.Proposition</code> is itself a subclass of <code>urf.Community</code>, and may therefore contain other <dfn>scoped assertions</dfn> that are contextual to the first proposition. The root assertions of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
-	<h2>TURF</h2>
-	<p>TURF is the text interchange format for URF. TURF emphasizes terseness and consistency while maintaining human readability, with a preference for using symbols from existing interchange formats such as JSON and programming languages such as Java and C#. TURF has several useful properties, including:</p>
-	<ul>
-		<li>TURF has a signature character sequence, <code>`URF</code>, for easy recognition.</li>
-		<li>TURF has unambiguous beginning and end delimiters, allowing TURF to be embedded in existing text-based content.</li>
-		<li>Whitespace separators and comments may be removed with no loss of semantics, resulting in an extremely compact representation.</li>
-		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, <code>&lt;…&gt;</code> for URIs, <code>#…#</code> for numbers, and <code>º…º</code> for ordinals.</li>
-	</ul>
-	<h3>Internet Media Type</h3>
-	<p>The Internet media type [<a href="#rfc2046">RFC 2046</a>] of general URF information encoded as TURF is:</p>
-	<figure>
-		<p><code>text/urf</code></p>
-	</figure>
-	<p>TURF differs from general [<a href="draft.xhtml#rfc2046">RFC 2046</a>] text media types in the following:</p>
-	<ul>
-		<li>The default charset of TURF is UTF-8 rather that US-ASCII.</li>
-		<li>TURF allows any Unicode newline character [<a href="draft.xhtml#utr13">UTR #13</a>] to represent newlines rather than only <code>CRLF</code>.</li>
-	</ul>
-	<p>For any application-specific URF data encoded as TURF should be represented as <code>application/<var>applicationName</var>+turf</code> to allow the data to be recognized as such, where <var>applicationName</var> is the application-specific identifier for the URF information. <em>Note: These Internet media types have yet to be registered with the IANA.</em></p>
-	<h3>Encoding</h3>
-	<p>TURF may use any encoding in a closed environment in which all relevant parties are aware of the encoding being used. In situations where the encoding may not be readily known to a processor, such as in a general file stored in a file system, TURF must use the UTF-8 character encoding. TURF interchange document files should use a UTF-8 U+FEFF sequence (the so-called UTF-8 Byte Order Mark or BOM) at their beginning to notify general text processing agents that may not be aware of TURF that UTF-8 encoding is being used [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
-	<h3>Signature</h3>
-	<p>Every TURF interchange document must begin with the signature character sequence, <code>`URF</code>, which must appear as the first characters of the document after the Byte Order Mark (BOM), if any [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
-	<h3>Grammar</h3>
-	<p>The following grammar indicates literals in normal style, variables in emphasized text, and grammar symbols in strong text.</p>
-	<p>Any two TURF tokens may be separated by <dfn>filler</dfn>: Unicode separator or Unicode whitespace characters, or a TURF comment, which is a string surrounded by the dagger <code>'†'</code> and double dagger <code>'‡'</code> characters.</p>
-	<figure>
-		<p><code><var>filler</var> ⇒ Unicode Paragraph Separator <strong>|</strong> Unicode Segment Separator <strong>|</strong> Unicode Whitespace <strong>|</strong> <var>comment</var></code></p>
-		<p><code><var>comment</var> ⇒ †"<strong>[</strong><var>Unicode character except double dagger and backslash</var> <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>‡</code></p>
-	</figure>
-	<p>Between elements in a list, filler has a caveat: Unicode newline characters [<a href="draft.xhtml#utr13">UTR #13</a>] function as a <dfn>list separator</dfn>, which is at least one newline character and/or at most a single comma character (<code>','</code>), optionally surrounded by other filler characters:</p>
-	<figure>
-		<p><code><var>listseparator</var> ⇒ Unicode Newline</code><code><strong>+ </strong></code><code><strong>|</strong> ,</code></p>
-	</figure>
-	<p>A TURF interchange document is encoded in UTF-8 and begins with the TURF signature <code>`URF</code> followed by the description of the instance community, which consists of optional properties and a required community short representation.</p>
-	<figure>
-		<p><code><var>TURF</var> ⇒ signature <strong>[</strong>:<var>properties</var>;<strong>]</strong> <var>communityshort</var></code></p>
-		<p><code><var>signature</var> ⇒ `URF</code></p>
-	</figure>
-	<p>The community short form, the grammar of which is below, is delimited by the currency character <code>'¤'</code> and the full stop character <code>'.'</code> and contains zero or more resource descriptions, separated by list separators. Each resource description must have at least one of the following optional components, any may have any or all of them: a label, a reference, one or more type short forms, a set of property definitions, a community short form, a proposition form, a list short form, a set short form, and a map short form. <em>No Unicode newline characters are allowed between elements of a resource description.</em></p>
-	<figure>
-		<p><code><var>resource</var> ⇒ <strong>[</strong><var>label</var><strong>]</strong> <strong>[</strong><var>reference</var><strong>]</strong> <strong>[</strong><var>type</var>s<strong>]</strong> <strong>[</strong><var>superclasses</var><strong>]</strong> <strong>[</strong><var>interfaces</var><strong>]</strong> <strong>[</strong><var>properties</var><strong>]</strong> <strong>[</strong><var>communityshort</var><strong>]</strong> <strong>[</strong><var>propositionshort</var><strong>]</strong> <strong>[</strong><var>listshort</var><strong>]</strong> <strong>[</strong><var>setshort</var><strong>]</strong> <strong>[</strong>mapshort<strong>]</strong></code></p>
-	</figure>
-	<p>A label consists of a name surrounded by matching vertical bars (<code>'|'</code>).</p>
-	<figure>
-		<p><code><var>label</var> ⇒ |<var>name</var>|</code></p>
-	</figure>
-	<p>A name is any letter followed by any number of letters, digits, or connectors such as the underscore character <code>'_'</code>.</p>
-	<figure>
-		<p><code><var>name</var> ⇒ <var>namebeginchar</var><strong>(</strong><var>namechar</var><strong>)</strong><strong>*</strong></code></p>
-		<p><code><var>namebeginchar</var> ⇒ <var>Unicode Letter</var></code></p>
-		<p><code><var>namechar</var> ⇒ <var>Unicode Letter</var> <strong>|</strong> <var>Unicode Decimal Digit Number</var> <strong>|</strong> <var>Unicode Connector Punctuation</var></code></p>
-	</figure>
-	<p>A resource reference is a URI reference, a name reference, or one of several short representations.</p>
-	<figure>
-		<p><code><var>reference</var> ⇒ <var>urireference</var> <strong>|</strong> <var>namereference</var> <strong>|</strong> <var>urishort</var> <strong>|</strong> <var>stringshort</var> <strong>|</strong> <var>charactershort</var> <strong>|</strong> <var>booleanshort</var> <strong>|</strong> <var>numbershort</var> <strong>|</strong> <var>ordinalshort</var> <strong>|</strong> <var>regexshort</var> <strong>|</strong> <var>temporalshort</var></code></p>
-	</figure>
-	<p>A resource URI reference is enclosed in angle quotes. The contents is either the text of a URI (or relative reference); or a resource reference to an inline type preceded by an asterisk <code>'*'</code>, immediately followed by a string containing the lexical representation of a resource, surrounded by parentheses <code>'('</code> and <code>')'</code>. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. Any URI reference that includes a lexical representation is equivalent to a URI reference in the form <code>«http://urf.name/inline/<var>encodedTypeURI</var>/<var>encodedTURFLexicalForm</var></code>».</p>
-	<figure>
-		<p><code><var>urireference</var> ⇒ «<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong> <strong>|</strong> <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>»</code></p>
-		<p><code><var>type</var> ⇒ <var>reference</var></code></p>
-	</figure>
-	<p>A name reference is a <var>name</var> representing the local name of a resource, optionally preceded by a <var>name</var> ending with the full stop or period character <code>'.'</code>, together representing the URI of a resource. The prefix, if present, must have been associated with a namespace URI in using the tilde character <code>'~'</code> either in the properties of the current resource or one of its subject resources. If no prefix is present for a property, the namespace is the URI of the first type of the subject resource. A prefix must be present in all other name references. The local name is the unencoded form of the fragment to be appended to the namespace URI.</p>
-	<figure>
-		<p><code><var>namereference</var> ⇒ <strong>[</strong>prefix.<strong>]</strong>localName</code></p>
-		<p><code><var>prefix</var> ⇒ <var>name</var></code></p>
-		<p><code><var>localName</var> ⇒ <var>name</var></code></p>
-	</figure>
-	<p>A string short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in double quotes. The double quotation mark (<code>'"'</code>) and backslash (<code>'\\'</code>) characters must be escaped. A string short form is equivalent to a resource of type <code>urf.String</code> using the corresponding inline namespace. The string short form <code>"example"</code> is the equivalent of the string resource <code>«(urf.String)"example"»</code>.</p>
-	<figure>
-		<p><code><var>stringshort</var> ⇒ "<strong>[</strong><var>Unicode character except double quote and backslash</var> <strong>|</strong> \" <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>"</code></p>
-	</figure>
-	<p>Any Unicode code point may be represented in string and other short representations where indicated by the four lowercase hexadecimal representation following the character sequence <code>"\u"</code>, or if the code point is not in the Basic Multilingual Plane, two such sequences representing UTF-16 surrogate pair.</p>
-	<figure>
-		<p><code><var>escapedunicode</var> ⇒ \u<var>xxxx</var></code></p>
-	</figure>
-	<p>Several control characters have escaped forms which can be used in string and other short representations where indicated.</p>
-	<figure>
-		<p><code><var>escapedcontrol</var> ⇒ \b <strong>|</strong> \t <strong>|</strong> \n <strong>|</strong> \f <strong>|</strong> \r <strong>|</strong> \“ <strong>|</strong> \”</code></p>
-		<p><code>\b †\\\u0062‡ ⇒ \u0008 †backspace‡</code></p>
-		<p><code>\t †\\\u0074‡ ⇒ \u0009 †character tabulation‡</code></p>
-		<p><code>\n †\\\u006e‡ ⇒ \u000a †line feed (LF)‡</code></p>
-		<p><code>\f †\\\u0066‡ ⇒ \u000c †form feed (FF)‡</code></p>
-		<p><code>\r †\\\u0072‡ ⇒ \u000d †carriage return (CR)‡</code></p>
-		<p><code>\“ †\\\u201c‡ ⇒ \u0098 †start of string (SOS)‡</code></p>
-		<p><code>\” †\\\u201d‡ ⇒ \u009c †string terminator (ST)‡</code></p>
-	</figure>
-	<p>A character short form is a single Unicode characters, using the backslash as an escape character, enclosed in a single quote. The single quote (<code>'\''</code>) and backslash (<code>'\\'</code>) characters must be escaped. A character short form is equivalent to a resource of type <code>urf.Character</code> using the corresponding inline namespace. The character short form <code>'x'</code> is the equivalent of the character resource <code>«(urf.Character)"x"»</code>.</p>
-	<figure>
-		<p><code><var>charactershort</var> ⇒ '<strong>[</strong><var>Unicode character except single quote and backslash</var> <strong>|</strong> \' <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>'</code></p>
-	</figure>
-	<p>A URI short form is a sequence of character constituting a syntactically correct URI or a relative reference, surrounded by the angle brackets <code>'&lt;'</code> and <code>'&gt;'</code>. Alternatively, a type and selector may be provided with identical syntax to a resource URI reference. If a relative reference is provided, it is resolved against the base URI of the TURF document according to the rules specified in [<a href="#rdfxml">RDF/XML</a>] <cite>5.3 Resolving URIs</cite>. A URI short form is equivalent to a resource of type <code>urf.URI</code> using the corresponding inline namespace. The URI short form <code>&lt;http://example.com&gt;</code> is the equivalent of the URI resource <code>«(urf.URI)"http://example.com"»</code>.</p>
-	<figure>
-		<p><code><var>urishort</var> ⇒ &lt;<strong>(</strong>*<var><var>type</var></var>(<var>stringshort</var>)<strong>)</strong> <strong>|</strong> <strong>(</strong><var>urichar</var><strong>+</strong><strong>)</strong>&gt;</code></p>
-	</figure>
-	<p>A boolean short form is the character sequence <code>true</code> or <code>false</code> surrounded by matching underscore characters <code>'_'</code>. A boolean short form is equivalent to a resource of type <code>urf.Boolean</code> using the corresponding inline namespace. The boolean short form <code>_true_</code> is the equivalent of the boolean resource <code>«(urf.Boolean)"true"»</code>.</p>
-	<figure>
-		<p><code><var>booleanshort</var> ⇒ _true_<strong>|</strong>_false_</code></p>
-	</figure>
-	<p>A number short form consists of Roman digits, optionally preceded by a minus sign, with an optional decimal and optional exponent, all surrounded by matching number signs <code>'#'</code>. A number short form is equivalent to a resource of type <code>urf.Integer</code> or <code>urf.Rational</code>, depending on the lexical form used, using the corresponding inline namespace. The number short form <code>#123#</code> is the equivalent of the number resource <code>«(urf.Integer)"123"»</code>, and the number short form <code>#123.45#</code> is the equivalent of the number resource <code>«(urf.Rational)"123.45"»</code>.</p>
-	<figure>
-		<p><code><var>numbershort</var> ⇒ #<strong>[</strong>-<strong>]</strong><var>n</var><strong>[</strong>.<var>n</var><strong>][</strong>e<strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>n</var><strong>]</strong>#</code></p>
-		<p><code><var>n</var> ⇒ <var>romandigit</var><strong>+</strong></code></p>
-	</figure>
-	<p>An ordinal short form consists of roman digits surrounded by matching ordinal signs <code>'º'</code>. An ordinal short form is equivalent to a resource of type <code>urf.Ordinal</code> using the corresponding inline namespace. The ordinal short form <code>º27º</code> is the equivalent of the ordinal resource <code>«(urf.Ordinal)"27"»</code>.</p>
-	<figure>
-		<p><code><var>ordinalshort</var> ⇒ º<var>n</var>º</code></p>
-	</figure>
-	<p>A regular expression short form is a sequence of Unicode characters, using the backslash as an escape character, enclosed in forward slash (<code>'/'</code>) characters. The slash (<code>'/'</code>) and backslash (<code>'\\'</code>) characters must be escaped. A regular expression short form is equivalent to a resource of type <code>urf.RegularExpression</code> using the corresponding inline namespace. The regular expression short form <code>/a?b+c*/</code> is the equivalent of the string resource <code>«(urf.RegularExpression)"a?b+c*"»</code>.</p>
-	<figure>
-		<p><code><var>regexshort</var> ⇒ /<strong>[</strong><var>Unicode character except slash and backslash</var> <strong>|</strong> \/ <strong>|</strong> \\ <strong>|</strong> <var>escapedunicode</var> <strong>|</strong> <var>escapedcontrol</var><strong>]*</strong>/</code></p>
-	</figure>
-	<p>A temporal short form consists of the lexical form of a temporal resource such as <code>urf.Date</code>, <code>urf.DateTime</code>, <code>urf.Duration</code>, <code>urf.Time</code>, or <code>urf.UTCOffset</code>, surrounded by matching at signs (<code>'@'</code>). An <code>urf.Duration</code> requires at least the date or the time section to be present. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead. A temporal short form is equivalent to a resource of the corresponding urf.Temporal type, based upon the specific lexical form used. The temporal short form <code>@1999-03-04@</code> is the equivalent of the number resource <code>«(urf.Date)"1999-03-04"»</code>, for example.</p>
-	<figure>
-		<p><code><var>temporalshort</var> ⇒ @<strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><strong>)</strong> <strong>|</strong> <strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><code>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code><strong>)</strong> <strong>|</strong> <strong>(</strong><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code>
-		</p>
-	</figure>
-	<p>The types declaration consists of one or more resource references, each preceded by an asterisk <code>'*'</code>. Each type reference is equivalent to the reference asserted as the object of the <code>urf.type</code> property. Each type reference may optionally specify comma-separated selector resources between parentheses characters <code>'('</code> and <code>')'</code> following the type reference. The selector resources are equivalent to the values of <code>urf.List</code> value of a scoped <code>urf.selector</code> property in the context of the resource's <code>urf.type</code> property for which the type is a value.</p>
-	<figure>
-		<p><code><var>types</var> ⇒ <var>typeshort</var><var><strong><strong>*</strong></strong></var></code></p>
-		<p><code><var>typeshort</var> ⇒ *<var>typereference</var><strong>[</strong>(<strong>[</strong><var>selectorresource</var><strong>[</strong>,<var>selectorresource</var><strong>]</strong><strong>*</strong><strong>]</strong>)<strong>]</strong></code></p>
-		<p><code><var>typereference</var> ⇒ <var>reference</var></code></p>
-		<p><code><var>selectorresource</var> ⇒ <var>resource</var></code></p>
-	</figure>
-	<p>The superclasses declaration consists of one or more resource references, each preceded by a circumflex accent <code>'^'</code>. Each superclass reference is equivalent to the reference asserted as the object of the <code>urf.subClassOf</code> property.</p>
-	<figure>
-		<p><code><var>superclasses</var> ⇒ <var>superclassshort</var><var><strong><strong>*</strong></strong></var></code></p>
-		<p><code><var>superclassshort</var> ⇒ ^<var>reference</var></code></p>
-	</figure>
-	<p>The interfaces declaration consists of one or more resource references, each preceded by a greater-than symbol <code>'&gt;'</code>. Each interface reference is equivalent to the reference asserted as the object of the <code>urf.implementationOf</code> property.</p>
-	<figure>
-		<p><code><var>interfaces</var> ⇒ <var>interfaceshort</var><var><strong><strong>*</strong></strong></var></code></p>
-		<p><code><var>interfaceshort</var> ⇒ *<var>reference</var></code></p>
-	</figure>
-	<p>Properties consist of a list of predicate resource and object resource pairs between the color character <code>':'</code> and the semicolon character <code>';'</code>, each separated by the equals sign <code>'='</code>. If the grave character <code>'`'</code> is present before the equals sign, it indicates that the property is scoped in the context of the property's subject resource and its respective predicate resource and subject resource. If a label is provided, it identifies the proposition represented by the reification of the assertion.</p>
-	<figure>
-		<p><code><var>properties</var> ⇒ :<strong>[</strong><var>property</var><strong>[</strong></code><code>listseparator</code><code> <var>property</var><strong><strong>]*</strong>]</strong>;</code></p>
-		<p><code><var>property</var> ⇒ <var>resource</var><strong>[</strong><var>label</var><strong>]</strong><strong>[</strong>`<strong>]</strong>=<strong>(</strong><var>sequenceshort</var><strong>|</strong><var>resource</var><strong>)</strong></code></p>
-	</figure>
-	<p>A sequence short form consists of a sequence of element resources separated by list separators and surrounded by the backslash character <code>'\\'</code>. Each listed element resource indicates another assertion of the given predicate with the given element resource as the value, each with a contextual property of <code>urf.order</code> with values starting at <code>#0#</code> and continuing sequentially.</p>
-	<figure>
-		<p><code><var>sequenceshort</var> ⇒ \<strong>[</strong><var>resource</var><strong>[</strong></code><code><var>listseparator</var></code><code> <var>resource</var><strong>]*]</strong>\</code></p>
-	</figure>
-	<p>A community short form consists of a sequence of resources surrounded by the currency symbol <code>'¤'</code> and the full stop character <code>'.'</code>, separated by list separators. Each listed resource represents an unreified proposition that is a value of the <code>urf.element</code> property. The presence of a community short form implies a type of <code>urf.Community</code> if no other types have yet been specified, either implicitly or explicitly.</p>
-	<figure>
-		<p><code><var>communityshort</var> ⇒ ¤<strong>[</strong><var>resource</var><strong>[</strong></code><code>listseparator</code><code> <var>resource</var><strong>]*].</strong></code></p>
-	</figure>
-	<p>A proposition short form lists the subject, predicate, and object of a proposition inside the open double quotation mark <code>'“'</code> and closed double quotation mark <code>'”'</code> characters, separated by list separators. A proposition short form is equivalent to setting the resource <code>urf.Subject</code>, <code>urf.Predicate</code>, and <code>urf.Object</code> propoerties to the three listed resources within the proposition short form. The presence of a proposition short form implies a type of <code>urf.Proposition</code> if no other types have yet been specified, either implicitly or explicitly.</p>
-	<figure>
-		<p><code><var>propositionshort</var> ⇒ “<var>subject</var> </code><code>listseparator</code><code> <var>predicate</var> </code><code>listseparator</code><code> <var>object</var>”</code></p>
-		<p><code><var>subject</var> ⇒ <var>resource</var></code></p>
-		<p><code><var>predicate</var> ⇒ <var>resource</var></code></p>
-		<p><code><var>object</var> ⇒ <var>resource</var></code></p>
-	</figure>
-	<p>A list short form consists of a sequence of element resources surrounded by bracket characters <code>'['</code> and <code>']'</code> and separated by list separators. Each listed element resource represents the value of an ordinal index property, in sequence beginning with the ordinal property <code><code>º0º</code></code>. The presence of a list short form implies a type of <code>urf.List</code> if no other types have yet been specified, either implicitly or explicitly.</p>
-	<figure>
-		<p><code><var>listshort</var> ⇒ [<strong>[</strong>resource<strong>[</strong></code><code>listseparator</code><code> resource<strong>]*]</strong>]</code></p>
-	</figure>
-	<p>A set short form consists of a sequence of element resources surrounded by curly bracket characters <code>'{'</code> and <code>'}'</code> and separated by list separators. Each listed element resource represents a value of the <code>urf.element</code> property. The presence of a set short form implies a type of <code>urf.Set</code> if no other types have yet been specified, either implicitly or explicitly.</p>
-	<figure>
-		<p><code><var>setshort</var> ⇒ {<strong>[</strong>resource<strong>[</strong></code><code>listseparator</code><code> resource<strong>]*]</strong>}</code></p>
-	</figure>
-	<p>A map short form consists of a sequence of key/value associations surrounded by tortoise shell bracket characters <code>'〔'</code> and <code>'〕'</code>. Each key is separated from its value using the equals sign <code>'='</code>, and the key/value combinations are separated by list separators. Each key/value association represents a resource of type <code>urf.MapEntry</code> as a value of the <code>urf.entry</code> property of the map resource, with key a value of the map entry <code>urf.key</code> property, and the value a value of the map entry <code>urf.value</code> property. The presence of a map short form implies a type of <code>urf.Map</code> if no other types have yet been specified, either implicitly or explicitly.</p>
-	<figure>
-		<p><code><var>mapshort</var> ⇒ 〔<strong>[</strong><var>mapentry</var><strong>[</strong></code><code>listseparator</code><code> <var>mapentry</var><strong><strong>]*</strong>]</strong>〕</code></p>
-		<p><code><var>mapentry</var> ⇒ <var>key</var>=<var>value</var></code></p>
-		<p><code><var>key</var> ⇒ <var>resource</var></code></p>
-		<p><code><var>value</var> ⇒ <var>resource</var></code></p>
-	</figure>
-	<h2>PLOOP</h2>
-	<p>It is possible to use URF as a Programming Language Ontology for Objects and Properties (PLOOP), allowing long-term storage and/or object tree instance descriptions of programming languages using TURF, for example. The following specifies a canonical set of rules a processor must follow for for constructing a hierarchy of programming language objects based upon an URF description. All examples are represented using TURF and are given in the Java programming language using the Guise Internet application framework [<a href="#guise">Guise</a>]. A complete <a href="#ploopExample">PLOOP example</a> is provided at the end of this specification.</p>
-	<h3>Classes</h3>
-	<p>The URI of an URF class must indicate the complete package name and class name of a programming language class to instantiate. In the following example, the Java class <code>com.guiseframework.component.Layoutpanel</code> should be instantiated using its default constructor:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/component/LayoutPanel»
-.</code></pre>
-	</figure>
-	<p>If a resource has a scoped <code>urf.selector</code> property with an <code>urf.List</code> value in the context of an <code>urf.type</code> declaration, a PLOOP processor must use all the corresponding values as arguments to the constructor of the specified type, converted the URF selector resources into programming language values as needed. A PLOOP instance would use the following example to indicate that an instance of the Guise class <code>com.guiseframework.Category</code> should be constructed using <code>new Category("category1", "First Category")</code>:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/Category»("category1", "First Category")
-.</code></pre>
-	</figure>
-	<h3>Properties</h3>
-	<p>URF allows identification of programming language properties through use of the default URF namespace <code>&lt;http://urf.name/default/&gt;</code>. A PLOOP processor must use normal get/set conventions for the language in question for interpreting the read/write properties available for a particular class. For example, the local name of the property <code>«http://urf.name/default/label»</code> for a resource of type <code>«java:/com/guiseframework/component/Button»</code> is considered a property name for getting or setting a value of an instance of the <code>Button</code> class:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/component/Button»:
-    label="Push Me"
-  ;
-.</code></pre>
-	</figure>
-	<h3>Values</h3>
-	<p>In general, URF resources with URIs that are recognized must be converted to the equivalent type in the programming language. For example, in Java all resources of type <code>urf.Integer</code> must be converted to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>, <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted to <code>java.util.List</code>, <code>java.util.Set</code>, and <code>java.util.Map</code> instances, respectively, with each element or entry recursively instantiated or converted as needed. A resource with an inline URI must be converted if possible to a programming language type functioning as a lexical identifier, if its inlin type indicates such an enumerated type. In the following example, the Guise Java class <code>com.guiseframework.component.layout.FlowLayout</code> has a <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The inline URI <code>«*layout.Flow("LINE")»</code> indicates a type of <code>com.guiseframework.component.layout.Flow</code>, which is a Java enum class. A PLOOP processor must construct a <code>com.guiseframework.component.layout.Flow</code> object from the string "LINE" and assign it to the instance of <code>com.guiseframework.component.layout.FlowLayout</code> using <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  («java:/com/guiseframework/component/layout/FlowLayout»:
-    flow=«*layout.Flow("LINE")»
-  ;
-.</code></pre>
-	</figure>
-	<h2>Reference Implementation</h2>
-	<p>GlobalMentor, Inc. maintains an open-source reference implementation for processing URF. The library provides an API and source code for parsing URF from TURF, parsing URF from RDF/XML, creating a Java instance tree from URF, generating TURF from URF, generating URF from a Java instance tree, and manipulating URF in-memory. The reference implementation source code may be downloaded from the GlobalMentor Subversion repository at &lt;<a href="https://svn.globalmentor.com/java/src/com/globalmentor/urf/">https://svn.globalmentor.com/java/src/com/globalmentor/urf/</a>&gt;. The API documentation may be found at &lt;<a href="http://www.guiseframework.com/doc/api/com/globalmentor/urf/package-summary.html">http://www.guiseframework.com/doc/api/com/globalmentor/urf/package-summary.html</a>&gt;. The Guise Internet application framework [<a href="#guise">Guise</a>] development library contains the URF reference implementation already compiled, and is available at &lt;<a href="http://www.guiseframework.com/com.guiseframework-unlicensed.jar">http://www.guiseframework.com/com.guiseframework-unlicensed.jar</a>&gt;.</p>
-	<p>GlobalMentor also maintains an online demonstration of live, dynamic URF processing and exploration. The demonstration uses the Guise Internet application framework [<a href="#guise">Guise</a>] and allows TURF or RDF/XML to be processed and displayed as URF assertions, TURF, and a dynamic tree or resources and properties. This URF processing demonstration is available at &lt;<a href="http://www.guiseframework.com/demo/urfprocess">http://www.guiseframework.com/demo/urfprocess</a>&gt;.</p>
-	<h2>Examples</h2>
-	<h3>JSON</h3>
-	<p>In the JavaScript Object Notation (JSON) [<a href="#rfc4627">RFC 4627</a>], every object besides strings, numbers, and booleans are associative arrays using string keys. The following is a complex JSON object, using every JSON data type available:</p>
-	<figure>
-		<pre><code class="language-json">{
-  "length":1234,
-  "valid":true,
-  "status":"processing",
-  "results":[false, 5, "dog", {"code":9.8}]
-}</code></pre>
-	</figure>
-	<p>While this representation has some undesirable traits (e.g. strings are not recommended as general property identifiers except in the case of resources used as maps), the following TURF representation is semantically identical to the JSON example above:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  :
-    "length"=#1234#,
-    "valid"=_true_,
-    "status"="processing",
-    "results"=[_false_, #5#, "dog", :"code"=#9.8#;]
-  ;
-.</code></pre>
-	</figure>
-	<p>Note that, unlike JSON, in TURF the commas separating the values are optional if the values appear on separate lines.</p>
-	<p>There is one slight semantic descrepancy between these two examples: URF uses a true ordinal property for each list element, while JSON adds each array element as the value of a string containing the lexical form of an integer.</p>
-	<p>Although the above TURF representation replicates the simple semantics of the given JSON example, a better formulation that takes advantage of URF semantics would most importantly use actual properties rather than associative array string key pseudo-properties. An improved formulation would also indicate the type of the resources. Such improvements are illustrated in the following reformulation (assuming the <code>"code"</code> string in the list was intended to actually be a key in a map):</p>
-	<figure>
-		<pre><code class="language-turf">`URF:
-  "urf"~&lt;http://urf.name/urf/&gt;
-  "example"~&lt;http://example.com/example/&gt;
-;¤
-  *example.Class:
-    example.length=#1234#
-    example.valid=_true_
-    example.status="processing"
-    example.results=[_false_, #5#, "dog", 〔"code"=#9.8#〕]
-  ;
-.</code></pre>
-	</figure>
-	<h3>PLOOP</h3>
-	<p>The following TURF example uses URF as <a href="#ploop">PLOOP</a> for the Guise Internet application framework [<a href="#guise">Guise</a>] using the Java programming language. It defines a panel of Guise components that allow temperature to be converted between Celsius and Fahrenheit. (The control listeners and temperature conversion logic would be defined elsewhere.)</p>
-	<figure>
-		<pre><code class="language-turf">`URF:
-  "component"~&lt;java:/com/guiseframework/component/&gt;
-  "layout"~&lt;java:/com/guiseframework/component/layout/&gt;
-  "validator"~&lt;java:/com/guiseframework/validator/&gt;
-  "demo"~&lt;java:/com/guiseframework/demo/&gt;
-;¤
-  *demo.TemperatureConversionPanel2:
-    label="Guise™ Demonstration: Temperature Conversion"
-    layout=*layout.FlowLayout:
-      flow=«*layout.Flow("LINE")»
-    ;
-    name="temperatureConversionPanel"
-    children=[
-      *component.LayoutPanel:
-        layout=*layout.FlowLayout:
-          flow=«*layout.Flow("PAGE")»
-        ;
-        name="inputPanel"
-        children=[
-          *component.TextControl(«java:/java/lang/Double»):
-            label="Input Temperature"
-            name="temperatureInput"
-            validator=*validator.ValueRequiredValidator
-          ;
-          *component.TextControl(«java:/java/lang/Double»):
-            editable=_false_
-            label="Output Temperature"
-            name="temperatureOutput"
-          ;
-        ]
-      ;,
-      *component.LayoutPanel:
-        layout=*layout.FlowLayout:
-          flow=«*layout.Flow("PAGE")»
-        ;
-        name="conversionPanel"
-        children=[
-          *component.GroupPanel:
-            label="Input Scale"
-            layout=*layout.FlowLayout:
-              flow=«*layout.Flow("PAGE")»
-            ;
-            name="scalePanel"
-            children=[
-              *component.CheckControl:
-                checkType="ellipse"
-                label="Calsius"
-                name="celsiusCheckControl"
-              ;
-              *component.CheckControl:
-                checkType="ellipse"
-                label="Fahrenheit"
-                name="fahrenheitCheckControl"
-              ;
-            ]
-          ;
-          *component.Button:
-            label="Convert"
-            name="conversionButton"
-          ;
-        ]
-      ;
-    ]
-  ;
-.</code></pre>
-	</figure>
-	<p>The preceding example, when processed by an URF PLOOP processor, will produce an object instance graph identical to that produced by the following Java code:</p>
-	<figure>
-		<pre><code class="language-java">import com.guiseframework.component.*;
-import com.guiseframework.component.layout.*;
-import com.guiseframework.validator.*;
-
-DefaultNavigationPanel navigationPanel=new DefaultNavigationPanel();
-navigationPanel.setName("temperatureConversionPanel");
-navigationPanel.setLayout(new FlowLayout(Flow.LINE));
-navigationPanel.setLabel("Guise\u2122 Demonstration: Temperature Conversion");
-
-LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));
-TextControl&lt;Double&gt; temperatureInput=new TextControl&lt;Double&gt;(Double.class);
-temperatureInput.setName("temperatureInput");
-temperatureInput.setLabel("Input Temperature");
-temperatureInput.setValidator(new ValueRequiredValidator&lt;Double&gt;());
-inputPanel.add(temperatureInput);
-
-TextControl&lt;Double&gt; temperatureOutput=temperatureOutput=new TextControl&lt;Double&gt;(Double.class);
-temperatureOutput.setName("temperatureOutput");
-temperatureOutput.setLabel("Output Temperature");
-temperatureOutput.setEditable(false);
-inputPanel.add(temperatureOutput);
-
-navigationPanel.add(inputPanel);
-
-LayoutPanel conversionPanel=new LayoutPanel();
-conversionPanel.setLayout(new FlowLayout(Flow.PAGE));
-
-GroupPanel scalePanel=new GroupPanel();
-scalePanel.setLayout(new FlowLayout(Flow.PAGE));
-
-scalePanel.setLabel("Input Scale");
-CheckControl celsiusCheckControl=celsiusCheckControl=new CheckControl();
-celsiusCheckControl.setName("celsiusCheckControl");
-celsiusCheckControl.setCheckType(CheckControl.CheckType.ELLIPSE);
-celsiusCheckControl.setLabel("Celsius");
-scalePanel.add(celsiusCheckControl);
-CheckControl fahrenheitCheckControl=fahrenheitCheckControl=new CheckControl();
-fahrenheitCheckControl.setName("fahrenheitCheckControl");
-fahrenheitCheckControl.setCheckType(CheckControl.CheckType.ELLIPSE);
-fahrenheitCheckControl.setLabel("Fahrenheit");
-scalePanel.add(fahrenheitCheckControl);
-
-conversionPanel.add(scalePanel);
-
-Button convertButton=new Button();
-convertButton.setName("conversionButton");
-convertButton.setLabel("Convert");
-conversionPanel.add(convertButton);
-navigationPanel.add(conversionPanel);
-</code></pre> </figure>
-	<h3>RDF/XML</h3>
-	<p>URF is a semantic superset of RDF, and can represent any construct available in RDF. URF presents equivalents of many RDF classes as well. In terms of representation formats, TURF can represent any semantic information that is available using [<a href="#rdfxml">RDF/XML</a>], yet is more flexible and has less restrictions. The following is a sample RDF/XML representation of an RDF data instance using many of the capabilities available in RDF/XML:</p>
-	<figure>
-		<pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
-&lt;!DOCTYPE rdf:RDF [&lt;!ENTITY xsd "http://www.w3.org/2001/XMLSchema#"&gt;]&gt;
-&lt;rdf:RDF
-  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:example="http://example.com/example/"
-  xmlns:foaf="http://xmlns.com/foaf/0.1/"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-&gt;
-  &lt;foaf:Person rdf:about="http://example.com/example#janedoe"&gt;
-    &lt;foaf:nick xml:lang="pt-BR"&gt;Janinha&lt;/foaf:nick&gt;
-    &lt;example:age rdf:datatype="&amp;xsd;integer"&gt;23&lt;/example:age&gt;
-    &lt;example:birthdate rdf:datatype="&amp;xsd;date"&gt;1980-04-05&lt;/example:birthdate&gt;
-    &lt;example:motto rdf:parseType="Literal"&gt;Do it. Do it &lt;xhtml:em&gt;right&lt;/xhtml:em&gt;.&lt;/example:motto&gt;
-    &lt;example:favoriteSites rdf:parseType="Collection"&gt;
-      &lt;rdf:Description rdf:about="http://www.globalmentor.com/"/&gt;
-      &lt;rdf:Description rdf:about="http://www.garretwilson.com/"/&gt;
-    &lt;/example:favoriteSites&gt;
-    &lt;example:possibleVacationDestinations&gt;
-      &lt;rdf:Alt&gt;
-        &lt;rdf:li&gt;Paris&lt;/rdf:li&gt;
-        &lt;rdf:li&gt;Rome&lt;/rdf:li&gt;
-      &lt;/rdf:Alt&gt;
-    &lt;/example:possibleVacationDestinations&gt;
-  &lt;/foaf:Person&gt;
-&lt;/rdf:RDF&gt;</code></pre>
-	</figure>
-	<p>The following URF information represented in TURF is semantically equivalent to the RDF information in the previous example represented in RDF/XML:</p>
-	<figure>
-		<pre><code class="language-turf">`URF:
-  "urf"~&lt;http://urf.name/urf/&gt;
-  "content"~&lt;http://urf.name/content/&gt;
-  "dc"~&lt;http://purl.org/dc/elements/1.1/&gt;
-  "example"~&lt;http://example.com/example/&gt;
-  "foaf"~&lt;http://xmlns.com/foaf/0.1/&gt;
-;¤
-  example.janedoe*foaf.Person:
-    example.age=#23#
-    example.birthdate=@1980-04-05@
-    example.favoriteSites=[
-      «http://www.globalmentor.com/»
-      «http://www.garretwilson.com/»
-    ],
-    example.motto="Do it. Do it &lt;xhtml:em xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"&gt;right&lt;/xhtml:em&gt;.":
-      content.type`=«*content.MediaType("text/xml-external-parsed-entity")»
-    ;
-    example.possibleVacationDestinations={
-      "Paris",
-      "Rome"
-    }
-    nick="Janinha":
-      dc.language`=«*urf.Language("pt-BR")»
-    ;
-  ;
-.</code></pre>
-	</figure>
-	<p>Note that, rather than use special literal types or general strings, URF promotes the representation of resources by URIs. Thus the language tag "pt-BR" for Brazilian Portuguese is represented as a resource with a URI in the <code>urf.Language</code> inline namespace, and the integer value <code>23</code> is represented as a resource with a URI in the <code>urf.Integer</code> inline namespace (shown here in its short form, <code>#23#</code>).</p>
-	<h3>VCard</h3>
-	<p>The URF <a href="#vcard">VCard Ontology</a> provides a representation of VCard [<a href="#rfc2426">RFC 2426</a>] within a semantic framework. The following is VCard information in traditional vCard MIME Directory Profile syntax as specified by [<a href="#rfc2426">RFC 2426</a>].</p>
-	<figure>
-		<pre><code class="language-vcard">BEGIN:vCard
-VERSION:3.0
-FN:Jane Doe
-N:Doe;Jane;Mary,Ann;Dr.;M.D.,Ph.D.
-ORG:Example Corporation;North American Division;Business Development
-TITLE:Directory of Business Development
-ADR;TYPE=WORK,POSTAL,PARCEL:;Suite 45;123 Some Street;Someplace;CA;12345-6789;USA
-LABEL="123 Some Street\nSuite 45\nSomeplace, CA 12345-6789"
-TEL;TYPE=PREF;VOICE,WORK:+1-234-567-8910
-TEL;TYPE=VOICE,HOME,CELL:+1-234-567-8911
-EMAIL;PREF:janedoe@example.com
-EMAIL:jdoe@example.org
-URL:http://www.example.com/home/jane/
-BDAY=1980-02-02T09:45:00
-CATEGORY:Internet,B2B,P2P,Web2.0,ABCD
-END:vCard</code></pre>
-	</figure>
-	<p>The same vCard information in its URF VCard formulation is shown below for the resource <code>«http://example.com/example/janedoe»</code>. Note that the URF VCard version provides more semantics by using true classes and properties to describe what [<a href="#rfc2426">RFC 2426</a>] calls <dfn>structured values</dfn>.</p>
-	<figure>
-		<pre><code class="language-turf">`URF:
-  "vcard"~&lt;http://urf.com/vcard/&gt;
-  "example"~&lt;http://example.com/example/&gt;
-;¤
-  example.janedoe:
-    vcard.fn="Jane Doe"
-    vcard.n=*vcard.Name:
-      vcard.familyName="Doe"
-      vcard.givenName="Jane"
-      vcard.additionalName=\"Mary", "Ann"\
-      vcard.honoraryPrefix="Dr."
-      vcard.honorarySuffix=\"M.D.", "Ph.D."\
-    ;
-    vcard.org=\"Example Corporation", "North American Division", "Business Development"\
-    vcard.title="Directory of Business Development"
-    vcard.adr=*vcard.Adr:
-      vcard.adrType=«*vcard.AdrType("work")»
-      vcard.adrType=«*vcard.AdrType("postal")»
-      vcard.adrType=«*vcard.AdrType("parcel")»
-      vcard.extendedAddress="Suite 45"
-      vcard.streetAddress="123 Some Street"
-      vcard.locality="Someplace"
-      vcard.region="CA"
-      vcard.postalCode="12345-6789"
-      vcard.countryName="USA"
-    ;
-    vcard.label="123 Some Street\nSuite 45\nSomeplace, CA 12345-6789"
-    vcard.tel=
-    \
-      «tel:+1-234-567-8910»:
-        vcard.telType`=«*vcard.TelType("voice")»
-        vcard.telType`=«*vcard.TelType("work")»
-      ;
-      «tel:+1-234-567-8911»:
-        vcard.telType`=«*vcard.TelType("voice")»
-        vcard.telType`=«*vcard.TelType("home")»
-        vcard.telType`=«*vcard.TelType("cell")»
-      ;
-    \
-    vcard.email=\&lt;janedoe@example.com&gt;, &lt;jdoe@example.org&gt;\
-    vcard.url=&lt;http://www.example.com/home/jane/&gt;
-    vcard.bday=@1980-02-02T09:45:00@
-    vcard.category="Internet"
-    vcard.category="B2B"
-    vcard.category="P2P"
-    vcard.category="Web2.0"
-    vcard.category="ABCD"
-  ;
-.</code></pre>
-	</figure>
 	<h2>References</h2>
 	<dl>
 		<dt>DCMI Namespace</dt>
@@ -1276,6 +764,12 @@ END:vCard</code></pre>
 	<p>Brad Neuberg encouraged the creation of an alternate RDF serialization; Frank Manola made convincing arguments for using ordinals instead of integers as list element predicates.</p>
 	<h2>History</h2>
 	<dl>
+		<dt>2017-09-25</dt>
+		<dd>
+			<ul>
+				<li>Split out original URF specification into separate <cite>URF Specification</cite>, <cite>TURF Specification</cite>, and <cite>URF Primer</cite> documents.</li>
+			</ul>
+		</dd>
 		<dt>2009-09-06</dt>
 		<dd>
 			<ul>
@@ -1430,6 +924,7 @@ END:vCard</code></pre>
 			</ul>
 		</dd>
 	</dl>
+	<footer><small>Copyright © 2007–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
