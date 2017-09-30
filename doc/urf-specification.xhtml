@@ -17,28 +17,112 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-09-25</dd>
+			<dd>Draft 2017-09-30</dd>
 		</dl>
 	</header>
-	<p>The Uniform Resource Framework (URF) provides a consistent way for representing resources and their relationships. URF and its interchange formats are useful for data storage, data interchange, data querying, and logical inferences. URF together with its interchange formats provides a more powerful yet in many ways simpler and more consistent replacement for data-oriented XML, RDF, and JSON.</p>
-	<p>This document defines the Uniform Resource Framework (URF) as an abstract model, and also defines a text-based representation format, Text URF (TURF). This document does not yet provide a description of the binary representation format Serial URF (SURF), or the XML-based format XML URF (XMURF).</p>
-	<h2>Conventions</h2>
-	<p>When this document refers to "URF", it indicates a model for representing a community of knowledge abstract from any representation format. When this document refers to "TURF", it indicates the textual representation of URF. Because abstract concepts must be textualized to be communicated in a text-based specification, at times a description of the URF abstract model will use TURF notation for clarification of the model.</p>
-	<h2>Ontologies</h2>
-	<p>The following are official URF ontologies sanctioned by this specification, with links to their formal definitions in TURF:</p>
+	<h2>Introduction</h2>
+	<p>The <dfn>Uniform Resource Framework</dfn> (<abbr>URF</abbr>) provides a general, simple, and consistent way for representing data and their relationships. URF is useful for data storage, data interchange, data querying, and logical inferences. As a data framework URF allows similar yet simpler representation as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>) . Together with its interchange formats, URF provides a more powerful yet simpler and more consistent replacement for data-oriented XML and JSON.</p>
+	<h3>Serialization</h3>
+	<p><em>This section is non-normative.</em></p>
+	<p>This document defines URF as an abstract data model. URF provides several official formats, specified in separate documents, including:</p>
 	<dl>
-		<dt><a href="urf.turf">URF</a></dt>
-		<dd>The core URF ontology for defining resources.</dd>
-		<dt><a href="content.turf">Content</a></dt>
-		<dd>The URF ontology for describing the content of a resource, such as content type, size, and actual content bytes.</dd>
-		<dt><a href="select.turf">Select</a></dt>
-		<dd>The URF ontology for selecting resources and other objects.</dd>
-		<dt><a href="vcard.turf">VCard</a></dt>
-		<dd>The URF ontology for describing person resource or white-pages type of directory information as described in [<a href="#rfc2426">RFC 2426</a>].</dd>
+		<dt><dfn>TURF</dfn></dt>
+		<dd>The canonical text serialization.</dd>
+		<dt><dfn>SURF</dfn></dt>
+		<dd>A simplified text serialization.</dd>
+		<dt><dfn>CURF</dfn></dt>
+		<dd>A space-efficient, comma-separated, tabular text format.</dd>
+		<dt><dfn>3URF</dfn></dt>
+		<dd>A propositional statement-oriented representation.</dd>
 	</dl>
+	<p>Examples in this document may present URF instances in TURF and/or 3URF for illustration purposes.</p>
+	<h3>Conventions Used in this Document</h3>
+	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Model</h2>
-	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. For purposes of description within URF, each resource may be identified using a URI [<a href="#rfc3986">RFC 3986</a>]. Resources are described by a set of <dfn>assertions</dfn>, each of which is a proposition, an instance of <code>urf.Proposition</code>. Each proposition contains a <dfn>subject</dfn>, a <dfn>predicate</dfn>, and an <dfn>object</dfn>.</p>
-	<p>A particular group of assertions is called an <dfn>URF instance</dfn>. Each asserted proposition exists in some URF <dfn>knowledge community</dfn> as an element of <code>urf.Community</code>. Each <code>urf.Proposition</code> is itself a subclass of <code>urf.Community</code>, and may therefore contain other <dfn>scoped assertions</dfn> that are contextual to the first proposition. The root assertions of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
+	<aside class="note far half">Examples of resources:
+		<ul>
+			<li>The web page at <code>https://www.example.com/trees.html</code>.</li>
+			<li>The book <cite>A Tale of Trees</cite>.</li>
+			<li>Gene ENSG00000223972.5.</li>
+			<li>Tree #456.</li>
+			<li>The date September 17, 2017.</li>
+			<li>The integer 5.</li>
+		</ul>
+	</aside>
+	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. Each resource is the instance of some <dfn>type</dfn>. A resource <span class="spec-may">may</span> also be identified by a <dfn>tag</dfn>.</p>
+	<figure>
+		<figcaption>A resource.</figcaption> <img src="images/resource-diagram.svg" alt="URF resource." /> </figure>
+	<h3>Statements </h3>
+	<figure class="far third">
+		<figcaption>Statements assert that resources have property values.</figcaption> <img src="images/resource-property-value-diagram.svg" alt="URF resource, property, and value." /> </figure>
+	<p>Resources are described by a set of <dfn>statements</dfn>, each claiming that some resource <dfn>subject</dfn> has a <dfn>property</dfn> with some <dfn>value</dfn>.</p>
+	<p>A particular group of statements is called an <dfn>URF instance</dfn>. Each statement exists in some URF <dfn>knowledge community</dfn>. The root statements of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
+	<aside class="note near">Examples of statements:
+		<ul>
+			<li><q>The web page at <code>https://www.example.com/trees.html</code> was written by Jane Doe.</q></li>
+			<li><q>The book <cite>A Tale of Trees</cite> was published by Arbor Publishing.</q></li>
+			<li><q>Gene ENSG00000223972.5. has a name of DDX11L1.</q></li>
+			<li><q>Tree #456 is of species <i>Quercus macrocarpa</i>.</q></li>
+		</ul>
+	</aside>
+	<h3>Tags</h3>
+	<aside class="note far half">Examples of tags:
+		<dl>
+			<dt><code>https://www.example.com/trees.html</code></dt>
+			<dd>A web page about trees.</dd>
+			<dt><code>urn:uuid:a2f9981a-fc28-4f49-895f-3a1a8b12fc2c</code></dt>
+			<dd>A book about trees.</dd>
+			<dt><code>https://urf/name/Tree#456</code></dt>
+			<dd>A particular tree.</dd>
+			<dt><code>https://urf/name/urf/Boolean#true</code></dt>
+			<dd>The Boolean value <code>true</code>.</dd>
+		</dl>
+	</aside>
+	<p>A <dfn>tag</dfn> which takes the form of an IRI as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. <span class="note">Although a tag may be a URL, this specification does not define whether the location indicated by the tag indicates any actual, retrievable content; an URF tag functions solely as an identifier.</span></p>
+	<h4>Names</h4>
+	<p>If a resource has a hierarchical IRI, the last path component, along with the IRI fragment if present, is considered the <dfn>name</dfn> of the resource. A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the fragment part of the name is considered the <dfn>ID</dfn> of the resource. <span class="warning">A resource ID will likely not be globally unique.</span></p>
+	<p>The <dfn>base name</dfn>, the non-fragment part of an URF name, <span class="spec-should">should</span> begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<p>For example, the resource with the tag <code>https://urf/name/Tree</code> has the name <code>Tree</code>, and the resource with the tag <code>https://urf/name/Tree#456</code> has the name <code>Tree#456</code>.</p>
+	<h4>Namespaces</h4>
+	<aside class="annotation far half">The URF definition of a namespace implies that a namespace must end in the slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). <span class="error">This disallows namespaces ending in the <code class="name">NUMBER SIGN</code> character <code>#</code> (<code class="unicode">U+0023</code>) such as <code>http://www.w3.org/2001/XMLSchema#</code>, which appears in other specifications such as XML and RDF.</span></aside>
+	<p>For those resources with names, the remaining part of the hierarchical IRI (the part before the last path component) is considered the <dfn>namespace</dfn> of the resource. Namespaces <span class="spec-should">should</span> be used to group resources with related semantics.</p>
+	<p>Each additional path component of a hierarchical IRI indicates a <dfn>subnamespace</dfn> inside the previous namespace. Thus the namespace identified by the IRI <code>https://urf.name/bio/</code> is a subnamespace of that identified by <code>https://urf.name/</code>. Each subnamespace path component <span class="spec-should">should</span> follow the syntax rules of a base name.</p>
+	<h5>Ad-Hoc Namespace</h5>
+	<p>The namespace <code>https://urf.name/</code> is the <dfn>ad-hoc namespace</dfn>. Applications that need a low-overhead naming scheme <span class="spec-may">may</span> use resource names placed directly within this namespace. <span class="warning">Names placed in the ad-hoc namespace have the potential to clash if used with other vocabularies that also use the ad-hoc namespace.</span> T<span>he ad-hoc namespace </span><span><span class="spec-should">should</span> only be used for applications for which the identity of the resource is unambiguous in the context.</span>
+	</p>
+	<p>The resource with tag <code>https://urf/name/Tree#456</code> is an example of a resource in the ad-hoc namespace.</p>
+	<h5>Informal Namespaces </h5>
+	<p>Subnamespaces of the ad-hoc namespace are considered <dfn>informal namespaces</dfn>. Applications that to mix vocabularies but still do not require or desire the overhead of formal namespace definition <span class="spec-may">may</span> use resource names placed within informal namespaces. Informal namespaces <span><span class="spec-should">should</span></span> attempt to avoid name clashes by using subnamespace components that reflect well-known vocabulary identifiers (such as <code>https://urf.name/refseq/</code> to annotate information in the <a href="https://www.ncbi.nlm.nih.gov/refseq/" class="external">NCBI Reference Sequence Database</a>); or by using subnamespace components corresponding to domain components which the vocabulary author controls (such as <code>https://urf.name/globalmentor</code> for <a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>, which controls the <code>globalmentor.com</code> domain).</p>
+	<p>The following namespaces which would otherwise be informal namespaces are reserved:</p>
+	<dl>
+		<dt><code>https://urf.name/example/</code></dt>
+		<dd>Reserved for use as examples in documentation or for private testing.</dd>
+		<dt><code>https://urf.name/urf/</code></dt>
+		<dd>Reserved for use by the URF specifications.</dd>
+	</dl>
+	<h5>Formal Namespaces</h5>
+	<p>All other namespaces constitute <dfn>formal namespaces</dfn> defined by third parties. For example, the <a href="http://dublincore.org/" class="external">Dublin Core Metadata Initiative</a> defines the formal namespace <code>http://purl.org/dc/elements/1.1/</code> for information in the <a href="http://www.dublincore.org/documents/dces/" class="external"><cite>Dublin Core Metadata Element Set, Version 1.1</cite></a>.</p>
+	<aside class="info">As a convenience the rest of this specification uses SURF/TURF shorthand notation to identify resources, in which the the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>) is used to indicate informal namespace hierarchies. Here are some non-normative examples, along with the IRIs they represent.
+		<dl>
+			<dt><code>label</code></dt>
+			<dd><code>https://urf.name/label</code></dd>
+			<dt><code>Tree</code></dt>
+			<dd><code>https://urf.name/Tree</code></dd>
+			<dt><code>Tree#456</code></dt>
+			<dd><code>https://urf.name/Tree#456</code></dd>
+			<dt><code>urf-Resource</code></dt>
+			<dd><code>https://urf.name/urf/Resource</code></dd>
+			<dt><code>gencode-level</code></dt>
+			<dd><code>https://urf.name/gencode/level</code></dd>
+		</dl>
+	</aside>
+	<h3>Types</h3>
+	<p>Each URF resource is the instance of some type. If a resource is not an instance of any more specific type, it is of type <code>urf-Resource</code>.</p>
+	<h4>ID Tag Types</h4>
+	<p>An ID tag indicates both the unique tag and the type of the resource, with the type being the part of the tag with the fragment removed. For example, the resource identified by the tag <code>https://urf.name/Tree#456</code> (<code>Tree#456</code>) is of type <code>Tree</code> (itself a resource, identified by the tag <code>https://urf.name/Tree</code>).</p>
+	<h4>Lexical ID Types</h4>
+	<aside class="annotation far half">URF, unlike RDF, has no so-called “literal” type. All things described in URF are resources, plain and simple. The integer 5 is just as much a resource as the web page <code>https://www.example.com/trees.html</code>. The integer 5 does have a convenient tag <code>https://urf.name/urf/urf-Integer#5</code> which indicates both its type and lexical representation, but that does not make it a different “thing” in the URF model.</aside>
+	<p>The resources of some types are identified by ID tags that use the canonical representation of the resource as the resource ID. For example, the <code>urf-Boolean</code> value <code>true</code> is identified by the tag <code>https://urf.name/urf/Boolean#true</code>. Similarly the integer <code>5</code>, which in URF is an instance of the <code>urf-Integer</code> type, is identified by the tag <code>https://urf.name/urf/urf-Integer#5</code>.</p>
 	<h2>URF Types</h2>
 	<p>URF and its standard ontologies comes with several built-in types, including:</p>
 	<dl>
@@ -138,12 +222,12 @@
 		<dd>Dave Beckett. <a href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax Specification (Revised)</cite></a>. World Wide Web Consortium, 2006-02-10.</dd>
 		<dt>RFC 2046</dt>
 		<dd>N. Freed and N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>. Internet Engineering Task Force, 1996.</dd>
+		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt>RFC 2130</dt>
 		<dd>C. Weider, C. Preston, K. Simonsen, H. Alvestrand, R. Atkinson, M. Crispin, and P. Svanberg. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2130: The Report of the IAB Character Set Workshop held 29 February - 1 March, 1996</cite></a>. Internet Engineering Task Force, 1997.</dd>
 		<dt>RFC 2278</dt>
 		<dd>N. Freed and J. Postel. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2278: IANA Charset Registration Procedures</cite></a>. Internet Engineering Task Force, 1998.</dd>
-		<dt>RFC 2426</dt>
-		<dd>F. Dawson and T. Howes. <a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2426: vCard MIME Directory Profile</cite></a>. Internet Engineering Task Force, 1998.</dd>
 		<dt>RFC 2445</dt>
 		<dd>F. Dawson and and D. Stenerson. <a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2445: Internet Calendaring and Scheduling Core Object Specification (iCalendar)</cite></a>. Internet Engineering Task Force, 1998.</dd>
 		<dt>RFC 3339</dt>
@@ -152,12 +236,16 @@
 		<dd>H. Schulzrinne. <a href="http://www.ietf.org/rfc/rfc3966.txt"><cite>RFC 3966: The tel URI for Telephone Numbers</cite></a>. Internet Engineering Task Force, 2004.</dd>
 		<dt>RFC 3986</dt>
 		<dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform Resource Identifier (URI): Generic Syntax</cite></a>. Internet Engineering Task Force, 2005.</dd>
+		<dt id="ref-rfc3987" class="ref-target">RFC 3987</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc3987"><cite>Internationalized Resource Identifiers (IRIs)</cite></a>, M. Duerst (W3C), M. Suignard (Microsoft Corporation). IETF.</dd>
 		<dt>RFC 4627</dt>
 		<dd>D. Crockford. <a href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The application/json Media Type for JavaScript Object Notation (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
 		<dt>RFC 4646</dt>
 		<dd>A. Phillips and M. Davis. <a href="http://www.ietf.org/rfc/rfc4646.txt"><cite>RFC 4646: Tags for Identifying Languages</cite></a>. Internet Engineering Task Force, 2006.</dd>
 		<dt>RFC 4648</dt>
 		<dd>S. Josefsson. <a href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16, Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task Force, 2006.</dd>
+		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
+		<dd><a href="http://unicode.org/reports/tr15/"><cite>Unicode® Standard Annex #15: Unicode Normalization Forms</cite></a>, Mark Davis, Ken Whistler. The Unicode Consortium.</dd>
 		<dt>Unicode BOM FAQ</dt>
 		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd>
 		<dt>UTR #13</dt>
@@ -167,168 +255,6 @@
 	</dl>
 	<h2>Acknowledgements</h2>
 	<p>Brad Neuberg encouraged the creation of an alternate RDF serialization; Frank Manola made convincing arguments for using ordinals instead of integers as list element predicates.</p>
-	<h2>History</h2>
-	<dl>
-		<dt>2017-09-25</dt>
-		<dd>
-			<ul>
-				<li>Split out original URF specification into separate <cite>URF Specification</cite>, <cite>TURF Specification</cite>, and <cite>URF Primer</cite> documents.</li>
-			</ul>
-		</dd>
-		<dt>2009-09-06</dt>
-		<dd>
-			<ul>
-				<li>Change namespace URI rules to only allow namespace URIs that are collection URIs.</li>
-				<li>Renamed "lexical namespace/URI" to "inline namespace/URI" and improved the corresponding semantics.</li>
-				<li>Renamed <code>urf.Real</code> to <code>urf.Rational</code>.</li>
-			</ul>
-		</dd>
-	</dl>
-	<dl>
-		<dt>2009-08-24</dt>
-		<dd>
-			<ul>
-				<li>Changed grammar to allow Unicode newline characters as separators.</li>
-				<li>Changed TURF content type to <code>text/urf</code>.</li>
-			</ul>
-		</dd>
-	</dl>
-	<dl>
-		<dt>2008-01-20 </dt>
-		<dd>
-			<ul>
-				<li>Improved semantics of <code>urf.Map</code> by adding map entries to distinguish between properties and map key/value associations.</li>
-				<li>Added delimiters for <code>urf.Map</code> TURF short form.</li>
-				<li>Changed delimiter of <code>urf.Boolean</code> TURF short form.</li>
-				<li>Modified <code>urf.type</code> TURF short form syntax.</li>
-				<li>Introduced <code>urf.selector</code> property with TURF short form.</li>
-				<li>Removed <code>urf.inits</code> property.</li>
-				<li>Documented <code>urf.subClassOf</code> and <code>urf.implementationOf</code> properties.</li>
-				<li>Added TURF superclass and interface short forms.</li>
-				<li>Renamed <code>content.CharacterEncoding</code> to <code>content.Charset</code>.</li>
-			</ul>
-		</dd>
-		<dt>2007-12-31</dt>
-		<dd>
-			<ul>
-				<li>Added <code>content.CharacterEncoding</code> class.</li>
-				<li>Renamed URF reference implementation Java package.</li>
-			</ul>
-		</dd>
-		<dt>2007-12-23</dt>
-		<dd>
-			<ul>
-				<li>Changed TURF preamble delimiters.</li>
-				<li>Changed TURF namespace association delimiter.</li>
-				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-				<li>Changed order of string and type in TURF lexical form reference.</li>
-				<li>Brought back requirement for ending delimiters for TURF number, temporal, and ordinal short representations to prevent an ambigious grammar.</li>
-			</ul>
-		</dd>
-		<dt>2007-11-22</dt>
-		<dd>
-			<ul>
-				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-				<li>Changed the TURF preface delimiter.</li>
-			</ul>
-		</dd>
-		<dt>2007-11-18</dt>
-		<dd>
-			<ul>
-				<li>Added TURF preamble.</li>
-				<li>Improved TURF name grammar.</li>
-				<li>Simplified TURF name namespace inheritance rules.</li>
-				<li>Changed <code>urf.MediaType</code> to <code>content.MediaType</code>.</li>
-				<li>Simplified PLOOP processing rules.</li>
-				<li>Addressed merging of ordered properties.</li>
-				<li>Changed syntax for <code>urf.Enum</code> value declarations.</li>
-				<li>Introducted <code>urf.Community</code>.</li>
-				<li>Reframed semantics of scoped properties in terms of URF communities.</li>
-				<li>Added <code>urf.Proposition</code> short form.</li>
-				<li>Changed comment syntax.</li>
-				<li>Expanded rules for URI namespace determination.</li>
-				<li>Changed syntax for <code>urf.Boolean</code> short form.</li>
-			</ul>
-		</dd>
-		<dt>2007-10-16</dt>
-		<dd>
-			<ul>
-				<li>Changed order of TURF properties declaration.</li>
-				<li>Added <code>urf.init</code> property.</li>
-				<li>Added PLOOP specification.</li>
-				<li>Improved and clarified TURF namespace inheritance rules.</li>
-				<li>Added list of ontologies along with links to their TURF definitions.</li>
-				<li>Added RDF/XML example.</li>
-				<li>Added PLOOP example.</li>
-				<li>Added reference implementation links.</li>
-				<li>Improved and simplified TURF URI and URI reference lexical form representation.</li>
-				<li>Clarified and extended <code>urf.Temporal</code> types.</li>
-				<li>Changed base lexical namespace URI to <code>&lt;http://urf.name/lexical/&gt;</code>.</li>
-				<li>Added <code>urf.Language</code> type.</li>
-				<li>Added <code>urf.MediaType</code> type.</li>
-				<li>Changed PLOOP example to use <code>java:</code> URIs.</li>
-				<li>Removed trailing delimiter from TURF temporal short forms.</li>
-				<li>Added <code>urf.Enum</code> description.</li>
-			</ul>
-		</dd>
-		<dt>2007-10-05</dt>
-		<dd>
-			<ul>
-				<li>Added TURF Internet media type.</li>
-				<li>Removed requirement that TURF strings must escape control characters.</li>
-				<li>Added period to set of name characters.</li>
-				<li>Added comments to TURF.</li>
-				<li>Clarified and expanded TURF Unicode control escape sequences.</li>
-				<li>Clarified and expanded namespace rules.</li>
-				<li>Added <code>urf.Binary</code> type.</li>
-				<li>Added <code>urf.Ordinal</code> type.</li>
-				<li>Changed arrays to use ordinal indexes.</li>
-				<li>Removed trailing delimiter from TURF number short forms.</li>
-				<li>Removed trailing delimiter from TURF boolean short forms.</li>
-				<li>Changed TURF boolean short form delimiter.</li>
-				<li>Changed TURF name short form prefix delimiter.</li>
-				<li>Changed TURF properties section delimiter.</li>
-				<li>Improved TURF name grammar.</li>
-				<li>Added <code>urf.Set</code> type.</li>
-				<li>Renamed <code>urf.Array</code> to <code>urf.List</code>.</li>
-				<li>Clarified TURF name reference namespace inheritance.</li>
-			</ul>
-		</dd>
-		<dt>2007-09-15</dt>
-		<dd>
-			<ul>
-				<li>Switched to <code>info:lexical</code> lexical namespaces.</li>
-			</ul>
-		</dd>
-		<dt>2007-09-14</dt>
-		<dd>
-			<ul>
-				<li>Added name reference short form.</li>
-				<li>Modified syntax for sequences.</li>
-				<li>Switched to <code>info:lexis</code> lexical namespaces.</li>
-				<li>Changed property type for array indexes.</li>
-				<li>Clarified number types.</li>
-				<li>Added delimiters to boolean and number types.</li>
-				<li>Added the ID namespace.</li>
-				<li>Clarified array grammar.</li>
-				<li>Added URF abstract model grammar.</li>
-				<li>Added JSON example.</li>
-			</ul>
-		</dd>
-		<dt>2007-09-08</dt>
-		<dd>
-			<ul>
-				<li>Modified and simplified syntax for resource URI references and type declarations.</li>
-				<li>Changed <dfn>contextual properties</dfn> to <dfn>scoped properties</dfn>.</li>
-			</ul>
-		</dd>
-		<dt>2007-09-02</dt>
-		<dd>
-			<ul>
-				<li>First public release of URF.</li>
-			</ul>
-		</dd>
-	</dl>
 	<footer><small>Copyright © 2007–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
