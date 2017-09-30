@@ -5,170 +5,27 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="author" content="Garret Wilson" />
-	<title>URF Specification</title>
+	<title>URF History</title>
 	<link type="text/css" rel="stylesheet" href="../../pub/css/globalmentor-doc.css" />
 </head>
 
 <body>
 	<header>
-		<h1>Uniform Resource Framework (URF) Specification</h1>
-		<aside class="important far side">Draft version.</aside>
+		<h1>Uniform Resource Framework (URF) History</h1>
 		<dl>
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-09-25</dd>
+			<dd>2017-09-30</dd>
 		</dl>
 	</header>
-	<p>The Uniform Resource Framework (URF) provides a consistent way for representing resources and their relationships. URF and its interchange formats are useful for data storage, data interchange, data querying, and logical inferences. URF together with its interchange formats provides a more powerful yet in many ways simpler and more consistent replacement for data-oriented XML, RDF, and JSON.</p>
-	<p>This document defines the Uniform Resource Framework (URF) as an abstract model, and also defines a text-based representation format, Text URF (TURF). This document does not yet provide a description of the binary representation format Serial URF (SURF), or the XML-based format XML URF (XMURF).</p>
-	<h2>Conventions</h2>
-	<p>When this document refers to "URF", it indicates a model for representing a community of knowledge abstract from any representation format. When this document refers to "TURF", it indicates the textual representation of URF. Because abstract concepts must be textualized to be communicated in a text-based specification, at times a description of the URF abstract model will use TURF notation for clarification of the model.</p>
-	<h2>Ontologies</h2>
-	<p>The following are official URF ontologies sanctioned by this specification, with links to their formal definitions in TURF:</p>
 	<dl>
-		<dt><a href="urf.turf">URF</a></dt>
-		<dd>The core URF ontology for defining resources.</dd>
-		<dt><a href="content.turf">Content</a></dt>
-		<dd>The URF ontology for describing the content of a resource, such as content type, size, and actual content bytes.</dd>
-		<dt><a href="select.turf">Select</a></dt>
-		<dd>The URF ontology for selecting resources and other objects.</dd>
-		<dt><a href="vcard.turf">VCard</a></dt>
-		<dd>The URF ontology for describing person resource or white-pages type of directory information as described in [<a href="#rfc2426">RFC 2426</a>].</dd>
-	</dl>
-	<h2>Model</h2>
-	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. For purposes of description within URF, each resource may be identified using a URI [<a href="#rfc3986">RFC 3986</a>]. Resources are described by a set of <dfn>assertions</dfn>, each of which is a proposition, an instance of <code>urf.Proposition</code>. Each proposition contains a <dfn>subject</dfn>, a <dfn>predicate</dfn>, and an <dfn>object</dfn>.</p>
-	<p>A particular group of assertions is called an <dfn>URF instance</dfn>. Each asserted proposition exists in some URF <dfn>knowledge community</dfn> as an element of <code>urf.Community</code>. Each <code>urf.Proposition</code> is itself a subclass of <code>urf.Community</code>, and may therefore contain other <dfn>scoped assertions</dfn> that are contextual to the first proposition. The root assertions of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
-	<h2>URF Types</h2>
-	<p>URF and its standard ontologies comes with several built-in types, including:</p>
-	<dl>
-		<dt><code>urf.Binary</code></dt>
-		<dd>Binary resources represent arbitrarily long sequences of bytes. Binary resources use the appropriate inline namespace for their type, with a lexical form of the <dfn>base64url</dfn> encoding of the binary data without line breaks according to [<a href="#rfc4648">RFC 4648</a>].</dd>
-		<dt><code>urf.Boolean</code></dt>
-		<dd>There are two boolean resources, the values <code>true</code> and <code>false</code>. Boolean resources are identified by URIs in the Boolean inline namespace with lexical representations of <code>"true"</code> and <code>"false"</code>, respectively.</dd>
-		<dt><code>urf.Character</code></dt>
-		<dd>Character resources are the Unicode code points, and their lexical forms are the Unicode characters represented by those code points.</dd>
-		<dt><code>urf.Class</code></dt>
-		<dd>Not every resource used as a class is an instance of the class <code>urf.Class</code>, but a resource may be declared to be of the class type to further specify its semantics. The class <code>urf.Class</code> is a subclass of the class <code>urf.Resource</code>.</dd>
-		<dt><code>urf.Date</code></dt>
-		<dd>Date resources represent calendar dates in terms of calendar year, calendar month, and calendar day of month. They use an inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>YYYY</var>-<var>MM</var>-<var>DD</var></code> as defined in [<a href="#iso8601">ISO 8601</a>].</dd>
-		<dt><code>urf.DateTime</code></dt>
-		<dd>A date time resource represents a time of day on a particular calendar date. They use an inline namespace with a lexical form combining the lexical forms of <code>urf.Date</code> and <code>urf.Time</code> separated by <code>T</code>: <code><var>YYYY</var>-<var>MM</var>-<var>DD</var>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO 8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd>
-		<dt><code>urf.Duration</code></dt>
-		<dd>Duration resources represent lengths of time. They use an inline namespace with a lexical form consistent with [<a href="#rfc2445">RFC 2445</a>] and [<a href="#iso8601">ISO 8601</a>] of <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>, where <var>n</var> is some positive number of roman digits and at least the date or time section is present.</dd>
-		<dt><code>urf.Enum</code></dt>
-		<dd>The base class of class resources having inline URIs the lexical forms of which are enumerated as class list elements.</dd>
-		<dt><code>urf.Integer</code></dt>
-		<dd>Integer resources are the positive whole numbers, the negative whole numbers, and zero. They are identified by inline namespace URIs with a lexical representation in the form <code><strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong></code>. The integer class is a subclass of the class <code>urf.Number</code>.</dd>
-		<dt><code>urf.Language</code></dt>
-		<dd>Language resources represent human langages and use inline namespace URIs. The lexical form of each is the corresponding <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC 4646</a>].</dd>
-		<dt><code>urf.List</code></dt>
-		<dd>List resources are resources that contain other <dfn>element</dfn> resources at certain <dfn>indexes</dfn> of the list. A list, like normal resources, may have any property, but the properties representing the elements of the list lie in the ordinal namespace <code>&lt;http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/&gt;</code>, each representing the ordinal index of the element. That is, if a list contains an element at index 5, the element resource will appear as a value of the property <code>«http://urf.name/inline/http%3A%2F%2Furf.name%2Furf%23Ordinal/%225%22»</code> (that is, the property <code>«(urf.Ordinal)"5"»</code>, or simply <code>º5</code>). Although many uses cases will prefer a continuous, unduplicated sequence of index properties beginning with <code>º5</code>, this is not an URF requirement.</dd>
-		<dt><code>urf.Map</code></dt>
-		<dd>A resource containing associations between keys and values. Each association is represented by an instance of <code>urf.MapEntry</code>, which indicates a value for the property <code>urf.key</code> and the property <code>urf.value</code>. Each map entry is the value of an <code>urf.entry</code> property of the map resource.</dd>
-		<dt><code>urf.Ordinal</code></dt>
-		<dd>Ordinal resources are numbers that represent the position of an element in a sequence. URF currently only supports finite ordinals, which means that there will be a corresponding ordinal for every positive whole numbers and zero. Ordinals are identified by inline namespace URIs with a lexical representation in the form <code><var>romandigit</var><strong>+</strong></code>. The ordinal class is a subclass of the class <code>urf.</code>Number.</dd>
-		<dt><code>urf.Property</code></dt>
-		<dd>Not every resource used as a predicate is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the property type to further specify its semantics and expected domain and range. The class <code>urf.Property</code> is a subclass of the class <code>urf.Class</code>.</dd>
-		<dt><code>urf.Rational</code></dt>
-		<dd>Rational number are all of the measuring numbers and may include decimal fractional parts. They are identified by inline namespace URIs with a lexical representation in the form <strong>[</strong>-<strong>]</strong><var>romandigit</var><strong>+</strong>.<var>romandigit</var><strong>+[</strong>e<strong>[</strong>+<strong>|</strong>-<strong>]</strong><var>romandigit</var><strong>+]</strong>. The integer class is a subclass of the class <code>urf.Number</code>.</dd>
-		<dt><code>urf.RegularExpression</code></dt>
-		<dd>Regular expression resources are text-based patterns that define rules for the content of strings. These are inline namespace resources.</dd>
-		<dt><code>urf.Resource</code></dt>
-		<dd>Every resource is implicitly an instance of the class <code>urf.Resource</code>. The resources <code>urf.Property</code> and <code>urf.Resource</code> are both instances of the class <code>urf.Resource</code>.</dd>
-		<dt><code>urf.Set</code></dt>
-		<dd>Set resources are resources that contain at most one instance of other <dfn>element</dfn> resources. A set, like normal resources, may have any property, but the properties representing the elements of the set appear as values of the <code>urf.element</code> property.</dd>
-		<dt><code>urf.String</code></dt>
-		<dd>String resources are sequences of Unicode code points or text and lie in the corresponding inline namespace.</dd>
-		<dt><code>urf.Time</code></dt>
-		<dd>Time resources represent time of day. They use a inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO 8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd>
-		<dt><code>urf.URI</code></dt>
-		<dd>URI resources are sequences of Unicode code points that function as resource identifiers and conform to [<a href="#rfc3986">RFC 3986</a>]. They lie in the corresponding inline namespace with a lexical form specified by [<a href="#rfc3986">RFC 3986</a>].</dd>
-		<dt><code>urf.UTCOffset</code></dt>
-		<dd>UTC offset resources represent an offset from UTC to local time. They use an inline namespace with a lexical form of <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var> with semantics corresponding to the UTC offset described in [<a href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</dd>
-		<dt><code>content.Charset</code></dt>
-		<dd>The name of the mapping of integer values to a set of characters. This is equivalent to the <dfn>charset</dfn> Internet media type parameter described by [<a href="#rfc2046">RFC 2046</a>] and further elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset encapsulates both the concept of a <dfn>coded character set</dfn> and a <dfn>character encoding scheme</dfn>, as specified in [<a href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA Charset Registry</a>], such as <code>UTF-16BE</code>.</dd>
-		<dt><code>content.MediaType</code></dt>
-		<dd>A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use inline namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</dd>
-	</dl>
-	<h2>PLOOP</h2>
-	<p>It is possible to use URF as a Programming Language Ontology for Objects and Properties (PLOOP), allowing long-term storage and/or object tree instance descriptions of programming languages using TURF, for example. The following specifies a canonical set of rules a processor must follow for for constructing a hierarchy of programming language objects based upon an URF description. All examples are represented using TURF and are given in the Java programming language using the Guise Internet application framework [<a href="#guise">Guise</a>]. A complete <a href="#ploopExample">PLOOP example</a> is provided at the end of this specification.</p>
-	<h3>Classes</h3>
-	<p>The URI of an URF class must indicate the complete package name and class name of a programming language class to instantiate. In the following example, the Java class <code>com.guiseframework.component.Layoutpanel</code> should be instantiated using its default constructor:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/component/LayoutPanel»
-.</code></pre>
-	</figure>
-	<p>If a resource has a scoped <code>urf.selector</code> property with an <code>urf.List</code> value in the context of an <code>urf.type</code> declaration, a PLOOP processor must use all the corresponding values as arguments to the constructor of the specified type, converted the URF selector resources into programming language values as needed. A PLOOP instance would use the following example to indicate that an instance of the Guise class <code>com.guiseframework.Category</code> should be constructed using <code>new Category("category1", "First Category")</code>:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/Category»("category1", "First Category")
-.</code></pre>
-	</figure>
-	<h3>Properties</h3>
-	<p>URF allows identification of programming language properties through use of the default URF namespace <code>&lt;http://urf.name/default/&gt;</code>. A PLOOP processor must use normal get/set conventions for the language in question for interpreting the read/write properties available for a particular class. For example, the local name of the property <code>«http://urf.name/default/label»</code> for a resource of type <code>«java:/com/guiseframework/component/Button»</code> is considered a property name for getting or setting a value of an instance of the <code>Button</code> class:</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  *«java:/com/guiseframework/component/Button»:
-    label="Push Me"
-  ;
-.</code></pre>
-	</figure>
-	<h3>Values</h3>
-	<p>In general, URF resources with URIs that are recognized must be converted to the equivalent type in the programming language. For example, in Java all resources of type <code>urf.Integer</code> must be converted to instances of java.lang.Integer. Likewise in Java <code>urf.List</code>, <code>urf.Set</code>, and <code>urf.Map</code> resources must be converted to <code>java.util.List</code>, <code>java.util.Set</code>, and <code>java.util.Map</code> instances, respectively, with each element or entry recursively instantiated or converted as needed. A resource with an inline URI must be converted if possible to a programming language type functioning as a lexical identifier, if its inlin type indicates such an enumerated type. In the following example, the Guise Java class <code>com.guiseframework.component.layout.FlowLayout</code> has a <code>setFlow(com.guiseframework.component.layout.Flow)</code> method. The inline URI <code>«*layout.Flow("LINE")»</code> indicates a type of <code>com.guiseframework.component.layout.Flow</code>, which is a Java enum class. A PLOOP processor must construct a <code>com.guiseframework.component.layout.Flow</code> object from the string "LINE" and assign it to the instance of <code>com.guiseframework.component.layout.FlowLayout</code> using <code>com.guiseframework.component.layout.FlowLayout.setFlow(com.guiseframework.component.layout.Flow)</code>.</p>
-	<figure>
-		<pre><code class="language-turf">`URF¤
-  («java:/com/guiseframework/component/layout/FlowLayout»:
-    flow=«*layout.Flow("LINE")»
-  ;
-.</code></pre>
-	</figure>
-	<h2>References</h2>
-	<dl>
-		<dt>DCMI Namespace</dt>
-		<dd>Andy Powell and Harry Wagner. <a href="http://dublincore.org/documents/dcmi-namespace/"><cite>Namespace Policy for the Dublin Core Metadata Initiative (DCMI)</cite></a>. Dublin Core Namespace Initiative, 2007.</dd>
-		<dt>Guise</dt>
-		<dd><a href="http://www.guiseframework.com/"><cite>Guise™ Internet Application Framework</cite></a>. GlobalMentor, Inc.</dd>
-		<dt>IANA Charset Registry</dt>
-		<dd><a href="http://www.iana.org/assignments/character-sets"><cite>IANA Charset Registry</cite></a>. Internet Assigned Numbers Authority.</dd>
-		<dt>ISO 8601</dt>
-		<dd><cite>ISO 8601:2004(E): Data elements and interchange formats — Information interchange — Representation of dates and times</cite>. International Organization for Standardization, 2004-12-01.</dd>
-		<dt>RDF/XML</dt>
-		<dd>Dave Beckett. <a href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax Specification (Revised)</cite></a>. World Wide Web Consortium, 2006-02-10.</dd>
-		<dt>RFC 2046</dt>
-		<dd>N. Freed and N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>. Internet Engineering Task Force, 1996.</dd>
-		<dt>RFC 2130</dt>
-		<dd>C. Weider, C. Preston, K. Simonsen, H. Alvestrand, R. Atkinson, M. Crispin, and P. Svanberg. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2130: The Report of the IAB Character Set Workshop held 29 February - 1 March, 1996</cite></a>. Internet Engineering Task Force, 1997.</dd>
-		<dt>RFC 2278</dt>
-		<dd>N. Freed and J. Postel. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2278: IANA Charset Registration Procedures</cite></a>. Internet Engineering Task Force, 1998.</dd>
-		<dt>RFC 2426</dt>
-		<dd>F. Dawson and T. Howes. <a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2426: vCard MIME Directory Profile</cite></a>. Internet Engineering Task Force, 1998.</dd>
-		<dt>RFC 2445</dt>
-		<dd>F. Dawson and and D. Stenerson. <a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2445: Internet Calendaring and Scheduling Core Object Specification (iCalendar)</cite></a>. Internet Engineering Task Force, 1998.</dd>
-		<dt>RFC 3339</dt>
-		<dd>G. Klyne and C. Newman. <a href="http://www.ietf.org/rfc/rfc3339.txt"><cite>RFC 3339: Date and Time on the Internet: Timestamps</cite></a>. Internet Engineering Task Force, 2002.</dd>
-		<dt>RFC 3966</dt>
-		<dd>H. Schulzrinne. <a href="http://www.ietf.org/rfc/rfc3966.txt"><cite>RFC 3966: The tel URI for Telephone Numbers</cite></a>. Internet Engineering Task Force, 2004.</dd>
-		<dt>RFC 3986</dt>
-		<dd>T. Berners-Lee, R. Fielding, and L. Masinter. <a href="http://www.ietf.org/rfc/rfc3986.txt"><cite>RFC 3986: Uniform Resource Identifier (URI): Generic Syntax</cite></a>. Internet Engineering Task Force, 2005.</dd>
-		<dt>RFC 4627</dt>
-		<dd>D. Crockford. <a href="http://www.ietf.org/rfc/rfc4627.txt"><cite>RFC 4627: The application/json Media Type for JavaScript Object Notation (JSON)</cite></a>. Internet Engineering Task Force, 2006.</dd>
-		<dt>RFC 4646</dt>
-		<dd>A. Phillips and M. Davis. <a href="http://www.ietf.org/rfc/rfc4646.txt"><cite>RFC 4646: Tags for Identifying Languages</cite></a>. Internet Engineering Task Force, 2006.</dd>
-		<dt>RFC 4648</dt>
-		<dd>S. Josefsson. <a href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16, Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task Force, 2006.</dd>
-		<dt>Unicode BOM FAQ</dt>
-		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd>
-		<dt>UTR #13</dt>
-		<dd>Mark Davis. <a href="http://unicode.org/unicode/standard/reports/tr13/tr13-5.html"><cite>Unicode Technical Report #13: Unicode Newline Guidelines</cite><cite></cite></a>. Unicode, Inc., 1999.</dd>
-		<dt>XML Schema 2</dt>
-		<dd>Paul V. Biron and Ashok Malhotra. <a href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2: Datatypes Second Edition</cite></a>. World Wide Web Consortium, 2004-10-28.</dd>
-	</dl>
-	<h2>Acknowledgements</h2>
-	<p>Brad Neuberg encouraged the creation of an alternate RDF serialization; Frank Manola made convincing arguments for using ordinals instead of integers as list element predicates.</p>
-	<h2>History</h2>
-	<dl>
+		<dt>2017-09-30</dt>
+		<dd>
+			<ul>
+				<li>Created separate <cite>URF History</cite> document.</li>
+			</ul>
+		</dd>
 		<dt>2017-09-25</dt>
 		<dd>
 			<ul>
@@ -183,8 +40,6 @@
 				<li>Renamed <code>urf.Real</code> to <code>urf.Rational</code>.</li>
 			</ul>
 		</dd>
-	</dl>
-	<dl>
 		<dt>2009-08-24</dt>
 		<dd>
 			<ul>
@@ -192,8 +47,6 @@
 				<li>Changed TURF content type to <code>text/urf</code>.</li>
 			</ul>
 		</dd>
-	</dl>
-	<dl>
 		<dt>2008-01-20 </dt>
 		<dd>
 			<ul>
