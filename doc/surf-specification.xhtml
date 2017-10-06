@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-09-25</dd>
+			<dd>Draft 2017-10-06</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -42,14 +42,14 @@
 		<li>SURF <span class="spec-must-not">must not</span> require namespace IRIs to be declared.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
-	<p>The key words <q><span class="spec-must">must</span></q>, <q><span class="spec-must-not">must not</span></q>, <q><span class="spec-must">required</span></q>, <q><span class="spec-must">shall</span></q>, <q><span class="spec-must-not">shall not</span></q>, <q><span class="spec-should">should</span></q>, <q><span class="spec-should-not">should not</span></q>, <q><span class="spec-should">recommended</span></q>, <q><span class="spec-may">may</span></q>, and <q><span class="spec-may">optional</span></q> in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
+	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
 	<aside class="note far third">The separate TURF format allows other encodings such as UTF-16 and UTF-32.</aside>
 	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
-	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of <q>WhiteSpace</q>. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul>
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
@@ -95,9 +95,9 @@
 		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
 		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
-	<h2>Names</h2>
+	<h2>Handles</h2>
 	<figure class="far side">
-		<figcaption>Example SURF names.</figcaption>
+		<figcaption>Example SURF handles.</figcaption>
 		<ul>
 			<li><code class="language-surf">foo</code></li>
 			<li><code class="language-surf">fooBar</code></li>
@@ -110,19 +110,19 @@
 			<li><code class="language-surf">chem-Molecule</code></li>
 		</ul>
 	</figure>
-	<p>A <dfn>name</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category, or the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>). Two hyphen-minus characters <span class="spec-must-not">must not</span> may appear subsequently in a name, and a name <span class="spec-must-not">must not</span> end with a hyphen-minus character.</p>
+	<p>A <dfn>name</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
 	<ul class="spec-production">
-		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code> | '-')*</li>
+		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code>)*</li>
 	</ul>
-	<aside class="note far third">The separate TURF format allows defining custom namespaces, each with a hierarchy of name contexts.</aside>
-	<aside class="annotation far half">The SURF name context delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF name context mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
-	<p>The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
-	<h5>Namespace</h5>
-	<p>Every SURF name is part of the URF <dfn>namespace</dfn> identified by the IRI <code>https://urf.name/</code>.</p>
-	<h5>Contexts</h5>
-	<p>The components delimited by hyphen-minus characters, with the exception of the last component which is referred to as the <dfn>simple name</dfn>, represent a hierarchy of <dfn>name contexts</dfn>. The name <code>example-foo</code>, for example, indicates simple name of <code>foo</code> in the <code>example</code> name context. Nevertheless a SURF parser <span class="spec-may">may</span> treat SURF names as opaque identifiers.</p>
-	<p>Authors of SURF documents <span class="spec-should">should</span> use name contexts corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a name <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
-	<p>SURF documents <span class="spec-must-not">must not</span> use names beginning with the <code>urf-</code> prefex unless defined by one of the URF specifications. The <code>example-</code> prefix is reserved for use as examples in documentation for private testing. There are no restrictions on using SURF identifiers with no context, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
+	<aside class="note far half">In URF each SURF handle represents a name inside the ad-hoc <dfn>namespace</dfn> <code>https://urf.name/</code>, with each prefix indicating an informal subnamespace of that IRI. For instance the handle <code>example-FooBar</code> represents the name <code>FooBar</code> in the namespace <code>https://urf.name/example/</code>, that is the tag <code>https://urf.name/example/FooBar</code>. <span class="tip">Nevertheless a SURF parser <span class="spec-may">may</span> treat SURF names as opaque identifiers.</span> <span class="info">The separate TURF format allows defining custom namespaces.</span></aside>
+	<aside class="annotation far half">The SURF prefix <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
+	<p>A name may be introduced by one or more <dfn>prefixes</dfn>, each itself a name ending in the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>). A name and its prefixes, if any, are referred to as a <dfn>handle</dfn>. An example of a handle is <code>example-FooBar</code>.</p>
+	<ul class="spec-production">
+		<li><code class="name">prefix</code> ⇒ <code class="name">Name</code> '-'</li>
+		<li><code class="name">handle</code> ⇒ <code class="name">prefix</code>* <code class="name">Name</code></li>
+	</ul>
+	<p>Authors of SURF documents <span class="spec-should">should</span> use name prefixes corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a handle <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
+	<p>SURF documents <span class="spec-must-not">must not</span> use handles beginning with the <code>urf-</code> prefex unless defined by one of the URF specifications. The <code>example-</code> prefix is reserved for use as examples in documentation for private testing. There are no restrictions on using SURF handles with no prefixes, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
 	<h2>Resources</h2>
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>tag</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
@@ -143,19 +143,19 @@
 	<ul class="spec-production">
 		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> · [<code class="name">type</code>] · [<code class="name">properties</code>]</li>
 		<li><code class="name">object_begin</code> ⇒ '*'</li>
-		<li><code class="name">type</code> ⇒ <code class="name">name</code></li>
+		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
 		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">name</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
-	<p>TODO recommend not to use "true" or "false" as property names, because the semantics in URF are different than expected</p>
-	<p>An object <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">name</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<p>TODO recommend not to use "true" or "false" as property handles, because the semantics in URF are different than expected</p>
+	<p>An object <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
 	<h3>Literals</h3>
 	<aside class="info far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
 	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
 	<h4>Binary</h4>
 	<aside class="annotation far side">SURF uses the binary delimiter <code>%</code> because it resembles <code>0</code> and <code>1</code>.</aside>
-	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the <q>Base 64 Encoding</q> defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-must-not">must not</span> include Base 64 padding.</p>
+	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the “Base 64 Encoding” defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-must-not">must not</span> include Base 64 padding.</p>
 	<ul class="spec-production">
 		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code></li>
 	</ul>
@@ -193,8 +193,8 @@
 	<ul class="spec-production">
 	</ul>
 	<h4>Email Address</h4>
-	<aside class="annotation far side">The caret delimiter indicating an email address resembles the paper airplane symbol representing <q>send email</q> in many user interfaces.</aside>
-	<p>An email address in SURF begins with the <code class="name">CIRCUMFLEX ACCENT</code> character <code>^</code> (<code class="unicode">U+005E</code>) <span class="note">commonly known as a <q>caret</q></span>, followed by the <q>addr-spec</q> format specified in <a href="#ref-rfc5322" class="ref">RFC 5322</a>. The representation <span class="spec-must-not">must not</span> include any obsolete elements (those starting with the prefix <q>obs-</q>) in <cite>RFC 5322</cite>. The representation <span class="spec-must-not">must not</span> include any <q>comments</q> or <q>folding white space</q> as defined by <cite>RFC 5322</cite>.</p>
+	<aside class="annotation far side">The caret delimiter indicating an email address resembles the paper airplane symbol representing “send email” in many user interfaces.</aside>
+	<p>An email address in SURF begins with the <code class="name">CIRCUMFLEX ACCENT</code> character <code>^</code> (<code class="unicode">U+005E</code>) <span class="note">commonly known as a “caret”</span>, followed by the “addr-spec” format specified in <a href="#ref-rfc5322" class="ref">RFC 5322</a>. The representation <span class="spec-must-not">must not</span> include any obsolete elements (those starting with the prefix “obs-”) in <cite>RFC 5322</cite>. The representation <span class="spec-must-not">must not</span> include any “comments” or “folding white space” as defined by <cite>RFC 5322</cite>.</p>
 	<ul class="spec-production">
 		<li><code class="name">email</code> ⇒ '^' <code class="name">rfc_5322_addr_spec</code></li>
 	</ul>
@@ -203,7 +203,7 @@
 	<ul class="spec-production">
 		<li><code class="name">iri</code> ⇒ '&lt;' ( <code class="name">rfc_3987_IRI</code> | <code class="name">email</code> | <code class="name">telephone</code> | <code class="name">uuid</code> ) '&gt;'</li>
 	</ul>
-	<p> If an email address, telephone number, or UUID appears between the delimiters, it represents an <q>IRI short form</q> that is equivalent to a literal IRI according to the following rules:</p>
+	<p> If an email address, telephone number, or UUID appears between the delimiters, it represents an “IRI short form” that is equivalent to a literal IRI according to the following rules:</p>
 	<dl>
 		<dt><code class="name">email</code></dt>
 		<dd>The email address is converted into an IRI with a scheme of <code>mailto</code> according to <a href="#ref-rfc3987" class="ref">RFC 6068</a>.</dd>
@@ -224,22 +224,22 @@
 			<dd><a href="https://docs.python.org/3/library/decimal.html" class="see"><code>decimal</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>number</dfn> represents a numerical value in base 10 that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<p>A <dfn>number</dfn> represents a numerical value in base 10 that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. If the number begins with the <code class="name">NUMBER SIGN</code> character <code>$</code> (<code class="unicode">U+0023</code>), it is considered an <dfn>integer</dfn> and <span class="spec-must-not">must not</span> contain a fraction or exponent component. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
 	<ul class="spec-production">
-		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
-		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
+		<li><code class="name">number</code> ⇒ ['#' | '$'] ['-'] <code class="name">whole</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
+		<li><code class="name">whole</code> ⇒ <code class="name">digit</code>+</li>
 		<li><code class="name">fraction</code> ⇒ '.' <code class="name">digit</code>+</li>
 		<li><code class="name">exponent</code> ⇒ ('e' | 'E') ['-' | '+'] <code class="name">digit</code>+</li>
 		<li><code class="name">digit</code> ⇒ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'</li>
 	</ul>
 	<p>A number <span class="spec-should">should</span> be in its canonical form:</p>
 	<ul>
-		<li>No leading zeros in the <code class="name">integer</code> component except to meet the requirement of at least one digit.</li>
+		<li>No leading zeros in the <code class="name">whole</code> component except to meet the requirement of at least one digit.</li>
 		<li>No trailing zeros in the digit(s) in the <code class="name">fraction</code> component except to meet the requirement of at least one digit.</li>
-		<li>o leading zeros in the digit(s) in the <code class="name">exponent</code> component.</li>
+		<li>No leading zeros in the digit(s) in the <code class="name">exponent</code> component.</li>
 		<li>A lowercase <code>'e'</code> in the <code class="name">exponent</code> component.</li>
 	</ul>
-	<p>Nevertheless the presence of any leading zero(s) in the <code class="name">integer</code> component <span class="spec-must-not">shall not</span> be interpreted as indicating any other number base other than base 10.</p>
+	<p>Nevertheless the presence of any leading zero(s) in the <code class="name">whole</code> component <span class="spec-must-not">shall not</span> be interpreted as indicating any other number base other than base 10.</p>
 	<h4>Regular Expression</h4>
 	<aside class="note far third">SURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that SURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
 	<p>A <dfn>regular expression</dfn> is surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
@@ -273,7 +273,7 @@
 	<p> TODO production</p>
 	<h4>Telephone</h4>
 	<aside class="annotation far half"><cite>RFC 3966</cite> allows visual separators as an aid to remembering URIs. SURF's focus is representing information and thus forgoes separators in the interest of simplicity.</aside>
-	<p>In SURF the representation of a <dfn>telephone</dfn> number follows the <q>global number</q> format prescribed by <a href="#ref-rfc3966" class="ref">RFC 3966</a>, which is a <code class="name">PLUS SIGN</code> <code>+</code> (<code class="unicode">U+002B</code>) followed by at least one digit. The representation <span class="spec-must-not">must not</span> include any <q>visual separators</q> as defined by <cite>RFC 3966</cite>.</p>
+	<p>In SURF the representation of a <dfn>telephone</dfn> number follows the “global number” format prescribed by <a href="#ref-rfc3966" class="ref">RFC 3966</a>, which is a <code class="name">PLUS SIGN</code> <code>+</code> (<code class="unicode">U+002B</code>) followed by at least one digit. The representation <span class="spec-must-not">must not</span> include any “visual separators” as defined by <cite>RFC 3966</cite>.</p>
 	<figure class="far half">
 		<figcaption>Example SURF telephone number.</figcaption>
 		<ul>
@@ -329,7 +329,7 @@
 	<p>TODO add support for durations</p>
 	<h4>UUID</h4>
 	<aside class="annotation far side">The ampersand character &amp; was chosen for UUIDs because it recalls the address-of operator of C/C++.</aside>
-	<p>A <dfn>Universally Unique IDentifier</dfn> (<abbr>UUID</abbr>) <span class="spec-must">must</span> adhere to the requirements of <a href="#ref-rfc4122" class="ref">RFC 4122</a>. The SURF representation of a UUID be <span class="spec-must">must</span> be introduced by the <code class="name">AMPERSAND</code> character <code>&amp;</code> (<code class="unicode">U+0026</code>) and be followed by the <q>UUID</q> production given in <cite>RFC 4122</cite>.</p>
+	<p>A <dfn>Universally Unique IDentifier</dfn> (<abbr>UUID</abbr>) <span class="spec-must">must</span> adhere to the requirements of <a href="#ref-rfc4122" class="ref">RFC 4122</a>. The SURF representation of a UUID be <span class="spec-must">must</span> be introduced by the <code class="name">AMPERSAND</code> character <code>&amp;</code> (<code class="unicode">U+0026</code>) and be followed by the “UUID” production given in <cite>RFC 4122</cite>.</p>
 	<figure class="far half">
 		<figcaption>Example SURF UUID.</figcaption>
 		<ul>
@@ -397,8 +397,6 @@
 	<ul class="spec-production">
 		<li><code class="name">set</code> ⇒ '(' <code class="name">resource-sequence</code> ')'</li>
 	</ul>
-	<h4>Table</h4>
-	<p>TODO</p>
 	<h2>References</h2>
 	<dl>
 		<dt id="ref-iso8601" class="ref-target">ISO 8601:2004</dt>
