@@ -17,11 +17,11 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-10-06</dd>
+			<dd>Draft 2017-10-20</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
-	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format for a directed graph of data values. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it is compatible with rigorous semantic frameworks such as the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
+	<p><dfn>Simple URF</dfn> (<abbr>SURF</abbr>) is a compact, text-based, human-readable persistence format for a directed graph of data values. It is similar in purpose to JSON yet less verbose and more expressive, supporting for example a greater number of types. Moreover as one of the primary serializations (along with <abbr title="Text URF">TURF</abbr>) of the <dfn>Uniform Resource Format</dfn> (<abbr>URF</abbr>), it rigorously represents semantic data in a simpler manner than serializations of the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>).</p>
 	<h3>Definitions</h3>
 	<dl>
 		<dt>SURF parser</dt>
@@ -124,22 +124,24 @@
 	<p>Authors of SURF documents <span class="spec-should">should</span> use name prefixes corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a handle <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
 	<p>SURF documents <span class="spec-must-not">must not</span> use handles beginning with the <code>urf-</code> prefex unless defined by one of the URF specifications. The <code>example-</code> prefix is reserved for use as examples in documentation for private testing. There are no restrictions on using SURF handles with no prefixes, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
 	<h2>Resources</h2>
-	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>tag</dfn> followed by a <dfn>resource representation</dfn>.</p>
+	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>ident</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
-		<li><code class="name">resource</code> ⇒ [<code class="name">tag</code>] · <code class="name">resource_representation</code> | <code class="name">tag</code></li>
+		<li><code class="name">resource</code> ⇒ [<code class="name">ident</code>] · <code class="name">resource_representation</code> | <code class="name">ident</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code><code class="name"></code></li>
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code><code class="name"></code></li>
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
 	</ul>
-	<p> A tag consists of an identifier, which is either a SURF name or an IRI, a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). A tag with a SURF name as its identifier is a <dfn>local tag</dfn>, while a tag with an IRI as its identifier is a <dfn>global tag</dfn>.</p>
+	<p> An ident consists of an identifier; which is either a SURF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of an ident with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of an ident with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the ident of an outer resource in the graph.</p>
 	<ul class="spec-production">
-		<li><code class="name">tag</code> ⇒ '|' <code class="name">tag_identifier</code> '|'</li>
-		<li><code class="name">tag_identifier</code> ⇒ <code class="name">name</code> | <code class="name">iri</code></li>
+		<li><code class="name">ident</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
+		<li><code class="name">alias</code> ⇒ <code class="name">name</code><code class="name"></code></li>
+		<li><code class="name">id</code> ⇒ <code class="name">string</code><code class="name"></code></li>
+		<li><code class="name">tag</code> ⇒ <code class="name">iri</code><code class="name"></code></li>
 	</ul>
-	<p>The first occurrence of a tag with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a tag with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the tag of an outer resource in the graph.</p>
-	<p>A <em>local tag</em> is merely part of the SURF document syntax, providing an identifier for referencing resources only within the confines of the SURF document. A <em>global tag</em> <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object, and provides an IRI identifier that remains associated with that object outside of the SURF document. A SURF parser <span class="spec-must">must</span> provide global tags as part of the parsed data.</p>
+	<p>If an ident uses a SURF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the SURF document. If the identifier is an IRI, it is a <dfn>tag</dfn> and provides a unique identifier for the resource across all SURF documents. A tag <span class="spec-must-not">must not</span> contain an IRI fragment. A string as the identifier functions as an <dfn>ID</dfn> for an object, unique only for a certain object type.</p>
+	<p>A tag or an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object. An ID <span class="spec-must-not">must not</span> appear in front of a resource representation without an indicated type. A SURF parser <span class="spec-must">must</span> provide tags and IDs as part of the parsed data. An ID</p>
 	<h3>Objects</h3>
-	<p>Objects are descriptions of unidentified resources.</p>
+	<p>Objects are descriptions of resources.</p>
 	<ul class="spec-production">
 		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> · [<code class="name">type</code>] · [<code class="name">properties</code>]</li>
 		<li><code class="name">object_begin</code> ⇒ '*'</li>
