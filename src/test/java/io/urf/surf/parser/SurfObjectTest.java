@@ -17,9 +17,7 @@
 package io.urf.surf.parser;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
-import static com.github.npathai.hamcrestopt.OptionalMatchers.hasValue;
 
 import java.time.*;
 import java.util.*;
@@ -38,7 +36,7 @@ public class SurfObjectTest {
 		surfObject.setPropertyValue("joined", LocalDate.of(2016, Month.JANUARY, 23));
 
 		final Optional<Object> optionalJoined = surfObject.getPropertyValue("joined");
-		assertThat(optionalJoined, hasValue(LocalDate.parse("2016-01-23")));
+		assertThat(optionalJoined, isPresentAndIs(LocalDate.parse("2016-01-23")));
 	}
 
 }
