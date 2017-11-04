@@ -41,7 +41,7 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
 import io.urf.SURF;
-import io.urf.surf.parser.SurfObject;
+import io.urf.surf.model.SurfObject;
 
 /**
  * Simple serializer for the Simple URF (SURF) document format.

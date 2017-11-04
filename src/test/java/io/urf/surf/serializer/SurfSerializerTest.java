@@ -43,6 +43,7 @@ import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
 import io.urf.SURF;
+import io.urf.surf.model.SurfObject;
 import io.urf.surf.parser.*;
 import io.urf.surf.test.SurfTestResources;
 
