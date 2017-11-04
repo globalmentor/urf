@@ -45,6 +45,7 @@ import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
 
 import io.urf.SURF;
+import io.urf.surf.model.SurfObject;
 
 /**
  * Simple parser for the Simple URF (SURF) document format.

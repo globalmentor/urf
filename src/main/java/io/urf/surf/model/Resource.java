@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package io.urf.surf.parser;
+package io.urf.surf.model;
 
-import static org.junit.Assert.*;
-import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
-
-import java.time.*;
-import java.util.*;
-
-import org.junit.*;
+import java.net.URI;
+import java.util.Optional;
 
 /**
- * Tests of {@link SurfObject}.
+ * Represents a resource with an optional identifying tag.
  * @author Garret Wilson
  */
-public class SurfObjectTest {
+public interface Resource { //TODO transfer to URF model package
 
-	@Test
-	public void testGetPropertyValue() {
-		final SurfObject surfObject = new SurfObject();
-		surfObject.setPropertyValue("joined", LocalDate.of(2016, Month.JANUARY, 23));
-
-		final Optional<Object> optionalJoined = surfObject.getPropertyValue("joined");
-		assertThat(optionalJoined, isPresentAndIs(LocalDate.parse("2016-01-23")));
-	}
+	/** @return The resource identifier tag. */
+	public Optional<URI> getTag();
 
 }
