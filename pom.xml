@@ -17,9 +17,7 @@
 		<module>../urf-apache-commons-configuration2-surf</module>
 		<module>../urf-model</module>
 		<module>../urf-spec</module>
-		<module>../urf-surf-parser</module>
-		<module>../urf-surf-serializer</module>
-		<module>../urf-surf-spec</module>
+		<module>../urf-surf</module>
 		<module>../urf-surf-test</module>
 		<module>../urf-turf-model</module>
 		<module>../urf-turf-spec</module>
