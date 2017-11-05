@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.surf.serializer;
+package io.urf.surf;
 
 import static org.junit.Assert.*;
 
@@ -42,9 +42,6 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
-import io.urf.SURF;
-import io.urf.surf.model.SurfObject;
-import io.urf.surf.parser.*;
 import io.urf.surf.test.SurfTestResources;
 
 /**

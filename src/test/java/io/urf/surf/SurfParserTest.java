@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.surf.parser;
+package io.urf.surf;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +41,6 @@ import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
-import io.urf.surf.model.SurfObject;
 import io.urf.surf.test.SurfTestResources;
 import junit.framework.AssertionFailedError;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.surf.model;
+package io.urf.surf;
 
 import static org.junit.Assert.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
@@ -23,8 +23,6 @@ import java.time.*;
 import java.util.*;
 
 import org.junit.*;
-
-import io.urf.surf.model.SurfObject;
 
 /**
  * Tests of {@link SurfObject}.
