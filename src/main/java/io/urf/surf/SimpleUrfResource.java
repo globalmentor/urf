@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.surf.model;
+package io.urf.surf;
 
 import java.util.*;
 

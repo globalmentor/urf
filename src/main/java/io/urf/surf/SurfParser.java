@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.urf.surf.parser;
+package io.urf.surf;
 
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
-import static io.urf.SURF.*;
-import static io.urf.SURF.WHITESPACE_CHARACTERS;
+import static io.urf.surf.SURF.*;
+import static io.urf.surf.SURF.WHITESPACE_CHARACTERS;
 import static java.util.Objects.*;
 
 import java.io.*;
@@ -43,9 +43,6 @@ import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
-
-import io.urf.SURF;
-import io.urf.surf.model.SurfObject;
 
 /**
  * Simple parser for the Simple URF (SURF) document format.

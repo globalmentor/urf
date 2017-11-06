@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.urf.surf.serializer;
+package io.urf.surf;
 
 import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
-import static io.urf.SURF.*;
+import static io.urf.surf.SURF.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
@@ -39,9 +39,6 @@ import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
-
-import io.urf.SURF;
-import io.urf.surf.model.SurfObject;
 
 /**
  * Simple serializer for the Simple URF (SURF) document format.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf;
+package io.urf.surf;
 
 import static com.globalmentor.java.Characters.*;
 

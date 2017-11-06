@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.urf.surf.model;
+package io.urf.surf;
 
 import static com.globalmentor.net.URIs.*;
-import static io.urf.SURF.*;
+import static io.urf.surf.SURF.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
