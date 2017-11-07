@@ -296,26 +296,6 @@ public class SURF {
 			return string;
 		}
 
-		//		/**
-		//		 * Determines if the given character is a SURF handle begin character. A handle begin character is a name begin character.
-		//		 * @param c The character to check.
-		//		 * @return <code>true</code> if the character is a SURF handle begin character.
-		//		 * @see Name#isBeginCharacter(int)
-		//		 */
-		//		public static final boolean isBeginCharacter(final int c) {
-		//			return Name.isBeginCharacter(c);
-		//		}
-		//
-		//		/**
-		//		 * Determines if the given character is a SURF handle character. A handle character is a name character or a hyphen-minus character.
-		//		 * @param c The character to check.
-		//		 * @return <code>true</code> if the character is a SURF name character.
-		//		 * @see Name#isValidCharacter(int)
-		//		 */
-		//		public static final boolean isValidCharacter(final int c) { //TODO remove hyphen check; move to program logic
-		//			return Name.isValidCharacter(c) || c == HYPHEN_MINUS_CHAR;
-		//		}
-
 	}
 
 }
