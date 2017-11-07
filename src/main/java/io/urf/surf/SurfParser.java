@@ -44,6 +44,8 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
 
+import io.urf.surf.SURF.Handle;
+
 /**
  * Simple parser for the Simple URF (SURF) document format.
  * <p>
@@ -60,8 +62,8 @@ import com.globalmentor.text.*;
 public class SurfParser {
 
 	/**
-	 * The map of resources that have been tagged. Each tag is either a name {@link String}, for local tags, or a {@link URI} representing the resource's global
-	 * identifier tag.
+	 * The map of resources that have been tagged. Each tag is either a name token {@link String}, for local tags, or a {@link URI} representing the resource's
+	 * global identifier tag.
 	 */
 	private final Map<Object, Object> taggedResources = new HashMap<>();
 
@@ -127,7 +129,7 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a tag, which is either a name or an IRI with appropriate delimiters, surrounded by tag delimiters. The current position must be that of the
+	 * Parses a tag, which is either a name token or an IRI with appropriate delimiters, surrounded by tag delimiters. The current position must be that of the
 	 * beginning tag delimiter character. The new position will be that immediately after the last tag delimiter.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The tag parsed from the reader; either a {@link String} for a local tag or a {@link URI} for a global resource identifier tag.
@@ -135,7 +137,7 @@ public class SurfParser {
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if there the tag is not valid.
 	 * @see SURF#TAG_DELIMITER
-	 * @see #parseName(Reader)
+	 * @see #parseHandle(Reader)
 	 * @see #parseIRI(Reader)
 	 */
 	public static Object parseTag(@Nonnull final Reader reader) throws IOException, ParseIOException {
@@ -144,39 +146,60 @@ public class SurfParser {
 		if(peekRequired(reader) == IRI_BEGIN) {
 			tag = parseIRI(reader);
 		} else {
-			tag = parseName(reader);
+			tag = parseNameToken(reader);
 		}
 		check(reader, TAG_DELIMITER);
 		return tag;
 	}
 
 	/**
-	 * Parses a name composed of a name beginning character followed by zero or more name characters. The current position must be that of the first name
-	 * character. The new position will be that immediately after the last name character.
+	 * Parses a name token composed of a name token beginning character followed by zero or more name token characters. The current position must be that of the
+	 * first name token character. The new position will be that immediately after the last name token character.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return The name parsed from the reader.
+	 * @return The name token parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if there are are no name characters.
-	 * @see SURF#isSurfNameBeginCharacter(int)
-	 * @see SURF#isSurfNameCharacter(int)
+	 * @see SURF.Name#isTokenBeginCharacter(int)
+	 * @see SURF.Name#isTokenCharacter(int)
 	 */
-	public static String parseName(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	protected static String parseNameToken(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder(); //create a string builder for reading the name segment
 		int c = reader.read(); //read the first name character
-		if(!isSurfNameBeginCharacter(c)) { //if the name doesn't start with a name character
+		if(!Name.isTokenBeginCharacter(c)) { //if the name doesn't start with a name token character
 			checkReaderNotEnd(reader, c); //make sure we're not at the end of the reader
-			throw new ParseIOException(reader, String.format("Expected name begin character; found %s.", Characters.getLabel(c)));
+			throw new ParseIOException(reader, String.format("Expected name token begin character; found %s.", Characters.getLabel(c)));
 		}
 		do {
 			stringBuilder.append((char)c); //append the character
 			reader.mark(1); //mark our current position
 			c = reader.read(); //read another character
-		} while(isSurfNameCharacter(c)); //keep reading and appending until we reach a non-name character
+		} while(Name.isTokenCharacter(c)); //keep reading and appending until we reach a non-name token character
 		if(c >= 0) { //if we didn't reach the end of the stream
 			reader.reset(); //reset to the last mark, which was set right before the non-name character we found
 		}
-		return stringBuilder.toString(); //return the name segment we read
+		//TODO check name token for validity
+		return stringBuilder.toString(); //return the name token we read
+	}
+
+	/**
+	 * Parses a handle composed of a name token followed by zero or more name tokens, separated by handle segment delimiters. The current position must be that of
+	 * the first handle character. The new position will be that immediately after the last handle character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return The handle parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if there are are no handle characters.
+	 */
+	public static String parseHandle(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(parseNameToken(reader)); //there should always be one name token
+		while(confirm(reader, Handle.SEGMENT_DELIMITER)) { //read another handle segments if present
+			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
+			stringBuilder.append(parseNameToken(reader)); //nameToken
+		}
+		//TODO check handle for validity
+		return stringBuilder.toString();
 	}
 
 	/**
@@ -276,7 +299,7 @@ public class SurfParser {
 	//objects
 
 	/**
-	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
+	 * Parses an object, a described resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value SURF#OBJECT_BEGIN}.
 	 * @param resourceIri The object resource's global identifier, or <code>null</code> if the object has no IRI.
 	 * @param reader The reader containing SURF data.
@@ -291,7 +314,7 @@ public class SurfParser {
 	/**
 	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value SURF#OBJECT_BEGIN}.
-	 * @param tag The object tag; either a name {@link String}, for local tags, or a {@link URI} representing the resource's global identifier, or
+	 * @param tag The object tag; either a name token {@link String}, for local tags, or a {@link URI} representing the resource's global identifier, or
 	 *          <code>null</code> if the object has no tag.
 	 * @param reader The reader containing SURF data.
 	 * @return The SURF object read from the reader.
@@ -302,15 +325,15 @@ public class SurfParser {
 		check(reader, OBJECT_BEGIN); //*
 		int c = skipFiller(reader);
 		//type (optional)
-		final String typeName;
+		final String typeHandle;
 		if(c >= 0 && c != PROPERTIES_BEGIN && !EOL_CHARACTERS.contains((char)c)) { //if there is something before properties, it must be a type
-			typeName = parseName(reader);
+			typeHandle = parseHandle(reader);
 			c = skipFiller(reader);
 		} else {
-			typeName = null;
+			typeHandle = null;
 		}
 		final Optional<URI> resourceIri = asInstance(tag, URI.class);
-		final SurfObject resource = new SurfObject(resourceIri.orElse(null), typeName);
+		final SurfObject resource = new SurfObject(resourceIri.orElse(null), typeHandle);
 
 		//TODO save the tag to allow internal references; do the same for collections 
 
@@ -318,13 +341,13 @@ public class SurfParser {
 		if(c == PROPERTIES_BEGIN) {
 			check(reader, PROPERTIES_BEGIN); //:
 			parseSequence(reader, PROPERTIES_END, r -> {
-				final String propertyName = parseName(reader);
+				final String propertyHandle = parseHandle(reader);
 				skipLineBreaks(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
 				skipLineBreaks(reader);
 				final Object value = parseResource(reader);
-				final Optional<Object> oldValue = resource.setPropertyValue(propertyName, value);
-				checkParseIO(reader, !oldValue.isPresent(), "Object has duplicate definition for property %s.", propertyName);
+				final Optional<Object> oldValue = resource.setPropertyValue(propertyHandle, value);
+				checkParseIO(reader, !oldValue.isPresent(), "Object has duplicate definition for property %s.", propertyHandle);
 			});
 			check(reader, PROPERTIES_END); //;
 		}

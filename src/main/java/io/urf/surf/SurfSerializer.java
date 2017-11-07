@@ -500,13 +500,13 @@ public class SurfSerializer {
 	 */
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
-		ifPresent(surfObject.getTypeName(), appendable::append); //typeName
+		ifPresent(surfObject.getTypeHandle(), appendable::append); //typeHandle
 		if(surfObject.getPropertyCount() > 0) { //if there are properties (otherwise skip the {} altogether)
 			appendable.append(PROPERTIES_BEGIN); //:
 			formatNewLine(appendable);
 			try (final Closeable indention = increaseIndentLevel()) {
-				serializeSequence(appendable, surfObject.getPropertyNameValuePairs(), (out, property) -> { //TODO make serializeProperty() method
-					out.append(property.getName());
+				serializeSequence(appendable, surfObject.getProperties(), (out, property) -> { //TODO make serializeProperty() method
+					out.append(property.getKey());
 					if(formatted) {
 						out.append(SPACE_CHAR);
 					}
