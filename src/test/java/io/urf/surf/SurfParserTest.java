@@ -72,7 +72,7 @@ public class SurfParserTest {
 			assertThat(okSimpleResourceName, object, isPresent());
 			assertThat(okSimpleResourceName, object, isPresentAnd(instanceOf(SurfObject.class)));
 			final SurfObject resource = (SurfObject)object.get();
-			assertThat(okSimpleResourceName, resource.getTypeName(), not(isPresent()));
+			assertThat(okSimpleResourceName, resource.getTypeHandle(), not(isPresent()));
 			assertThat(okSimpleResourceName, resource.getPropertyCount(), is(0));
 		}
 	}
@@ -89,7 +89,7 @@ public class SurfParserTest {
 			assertThat(okObjectNoPropertiesResourceName, object, isPresent());
 			assertThat(okObjectNoPropertiesResourceName, object, isPresentAnd(instanceOf(SurfObject.class)));
 			final SurfObject resource = (SurfObject)object.get();
-			assertThat(okObjectNoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
+			assertThat(okObjectNoPropertiesResourceName, resource.getTypeHandle(), not(isPresent()));
 			assertThat(okObjectNoPropertiesResourceName, resource.getPropertyCount(), is(0));
 		}
 	}
@@ -102,7 +102,7 @@ public class SurfParserTest {
 			assertThat(okObjectOnePropertyResourceName, object, isPresent());
 			assertThat(okObjectOnePropertyResourceName, object, isPresentAnd(instanceOf(SurfObject.class)));
 			final SurfObject resource = (SurfObject)object.get();
-			assertThat(okObjectOnePropertyResourceName, resource.getTypeName(), not(isPresent()));
+			assertThat(okObjectOnePropertyResourceName, resource.getTypeHandle(), not(isPresent()));
 			assertThat(okObjectOnePropertyResourceName, resource.getPropertyCount(), is(1));
 			assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one"), isPresent());
 			assertThat(okObjectOnePropertyResourceName, resource.getPropertyValue("one"), isPresentAndIs("one"));
@@ -118,7 +118,7 @@ public class SurfParserTest {
 			assertThat(okObjectTwoPropertiesResourceName, object, isPresent());
 			assertThat(okObjectTwoPropertiesResourceName, object, isPresentAnd(instanceOf(SurfObject.class)));
 			final SurfObject resource = (SurfObject)object.get();
-			assertThat(okObjectTwoPropertiesResourceName, resource.getTypeName(), not(isPresent()));
+			assertThat(okObjectTwoPropertiesResourceName, resource.getTypeHandle(), not(isPresent()));
 			assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyCount(), is(2));
 			assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one"), isPresent());
 			assertThat(okObjectTwoPropertiesResourceName, resource.getPropertyValue("one"), isPresentAndIs("one"));
@@ -136,7 +136,7 @@ public class SurfParserTest {
 			assertThat(okObjectTypeResourceName, object, isPresent());
 			assertThat(okObjectTypeResourceName, object, isPresentAnd(instanceOf(SurfObject.class)));
 			final SurfObject resource = (SurfObject)object.get();
-			assertThat(okObjectTypeResourceName, resource.getTypeName(), isPresentAndIs("example-FooBar"));
+			assertThat(okObjectTypeResourceName, resource.getTypeHandle(), isPresentAndIs("example-FooBar"));
 			assertThat(okObjectTypeResourceName, resource.getPropertyCount(), is(0));
 		}
 	}
@@ -567,7 +567,7 @@ public class SurfParserTest {
 			final Object stuffElement4 = stuff.get(3);
 			assertThat(stuffElement4, instanceOf(SurfObject.class));
 			final SurfObject exampleThing = (SurfObject)stuffElement4;
-			assertThat(exampleThing.getTypeName(), isPresentAndIs("example-Thing"));
+			assertThat(exampleThing.getTypeHandle(), isPresentAndIs("example-Thing"));
 			assertThat(exampleThing.getTag(), isPresentAndIs(URI.create("http://example.com/thing")));
 			assertThat(exampleThing.getPropertyValue("name"), isPresentAndIs("Example Thing"));
 			final Optional<Object> exampleThingIriTagged = surfParser.getResourceByTag(URI.create("http://example.com/thing"));
@@ -586,7 +586,7 @@ public class SurfParserTest {
 			assertThat(set, hasItem(false));
 			final Optional<Object> newTagged = surfParser.getResourceByTag("new");
 			final SurfObject newTaggedResource = (SurfObject)newTagged.orElseThrow(AssertionFailedError::new);
-			assertThat(newTaggedResource.getTypeName(), isPresentAndIs("example-Thing"));
+			assertThat(newTaggedResource.getTypeHandle(), isPresentAndIs("example-Thing"));
 			assertThat(newTaggedResource.getPropertyValue("description"), isPresentAndIs("a new thing"));
 			final Optional<Object> anotherTagged = surfParser.getResourceByTag("another");
 			final SurfObject anotherTaggedResource = (SurfObject)anotherTagged.orElseThrow(AssertionFailedError::new);

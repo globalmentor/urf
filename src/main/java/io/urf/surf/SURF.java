@@ -19,11 +19,15 @@ package io.urf.surf;
 import static com.globalmentor.java.Characters.*;
 
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.URIs.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
+
+import javax.annotation.*;
 
 import com.globalmentor.java.Characters;
 
@@ -35,12 +39,6 @@ public class SURF {
 
 	/** The SURF charset. */
 	public static final Charset CHARSET = UTF_8;
-
-	/** The delimiter separating segments in a name. */
-	public static final char NAME_SEGMENT_DELIMITER = '-';
-
-	/** Regular expression pattern to match a SURF name . */
-	public static final Pattern NAME_PATTERN = Pattern.compile("\\p{L}[\\p{L}\\p{M}\\p{N}\\p{Pc}\\-]*"); //TODO fix to prevent two hyphens together
 
 	/** Characters recognized by SURF as whitespace. */
 	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
@@ -166,56 +164,158 @@ public class SURF {
 	public static final char SET_END = ')';
 
 	/**
-	 * Determines whether the given string conforms to the rules for a SURF name.
-	 * @param string The string to test.
-	 * @return <code>true</code> if the string is a valid SURF name.
-	 * @throws NullPointerException if the given string is <code>null</code>.
-	 * @see #NAME_PATTERN
+	 * Utilities for working with SURF tags.
+	 * @author Garret Wilson
 	 */
-	public static boolean isValidSurfName(final String string) {
-		return NAME_PATTERN.matcher(requireNonNull(string)).matches();
+	public static final class Tag {
+
+		/**
+		 * Ensures that the given URI is a valid resource tag.
+		 * <p>
+		 * Primarily this ensures that the given URI is absolute.
+		 * </p>
+		 * @param tag The tag to validate.
+		 * @return The given tag.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 */
+		public static URI checkValidTag(@Nonnull final URI tag) {
+			return checkAbsolute(tag);
+		}
+
 	}
 
 	/**
-	 * Confirms that the given string conforms to the rules for a SURF name.
-	 * @param string The string to check.
-	 * @return The given string.
-	 * @throws NullPointerException if the given string is <code>null</code>.
-	 * @throws IllegalArgumentException if the given string does not conform to the rules for a SURF name.
-	 * @see #NAME_PATTERN
+	 * Utilities for working with SURF names.
+	 * @author Garret Wilson
 	 */
-	public static String checkArgumentValidSurfName(final String string) {
-		checkArgument(isValidSurfName(string), "Invalid SURF name \"%s\".", string);
-		return string;
+	public static final class Name {
+
+		/** Regular expression pattern to match a SURF name token . */
+		public static final Pattern TOKEN_PATTERN = Pattern.compile("\\p{L}[\\p{L}\\p{M}\\p{N}\\p{Pc}]*"); //TODO add test
+
+		/**
+		 * Determines whether the given string conforms to the rules for an URF name token.
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid URF name token.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @see #TOKEN_PATTERN
+		 */
+		public static boolean isValidToken(final String string) {
+			return TOKEN_PATTERN.matcher(requireNonNull(string)).matches();
+		}
+
+		/**
+		 * Determines if the given character is a SURF token name begin character. A name token begin character is a Unicode letter.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is a SURF name begin character.
+		 */
+		public static final boolean isTokenBeginCharacter(final int c) {
+			return Character.isLetter(c); //see if this is a letter
+		}
+
+		/**
+		 * Determines if the given character is a SURF name token character. A name token character is a Unicode letter, mark, number, or connector punctuation.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is a SURF name character.
+		 */
+		public static final boolean isTokenCharacter(final int c) {
+			return (((
+			//letter
+			(1 << Character.UPPERCASE_LETTER) | (1 << Character.LOWERCASE_LETTER) | (1 << Character.TITLECASE_LETTER) | (1 << Character.MODIFIER_LETTER)
+					| (1 << Character.OTHER_LETTER) |
+					//mark
+					(1 << Character.NON_SPACING_MARK) | (1 << Character.COMBINING_SPACING_MARK) | (1 << Character.ENCLOSING_MARK) |
+					//digit
+					(1 << Character.DECIMAL_DIGIT_NUMBER) |
+					//connector punctuation
+					(1 << Character.CONNECTOR_PUNCTUATION)) >> Character.getType(c)) & 1) != 0;
+		}
+
+		/** A SURF name is a single name token. */
+		public static final Pattern PATTERN = TOKEN_PATTERN; //TODO add test
+
+		/**
+		 * Determines whether the given string conforms to the rules for a SURF name.
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid SURF name.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @see #PATTERN
+		 */
+		public static boolean isValid(final String string) {
+			return PATTERN.matcher(requireNonNull(string)).matches();
+		}
+
+		/**
+		 * Confirms that the given string conforms to the rules for a SURF name.
+		 * @param string The string to check.
+		 * @return The given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for a SURF name.
+		 * @see #PATTERN
+		 */
+		public static String checkArgumentValid(final String string) {
+			checkArgument(isValid(string), "Invalid SURF name \"%s\".", string);
+			return string;
+		}
+
 	}
 
 	/**
-	 * Determines if the given character is a SURF name begin character. A name begin character is a Unicode letter.
-	 * @param c The character to check.
-	 * @return <code>true</code> if the character is a SURF name begin character.
+	 * Utilities for working with SURF handles.
+	 * @author Garret Wilson
 	 */
-	public static final boolean isSurfNameBeginCharacter(final int c) {
-		return Character.isLetter(c); //see if this is a letter
-	}
+	public static final class Handle {
 
-	/**
-	 * Determines if the given character is a SURF name character. A name character is a Unicode letter, mark, number, or connector punctuation.
-	 * @param c The character to check.
-	 * @return <code>true</code> if the character is a SURF name character.
-	 */
-	public static final boolean isSurfNameCharacter(final int c) {
-		return (((
-		//letter
-		(1 << Character.UPPERCASE_LETTER) | (1 << Character.LOWERCASE_LETTER) | (1 << Character.TITLECASE_LETTER) | (1 << Character.MODIFIER_LETTER)
-				| (1 << Character.OTHER_LETTER) |
-				//mark
-				(1 << Character.NON_SPACING_MARK) | (1 << Character.COMBINING_SPACING_MARK) | (1 << Character.ENCLOSING_MARK) |
-				//digit
-				(1 << Character.DECIMAL_DIGIT_NUMBER) |
-				//connector punctuation
-				(1 << Character.CONNECTOR_PUNCTUATION)) >> Character.getType(c)) & 1) != 0
-				//hyphen-minus
-				|| c == HYPHEN_MINUS_CHAR;
+		/** The delimiter used to separate segments of a SURF handle. */
+		public static final char SEGMENT_DELIMITER = '-';
+
+		/** Regular expression pattern to match a SURF handle . */
+		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))*", Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN)); //TODO add test; document matching groups
+
+		/**
+		 * Determines whether the given string conforms to the rules for a SURF handle.
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid SURF handle.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @see #PATTERN
+		 */
+		public static boolean isValid(final String string) {
+			return PATTERN.matcher(requireNonNull(string)).matches();
+		}
+
+		/**
+		 * Confirms that the given string conforms to the rules for a SURF handle.
+		 * @param string The string to check.
+		 * @return The given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for a SURF handle.
+		 * @see #PATTERN
+		 */
+		public static String checkArgumentValid(final String string) {
+			checkArgument(isValid(string), "Invalid SURF handle \"%s\".", string);
+			return string;
+		}
+
+		//		/**
+		//		 * Determines if the given character is a SURF handle begin character. A handle begin character is a name begin character.
+		//		 * @param c The character to check.
+		//		 * @return <code>true</code> if the character is a SURF handle begin character.
+		//		 * @see Name#isBeginCharacter(int)
+		//		 */
+		//		public static final boolean isBeginCharacter(final int c) {
+		//			return Name.isBeginCharacter(c);
+		//		}
+		//
+		//		/**
+		//		 * Determines if the given character is a SURF handle character. A handle character is a name character or a hyphen-minus character.
+		//		 * @param c The character to check.
+		//		 * @return <code>true</code> if the character is a SURF name character.
+		//		 * @see Name#isValidCharacter(int)
+		//		 */
+		//		public static final boolean isValidCharacter(final int c) { //TODO remove hyphen check; move to program logic
+		//			return Name.isValidCharacter(c) || c == HYPHEN_MINUS_CHAR;
+		//		}
+
 	}
 
 }
