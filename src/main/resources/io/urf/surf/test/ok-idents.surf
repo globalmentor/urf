@@ -9,9 +9,13 @@ value = |test|false
 			;
 		]
 	;
+	foobar = |"foo"|*Bar:
+		prop = "val"
+	;
 	map = {
 		1: "one"
 		2: |number|
+		4: |"foo"|*Bar
 		99: |<http://example.com/thing>|
 		100: |object|
 	}

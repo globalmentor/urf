@@ -204,5 +204,5 @@ public class SurfTestResources {
 			OK_SET_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
 
 	//#tags
-	public static final String OK_TAGS_RESOURCE_NAME = "ok-tags.surf";
+	public static final String OK_IDENTS_RESOURCE_NAME = "ok-idents.surf";
 }
