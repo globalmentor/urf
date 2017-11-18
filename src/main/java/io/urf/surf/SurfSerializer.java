@@ -120,7 +120,7 @@ import com.globalmentor.net.EmailAddress;
  * serialization state.
  * </p>
  * <p>
- * The serializer should be released after use so as not to leak memory of parsed resources when tagged resources are present.
+ * The serializer should be released after use so as not to leak memory of parsed resources when resources are present with tags/IDs and/or generate aliases.
  * </p>
  * <p>
  * This implementation is not thread safe.

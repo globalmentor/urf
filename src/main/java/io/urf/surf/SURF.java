@@ -19,7 +19,6 @@ package io.urf.surf;
 import static com.globalmentor.java.Characters.*;
 
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.net.URIs.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
@@ -53,8 +52,8 @@ public class SURF {
 	/** The character indicating the start of a Surf single-line comment. */
 	public static final char LINE_COMMENT_BEGIN = '!';
 
-	/** The delimiter that begins and ends tags. */
-	public static final char TAG_DELIMITER = '|';
+	/** The delimiter that begins and ends idents such as tags. */
+	public static final char IDENT_DELIMITER = '|';
 
 	//objects
 
@@ -172,14 +171,18 @@ public class SURF {
 		/**
 		 * Ensures that the given URI is a valid resource tag.
 		 * <p>
-		 * Primarily this ensures that the given URI is absolute.
+		 * Primarily this ensures that the given URI is absolute and does not contain a fragment.
 		 * </p>
 		 * @param tag The tag to validate.
 		 * @return The given tag.
-		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid SURF tag.
 		 */
-		public static URI checkValidTag(@Nonnull final URI tag) {
-			return checkAbsolute(tag);
+		public static URI checkArgumentValid(@Nonnull final URI tag) {
+			requireNonNull(tag);
+			checkArgument(tag.isAbsolute(), "SURF tag %s must be absolute.", tag);
+			checkArgument(tag.getRawFragment() == null, "SURF tag %s not allowed to have a fragment.", tag);
+			return tag;
 		}
 
 	}
