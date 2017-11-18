@@ -18,7 +18,6 @@ package io.urf.surf;
 
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Objects.*;
 import static io.urf.surf.SURF.*;
 import static io.urf.surf.SURF.WHITESPACE_CHARACTERS;
 import static java.util.Objects.*;
@@ -52,7 +51,7 @@ import io.urf.surf.SURF.Handle;
  * This parser is meant to be used once for parsing a single SURF document. It should not be used to parse multiple documents, as it maintains parsing state.
  * </p>
  * <p>
- * The parser should be released after use so as not to leak memory of parsed resources when tagged resources are present.
+ * The parser should be released after use so as not to leak memory of parsed resources when resources are present with tags/IDs/aliases.
  * </p>
  * <p>
  * This implementation is not thread safe.
@@ -62,27 +61,55 @@ import io.urf.surf.SURF.Handle;
 public class SurfParser {
 
 	/**
-	 * The map of resources that have been tagged. Each tag is either a name token {@link String}, for local tags, or a {@link URI} representing the resource's
-	 * global identifier tag.
+	 * The map of resources that have been given an ident. Each key is either:
+	 * <dl>
+	 * <dt>tag</dt>
+	 * <dd>A {@link URI} containing the tag IRI.</dd>
+	 * <dt>ID</dt>
+	 * <dd>A {@link Map.Entry} containing the type handle as {@link Map.Entry#getKey()} and the ID as {@link Map.Entry#getValue()}.</dd>
+	 * <dt>alias</dt>
+	 * <dd>A {@link String} with the alias.</dd>
+	 * </dl>
 	 */
-	private final Map<Object, Object> taggedResources = new HashMap<>();
+	private final Map<Object, Object> identedResources = new HashMap<>();
 
 	/**
-	 * Returns a parsed resource by its local tag.
-	 * @param tag The legal tag of the resource.
-	 * @return The resource associated with the given tag, if any.
+	 * Returns a parsed resource by its alias.
+	 * @param alias The alias used by the resource in the document.
+	 * @return The resource associated with the given alias, if any.
 	 */
-	public Optional<Object> getResourceByTag(@Nonnull final String tag) {
-		return Optional.ofNullable(taggedResources.get(requireNonNull(tag))); //TODO be more rigorous here if/when null can be tagged
+	public Optional<Object> findResourceByAlias(@Nonnull final String alias) {
+		return Optional.ofNullable(identedResources.get(requireNonNull(alias))); //TODO be more rigorous here if/when null can be aliased
 	}
 
 	/**
-	 * Returns a parsed resource by its global identifier.
+	 * Returns a parsed object by its tag.
 	 * @param tag The global IRI identifier tag of the resource.
-	 * @return The resource associated with the given tag, if any.
+	 * @return The object associated with the given tag, if any.
 	 */
-	public Optional<Object> getResourceByTag(@Nonnull final URI tag) {
-		return Optional.ofNullable(taggedResources.get(requireNonNull(tag)));
+	public Optional<SurfObject> findObjectByTag(@Nonnull final URI tag) {
+		return Optional.ofNullable((SurfObject)identedResources.get(requireNonNull(tag)));
+	}
+
+	/**
+	 * Returns a parsed object by its type handle and ID.
+	 * @param typeHandle The handle of the object's type.
+	 * @param id The object ID for the indicated type.
+	 * @return The typed object with the given ID, if any.
+	 */
+	public Optional<SurfObject> findObjectByID(@Nonnull final String typeHandle, @Nonnull final String id) {
+		return Optional.ofNullable(getObjectByID(typeHandle, id));
+	}
+
+	/**
+	 * Returns a parsed object by its type handle and ID.
+	 * @param typeHandle The handle of the object's type.
+	 * @param id The object ID for the indicated type.
+	 * @return The typed object with the given ID, or <code>null</code> if no such object was found.
+	 */
+	protected SurfObject getObjectByID(@Nonnull final String typeHandle, @Nonnull final String id) {
+		//TODO switch to Java 9 Map.entry()
+		return (SurfObject)identedResources.get(new AbstractMap.SimpleImmutableEntry<String, String>(requireNonNull(typeHandle), requireNonNull(id)));
 	}
 
 	/**
@@ -129,27 +156,55 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a tag, which is either a name token or an IRI with appropriate delimiters, surrounded by tag delimiters. The current position must be that of the
-	 * beginning tag delimiter character. The new position will be that immediately after the last tag delimiter.
+	 * Parses an ident, surrounded by tag delimiters, and which is returned as one of the following:
+	 * <dl>
+	 * <dt>tag</dt>
+	 * <dd>The tag IRI as an absolute {@link URI}.</dd>
+	 * <dt>ID</dt>
+	 * <dd>Some object that is neither a {@link URI} nor a {@link String} and which will provide the ID using {@link Object#toString()}.</dd>
+	 * <dt>alias</dt>
+	 * <dd>The alias as a {@link String}.</dd>
+	 * </dl>
+	 * <p>
+	 * The current position must be that of the beginning ident delimiter character. The new position will be that immediately after the last ident delimiter.
+	 * </p>
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return The tag parsed from the reader; either a {@link String} for a local tag or a {@link URI} for a global resource identifier tag.
+	 * @return The tag parsed from the reader; either a {@link String} for an alias, an absolute {@link URI} for a tag, or a fragment-only {@link URI} for an ID.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if there the tag is not valid.
-	 * @see SURF#TAG_DELIMITER
+	 * @throws ParseIOException if the ident is not valid.
+	 * @see SURF#IDENT_DELIMITER
 	 * @see #parseHandle(Reader)
 	 * @see #parseIRI(Reader)
 	 */
-	public static Object parseTag(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		check(reader, TAG_DELIMITER);
-		final Object tag;
-		if(peekRequired(reader) == IRI_BEGIN) {
-			tag = parseIRI(reader);
-		} else {
-			tag = parseNameToken(reader);
+	public static Object parseIdent(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		check(reader, IDENT_DELIMITER);
+		final Object ident;
+		switch(peekRequired(reader)) {
+			case IRI_BEGIN: //tag
+				try {
+					ident = Tag.checkArgumentValid(parseIRI(reader));
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ParseIOException(reader, "Invalid tag.", illegalArgumentException);
+				}
+				break;
+			case STRING_DELIMITER: //ID
+			{
+				final String alias = parseString(reader);
+				ident = new Object() { //use an anonymous decorator to hold the alias
+					@Override
+					public String toString() {
+						return alias;
+					}
+				};
+				break;
+			}
+			default: //alias
+				ident = parseNameToken(reader);
+				break;
 		}
-		check(reader, TAG_DELIMITER);
-		return tag;
+		check(reader, IDENT_DELIMITER);
+		return ident;
 	}
 
 	/**
@@ -210,23 +265,23 @@ public class SurfParser {
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
-		Object tag = null;
+		Object ident = null;
 		int c = peek(reader);
-		if(c == TAG_DELIMITER) {
-			tag = parseTag(reader);
+		if(c == IDENT_DELIMITER) {
+			ident = parseIdent(reader);
 			c = skipFiller(reader);
-		}
-		if(tag != null) { //see if this is a resource reference
-			final Object resource = taggedResources.get(tag);
-			if(resource != null) { //TODO be more rigorous here if we allow null to be tagged
-				return resource;
+			if(ident instanceof URI || ident instanceof String) { //tag or alias
+				final Object resource = identedResources.get(ident);
+				if(resource != null) {
+					return resource;
+				}
 			}
 		}
 		final Object resource;
 		switch(c) {
 			//objects
 			case OBJECT_BEGIN:
-				resource = parseObject(tag, reader);
+				resource = parseObject(ident, reader);
 				break;
 			//literals
 			case BINARY_BEGIN:
@@ -288,10 +343,10 @@ public class SurfParser {
 				//TODO the spec currently says a tag MAY have a resource representation; should we create an object if there is none?
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 		}
-		if(tag != null) { //if a resource was tagged, save it for later
-			checkParseIO(reader, resource != null, "Cannot use tag |%s| with null.", tag);
+		if(ident instanceof URI || ident instanceof String) { //if a resource was tagged or aliased, save it for later
+			checkParseIO(reader, resource != null, "Cannot use tag |%s| with null.", ident);
 			//TODO prevent tags for non-objects, as the spec says
-			taggedResources.put(tag, resource);
+			identedResources.put(ident, resource);
 		}
 		return resource;
 	}
@@ -301,41 +356,66 @@ public class SurfParser {
 	/**
 	 * Parses an object, a described resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value SURF#OBJECT_BEGIN}.
-	 * @param resourceIri The object resource's global identifier, or <code>null</code> if the object has no IRI.
+	 * @param tag The object resource's globally identifying tag, or <code>null</code> if the object has no tag.
 	 * @param reader The reader containing SURF data.
 	 * @return The SURF object read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see SURF#OBJECT_BEGIN
 	 */
-	public SurfObject parseObject(@Nullable URI resourceIri, @Nonnull final Reader reader) throws IOException {
-		return parseObject((Object)resourceIri, reader);
+	public SurfObject parseObject(@Nullable URI tag, @Nonnull final Reader reader) throws IOException {
+		return parseObject((Object)tag, reader);
 	}
 
 	/**
-	 * Parses an object; that is, an anonymous resource instance indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be
-	 * {@value SURF#OBJECT_BEGIN}.
-	 * @param tag The object tag; either a name token {@link String}, for local tags, or a {@link URI} representing the resource's global identifier, or
-	 *          <code>null</code> if the object has no tag.
+	 * Parses an object indicated by {@value SURF#OBJECT_BEGIN}. The next character read is expected to be {@value SURF#OBJECT_BEGIN}.
+	 * <p>
+	 * If the given ident indicates an ID, after parsing the object type if an object already exists with the given ID for that type, it will be immediately
+	 * returned.
+	 * </p>
+	 * <p>
+	 * Once the object is created, it will be associated with the given ident or, if the ident is an ID, with the object type and ID, for later lookup.
+	 * </p>
+	 * @param ident The object ident; either a {@link String} representing an alias, a {@link URI} representing a tag IRI, some other type of object returning an
+	 *          ID for {@link Object#toString()}, or <code>null</code> if the object has no ident.
 	 * @param reader The reader containing SURF data.
 	 * @return The SURF object read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see SURF#OBJECT_BEGIN
 	 */
-	protected SurfObject parseObject(@Nullable Object tag, @Nonnull final Reader reader) throws IOException {
+	protected SurfObject parseObject(@Nullable Object ident, @Nonnull final Reader reader) throws IOException {
+		//the object has an ID if its ident is neither a URI nor a String
+		final String id = ident != null && !(ident instanceof URI) && !(ident instanceof String) ? ident.toString() : null;
 		check(reader, OBJECT_BEGIN); //*
 		int c = skipFiller(reader);
 		//type (optional)
 		final String typeHandle;
 		if(c >= 0 && c != PROPERTIES_BEGIN && !EOL_CHARACTERS.contains((char)c)) { //if there is something before properties, it must be a type
 			typeHandle = parseHandle(reader);
+			if(id != null) { //if an ID was passed
+				final SurfObject objectById = getObjectByID(typeHandle, id);
+				if(objectById != null) {
+					return objectById;
+				}
+			}
 			c = skipFiller(reader);
 		} else {
 			typeHandle = null;
 		}
-		final Optional<URI> resourceIri = asInstance(tag, URI.class);
-		final SurfObject resource = new SurfObject(resourceIri.orElse(null), typeHandle);
+		final SurfObject resource; //create a resource based upon the type of ident
+		if(ident instanceof URI) { //tag
+			resource = new SurfObject((URI)ident, typeHandle);
+		} else if(ident instanceof String) { //alias
+			resource = new SurfObject(typeHandle);
+		} else { //ID
+			if(id != null) { //if an ID was given, cache the resource
+				resource = new SurfObject(typeHandle, id);
+				identedResources.put(new AbstractMap.SimpleImmutableEntry<String, String>(typeHandle, id), resource);
+			} else {
+				resource = new SurfObject(typeHandle); //the type may be null				
+			}
+		}
 
-		//TODO save the tag to allow internal references; do the same for collections 
+		//TODO associate the object with the tag to allow internal references; do the same for collections 
 
 		//properties (optional)
 		if(c == PROPERTIES_BEGIN) {

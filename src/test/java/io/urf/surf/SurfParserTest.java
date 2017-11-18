@@ -62,6 +62,13 @@ public class SurfParserTest {
 		}
 	}
 
+	//identifiers
+
+	//TODO create bad test with handles containing subsequent dashes
+	//TODO create bad test with non-absolute-URI tag
+	//TODO create bad test with tag with fragment
+	//TODO create bad test with ID but no type
+
 	//simple files
 
 	/** @see SurfTestResources#OK_SIMPLE_RESOURCE_NAMES */
@@ -152,8 +159,8 @@ public class SurfParserTest {
 	public void testOkBinary() throws IOException {
 		final SurfObject resource = (SurfObject)parseTestResource(OK_BINARY_RESOURCE_NAME).get();
 
-		assertThat(resource.getPropertyValue("count"), isPresentAndIs(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99, (byte)0xaa,
-				(byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff}));
+		assertThat(resource.getPropertyValue("count"), isPresentAndIs(new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte)0x88, (byte)0x99,
+				(byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff}));
 
 		assertThat(resource.getPropertyValue("rfc4648Example1"), isPresentAndIs(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9, 0x7e}));
 		assertThat(resource.getPropertyValue("rfc4648Example2"), isPresentAndIs(new byte[] {0x14, (byte)0xfb, (byte)0x9c, 0x03, (byte)0xd9}));
@@ -531,38 +538,45 @@ public class SurfParserTest {
 
 	//TODO create tests for duplicate items and double list item separators
 
-	//#tags
+	//#idents
 
-	/** @see SurfTestResources#OK_TAGS_RESOURCE_NAME */
+	/** @see SurfTestResources#OK_IDENTS_RESOURCE_NAME */
 	@Test
 	public void testOkTags() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_TAGS_RESOURCE_NAME)) {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_IDENTS_RESOURCE_NAME)) {
 			final SurfParser surfParser = new SurfParser();
 			final SurfObject root = (SurfObject)surfParser.parse(inputStream).get();
 			//|root|
-			final Optional<Object> rootTagged = surfParser.getResourceByTag("root");
-			assertThat(rootTagged, isPresentAnd(sameInstance(root)));
+			final Optional<Object> rootAliased = surfParser.findResourceByAlias("root");
+			assertThat(rootAliased, isPresentAnd(sameInstance(root)));
 			//|number|
 			final Object foo = root.getPropertyValue("foo").orElseThrow(AssertionFailedError::new);
 			assertThat(foo, is(123));
-			final Optional<Object> numberTagged = surfParser.getResourceByTag("number");
-			assertThat(numberTagged, isPresentAnd(sameInstance(foo)));
+			final Optional<Object> numberAliased = surfParser.findResourceByAlias("number");
+			assertThat(numberAliased, isPresentAnd(sameInstance(foo)));
 			//|test|
 			final Object value = root.getPropertyValue("value").orElseThrow(AssertionFailedError::new);
 			assertThat(value, is(false));
-			final Optional<Object> testTagged = surfParser.getResourceByTag("test");
-			assertThat(testTagged, isPresentAnd(sameInstance(value)));
+			final Optional<Object> testAliased = surfParser.findResourceByAlias("test");
+			assertThat(testAliased, isPresentAnd(sameInstance(value)));
 			//|object|
 			final SurfObject thing = (SurfObject)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
-			//TODO assert type of thing
-			final Optional<Object> objectTagged = surfParser.getResourceByTag("object");
-			assertThat(objectTagged, isPresentAnd(sameInstance(thing)));
+			assertThat(thing.getTypeHandle(), isPresentAndIs("example-Type"));
+			final Optional<Object> objectAliased = surfParser.findResourceByAlias("object");
+			assertThat(objectAliased, isPresentAnd(sameInstance(thing)));
+			//|"foo"|*Bar
+			final SurfObject foobar = (SurfObject)root.getPropertyValue("foobar").orElseThrow(AssertionFailedError::new);
+			assertThat(foobar.getTypeHandle(), isPresentAndIs("Bar"));
+			assertThat(foobar.getId(), isPresentAndIs("foo"));
+			assertThat(foobar.getPropertyValue("prop"), isPresentAndIs("val"));
+			final Optional<SurfObject> foobarIded = surfParser.findObjectByID("Bar", "foo");
+			assertThat(foobarIded, isPresentAnd(sameInstance(foobar)));
 			//list elements
 			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
 			assertThat(stuff, hasSize(4));
 			assertThat(stuff.get(0), is("one"));
 			assertThat(stuff.get(1), is(123));
-			assertThat(numberTagged, isPresentAnd(sameInstance(stuff.get(1))));
+			assertThat(numberAliased, isPresentAnd(sameInstance(stuff.get(1))));
 			assertThat(stuff.get(2), is("three"));
 			final Object stuffElement4 = stuff.get(3);
 			assertThat(stuffElement4, instanceOf(SurfObject.class));
@@ -570,34 +584,35 @@ public class SurfParserTest {
 			assertThat(exampleThing.getTypeHandle(), isPresentAndIs("example-Thing"));
 			assertThat(exampleThing.getTag(), isPresentAndIs(URI.create("http://example.com/thing")));
 			assertThat(exampleThing.getPropertyValue("name"), isPresentAndIs("Example Thing"));
-			final Optional<Object> exampleThingIriTagged = surfParser.getResourceByTag(URI.create("http://example.com/thing"));
-			assertThat(exampleThingIriTagged, isPresentAnd(sameInstance(exampleThing)));
+			final Optional<SurfObject> exampleThingTagged = surfParser.findObjectByTag(URI.create("http://example.com/thing"));
+			assertThat(exampleThingTagged, isPresentAnd(sameInstance(exampleThing)));
 			//map values
 			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
 			assertThat(map.get(1), is("one"));
-			assertThat(map.get(2), is(sameInstance(numberTagged.get())));
-			assertThat(map.get(99), is(sameInstance(exampleThingIriTagged.get())));
-			assertThat(map.get(100), is(sameInstance(objectTagged.get())));
+			assertThat(map.get(2), is(sameInstance(numberAliased.get())));
+			assertThat(map.get(4), is(sameInstance(foobar)));
+			assertThat(map.get(99), is(sameInstance(exampleThingTagged.get())));
+			assertThat(map.get(100), is(sameInstance(objectAliased.get())));
 			//set members
 			@SuppressWarnings("unchecked")
 			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionFailedError::new);
 			assertThat(set, hasSize(5));
 			assertThat(set, hasItem(123));
 			assertThat(set, hasItem(false));
-			final Optional<Object> newTagged = surfParser.getResourceByTag("new");
-			final SurfObject newTaggedResource = (SurfObject)newTagged.orElseThrow(AssertionFailedError::new);
-			assertThat(newTaggedResource.getTypeHandle(), isPresentAndIs("example-Thing"));
-			assertThat(newTaggedResource.getPropertyValue("description"), isPresentAndIs("a new thing"));
-			final Optional<Object> anotherTagged = surfParser.getResourceByTag("another");
-			final SurfObject anotherTaggedResource = (SurfObject)anotherTagged.orElseThrow(AssertionFailedError::new);
-			assertThat(anotherTaggedResource.getPropertyValue("description"), isPresentAndIs("yet another thing"));
-			assertThat(set, hasItem(sameInstance(numberTagged.get())));
-			assertThat(set, hasItem(sameInstance(testTagged.get())));
-			assertThat(set, hasItem(sameInstance(objectTagged.get())));
-			assertThat(set, hasItem(sameInstance(newTaggedResource)));
-			assertThat(set, hasItem(sameInstance(anotherTaggedResource)));
+			final Optional<Object> newAliased = surfParser.findResourceByAlias("new");
+			final SurfObject newAliasedResource = (SurfObject)newAliased.orElseThrow(AssertionFailedError::new);
+			assertThat(newAliasedResource.getTypeHandle(), isPresentAndIs("example-Thing"));
+			assertThat(newAliasedResource.getPropertyValue("description"), isPresentAndIs("a new thing"));
+			final Optional<Object> anotherAliased = surfParser.findResourceByAlias("another");
+			final SurfObject anotherAliasedResource = (SurfObject)anotherAliased.orElseThrow(AssertionFailedError::new);
+			assertThat(anotherAliasedResource.getPropertyValue("description"), isPresentAndIs("yet another thing"));
+			assertThat(set, hasItem(sameInstance(numberAliased.get())));
+			assertThat(set, hasItem(sameInstance(testAliased.get())));
+			assertThat(set, hasItem(sameInstance(objectAliased.get())));
+			assertThat(set, hasItem(sameInstance(newAliasedResource)));
+			assertThat(set, hasItem(sameInstance(anotherAliasedResource)));
 		}
 	}
 
-	//TODO create test with bad tags, such as tags with whitespace, tags for null, and redefined tags
+	//TODO create test with bad idents, such as aliases with whitespace, tags for null, and redefined idents
 }

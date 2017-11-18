@@ -16,7 +16,6 @@
 
 package io.urf.surf;
 
-import static com.globalmentor.net.URIs.*;
 import static io.urf.surf.SURF.*;
 import static java.util.Objects.*;
 
@@ -30,7 +29,7 @@ import com.globalmentor.collections.iterables.ConverterIterable;
 /**
  * A SURF object for a SURF document.
  * <p>
- * SURF objects are considered equal if their tags, type handles, and property handles and values are equal.
+ * SURF objects are considered equal if their tags, type handles, IDs, and property handles and values are equal.
  * </p>
  * <p>
  * This implementation does not consider another object equal unless it is an implementation of {@link SurfObject}.
@@ -53,6 +52,17 @@ public class SurfObject {
 	/** @return The handle of the object type if known. */
 	public Optional<String> getTypeHandle() {
 		return Optional.ofNullable(typeHandle);
+	}
+
+	/** The ID of the object, or <code>null</code> if the object has no ID. */
+	private final String id;
+
+	/**
+	 * Returns the ID, if any, of the object for its type. Objects with no type never have an ID.
+	 * @return The ID, if any, of the object.
+	 */
+	public Optional<String> getId() {
+		return Optional.ofNullable(id);
 	}
 
 	private final Map<String, Object> properties = new HashMap<>();
@@ -108,7 +118,7 @@ public class SurfObject {
 
 	/** Constructor of a object with no tag and an unknown type. */
 	public SurfObject() {
-		this(null, null);
+		this((URI)null, null);
 	}
 
 	/**
@@ -121,29 +131,43 @@ public class SurfObject {
 	}
 
 	/**
+	 * Optional tag and optional type handle constructor.
+	 * @param tag The identifying object tag, or <code>null</code> if not known.
+	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
+	 * @throws IllegalArgumentException if a tag is given that is not an absolute URI.
+	 * @throws IllegalArgumentException if the given type handle is not a valid SURF handle.
+	 */
+	public SurfObject(@Nullable final URI tag, @Nullable final String typeHandle) {
+		this.tag = tag != null ? Tag.checkArgumentValid(tag) : null;
+		this.typeHandle = typeHandle != null ? Handle.checkArgumentValid(typeHandle) : null;
+		this.id = null;
+	}
+
+	/**
 	 * Optional type handle constructor.
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if the given type handle is not a valid SURF handle.
 	 */
 	public SurfObject(@Nullable final String typeHandle) {
-		this(null, typeHandle);
+		this((URI)null, typeHandle);
 	}
 
 	/**
-	 * Optional tag and optional type handle constructor.
-	 * @param tag The identifying object tag, or <code>null</code> if not known.
-	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
-	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
+	 * Type handle and optional ID constructor.
+	 * @param typeHandle The handle of the object type.
+	 * @param id The object identifier unique for the object type.
+	 * @throws NullPointerException if the given type handle is <code>null</code>.
 	 * @throws IllegalArgumentException if the given type handle is not a valid SURF handle.
 	 */
-	public SurfObject(@Nullable final URI tag, @Nullable final String typeHandle) {
-		this.tag = tag != null ? checkAbsolute(tag) : null;
-		this.typeHandle = typeHandle != null ? Handle.checkArgumentValid(typeHandle) : null;
+	public SurfObject(@Nonnull final String typeHandle, @Nullable final String id) {
+		this.tag = null;
+		this.typeHandle = Handle.checkArgumentValid(typeHandle);
+		this.id = id;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(tag, typeHandle, properties);
+		return Objects.hash(tag, typeHandle, id, properties);
 	}
 
 	@Override
@@ -155,6 +179,7 @@ public class SurfObject {
 			return false;
 		}
 		final SurfObject surfObject = (SurfObject)object;
-		return getTag().equals(surfObject.getTag()) && getTypeHandle().equals(surfObject.getTypeHandle()) && properties.equals(surfObject.properties);
+		return getTag().equals(surfObject.getTag()) && getTypeHandle().equals(surfObject.getTypeHandle()) && getId().equals(surfObject.getId())
+				&& properties.equals(surfObject.properties);
 	}
 }
