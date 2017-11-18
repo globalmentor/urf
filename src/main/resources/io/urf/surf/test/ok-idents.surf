@@ -1,5 +1,6 @@
 |root|*:
 	foo=|number|123
+	self = |root|
 value = |test|false
 	thing =
 |object|*example-Type:
@@ -11,19 +12,23 @@ value = |test|false
 	;
 	foobar = |"foo"|*Bar:
 		prop = "val"
+		self = |"foo"|*Bar
 	;
-	map = {
+	map = |me|{
+		0: |me|
 		1: "one"
 		2: |number|
 		4: |"foo"|*Bar
 		99: |<http://example.com/thing>|
 		100: |object|
 	}
-	set = (
+	set = |these|(
 |number|
 	|test|
 		|object|
+		|root|
 		|new| * example-Thing :description = "a new thing";
 		|another| *  :description = "yet another thing";
+		|these|
 	)
 ;
