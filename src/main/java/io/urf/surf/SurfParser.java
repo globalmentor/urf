@@ -64,7 +64,7 @@ public class SurfParser {
 	 * Represents an alias ident parsed in a SURF document.
 	 * @author Garret Wilson
 	 */
-	public final static class Alias {
+	private final static class Alias {
 		private final String string;
 
 		private Alias(@Nonnull final String string) {
