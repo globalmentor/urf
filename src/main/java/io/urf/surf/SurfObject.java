@@ -164,8 +164,10 @@ public class SurfObject {
 
 	@Override
 	public int hashCode() {
-		//calculate the hash code of the properties similar to how a normal hash map would, but don't recursively
-		//get the hash code of compound objects to prevent infinite recursive hashing for circular references
+		//Calculate the hash code of the properties similar to how a normal hash map would, but don't recursively
+		//get the hash code of compound objects. This will effectively narrow the distribution of hash codes
+		//(e.g. a nested anonymous object with the same number of properties will produce the same hash code, for example),
+		//but it will prevent infinite recursive hashing if there are circular references.
 		int propertiesHashCode = 0;
 		for(final Map.Entry<String, Object> propertyEntry : properties.entrySet()) {
 			final Object propertyValue = propertyEntry.getValue();
