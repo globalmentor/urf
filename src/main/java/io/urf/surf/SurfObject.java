@@ -31,9 +31,6 @@ import com.globalmentor.collections.iterables.ConverterIterable;
  * <p>
  * SURF objects are considered equal if their tags, type handles, IDs, and property handles and values are equal.
  * </p>
- * <p>
- * This implementation does not consider another object equal unless it is an implementation of {@link SurfObject}.
- * </p>
  * @author Garret Wilson
  */
 public class SurfObject {
@@ -167,7 +164,29 @@ public class SurfObject {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(tag, typeHandle, id, properties);
+		//Calculate the hash code of the properties similar to how a normal hash map would, but don't recursively
+		//get the hash code of compound objects. This will effectively narrow the distribution of hash codes
+		//(e.g. a nested anonymous object with the same number of properties will produce the same hash code, for example),
+		//but it will prevent infinite recursive hashing if there are circular references.
+		int propertiesHashCode = 0;
+		for(final Map.Entry<String, Object> propertyEntry : properties.entrySet()) {
+			final Object propertyValue = propertyEntry.getValue();
+			final int propertyValueHashCode;
+			if(propertyValue instanceof SurfObject) {
+				final SurfObject surfObjectPropertyValue = (SurfObject)propertyValue;
+				//don't recursively get hash codes of SurfObjet property values
+				propertyValueHashCode = Objects.hash(surfObjectPropertyValue.tag, surfObjectPropertyValue.typeHandle, surfObjectPropertyValue.id,
+						surfObjectPropertyValue.properties.size());
+			} else if(propertyValue instanceof Collection) {
+				propertyValueHashCode = ((Collection<?>)propertyValue).size();
+			} else if(propertyValue instanceof Map) {
+				propertyValueHashCode = ((Map<?, ?>)propertyValue).size();
+			} else {
+				propertyValueHashCode = propertyValue.hashCode();
+			}
+			propertiesHashCode += propertyEntry.getKey().hashCode() ^ propertyValueHashCode;
+		}
+		return Objects.hash(tag, typeHandle, id, propertiesHashCode);
 	}
 
 	@Override
