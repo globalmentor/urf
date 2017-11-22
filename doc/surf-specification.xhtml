@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 
 <head>
 	<meta charset="UTF-8" />
@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-10-20</dd>
+			<dd>Draft 2017-11-22</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -110,18 +110,19 @@
 			<li><code class="language-surf">chem-Molecule</code></li>
 		</ul>
 	</figure>
-	<p>A <dfn>name</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<p>A <dfn>name token</dfn> in SURF must begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
 	<ul class="spec-production">
-		<li><code class="name">name</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code>)*</li>
+		<li><code class="name">name_token</code> ⇒ <code class="name">Letter</code> (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code>)*</li>
 	</ul>
 	<aside class="note far half">In URF each SURF handle represents a name inside the ad-hoc <dfn>namespace</dfn> <code>https://urf.name/</code>, with each prefix indicating an informal subnamespace of that IRI. For instance the handle <code>example-FooBar</code> represents the name <code>FooBar</code> in the namespace <code>https://urf.name/example/</code>, that is the tag <code>https://urf.name/example/FooBar</code>. <span class="tip">Nevertheless a SURF parser <span class="spec-may">may</span> treat SURF names as opaque identifiers.</span> <span class="info">The separate TURF format allows defining custom namespaces.</span></aside>
-	<aside class="annotation far half">The SURF prefix <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
-	<p>A name may be introduced by one or more <dfn>prefixes</dfn>, each itself a name ending in the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>). A name and its prefixes, if any, are referred to as a <dfn>handle</dfn>. An example of a handle is <code>example-FooBar</code>.</p>
+	<aside class="annotation far half">The SURF prefix delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
+	<p>A <dfn>name</dfn>, which is a name token, may be introduced by one or more <dfn>prefixes</dfn>, each itself a name token. These <dfn>segments</dfn> are separated by the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>), and together are referred to as a <dfn>handle</dfn>. An example of a handle is <code>example-FooBar</code>.</p>
 	<ul class="spec-production">
-		<li><code class="name">prefix</code> ⇒ <code class="name">Name</code> '-'</li>
-		<li><code class="name">handle</code> ⇒ <code class="name">prefix</code>* <code class="name">Name</code></li>
+		<li><code class="name">handle</code> ⇒ (<code class="name">prefix</code> '-')* <code class="name">name</code></li>
+		<li><code class="name">prefix</code> ⇒ <code class="name">name_token</code></li>
+		<li><code class="name">name</code> ⇒ <code class="name">name_token</code></li>
 	</ul>
-	<p>Authors of SURF documents <span class="spec-should">should</span> use name prefixes corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a handle <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
+	<p>Authors of SURF documents <span class="spec-should">should</span> use prefixes corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a handle <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
 	<p>SURF documents <span class="spec-must-not">must not</span> use handles beginning with the <code>urf-</code> prefex unless defined by one of the URF specifications. The <code>example-</code> prefix is reserved for use as examples in documentation for private testing. There are no restrictions on using SURF handles with no prefixes, although authors should <span class="spec-should">should</span> follow conventions that may develop associating semantics with certain names.</p>
 	<h2>Resources</h2>
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>ident</dfn> followed by a <dfn>resource representation</dfn>.</p>
@@ -134,7 +135,7 @@
 	<p> An ident consists of an identifier; which is either a SURF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of an ident with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of an ident with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the ident of an outer resource in the graph.</p>
 	<ul class="spec-production">
 		<li><code class="name">ident</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
-		<li><code class="name">alias</code> ⇒ <code class="name">name</code><code class="name"></code></li>
+		<li><code class="name">alias</code> ⇒ <code class="name">name_token</code><code class="name"></code></li>
 		<li><code class="name">id</code> ⇒ <code class="name">string</code><code class="name"></code></li>
 		<li><code class="name">tag</code> ⇒ <code class="name">iri</code><code class="name"></code></li>
 	</ul>
