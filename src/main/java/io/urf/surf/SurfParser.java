@@ -20,11 +20,11 @@ import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static io.urf.surf.SURF.*;
 import static io.urf.surf.SURF.WHITESPACE_CHARACTERS;
+import static io.urf.surf.SurfResources.*;
 import static java.util.Objects.*;
 
 import java.io.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.DateTimeParseException;
@@ -255,8 +255,9 @@ public class SurfParser {
 		if(c >= 0) { //if we didn't reach the end of the stream
 			reader.reset(); //reset to the last mark, which was set right before the non-name character we found
 		}
-		//TODO check name token for validity
-		return stringBuilder.toString(); //return the name token we read
+		final String nameToken = stringBuilder.toString();
+		checkParseIO(reader, Name.isValidToken(nameToken), "Invalid name token %s.", nameToken);
+		return nameToken;
 	}
 
 	/**
@@ -275,8 +276,9 @@ public class SurfParser {
 			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
 			stringBuilder.append(parseNameToken(reader)); //nameToken
 		}
-		//TODO check handle for validity
-		return stringBuilder.toString();
+		final String handle = stringBuilder.toString();
+		checkParseIO(reader, Handle.isValid(handle), "Invalid handle %s.", handle);
+		return handle;
 	}
 
 	/**
@@ -378,7 +380,7 @@ public class SurfParser {
 			assert findObjectById(((SurfObject)resource).getTypeHandle().get(), (String)ident).get() == resource;
 		} else if(ident instanceof Alias) { //alias
 			checkParseIO(reader, resource != null, "Cannot use alias |%s| with null.", ident);
-			if(!(resource instanceof SurfObject) && !(resource instanceof Collection) && !(resource instanceof Map)) { //compound objects already saved the association
+			if(!isCompoundResource(resource)) { //compound objects already saved the association
 				identedResources.put(ident, resource);
 			}
 			//aliases can refer to SurfObjects, collections, or value objects; normally we would want to ensure == for SurfObjects,
