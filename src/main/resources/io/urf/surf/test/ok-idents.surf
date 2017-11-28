@@ -1,6 +1,6 @@
 |root|*:
 	foo=|number|123
-	self = |root|
+	!TODO self = |root|
 value = |test|false
 	thing =
 |object|*example-Type:
@@ -12,10 +12,10 @@ value = |test|false
 	;
 	foobar = |"foo"|*Bar:
 		prop = "val"
-		self = |"foo"|*Bar
+		!TODO self = |"foo"|*Bar
 	;
 	map = |me|{
-		0: |me|
+		!TODO 0: |me|
 		1: "one"
 		2: |number|
 		4: |"foo"|*Bar
@@ -26,9 +26,9 @@ value = |test|false
 |number|
 	|test|
 		|object|
-		|root|
-		|new| * example-Thing :description = "a new thing";
+		!TODO |root|
+		|newThing| * example-Thing :description = "a new thing";
 		|another| *  :description = "yet another thing";
-		|these|
+		!TODO |these|
 	)
 ;
