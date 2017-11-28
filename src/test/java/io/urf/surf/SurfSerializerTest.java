@@ -264,6 +264,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("devanagari-maEscaped", CodePointCharacter.of('\u092E'));
 		surfObject.setPropertyValue("tearsOfJoy", CodePointCharacter.of(0x1F602));
 		surfObject.setPropertyValue("tearsOfJoyEscaped", CodePointCharacter.of(0x1F602));
+		assertThat(surfObject, equalTo(parseTestResource(OK_CHARACTERS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -285,6 +286,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("x", EmailAddress.fromString("x@example.com"));
 		surfObject.setPropertyValue("dashedDomain", EmailAddress.fromString("foo-bar@strange-example.com"));
 		surfObject.setPropertyValue("longTLD", EmailAddress.fromString("example@s.solutions"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_EMAIL_ADDRESSES_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -304,6 +306,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("example", URI.create("http://www.example.com/"));
 		surfObject.setPropertyValue("iso_8859_1", URI.create("http://www.example.org/Dürst"));
 		surfObject.setPropertyValue("encodedForbidden", URI.create("http://xn--99zt52a.example.org/%E2%80%AE"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_IRIS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -349,6 +352,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("decimalScientific3", new BigDecimal("-123.4e+5"));
 		surfObject.setPropertyValue("decimalScientific4", new BigDecimal("-321.45e-12"));
 		surfObject.setPropertyValue("decimalScientific5", new BigDecimal("45.67e+89"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_NUMBERS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -369,6 +373,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("regexEscape", Pattern.compile("ab\\.c"));
 		surfObject.setPropertyValue("doubleBackslash", Pattern.compile("\\\\"));
 		surfObject.setPropertyValue("slash", Pattern.compile("/"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_REGULAR_EXPRESSIONS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -402,6 +407,7 @@ public class SurfSerializerTest implements Clogged {
 		final SurfObject surfObject = new SurfObject();
 		surfObject.setPropertyValue("rfc3966Example", TelephoneNumber.parse("+12015550123"));
 		surfObject.setPropertyValue("brazil", TelephoneNumber.parse("+552187654321"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_TELEPHONE_NUMBERS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -431,6 +437,7 @@ public class SurfSerializerTest implements Clogged {
 		surfObject.setPropertyValue("yearMonth", YearMonth.parse("2017-02"));
 		surfObject.setPropertyValue("monthDay", MonthDay.parse("--02-12"));
 		surfObject.setPropertyValue("year", Year.parse("2017"));
+		assertThat(surfObject, equalTo(parseTestResource(OK_TEMPORALS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -514,6 +521,7 @@ public class SurfSerializerTest implements Clogged {
 		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		map.put("map", pingPong);
 		map.put(new HashSet<Object>(Arrays.asList("foo", false)), true);
+		assertThat(map, equalTo(parseTestResource(OK_MAPS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
@@ -608,6 +616,56 @@ public class SurfSerializerTest implements Clogged {
 			for(final String okSetTwoItemsResourceName : OK_SET_TWO_ITEMS_RESOURCE_NAMES) {
 				assertThat(okSetTwoItemsResourceName, new SurfParser().parse(serialization), equalTo(parseTestResource(okSetTwoItemsResourceName)));
 			}
+		}
+	}
+
+	//#idents
+
+	/** @see SurfTestResources#OK_IDENTS_RESOURCE_NAME */
+	@Test
+	public void testOkIdents() throws IOException {
+		final SurfObject root = new SurfObject();
+		root.setPropertyValue("foo", 123);
+		//TODO circular references: root.setPropertyValue("self", root);
+		root.setPropertyValue("value", false);
+		final SurfObject object = new SurfObject("example-Type");
+		final SurfObject exampleThing = new SurfObject(URI.create("http://example.com/thing"), "example-Thing");
+		exampleThing.setPropertyValue("name", "Example Thing");
+		object.setPropertyValue("stuff", asList("one", 123, "three", exampleThing));
+		root.setPropertyValue("thing", object);
+		final SurfObject fooBar = new SurfObject("Bar", "foo");
+		fooBar.setPropertyValue("prop", "val");
+		//TODO circular references: fooBar.setPropertyValue("self", fooBar);
+		root.setPropertyValue("foobar", fooBar);
+		final Map<Integer, Object> me = new HashMap<>();
+		//TODO circular references: me.put(0, me);
+		me.put(1, "one");
+		me.put(2, 123);
+		me.put(4, fooBar);
+		me.put(99, exampleThing);
+		me.put(100, object);
+		root.setPropertyValue("map", me);
+		final Set<Object> these = new HashSet<>();
+		these.add(123);
+		these.add(false);
+		these.add(object);
+		//TODO circular references: these.add(root);
+		final SurfObject newThing = new SurfObject("example-Thing");
+		newThing.setPropertyValue("description", "a new thing");
+		these.add(newThing);
+		final SurfObject another = new SurfObject();
+		another.setPropertyValue("description", "yet another thing");
+		these.add(another);
+		//TODO circular references: these.add(these);
+		root.setPropertyValue("set", these);
+		assertThat(root, equalTo(parseTestResource(OK_IDENTS_RESOURCE_NAME).get())); //verify the test data
+		//test with generated references
+		for(final boolean formatted : asList(false, true)) {
+			final SurfSerializer serializer = new SurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serialize(root);
+			//TODO fix circular references; both the parser and serializer seem to support them --- the difficulty is comparing them! 
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_IDENTS_RESOURCE_NAME)));
 		}
 	}
 

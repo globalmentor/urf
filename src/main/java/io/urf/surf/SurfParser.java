@@ -23,8 +23,7 @@ import static io.urf.surf.SURF.WHITESPACE_CHARACTERS;
 import static java.util.Objects.*;
 
 import java.io.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.DateTimeParseException;
@@ -255,8 +254,9 @@ public class SurfParser {
 		if(c >= 0) { //if we didn't reach the end of the stream
 			reader.reset(); //reset to the last mark, which was set right before the non-name character we found
 		}
-		//TODO check name token for validity
-		return stringBuilder.toString(); //return the name token we read
+		final String nameToken = stringBuilder.toString();
+		checkParseIO(reader, Name.isValidToken(nameToken), "Invalid name token %s.", nameToken);
+		return nameToken;
 	}
 
 	/**
@@ -275,8 +275,9 @@ public class SurfParser {
 			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
 			stringBuilder.append(parseNameToken(reader)); //nameToken
 		}
-		//TODO check handle for validity
-		return stringBuilder.toString();
+		final String handle = stringBuilder.toString();
+		checkParseIO(reader, Handle.isValid(handle), "Invalid handle %s.", handle);
+		return handle;
 	}
 
 	/**
@@ -299,6 +300,7 @@ public class SurfParser {
 			}
 			c = skipFiller(reader);
 		}
+
 		final Object resource;
 		switch(c) {
 			//objects
@@ -368,23 +370,40 @@ public class SurfParser {
 				//TODO the spec currently says a tag MAY have a resource representation; should we create an object if there is none?
 				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 		}
+
 		//check and associate with the ident as needed
 		if(ident instanceof URI) { //tag
 			checkParseIO(reader, resource instanceof SurfObject, "Tag |%s| can only be used an object.", ident);
-			assert findObjectByTag((URI)ident).get() == resource;
+			assert ident.equals(((SurfObject)resource).getTag().orElse(null));
+			identedResources.put(ident, resource);
 		} else if(ident instanceof String) { //ID
-			checkParseIO(reader, resource instanceof SurfObject, "ID |%s| can only be used an object.", ident);
-			assert ((SurfObject)resource).getTypeHandle().isPresent() : "Parsing the object should have verified that an IDed object has a type.";
-			assert findObjectById(((SurfObject)resource).getTypeHandle().get(), (String)ident).get() == resource;
+			final String id = (String)ident;
+			checkParseIO(reader, resource instanceof SurfObject, "ID |%s| can only be used an object.", id);
+			final SurfObject surfObject = (SurfObject)resource;
+			assert id.equals(((SurfObject)resource).getId().orElse(null));
+			final String typeHandle = surfObject.getTypeHandle()
+					.orElseThrow(() -> new ParseIOException(reader, String.format("Object with ID %s does not indicate a type.", id)));
+			identedResources.put(new AbstractMap.SimpleImmutableEntry<String, String>(typeHandle, id), resource);
 		} else if(ident instanceof Alias) { //alias
 			checkParseIO(reader, resource != null, "Cannot use alias |%s| with null.", ident);
-			if(!(resource instanceof SurfObject) && !(resource instanceof Collection) && !(resource instanceof Map)) { //compound objects already saved the association
+			if(!(resource instanceof Collection)) { //collections already saved the association
 				identedResources.put(ident, resource);
 			}
 			//aliases can refer to SurfObjects, collections, or value objects; normally we would want to ensure == for SurfObjects,
 			//but value objects are substitutable, so it's not good practice to compare them using ==
 			assert findResourceByAlias(ident.toString()).isPresent();
 		}
+
+		//description (optional)
+		//TODO decide how to handle objects as map keys; require a description, even an empty one, to distinguish from the map key/value delimiter?
+		if(resource instanceof SurfObject) {
+			c = peek(reader);
+			if(c == DESCRIPTION_BEGIN) {
+				checkParseIO(reader, resource instanceof SurfObject, "SURF only allows objects to have a description.");
+				parseDescription(reader, (SurfObject)resource);
+			}
+		}
+
 		return resource;
 	}
 
@@ -409,9 +428,6 @@ public class SurfParser {
 	 * If the given ident indicates an ID, after parsing the object type if an object already exists with the given ID for that type, it will be immediately
 	 * returned.
 	 * </p>
-	 * <p>
-	 * Once the object is created, it will be associated with the given ident or, if the ident is an ID, with the object type and ID, for later lookup.
-	 * </p>
 	 * @param ident The object ident; either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an ID.
 	 * @param reader The reader containing SURF data.
 	 * @return The SURF object read from the reader.
@@ -423,7 +439,7 @@ public class SurfParser {
 		int c = skipFiller(reader);
 		//type (optional)
 		final String typeHandle;
-		if(c >= 0 && c != PROPERTIES_BEGIN && !EOL_CHARACTERS.contains((char)c)) { //if there is something before properties, it must be a type
+		if(c >= 0 && Handle.isBeginCharacter((char)c)) {
 			typeHandle = parseHandle(reader);
 			//if a type#id was already defined return it
 			if(ident instanceof String) {
@@ -439,32 +455,36 @@ public class SurfParser {
 		final SurfObject resource; //create a resource based upon the type of ident
 		if(ident instanceof URI) { //tag
 			resource = new SurfObject((URI)ident, typeHandle);
-			identedResources.put(ident, resource);
 		} else if(ident instanceof String) { //ID
-			final String id = (String)ident;
-			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", id);
-			resource = new SurfObject(typeHandle, id);
-			identedResources.put(new AbstractMap.SimpleImmutableEntry<String, String>(typeHandle, id), resource);
+			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", ident);
+			resource = new SurfObject(typeHandle, (String)ident);
 		} else { //no tag or ID
 			resource = new SurfObject(typeHandle); //the type may be null
-			if(ident instanceof Alias) {
-				identedResources.put(ident, resource);
-			}
 		}
-		//properties (optional)
-		if(c == PROPERTIES_BEGIN) {
-			check(reader, PROPERTIES_BEGIN); //:
-			parseSequence(reader, PROPERTIES_END, r -> {
-				final String propertyHandle = parseHandle(reader);
-				skipLineBreaks(reader);
-				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipLineBreaks(reader);
-				final Object value = parseResource(reader);
-				final Optional<Object> oldValue = resource.setPropertyValue(propertyHandle, value);
-				checkParseIO(reader, !oldValue.isPresent(), "Object has duplicate definition for property %s.", propertyHandle);
-			});
-			check(reader, PROPERTIES_END); //;
-		}
+		return resource;
+	}
+
+	/**
+	 * Parses the description properties of a resource. The next character read is expected to be the start of the description {@value SURF#DESCRIPTION_BEGIN}.
+	 * @param reader The reader containing SURF data.
+	 * @param resource The resource to which properties should be added; SURF only supports object descriptions.
+	 * @return The described SURF resource read from the reader.
+	 * @throws IOException If there was an error reading the SURF data.
+	 * @see SURF#DESCRIPTION_BEGIN
+	 */
+	protected SurfObject parseDescription(@Nonnull final Reader reader, @Nonnull final SurfObject resource) throws IOException {
+		requireNonNull(resource);
+		check(reader, DESCRIPTION_BEGIN); //:
+		parseSequence(reader, DESCRIPTION_END, r -> {
+			final String propertyHandle = parseHandle(reader);
+			skipLineBreaks(reader);
+			check(reader, PROPERTY_VALUE_DELIMITER); //=
+			skipLineBreaks(reader);
+			final Object value = parseResource(reader);
+			final Optional<Object> oldValue = resource.setPropertyValue(propertyHandle, value);
+			checkParseIO(reader, !oldValue.isPresent(), "Resource has duplicate definition for property %s.", propertyHandle);
+		});
+		check(reader, DESCRIPTION_END); //;
 		return resource;
 	}
 

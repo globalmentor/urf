@@ -20,6 +20,7 @@ import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static io.urf.surf.SURF.*;
+import static io.urf.surf.SurfResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
@@ -128,6 +129,9 @@ import com.globalmentor.net.EmailAddress;
  * @author Garret Wilson
  */
 public class SurfSerializer {
+
+	/** The prefix used when generating aliases. */
+	public static final String GENERATED_ALIAS_PREFIX = "resource";
 
 	private final static String ARRAY_LIST_CLASS_NAME = "java.util.ArrayList";
 	private final static String BIG_DECIMAL_CLASS_NAME = "java.math.BigDecimal";
@@ -311,7 +315,173 @@ public class SurfSerializer {
 	}
 
 	/**
+	 * A map indicating whether a resource has a reference.
+	 * <p>
+	 * If a resource does not appear as a key in the map, it has not been encountered in the graph. If the resource is associated with {@link Boolean#FALSE}, it
+	 * has no references. If it is associated with {@link Boolean#TRUE}, it has at least one reference and will need an alias if it has no tag or ID.
+	 * </p>
+	 */
+	private final Map<Object, Boolean> resourceHasReferenceMap = new IdentityHashMap<>();
+
+	/**
+	 * Stores whether a resource has references based upon the resources currently seen.
+	 * <p>
+	 * If we've never seen the resource, it will be associated with <code>false</code>; if we have seen it, it will be associated with <code>true</code> in the
+	 * map.
+	 * </p>
+	 * @param resource The resource to check.
+	 * @return Whether the resource has at least one reference (i.e. it has been seen before).
+	 */
+	private boolean calculateResourceHasReference(@Nonnull final Object resource) {
+		final boolean hasReference = resourceHasReferenceMap.containsKey(resource);
+		resourceHasReferenceMap.put(resource, hasReference);
+		return hasReference;
+	}
+
+	/**
+	 * Discovers whether there are references to the given resource and recursively all nested resources.
+	 * <p>
+	 * This method should not be called more than once for any resource graph, or all resources in the graph will be marked as having references.
+	 * </p>
+	 * @param resource The resource graph for which references should be discovered.
+	 */
+	protected void discoverResourceReferences(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		if(resource instanceof SurfObject) { //discover references to object property values
+			if(!calculateResourceHasReference(resource)) { //don't recheck referenced resources
+				((SurfObject)resource).getProperties().forEach(propertyEntry -> {
+					discoverResourceReferences(propertyEntry.getValue());
+				});
+			}
+		} else if(resource instanceof Collection) { //discover references to collection members
+			if(!calculateResourceHasReference(resource)) { //don't recheck referenced resources
+				((Collection<?>)resource).forEach(this::discoverResourceReferences);
+			}
+		} else if(resource instanceof Map) { //discover references to map keys and values
+			if(!calculateResourceHasReference(resource)) { //don't recheck referenced resources
+				((Map<?, ?>)resource).forEach((key, value) -> {
+					discoverResourceReferences(key);
+					discoverResourceReferences(value);
+				});
+			}
+		}
+	}
+
+	/** The map of aliases for objects and collections, with identity keys. */
+	private final Map<Object, String> aliasesByCompoundResource = new IdentityHashMap<>();
+
+	/** The map of aliases for value objects (which become SURF literals), with equality keys. */
+	private final Map<Object, String> aliasesByValue = new HashMap<>();
+
+	/**
+	 * Returns any alias associated with a resource.
+	 * @param resource The resource with which an alias may be associated.
+	 * @return The alias, if any associated with the given resource.
+	 */
+	public Optional<String> getAliasForResource(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		if(isCompoundResource(resource)) {
+			return Optional.ofNullable(aliasesByCompoundResource.get(resource));
+		} else {
+			return Optional.ofNullable(aliasesByValue.get(resource));
+		}
+	}
+
+	/**
+	 * Associates an alias with a resource. This method allows associating aliases with non-object and non-collection resources as well, such as the number 5.
+	 * <p>
+	 * Aliases are not allowed to be set for objects with tags or IDs, which themselves serve as idents.
+	 * </p>
+	 * @param resource The resource to associate with an alias.
+	 * @param alias The alias to associate with the resource.
+	 * @throws NullPointerException if the given resource and/or alias is <code>null</code>.
+	 * @throws IllegalArgumentException if the given alias is not a valid name token.
+	 * @throws IllegalArgumentException if an alias is given for a {@link SurfObject} with a tag or an ID.
+	 */
+	public void setAliasForResource(@Nonnull final Object resource, @Nonnull final String alias) {
+		requireNonNull(resource);
+		Name.checkArgumentValidToken(alias);
+		if(isCompoundResource(resource)) {
+			if(resource instanceof SurfObject) {
+				final SurfObject surfObject = (SurfObject)resource;
+				checkArgument(!surfObject.getTag().isPresent(), "An alias cannot be specified for object with tag %s.", surfObject.getTag().orElse(null));
+				checkArgument(!surfObject.getId().isPresent(), "An alias cannot be specified for object with ID %s for type %s.", surfObject.getId().orElse(null),
+						surfObject.getTypeHandle().orElse(null));
+			}
+			aliasesByCompoundResource.put(resource, alias);
+		} else {
+			aliasesByValue.put(resource, alias);
+		}
+	}
+
+	/** The number of generated aliases. */
+	private long generatedAliasCount = 0;
+
+	/**
+	 * Determines an alias to use with a resource, generating one if the graph requires it.
+	 * <ul>
+	 * <li>If an alias has already been associated with a resource, it is returned.</li>
+	 * <li>Otherwise if the resource is a compound resource that has references, a new alias is generated, associated with the resource for future use and
+	 * returned.</li>
+	 * <li>An alias is never generated for a {@link SurfObject} with an a tag or an ID, as that serves as an ident.</li>
+	 * </ul>
+	 * @param resource The resource with which an alias may be associated, or <code>null</code> if there is no alias.
+	 * @return The alias, if any associated with the given resource.
+	 */
+	protected String determineAliasForResource(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		return getAliasForResource(resource).orElseGet(() -> { //TODO improve with Java 9 Optional.or()
+			//if this is a compound resource
+			if(isCompoundResource(resource)) {
+				if(resource instanceof SurfObject) {
+					final SurfObject surfObject = (SurfObject)resource;
+					if(surfObject.getTag().isPresent() || surfObject.getId().isPresent()) {
+						return null; //a SURF object with a tag or an ID does not need an alias
+					}
+				}
+				//if the compound resource has references
+				if(Boolean.TRUE.equals(resourceHasReferenceMap.get(resource))) {
+					final long aliasNumber = ++generatedAliasCount;
+					final String newAlias = GENERATED_ALIAS_PREFIX + aliasNumber;
+					setAliasForResource(resource, newAlias);
+					return newAlias;
+				}
+			}
+			return null;
+		});
+	}
+
+	/** The set of objects and collections that have been serialized. */
+	private final Set<Object> serializedCompoundResources = Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
+
+	/** The map of value objects (which become SURF literals), that have been serialized. */
+	private final Set<Object> serializedValues = new HashSet<>();
+
+	/**
+	 * Determines whether a given resource has already been serialized.
+	 * 
+	 * @param resource The resource to check.
+	 * @return <code>true</code> if the resource has already been serialized.
+	 */
+	protected boolean isSerialized(@Nonnull final Object resource) {
+		return (isCompoundResource(resource) ? serializedCompoundResources : serializedValues).contains(resource);
+	}
+
+	/**
+	 * Sets a resource has having been serialized.
+	 * @param resource The resource to record as serialized.
+	 * @return Whether the resource was previously marked as serialized before this call.
+	 */
+	protected boolean setSerialized(@Nonnull final Object resource) {
+		return !(isCompoundResource(resource) ? serializedCompoundResources : serializedValues).add(resource);
+	}
+
+	/**
 	 * Serializes a SURF resource graph to a string.
+	 * <p>
+	 * This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after serialization, but
+	 * any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same aliases being used.
+	 * </p>
 	 * <p>
 	 * This is a convenience method that delegates to {@link #serialize(Appendable, Object)}.
 	 * </p>
@@ -320,29 +490,46 @@ public class SurfSerializer {
 	 * @return A serialized string representation of the given SURF resource graph.
 	 */
 	public String serialize(@Nonnull @Nullable Object root) throws IOException {
-		final Writer stringWriter = new StringWriter();
+		discoverResourceReferences(root);
 		try {
-			serialize(stringWriter, root);
+			final Writer stringWriter = new StringWriter();
+			try {
+				serialize(stringWriter, root);
+			} finally {
+				stringWriter.close(); //close for completeness, not for necessity
+			}
+			return stringWriter.toString();
 		} finally {
-			stringWriter.close(); //close for completeness, not for necessity
+			resourceHasReferenceMap.clear();
 		}
-		return stringWriter.toString();
 	}
 
 	/**
 	 * Serializes a SURF resource graph to an output stream.
+	 * <p>
+	 * This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after serialization, but
+	 * any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same aliases being used.
+	 * </p>
 	 * @param outputStream The output stream to receive SURF data.
 	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws IOException If there was an error writing the SURF data.
 	 */
 	public void serialize(@Nonnull final OutputStream outputStream, @Nullable Object root) throws IOException {
-		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, CHARSET));
-		serialize(writer, root);
-		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+		discoverResourceReferences(root);
+		try {
+			final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, CHARSET));
+			serialize(writer, root);
+			writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+		} finally {
+			resourceHasReferenceMap.clear();
+		}
 	}
 
 	/**
 	 * Serializes a SURF resource graph to a writer.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
@@ -357,12 +544,23 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF resource to a writer.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param resource The SURF resource to serialize to serialize.
 	 * @throws NullPointerException if the given appendable and/or resource is <code>null</code>.
 	 * @throws IOException If there was an error appending the SURF data.
 	 */
 	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
+		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
+		final String alias = determineAliasForResource(resource);
+		if(alias != null) {
+			appendable.append(IDENT_DELIMITER).append(alias).append(IDENT_DELIMITER);
+			if(wasSerialized) { //an aliased resource never has to be serialized twice
+				return;
+			}
+		}
 		switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
 			//#literals
 			//##binary
@@ -461,7 +659,25 @@ public class SurfSerializer {
 			default:
 				//handle general base types and interfaces
 				if(resource instanceof SurfObject) { //objects TODO additionally create class name constant when package stabilizes
+					final SurfObject surfObject = (SurfObject)resource;
+					if(surfObject.getTag().isPresent()) { //|<tag>|
+						appendable.append(IDENT_DELIMITER);
+						serializeIri(appendable, surfObject.getTag().get());
+						appendable.append(IDENT_DELIMITER);
+						if(wasSerialized) { //an object with a tag never has to be serialized twice
+							return;
+						}
+					} else if(surfObject.getId().isPresent()) { //|"id"|
+						appendable.append(IDENT_DELIMITER);
+						serializeString(appendable, surfObject.getId().get());
+						appendable.append(IDENT_DELIMITER);
+					}
 					serializeObject(appendable, (SurfObject)resource);
+					if(surfObject.getId().isPresent()) {
+						if(wasSerialized) { //an object with and ID never needs its description serialized again
+							return;
+						}
+					}
 				} else if(resource instanceof List) { //list
 					serializeList(appendable, (List<?>)resource);
 				} else if(resource instanceof Map) { //map
@@ -484,42 +700,64 @@ public class SurfSerializer {
 				}
 				break;
 		}
+
+		//serialize description if appropriate
+		if(resource instanceof SurfObject) {
+			final SurfObject surfObject = (SurfObject)resource;
+			if(surfObject.getPropertyCount() > 0) { //if there are properties (otherwise skip the {} altogether)
+				serializeDescription(appendable, surfObject);
+			}
+		}
 	}
 
 	//objects
 
 	/**
-	 * Serializes a SURF object.
+	 * Serializes a SURF object representation <em>without</em> the following description.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param surfObject The information to be serialized as a SURF object.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#OBJECT_BEGIN
-	 * @see SURF#PROPERTIES_BEGIN
-	 * @see SURF#PROPERTIES_END
 	 */
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
 		ifPresent(surfObject.getTypeHandle(), appendable::append); //typeHandle
-		if(surfObject.getPropertyCount() > 0) { //if there are properties (otherwise skip the {} altogether)
-			appendable.append(PROPERTIES_BEGIN); //:
-			formatNewLine(appendable);
-			try (final Closeable indention = increaseIndentLevel()) {
-				serializeSequence(appendable, surfObject.getProperties(), (out, property) -> { //TODO make serializeProperty() method
-					out.append(property.getKey());
-					if(formatted) {
-						out.append(SPACE_CHAR);
-					}
-					out.append(PROPERTY_VALUE_DELIMITER); //=
-					if(formatted) {
-						out.append(SPACE_CHAR);
-					}
-					serializeResource(out, property.getValue());
-				});
-			}
-			formatIndent(appendable);
-			appendable.append(PROPERTIES_END); //;
+	}
+
+	/**
+	 * Serializes a SURF resource description. The description section, including delimiters, will be serialized even if there are no properties.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
+	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param surfObject The SURF object with the description to be serialized.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#DESCRIPTION_BEGIN
+	 * @see SURF#DESCRIPTION_END
+	 */
+	public void serializeDescription(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
+		appendable.append(DESCRIPTION_BEGIN); //:
+		formatNewLine(appendable);
+		try (final Closeable indention = increaseIndentLevel()) {
+			serializeSequence(appendable, surfObject.getProperties(), (out, property) -> { //TODO make serializeProperty() method
+				out.append(property.getKey());
+				if(formatted) {
+					out.append(SPACE_CHAR);
+				}
+				out.append(PROPERTY_VALUE_DELIMITER); //=
+				if(formatted) {
+					out.append(SPACE_CHAR);
+				}
+				serializeResource(out, property.getValue());
+			});
 		}
+		formatIndent(appendable);
+		appendable.append(DESCRIPTION_END); //;
 	}
 
 	//literals
@@ -800,6 +1038,9 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF list.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param list The information to be serialized as a SURF list.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
@@ -821,6 +1062,9 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF map.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param map The information to be serialized as a SURF map.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
@@ -850,6 +1094,9 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a SURF set.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param set The information to be serialized as a SURF set.
 	 * @throws NullPointerException if the given reader is <code>null</code>.

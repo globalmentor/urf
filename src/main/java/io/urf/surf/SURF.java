@@ -59,10 +59,10 @@ public class SURF {
 
 	/** The indicator of an object (an anonymous resource instance). */
 	public static final char OBJECT_BEGIN = '*';
-	/** The delimiter that begins property declarations. */
-	public static final char PROPERTIES_BEGIN = ':';
-	/** The delimiter that ends property declarations. */
-	public static final char PROPERTIES_END = ';';
+	/** The delimiter that begins an object description. */
+	public static final char DESCRIPTION_BEGIN = ':';
+	/** The delimiter that ends a property description. */
+	public static final char DESCRIPTION_END = ';';
 	/** The character that separates properties and assigned values. */
 	public static final char PROPERTY_VALUE_DELIMITER = '=';
 
@@ -208,6 +208,19 @@ public class SURF {
 		}
 
 		/**
+		 * Confirms that the given string conforms to the rules for a SURF name token.
+		 * @param string The string to check.
+		 * @return The given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for a SURF name token.
+		 * @see #TOKEN_PATTERN
+		 */
+		public static String checkArgumentValidToken(final String string) {
+			checkArgument(isValidToken(string), "Invalid SURF name token \"%s\".", string);
+			return string;
+		}
+
+		/**
 		 * Determines if the given character is a SURF token name begin character. A name token begin character is a Unicode letter.
 		 * @param c The character to check.
 		 * @return <code>true</code> if the character is a SURF name begin character.
@@ -274,6 +287,16 @@ public class SURF {
 
 		/** Regular expression pattern to match a SURF handle . */
 		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))*", Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN)); //TODO add test; document matching groups
+
+		/**
+		 * Determines if the given character is valid to begin SURF handle. A SURF handle begins with a name token.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is a SURF handle begin character.
+		 * @see Name#isTokenBeginCharacter(int)
+		 */
+		public static final boolean isBeginCharacter(final int c) {
+			return Name.isTokenBeginCharacter(c); //see if this is a letter
+		}
 
 		/**
 		 * Determines whether the given string conforms to the rules for a SURF handle.
