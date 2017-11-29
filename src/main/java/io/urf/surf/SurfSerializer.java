@@ -390,7 +390,7 @@ public class SurfSerializer {
 	/**
 	 * Associates an alias with a resource. This method allows associating aliases with non-object and non-collection resources as well, such as the number 5.
 	 * <p>
-	 * Aliases are not allowed to be set for objects with tags or IDs, which themselves serve as idents.
+	 * Aliases are not allowed to be set for objects with tags or IDs, which themselves serve as labels.
 	 * </p>
 	 * @param resource The resource to associate with an alias.
 	 * @param alias The alias to associate with the resource.
@@ -423,7 +423,7 @@ public class SurfSerializer {
 	 * <li>If an alias has already been associated with a resource, it is returned.</li>
 	 * <li>Otherwise if the resource is a compound resource that has references, a new alias is generated, associated with the resource for future use and
 	 * returned.</li>
-	 * <li>An alias is never generated for a {@link SurfObject} with an a tag or an ID, as that serves as an ident.</li>
+	 * <li>An alias is never generated for a {@link SurfObject} with an a tag or an ID, as that serves as a label.</li>
 	 * </ul>
 	 * @param resource The resource with which an alias may be associated, or <code>null</code> if there is no alias.
 	 * @return The alias, if any associated with the given resource.
@@ -556,7 +556,7 @@ public class SurfSerializer {
 		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
 		final String alias = determineAliasForResource(resource);
 		if(alias != null) {
-			appendable.append(IDENT_DELIMITER).append(alias).append(IDENT_DELIMITER);
+			appendable.append(LABEL_DELIMITER).append(alias).append(LABEL_DELIMITER);
 			if(wasSerialized) { //an aliased resource never has to be serialized twice
 				return;
 			}
@@ -661,16 +661,16 @@ public class SurfSerializer {
 				if(resource instanceof SurfObject) { //objects TODO additionally create class name constant when package stabilizes
 					final SurfObject surfObject = (SurfObject)resource;
 					if(surfObject.getTag().isPresent()) { //|<tag>|
-						appendable.append(IDENT_DELIMITER);
+						appendable.append(LABEL_DELIMITER);
 						serializeIri(appendable, surfObject.getTag().get());
-						appendable.append(IDENT_DELIMITER);
+						appendable.append(LABEL_DELIMITER);
 						if(wasSerialized) { //an object with a tag never has to be serialized twice
 							return;
 						}
 					} else if(surfObject.getId().isPresent()) { //|"id"|
-						appendable.append(IDENT_DELIMITER);
+						appendable.append(LABEL_DELIMITER);
 						serializeString(appendable, surfObject.getId().get());
-						appendable.append(IDENT_DELIMITER);
+						appendable.append(LABEL_DELIMITER);
 					}
 					serializeObject(appendable, (SurfObject)resource);
 					if(surfObject.getId().isPresent()) {
