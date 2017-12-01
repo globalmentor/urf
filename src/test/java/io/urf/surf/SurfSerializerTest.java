@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import javax.annotation.*;
 
 import static com.globalmentor.java.Bytes.*;
-import static io.urf.surf.test.SurfTestResources.*;
+import static io.urf.surf.SurfTestResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -42,7 +42,6 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
-import io.urf.surf.test.SurfTestResources;
 
 /**
  * Tests of {@link SurfParser}.
