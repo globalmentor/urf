@@ -619,11 +619,11 @@ public class SurfSerializerTest implements Clogged {
 		}
 	}
 
-	//#idents
+	//#labels
 
-	/** @see SurfTestResources#OK_IDENTS_RESOURCE_NAME */
+	/** @see SurfTestResources#OK_LABELS_RESOURCE_NAME */
 	@Test
-	public void testOkIdents() throws IOException {
+	public void testOkLabels() throws IOException {
 		final SurfObject root = new SurfObject();
 		root.setPropertyValue("foo", 123);
 		//TODO circular references: root.setPropertyValue("self", root);
@@ -658,14 +658,14 @@ public class SurfSerializerTest implements Clogged {
 		these.add(another);
 		//TODO circular references: these.add(these);
 		root.setPropertyValue("set", these);
-		assertThat(root, equalTo(parseTestResource(OK_IDENTS_RESOURCE_NAME).get())); //verify the test data
+		assertThat(root, equalTo(parseTestResource(OK_LABELS_RESOURCE_NAME).get())); //verify the test data
 		//test with generated references
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serialize(root);
 			//TODO fix circular references; both the parser and serializer seem to support them --- the difficulty is comparing them! 
-			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_IDENTS_RESOURCE_NAME)));
+			assertThat(new SurfParser().parse(serialization), equalTo(parseTestResource(OK_LABELS_RESOURCE_NAME)));
 		}
 	}
 

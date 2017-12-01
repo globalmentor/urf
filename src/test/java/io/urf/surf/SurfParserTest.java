@@ -538,12 +538,12 @@ public class SurfParserTest {
 
 	//TODO create tests for duplicate items and double list item separators
 
-	//#idents
+	//#labels
 
-	/** @see SurfTestResources#OK_IDENTS_RESOURCE_NAME */
+	/** @see SurfTestResources#OK_LABELS_RESOURCE_NAME */
 	@Test
-	public void testOkIdents() throws IOException {
-		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_IDENTS_RESOURCE_NAME)) {
+	public void testOkLabels() throws IOException {
+		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_LABELS_RESOURCE_NAME)) {
 			final SurfParser surfParser = new SurfParser();
 			final SurfObject root = (SurfObject)surfParser.parse(inputStream).get();
 			//|root|
@@ -619,5 +619,5 @@ public class SurfParserTest {
 		}
 	}
 
-	//TODO create test with bad idents, such as aliases with whitespace, tags for null, and redefined idents
+	//TODO create test with bad labels, such as aliases with whitespace, tags for null, and redefined labels
 }
