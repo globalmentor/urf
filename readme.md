@@ -6,6 +6,8 @@ Reference implementation of the Simple URF (SURF) document format.
 
 SURF is available in the Maven Central Repository as [io.urf:surf](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf%22).
 
+SURF test documents are available in the Maven Central Repository as [io.urf:surf:jar:tests](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf%22%20AND%20l%3A%22tests%22).
+
 ## Issues
 
 Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF/).
