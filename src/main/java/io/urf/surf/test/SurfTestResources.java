@@ -203,6 +203,6 @@ public class SurfTestResources {
 			OK_SET_TWO_ITEMS_1_RESOURCE_NAME, OK_SET_TWO_ITEMS_1_NO_COMMAS_RESOURCE_NAME, OK_SET_TWO_ITEMS_2_RESOURCE_NAME,
 			OK_SET_TWO_ITEMS_2_NO_COMMAS_RESOURCE_NAME);
 
-	//#tags
-	public static final String OK_IDENTS_RESOURCE_NAME = "ok-idents.surf";
+	//#labels
+	public static final String OK_LABELS_RESOURCE_NAME = "ok-labels.surf";
 }
