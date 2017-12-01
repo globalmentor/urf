@@ -28,12 +28,12 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
-import static io.urf.surf.test.SurfTestResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.Matchers.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.Bytes.*;
+import static io.urf.surf.SurfTestResources.*;
 
 import org.junit.*;
 
@@ -41,7 +41,6 @@ import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.net.EmailAddress;
 
-import io.urf.surf.test.SurfTestResources;
 import junit.framework.AssertionFailedError;
 
 /**
