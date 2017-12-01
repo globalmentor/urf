@@ -1,0 +1,8 @@
+*:
+	empty = //
+	abc = /abc/
+	regexEscape = /ab\.c/
+	doubleBackslash = /\\/
+	! a single backslash /\/ is not a valid regular expression
+	slash = /\//
+;
