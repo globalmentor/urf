@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-11-28</dd>
+			<dd>Draft 2017-12-05</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -128,11 +128,12 @@
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
 		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> | <code class="name">label</code></li>
+		<li><code class="name">described_resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> · [<code class="name">description</code>] | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
-		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code> | <code class="name">table</code></li>
+		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
-	<p> A label consists of an identifier; which is either a SURF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
+	<p> A label consists of an identifier; which is either a SURF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
 	<ul class="spec-production">
 		<li><code class="name">label</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
 		<li><code class="name">alias</code> ⇒ <code class="name">name_token</code></li>
@@ -142,17 +143,19 @@
 	<p>If a label uses a SURF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the SURF document. If the identifier is an IRI, it is a <dfn>tag</dfn> and provides a unique identifier for the resource across all SURF documents. A SURF tag <span class="spec-must-not">must not</span> contain an IRI fragment. A string as the identifier functions as an <dfn>ID</dfn> for an object, unique only for a certain object type.</p>
 	<p>A tag or an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object. An ID <span class="spec-must-not">must not</span> appear in front of a resource representation without an indicated type. A SURF parser <span class="spec-must">must</span> provide tags and IDs as part of the parsed data.</p>
 	<h3>Objects</h3>
-	<p>Objects are descriptions of resources.</p>
+	<p>Objects are are general resources with an optional type, an optional ID, and that <span class="spec-may">may</span> be described by properties.</p>
 	<ul class="spec-production">
-		<li><code class="name">object</code> ⇒ <code class="name">object_begin</code> · [<code class="name">type</code>] · [<code class="name">properties</code>]</li>
-		<li><code class="name">object_begin</code> ⇒ '*'</li>
+		<li><code class="name">object</code> ⇒ '*' · [<code class="name">type</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
 		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
 		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
-	<p>An <code class="name">eol</code> <span class="spec-must-not">must not</span> appear between an <code class="name">object_begin</code> and a <code class="name">type</code>, or between a <code class="name">type</code> and any following <code class="name">properties</code>. </p>
-	<p>TODO recommend not to use "true" or "false" as property handles, because the semantics in URF are different than expected</p>
-	<p>An object <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<h3>Descriptions</h3>
+	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<ul class="spec-production">
+		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
+		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+	</ul>
 	<h3>Literals</h3>
 	<aside class="info far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
 	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
@@ -357,9 +360,9 @@
 			<dd><a href="https://docs.python.org/3/library/stdtypes.html#list" class="see"><code>list</code></a></dd>
 		</dl>
 	</aside>
-	<p>A SURF <dfn>list</dfn> is an <em>ordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF parser <span class="spec-should">should</span> represent a SURF list using an corresponding language construct that represents list semantics.</p>
+	<p>A SURF <dfn>list</dfn> is an <em>ordered</em> sequence of zero or more resources with optional descriptions, beginning with a <code class="name">LEFT SQUARE BRACKET</code> character <code>[</code> (<code class="unicode">U+005B</code>) and ending with a <code class="name">RIGHT SQUARE BRACKET</code> character <code>]</code> (<code class="unicode">U+005D</code>). A SURF parser <span class="spec-should">should</span> represent a SURF list using an corresponding language construct that represents list semantics.</p>
 	<ul class="spec-production">
-		<li><code class="name">list</code> ⇒ '[' <code class="name">resource-sequence</code> ']'</li>
+		<li><code class="name">list</code> ⇒ '[' <code class="name">described_resource-sequence</code> ']'</li>
 	</ul>
 	<h4>Map</h4>
 	<aside class="note far third">Examples of map types SURF processors <span class="spec-may">may</span> use include:
@@ -374,14 +377,14 @@
 			<dd><a href="https://docs.python.org/3/library/stdtypes.html#dict" class="see"><code>dict</code></a></dd>
 		</dl>
 	</aside>
-	<p>A SURF <dfn>map</dfn> is a sequence of associations between a key and a value. A map begins a <code class="name">LEFT CURLY BRACKET</code> character <code>{</code> (<code class="unicode">U+007B</code>) and ends with a <code class="name">RIGHT CURLY BRACKET</code> character <code>}</code> (<code class="unicode">U+007D</code>). Keys and values can be any resources. The key and value in each association or <dfn>entry</dfn> are separated by a <code class="name">COLON</code> character <code>:</code> (<code class="unicode">U+003A</code>).</p>
-	<p>A map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a SURF serializer <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with tags if a duplicate entry is ignored</p>
+	<p>A SURF <dfn>map</dfn> is a sequence of associations between a key and a value. A map begins a <code class="name">LEFT CURLY BRACKET</code> character <code>{</code> (<code class="unicode">U+007B</code>) and ends with a <code class="name">RIGHT CURLY BRACKET</code> character <code>}</code> (<code class="unicode">U+007D</code>). Keys and values can be any resources. If a key is an object with a description, the key <span class="spec-must">must</span> be surrounded by the <code class="name">REVERSE SOLIDUS</code> character <code>\</code> (<code class="unicode">U+005C</code>). The key and value in each association or <dfn>entry</dfn> are separated by a <code class="name">COLON</code> character <code>:</code> (<code class="unicode">U+003A</code>).</p>
+	<p>A map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a SURF serializer <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with tags if a duplicate entry is ignored; also address key equality</p>
 	<p>A SURF parser <span class="spec-should">should</span> represent a SURF map using an corresponding language construct that represents map semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
 		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">value</code></li>
-		<li><code class="name">key</code> ⇒ <code class="name">resource</code></li>
-		<li><code class="name">value</code> ⇒ <code class="name">resource</code></li>
+		<li><code class="name">key</code> ⇒ '\' <code class="name">described_resource</code> '\' | <code class="name">resource</code></li>
+		<li><code class="name">value</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
 	<h4>Set</h4>
 	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
@@ -396,9 +399,9 @@
 			<dd><a href="https://docs.python.org/3/library/stdtypes.html#set" class="see"><code>set</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>set</dfn> in SURF is an <em>unordered</em> sequence of zero or more resources, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set. A SURF parser <span class="spec-should">should</span> represent a SURF set using an corresponding language construct that represents set semantics.</p>
+	<p>A <dfn>set</dfn> in SURF is an <em>unordered</em> sequence of zero or more resources with optional descriptions, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set. A SURF parser <span class="spec-should">should</span> represent a SURF set using an corresponding language construct that represents set semantics.</p>
 	<ul class="spec-production">
-		<li><code class="name">set</code> ⇒ '(' <code class="name">resource-sequence</code> ')'</li>
+		<li><code class="name">set</code> ⇒ '(' <code class="name">described_resource-sequence</code> ')'</li>
 	</ul>
 	<h2>References</h2>
 	<dl>
