@@ -154,6 +154,8 @@ public class SURF {
 	public static final char MAP_BEGIN = '{';
 	/** The delimiter that ends maps. */
 	public static final char MAP_END = '}';
+	/** The delimiter that optionally begins and ends map keys. */
+	public static final char MAP_KEY_DELIMITER = '\\';
 	/** The character that separates keys and values in a map entry. */
 	public static final char ENTRY_KEY_VALUE_DELIMITER = ':';
 

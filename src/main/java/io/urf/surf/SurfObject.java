@@ -69,6 +69,11 @@ public class SurfObject {
 		return properties.size();
 	}
 
+	/** @return <code>true</code> if this object has at least one property. */
+	public boolean hasDescription() {
+		return !properties.isEmpty();
+	}
+
 	/**
 	 * Retrieves the value of a property by the property handle.
 	 * 

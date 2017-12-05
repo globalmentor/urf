@@ -440,7 +440,7 @@ public class SurfParserTest {
 		assertThat(object, isPresent());
 		assertThat(object, isPresentAnd(instanceOf(Map.class)));
 		final Map<?, ?> map = (Map<?, ?>)object.get();
-		assertThat(map.size(), is(7));
+		assertThat(map.size(), is(10));
 		assertThat(map.get("foo"), is("bar"));
 		assertThat(map.get(123), is("number"));
 		assertThat(map.get(false), is("Boolean"));
@@ -450,6 +450,22 @@ public class SurfParserTest {
 		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		assertThat(map.get("map"), is(pingPong));
 		assertThat(map.get(new HashSet<Object>(Arrays.asList("foo", false))), is(true));
+		assertThat(map.get(new SurfObject("Game", "pingpong")), is("ping pong"));
+		//find the bull's eye map entry by iteration to avoid relying on object key equality
+		SurfObject bullsEye = null;
+		for(final Map.Entry<?, ?> entry : map.entrySet()) {
+			if(entry.getValue().equals("Bull's Eye")) {
+				assertThat(entry.getKey(), instanceOf(SurfObject.class));
+				bullsEye = (SurfObject)entry.getKey();
+				break;
+			}
+		}
+		assertThat(bullsEye.getTypeHandle(), isPresentAndIs("Point"));
+		assertThat(bullsEye.getPropertyValue("x"), isPresentAndIs(0));
+		assertThat(bullsEye.getPropertyValue("y"), isPresentAndIs(0));
+		final Map<String, String> abbrMap = new HashMap<>();
+		abbrMap.put("ITTF", "International Table Tennis Federation");
+		assertThat(map.get(abbrMap), is("abbr"));
 	}
 
 	/** @see SurfTestResources#OK_MAP_EMPTY_RESOURCE_NAMES */
