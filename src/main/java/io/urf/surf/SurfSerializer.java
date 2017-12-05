@@ -1085,7 +1085,7 @@ public class SurfSerializer {
 					if(hasDescription) {
 						out.append(MAP_KEY_DELIMITER); //\
 					}
-					serializeResource(out, entry.getKey());
+					serializeResource(out, key);
 					if(hasDescription) {
 						out.append(MAP_KEY_DELIMITER); //\
 					}
