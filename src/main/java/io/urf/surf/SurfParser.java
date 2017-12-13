@@ -281,13 +281,26 @@ public class SurfParser {
 	}
 
 	/**
-	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
+	 * Parses a resource; either a tag or a resource representation with an optional description. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
 	 * @return An object representing the SURF resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Object parseResource(@Nonnull final Reader reader) throws IOException {
+		return parseResource(reader, true);
+	}
+
+	/**
+	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
+	 * @param reader The reader containing SURF data.
+	 * @param allowDescription Whether a description is allowed; if <code>false</code>, an following description delimiter will not be considered part of the
+	 *          resource.
+	 * @return An object representing the SURF resource read from the reader.
+	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws ParseIOException if the SURF data was invalid.
+	 */
+	public Object parseResource(@Nonnull final Reader reader, final boolean allowDescription) throws IOException {
 		Object label = null;
 		int c = peek(reader);
 		if(c == LABEL_DELIMITER) {
@@ -395,8 +408,7 @@ public class SurfParser {
 		}
 
 		//description (optional)
-		//TODO decide how to handle objects as map keys; require a description, even an empty one, to distinguish from the map key/value delimiter?
-		if(resource instanceof SurfObject) {
+		if(allowDescription && resource instanceof SurfObject) {
 			c = peek(reader);
 			if(c == DESCRIPTION_BEGIN) {
 				checkParseIO(reader, resource instanceof SurfObject, "SURF only allows objects to have a description.");
@@ -1076,7 +1088,14 @@ public class SurfParser {
 		}
 		check(reader, MAP_BEGIN); //{
 		parseSequence(reader, MAP_END, r -> {
-			final Object key = parseResource(reader);
+			final Object key;
+			if(peek(reader) == MAP_KEY_DELIMITER) {
+				check(reader, MAP_KEY_DELIMITER); //\
+				key = parseResource(reader, true);
+				check(reader, MAP_KEY_DELIMITER); //\
+			} else {
+				key = parseResource(reader, false);
+			}
 			skipLineBreaks(reader);
 			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
 			skipLineBreaks(reader);

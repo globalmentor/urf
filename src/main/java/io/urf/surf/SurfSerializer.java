@@ -1071,6 +1071,7 @@ public class SurfSerializer {
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#MAP_BEGIN
 	 * @see SURF#MAP_END
+	 * @see SURF#MAP_KEY_DELIMITER
 	 * @see SURF#ENTRY_KEY_VALUE_DELIMITER
 	 */
 	public void serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
@@ -1079,7 +1080,15 @@ public class SurfSerializer {
 			formatNewLine(appendable);
 			try (final Closeable indention = increaseIndentLevel()) { //TODO allow configurable indent for small maps
 				serializeSequence(appendable, map.entrySet(), (out, entry) -> { //TODO make serializeMapEntry() method
-					serializeResource(out, entry.getKey());
+					final Object key = entry.getKey();
+					final boolean hasDescription = key instanceof SurfObject && ((SurfObject)key).hasDescription();
+					if(hasDescription) {
+						out.append(MAP_KEY_DELIMITER); //\
+					}
+					serializeResource(out, key);
+					if(hasDescription) {
+						out.append(MAP_KEY_DELIMITER); //\
+					}
 					out.append(ENTRY_KEY_VALUE_DELIMITER); //:
 					if(formatted) {
 						out.append(SPACE_CHAR);

@@ -520,6 +520,14 @@ public class SurfSerializerTest implements Clogged {
 		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		map.put("map", pingPong);
 		map.put(new HashSet<Object>(Arrays.asList("foo", false)), true);
+		map.put(new SurfObject("Game", "pingpong"), "ping pong");
+		final SurfObject bullsEye = new SurfObject("Point");
+		bullsEye.setPropertyValue("x", 0);
+		bullsEye.setPropertyValue("y", 0);
+		map.put(bullsEye, "Bull's Eye");
+		final Map<String, String> abbrMap = new HashMap<>();
+		abbrMap.put("ITTF", "International Table Tennis Federation");
+		map.put(abbrMap, "abbr");
 		assertThat(map, equalTo(parseTestResource(OK_MAPS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();
