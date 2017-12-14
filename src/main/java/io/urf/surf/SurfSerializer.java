@@ -776,7 +776,7 @@ public class SurfSerializer {
 	 */
 	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
 		appendable.append(BINARY_BEGIN);
-		appendable.append(Base64.getEncoder().withoutPadding().encodeToString(bytes));
+		appendable.append(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
 	}
 
 	/**

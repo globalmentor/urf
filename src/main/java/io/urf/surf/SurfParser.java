@@ -516,11 +516,11 @@ public class SurfParser {
 	 */
 	public static byte[] parseBinary(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, BINARY_BEGIN);
-		final String base64String = readWhile(reader, BINARY_BASE64_CHARACTERS);
+		final String base64String = readWhile(reader, BINARY_BASE64URL_CHARACTERS);
 		try {
-			return Base64.getDecoder().decode(base64String);
+			return Base64.getUrlDecoder().decode(base64String);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader, "Invalid SURF binary Base64 encoding: " + base64String, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid SURF binary Base64 (base64url) encoding: " + base64String, illegalArgumentException);
 		}
 	}
 
