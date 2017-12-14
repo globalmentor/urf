@@ -19,6 +19,7 @@ package io.urf.surf;
 import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.URIs.*;
 import static io.urf.surf.SURF.*;
 import static io.urf.surf.SurfResources.*;
 import static java.nio.charset.StandardCharsets.*;
@@ -31,6 +32,7 @@ import java.nio.ByteBuffer;
 import java.time.*;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.*;
@@ -39,7 +41,9 @@ import com.globalmentor.io.*;
 import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.model.UUIDs;
 import com.globalmentor.net.EmailAddress;
+import com.globalmentor.text.ASCII;
 
 /**
  * Simple serializer for the Simple URF (SURF) document format.
@@ -900,15 +904,40 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes an IRI along with its delimiters.
+	 * <p>
+	 * This implementation serializes an IRI using a SURF IRI short form if possible.
+	 * </p>
 	 * @param appendable The appendable to which SURF data should be appended.
 	 * @param iri The information to be serialized as a SURF IRI.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IllegalArgumentException if the given IRI is not a true, absolute IRI with a scheme.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#IRI_BEGIN
 	 */
 	public static void serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
+		checkAbsolute(iri);
 		appendable.append(IRI_BEGIN);
-		appendable.append(iri.toString());
+		switch(ASCII.toLowerCase(iri.getScheme()).toString()) {
+			case MAILTO_SCHEME:
+				appendable.append(EMAIL_ADDRESS_BEGIN).append(iri.getSchemeSpecificPart()); //^jdoe@example.com
+				break;
+			case TEL_SCHEME:
+				appendable.append(iri.getSchemeSpecificPart()); //+12015550123
+				break;
+			case URN_SCHEME: {
+				final String ssp = iri.getSchemeSpecificPart();
+				final Matcher urnMatcher = URN_SSP_PATTERN.matcher(ssp);
+				//urn:uuid
+				if(urnMatcher.matches() && ASCII.toLowerCase(urnMatcher.group(URN_SSP_PATTERN_NID_MATCHING_GROUP)).equals(UUIDs.UUID_URN_NAMESPACE)) {
+					appendable.append(UUID_BEGIN).append(urnMatcher.group(URN_SSP_PATTERN_NSS_MATCHING_GROUP));
+					break;
+				}
+				//for all other URN NIDs (e.g. "isbn"), fall through and serialize the IRI normally
+			}
+			default:
+				appendable.append(iri.toString());
+				break;
+		}
 		appendable.append(IRI_END);
 	}
 

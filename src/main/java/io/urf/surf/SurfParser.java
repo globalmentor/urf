@@ -18,6 +18,7 @@ package io.urf.surf;
 
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.net.URIs.*;
 import static io.urf.surf.SURF.*;
 import static io.urf.surf.SURF.WHITESPACE_CHARACTERS;
 import static java.util.Objects.*;
@@ -39,6 +40,7 @@ import com.globalmentor.iso.datetime.ISO8601;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.model.UUIDs;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
 
@@ -698,6 +700,9 @@ public class SurfParser {
 	/**
 	 * Parses an IRI. The current position must be that of the beginning IRI delimiter character. The new position will be that immediately after the ending IRI
 	 * delimiter character.
+	 * <p>
+	 * SURF IRI short forms are accepted.
+	 * </p>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return A Java {@link URI} containing the IRI parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
@@ -708,13 +713,29 @@ public class SurfParser {
 	 */
 	public static URI parseIRI(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, IRI_BEGIN);
-		final String iriString = readUntilRequired(reader, IRI_END);
-		check(reader, IRI_END);
-		try {
-			return new URI(iriString);
-		} catch(final URISyntaxException uriSyntaxException) {
-			throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+		final URI iri;
+		switch(peekRequired(reader)) { //check for short forms
+			case EMAIL_ADDRESS_BEGIN: //^
+				iri = URI.create(MAILTO_SCHEME + SCHEME_SEPARATOR + parseEmailAddress(reader).toString());
+				break;
+			case TELEPHONE_NUMBER_BEGIN: //+
+				iri = URI.create(TEL_SCHEME + SCHEME_SEPARATOR + parseTelephoneNumber(reader).getCanonicalString());
+				break;
+			case UUID_BEGIN: //&
+				iri = UUIDs.toURI(parseUuid(reader));
+				break;
+			default: {
+				final String iriString = readUntilRequired(reader, IRI_END);
+				try {
+					iri = new URI(iriString);
+				} catch(final URISyntaxException uriSyntaxException) {
+					throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+				}
+			}
+				break;
 		}
+		check(reader, IRI_END);
+		return iri;
 	}
 
 	/**

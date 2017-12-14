@@ -252,6 +252,11 @@ public class SurfParserTest {
 		assertThat(resource.getPropertyValue("example"), isPresentAndIs(URI.create("http://www.example.com/")));
 		assertThat(resource.getPropertyValue("iso_8859_1"), isPresentAndIs(URI.create("http://www.example.org/Dürst")));
 		assertThat(resource.getPropertyValue("encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
+		assertThat(resource.getPropertyValue("encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
+		assertThat(resource.getPropertyValue("mailto"), isPresentAndIs(URI.create("mailto:jdoe@example.com")));
+		assertThat(resource.getPropertyValue("tel"), isPresentAndIs(URI.create("tel:+12015550123")));
+		assertThat(resource.getPropertyValue("urn_uuid"), isPresentAndIs(URI.create("urn:uuid:5623962b-22b1-4680-ae1c-7174a46144fc")));
+		assertThat(resource.getPropertyValue("isbn"), isPresentAndIs(URI.create("urn:isbn:0-395-36341-1")));
 	}
 
 	//TODO add tests for extended characters; bad IRIs (such as a non-absolute IRI); a test containing U+202E, as described in RFC 3987 3.2.1

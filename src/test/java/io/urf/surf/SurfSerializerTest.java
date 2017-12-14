@@ -299,12 +299,22 @@ public class SurfSerializerTest implements Clogged {
 	/** @see SurfTestResources#OK_IRIS_RESOURCE_NAME */
 	@Test
 	public void testOkIris() throws IOException {
-		//test serializing java.netURL separately, because the parser never sends that back
+		//test serializing java.net.URL separately, because the parser never sends that back
 		assertThat(new SurfSerializer().serialize(new URL("http://www.example.com/")), equalTo("<http://www.example.com/>"));
+		//test serializing IRI short forms
+		assertThat(new SurfSerializer().serialize(URI.create("mailto:jdoe@example.com")), equalTo("<^jdoe@example.com>"));
+		assertThat(new SurfSerializer().serialize(URI.create("tel:+12015550123")), equalTo("<+12015550123>"));
+		assertThat(new SurfSerializer().serialize(URI.create("urn:uuid:5623962b-22b1-4680-ae1c-7174a46144fc")), equalTo("<&5623962b-22b1-4680-ae1c-7174a46144fc>"));
+		//make sure the parser doesn't get confused with non-UUID URNs (there is no SURF short form for ISBN URNs)
+		assertThat(new SurfSerializer().serialize(URI.create("urn:isbn:0-395-36341-1")), equalTo("<urn:isbn:0-395-36341-1>"));
 		final SurfObject surfObject = new SurfObject();
 		surfObject.setPropertyValue("example", URI.create("http://www.example.com/"));
 		surfObject.setPropertyValue("iso_8859_1", URI.create("http://www.example.org/Dürst"));
 		surfObject.setPropertyValue("encodedForbidden", URI.create("http://xn--99zt52a.example.org/%E2%80%AE"));
+		surfObject.setPropertyValue("mailto", URI.create("mailto:jdoe@example.com"));
+		surfObject.setPropertyValue("tel", URI.create("tel:+12015550123"));
+		surfObject.setPropertyValue("urn_uuid", URI.create("urn:uuid:5623962b-22b1-4680-ae1c-7174a46144fc"));
+		surfObject.setPropertyValue("isbn", URI.create("urn:isbn:0-395-36341-1"));
 		assertThat(surfObject, equalTo(parseTestResource(OK_IRIS_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();

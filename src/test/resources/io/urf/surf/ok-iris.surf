@@ -2,4 +2,8 @@
 	example = <http://www.example.com/>
 	iso_8859_1 = <http://www.example.org/Dürst>
 	encodedForbidden = <http://xn--99zt52a.example.org/%E2%80%AE>
+	mailto = <^jdoe@example.com>
+	tel = <+12015550123>
+	urn_uuid = <&5623962b-22b1-4680-ae1c-7174a46144fc>
+	isbn = <urn:isbn:0-395-36341-1>
 ;
