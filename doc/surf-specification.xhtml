@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-12-05</dd>
+			<dd>Draft 2017-12-14</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -88,8 +88,7 @@
 	<h3 id="sequence">Sequences</h3>
 	<p>Several SURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note far third">The sequence separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
-	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span>
-	</p>
+	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
 	<ul class="spec-production">
 		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
 		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
@@ -157,13 +156,13 @@
 		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<h3>Literals</h3>
-	<aside class="info far third">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
+	<aside class="info far half">Literals are a way to represent URF <dfn>lexical identity resources</dfn>, those resources that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
 	<p>SURF <dfn>literals</dfn> are lexical representations of resources.</p>
 	<h4>Binary</h4>
 	<aside class="annotation far side">SURF uses the binary delimiter <code>%</code> because it resembles <code>0</code> and <code>1</code>.</aside>
-	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the “Base 64 Encoding” defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-must-not">must not</span> include Base 64 padding.</p>
+	<p>URF allows the encoding of an arbitrary sequence of octets. Zero or more bytes <span class="spec-must">must</span> be encoded using the “Base 64 Encoding” defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>). The encoding <span class="spec-must">must</span> use the “base64url” alphabet and <span class="spec-must-not">must not</span> include Base 64 padding.</p>
 	<ul class="spec-production">
-		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base_64</code></li>
+		<li><code class="name">binary</code> ⇒ '%' <code class="name">rfc_4648_base64url</code></li>
 	</ul>
 	<h4>Boolean</h4>
 	<p>A <dfn>Boolean</dfn> is either of the tokens <code>true</code> or <code>false</code>.</p>
