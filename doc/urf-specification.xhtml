@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 
 <head>
 	<meta charset="UTF-8" />
@@ -17,11 +17,11 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-10-06</dd>
+			<dd>Draft 2017-11-04</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
-	<p>The <dfn>Uniform Resource Framework</dfn> (<abbr>URF</abbr>) provides a general, simple, and consistent way for representing data and their relationships. URF is useful for data storage, data interchange, data querying, and logical inferences. As a data framework URF allows similar yet simpler representation than the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>) . Together with its interchange formats, URF provides a more powerful yet simpler and more consistent replacement for data-oriented XML and JSON.</p>
+	<p>The <dfn>Uniform Resource Framework</dfn> (<abbr>URF</abbr>) provides a general, simple, and consistent way for representing data and their relationships. URF is useful for data storage, data interchange, data querying, and logical inferences. As a data framework URF allows similar yet simpler representation than the <dfn>Resource Description Framework</dfn> (<abbr>RDF</abbr>) . Together with its interchange formats, URF provides a powerful and concise replacement for data-oriented XML and JSON.</p>
 	<h3>Serialization</h3>
 	<p><em>This section is non-normative.</em></p>
 	<p>This document defines URF as an abstract data model. URF provides several official formats, specified in separate documents, including:</p>
@@ -55,7 +55,7 @@
 	<h3>Statements </h3>
 	<figure class="far third">
 		<figcaption>Statements assert that resources have property values.</figcaption> <img src="images/resource-property-value-diagram.svg" alt="URF resource, property, and value." /> </figure>
-	<p>Resources are described by a set of <dfn>statements</dfn>, each claiming that some resource <dfn>subject</dfn> has a <dfn>property</dfn> with some <dfn>value</dfn>.</p>
+	<p>Resources are described by a set of <dfn>statements</dfn>, each claiming that some resource <dfn>subject</dfn> has a <dfn>property</dfn> with some <dfn>property value</dfn>.</p>
 	<p>A particular group of statements is called an <dfn>URF instance</dfn>. Each statement exists in some URF <dfn>knowledge community</dfn>. The root statements of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
 	<aside class="note near">Examples of statements:
 		<ul>
@@ -78,21 +78,20 @@
 			<dd>The Boolean value <code>true</code>.</dd>
 		</dl>
 	</aside>
-	<p>A <dfn>tag</dfn> which takes the form of an IRI as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. <span class="note">Although a tag may be a URL, this specification does not define whether the location indicated by the tag indicates any actual, retrievable content; an URF tag functions solely as an identifier.</span></p>
+	<p>URF identifies a resource using using a tag, which takes the form of an IRI as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. <span class="note">Although a tag may be a URL, this specification does not define whether the location indicated by the tag indicates any actual, retrievable content; an URF tag functions solely as an identifier.</span></p>
 	<h4>Names</h4>
-	<p>If a resource has a hierarchical IRI, the last path component, along with the IRI fragment if present, is considered the <dfn>name</dfn> of the resource. A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the decoded fragment part of the name is considered the <dfn>ID</dfn> of the resource. <span class="warning">A resource ID will likely not be globally unique for resources of other types.</span></p>
-	<p>The <dfn>base name</dfn>, the non-fragment part of an URF name, <span class="spec-should">should</span> begin with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<p>If a resource has a hierarchical tag using a path, the last path component, along with the IRI fragment if present, is considered the <dfn>name</dfn> of the resource if the non-fragment begins with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<p>A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the decoded fragment part of the name is considered the <dfn>ID</dfn> of the resource. <span class="warning">A resource ID will likely not be globally unique for resources of other types.</span></p>
 	<p>For example, the resource with the tag <code>https://urf/name/Tree</code> has the name <code>Tree</code>, and the resource with the tag <code>https://urf/name/Tree#456</code> has the name <code>Tree#456</code>.</p>
 	<h4>Namespaces</h4>
 	<aside class="annotation far half">The URF definition of a namespace implies that a namespace must end in the slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). <span class="error">This disallows namespaces ending in the <code class="name">NUMBER SIGN</code> character <code>#</code> (<code class="unicode">U+0023</code>) such as <code>http://www.w3.org/2001/XMLSchema#</code>, which appears in other specifications such as XML and RDF.</span></aside>
-	<p>For those resources with names, the remaining part of the hierarchical IRI (the part before the last path component) is considered the <dfn>namespace</dfn> of the resource. Namespaces <span class="spec-should">should</span> be used to group resources with related semantics.</p>
-	<p>Each additional path component of a hierarchical IRI indicates a <dfn>subnamespace</dfn> inside the previous namespace. Thus the namespace identified by the IRI <code>https://urf.name/bio/</code> is a subnamespace of that identified by <code>https://urf.name/</code>. Each subnamespace path component <span class="spec-should">should</span> follow the syntax rules of a base name.</p>
+	<p>For those resources with names, the remaining part of the tag path (the part before the last path component) is considered the <dfn>namespace</dfn> of the resource. Namespaces <span class="spec-should">should</span> be used to group resources with related semantics.</p>
+	<p>Each additional path component of a tag path indicates a <dfn>subnamespace</dfn> inside the previous namespace. Thus the namespace identified by the IRI <code>https://urf.name/bio/</code> is a subnamespace of that identified by <code>https://urf.name/</code>. Each subnamespace path component <span class="spec-should">should</span> follow the syntax rules of a base name.</p>
 	<h5>Ad-Hoc Namespace</h5>
-	<p>The namespace <code>https://urf.name/</code> is the <dfn>ad-hoc namespace</dfn>. Applications that need a low-overhead naming scheme <span class="spec-may">may</span> use resource names placed directly within this namespace. <span class="warning">Names placed in the ad-hoc namespace have the potential to clash if used with other vocabularies that also use the ad-hoc namespace.</span> T<span>he ad-hoc namespace </span><span><span class="spec-should">should</span> only be used for applications for which the identity of the resource is unambiguous in the context.</span>
-	</p>
+	<p>The namespace <code>https://urf.name/</code> is the <dfn>ad-hoc namespace</dfn>. Applications that need a low-overhead naming scheme <span class="spec-may">may</span> use resource names placed directly within this namespace. <span class="warning">Names placed in the ad-hoc namespace have the potential to clash if used with other vocabularies that also use the ad-hoc namespace.</span> The ad-hoc namespace <span class="spec-should">should</span> only be used for applications for which the identity of the resource is unambiguous in the context.</p>
 	<p>The resource with tag <code>https://urf/name/Tree#456</code> is an example of a resource in the ad-hoc namespace.</p>
 	<h5>Informal Namespaces </h5>
-	<p>Subnamespaces of the ad-hoc namespace are considered <dfn>informal namespaces</dfn>. Applications that to mix vocabularies but still do not require or desire the overhead of formal namespace definition <span class="spec-may">may</span> use resource names placed within informal namespaces. Informal namespaces <span><span class="spec-should">should</span></span> attempt to avoid name clashes by using subnamespace components that reflect well-known vocabulary identifiers (such as <code>https://urf.name/refseq/</code> to annotate information in the <a href="https://www.ncbi.nlm.nih.gov/refseq/" class="external">NCBI Reference Sequence Database</a>); or by using subnamespace components corresponding to domain components which the vocabulary author controls (such as <code>https://urf.name/globalmentor</code> for <a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>, which controls the <code>globalmentor.com</code> domain).</p>
+	<p>Subnamespaces of the ad-hoc namespace are considered <dfn>informal namespaces</dfn>. Applications that to mix vocabularies but still do not require or desire the overhead of formal namespace definition <span class="spec-may">may</span> use resource names placed within informal namespaces. Informal namespaces <span class="spec-should">should</span> attempt to avoid name clashes by using subnamespace components that reflect well-known vocabulary identifiers (such as <code>https://urf.name/refseq/</code> to annotate information in the <a href="https://www.ncbi.nlm.nih.gov/refseq/" class="external">NCBI Reference Sequence Database</a>); or by using subnamespace components corresponding to domain components which the vocabulary author controls (such as <code>https://urf.name/globalmentor</code> for <a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>, which controls the <code>globalmentor.com</code> domain).</p>
 	<p>The following namespaces which would otherwise be informal namespaces are reserved:</p>
 	<dl>
 		<dt><code>https://urf.name/example/</code></dt>
@@ -126,8 +125,10 @@
 	<h4>Classes</h4>
 	<p>Resources that define types are called <dfn>classes</dfn> and are instances of the resource <code>urf-Class</code>, which is itself instance of <code>urf-Class</code>. A class can be a specialization or <dfn>subclass</dfn> of another class. The class <code>urf-Integer</code>, for example, is a subclass of <code>urf-Number</code>. The class <code>urf-Class</code> is a subclass of <code>urf-Resource</code>.</p>
 	<h3>Properties</h3>
-	<h2>Ontology</h2>
-	<h3>URF <code>&lt;https://urf.name/urf/&gt;</code></h3>
+	<p>TODO</p>
+	<h2>Ontologies</h2>
+	<h3>URF Ontology <code>&lt;https://urf.name/urf/&gt;</code></h3>
+	<p><strong>Namespace:</strong> <code>https://urf.name/urf/</code></p>
 	<h4><code>urf-Binary</code></h4>
 	<p>Represents an arbitrary sequence of octets. This is a lexical ID type. The canonical lexical form is the Base 64 encoding of the bytes as defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, using the “base64url” alphabet with no padding.</p>
 	<h4><code>urf-Boolean</code></h4>
