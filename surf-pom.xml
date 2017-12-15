@@ -8,17 +8,14 @@
 	<version>0.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>URF</name>
+	<name>SURF Aggregate</name>
 	<description>Aggregate POM of all SURF Java projects.</description>
 	<url>https://urf.io/surf/</url>
 	<inceptionYear>2007</inceptionYear>
 
 	<modules>
 		<module>../urf-apache-commons-configuration2-surf</module>
-		<module>../urf-surf-parser</module>
-		<module>../urf-surf-serializer</module>
-		<module>../urf-surf-spec</module>
-		<module>../urf-surf-test</module>
+		<module>../urf-surf</module>
 	</modules>
 
 </project>

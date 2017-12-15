@@ -8,7 +8,7 @@
 	<version>0.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>URF</name>
+	<name>URF Aggregate</name>
 	<description>Aggregate POM of all URF Java projects.</description>
 	<url>https://urf.io/</url>
 	<inceptionYear>2007</inceptionYear>
@@ -18,7 +18,6 @@
 		<module>../urf-model</module>
 		<module>../urf-spec</module>
 		<module>../urf-surf</module>
-		<module>../urf-surf-test</module>
 		<module>../urf-turf-model</module>
 		<module>../urf-turf-spec</module>
 	</modules>
