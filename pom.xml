@@ -66,6 +66,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
+			<version>0.5.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.clogr</groupId>
 			<artifactId>clogr-logback</artifactId>
 			<version>0.7.0</version>

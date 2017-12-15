@@ -16,7 +16,6 @@
 
 package io.urf.surf;
 
-import static com.globalmentor.io.IOOptionals.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
@@ -24,6 +23,7 @@ import static io.urf.surf.SURF.*;
 import static io.urf.surf.SurfResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.math.*;
@@ -729,7 +729,7 @@ public class SurfSerializer {
 	 */
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
-		ifPresent(surfObject.getTypeHandle(), appendable::append); //typeHandle
+		surfObject.getTypeHandle().ifPresent(throwingConsumer(appendable::append)); //typeHandle
 	}
 
 	/**
