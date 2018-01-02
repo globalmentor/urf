@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.urf</groupId>
+		<artifactId>urf</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>turf-spec</artifactId>
+
+	<name>TURF Specification</name>
+	<description>Java definitions for the Text URF (TURF) document format.</description>
+	<url>https://urf.io/turf/</url>
+
+	<scm>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf-turf-spec.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-turf-spec.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf-turf-spec</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-spec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.npathai</groupId>
+			<artifactId>hamcrest-optional</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
