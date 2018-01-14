@@ -21,6 +21,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import io.urf.URF;
+
 /**
  * Provides a description of a resource via a graph of properties.
  * @author Garret Wilson
@@ -38,6 +40,18 @@ public interface UrfResourceDescription {
 	 * @throws NullPointerException if the given property tag is <code>null</code>.
 	 */
 	public Optional<Object> getPropertyValue(@Nonnull URI propertyTag);
+
+	/**
+	 * Retrieves the value of a property by the property handle.
+	 * 
+	 * @param propertyHandle The handle of the property.
+	 * @return The value of the property, if any.
+	 * @throws NullPointerException if the given property handle is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 */
+	public default Optional<Object> getPropertyValue(@Nonnull String propertyHandle) {
+		return getPropertyValue(URF.Handle.toTag(propertyHandle));
+	}
 
 	/**
 	 * Sets a property value by the property tag.
@@ -60,5 +74,18 @@ public interface UrfResourceDescription {
 	 */
 	public default void setPropertyValues(@Nonnull final Map<URI, ?> properties) {
 		properties.forEach(this::setPropertyValue);
+	}
+
+	/**
+	 * Sets a property value by the property handle.
+	 * 
+	 * @param propertyHandle The handle of the property.
+	 * @param propertyValue The new value of the property.
+	 * @return The previous value of the property, if any.
+	 * @throws NullPointerException if the given property property tag and/or property value is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 */
+	public default Optional<Object> setPropertyValue(@Nonnull String propertyHandle, @Nonnull Object propertyValue) {
+		return setPropertyValue(URF.Handle.toTag(propertyHandle), propertyValue);
 	}
 }

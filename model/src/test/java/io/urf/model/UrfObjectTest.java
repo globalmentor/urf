@@ -40,4 +40,13 @@ public class UrfObjectTest {
 		assertThat(optionalJoined, isPresentAndIs(LocalDate.parse("2016-01-23")));
 	}
 
+	@Test
+	public void testGetPropertyValueHandle() {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.setPropertyValue("joined", LocalDate.of(2016, Month.JANUARY, 23));
+
+		final Optional<Object> optionalJoined = urfObject.getPropertyValue("joined");
+		assertThat(optionalJoined, isPresentAndIs(LocalDate.parse("2016-01-23")));
+	}
+
 }

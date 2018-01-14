@@ -17,6 +17,7 @@
 package io.urf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.net.URI;
@@ -83,4 +84,32 @@ public class URFTest {
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo123/bar/Example")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo/123/Example")), isEmpty());
 	}
+
+	/** @see URF.Handle#fromTag(URI) */
+	@Test
+	public void testHandleFromTag() {
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/")), isEmpty());
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/Example")), isPresentAndIs("Example"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/Example#foo")), isPresentAndIs("Example#foo"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/Example#123")), isPresentAndIs("Example#123"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/test")), isPresentAndIs("test"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/test/")), isEmpty());
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar")), isPresentAndIs("foo-bar"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar/")), isEmpty());
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar/Example")), isPresentAndIs("foo-bar-Example"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar/Example#test123")), isPresentAndIs("foo-bar-Example#test123"));
+	}
+
+	/** @see URF.Handle#toTag(String) */
+	@Test
+	public void testHandleToTag() {
+		assertThat(URF.Handle.toTag("Example"), is(URI.create("https://urf.name/Example")));
+		assertThat(URF.Handle.toTag("Example#foo"), is(URI.create("https://urf.name/Example#foo")));
+		assertThat(URF.Handle.toTag("Example#123"), is(URI.create("https://urf.name/Example#123")));
+		assertThat(URF.Handle.toTag("test"), is(URI.create("https://urf.name/test")));
+		assertThat(URF.Handle.toTag("foo-bar"), is(URI.create("https://urf.name/foo/bar")));
+		assertThat(URF.Handle.toTag("foo-bar-Example"), is(URI.create("https://urf.name/foo/bar/Example")));
+		assertThat(URF.Handle.toTag("foo-bar-Example#test123"), is(URI.create("https://urf.name/foo/bar/Example#test123")));
+	}
+
 }
