@@ -9,16 +9,16 @@
 		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>turf-model</artifactId>
+	<artifactId>turf-serializer</artifactId>
 
-	<name>TURF Model</name>
-	<description>Java object model for the Text URF (TURF) document format.</description>
+	<name>TURF Serializer</name>
+	<description>Serializer for the the Text URF (TURF) document format.</description>
 	<url>https://urf.io/turf/</url>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf-turf-model.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-turf-model.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf-turf-model</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf-turf-serializer.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-turf-serializer.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf-turf-serializer</url>
 	</scm>
 
 	<properties>
