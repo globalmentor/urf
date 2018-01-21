@@ -16,9 +16,9 @@
 	<url>https://urf.io/</url>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf-model.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-model.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf-model</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
 
 	<properties>

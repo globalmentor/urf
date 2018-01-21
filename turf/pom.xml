@@ -9,16 +9,16 @@
 		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>turf-spec</artifactId>
+	<artifactId>turf</artifactId>
 
-	<name>TURF Specification</name>
-	<description>Java definitions for the Text URF (TURF) document format.</description>
+	<name>TURF</name>
+	<description>Parser and serializer for the Text URF (TURF) document format.</description>
 	<url>https://urf.io/turf/</url>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf-turf-spec.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf-turf-spec.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf-turf-spec</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/urf.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
 
 	<properties>
@@ -37,8 +37,18 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-itu</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>io.urf</groupId>
-			<artifactId>urf-spec</artifactId>
+			<artifactId>urf-model</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
 		</dependency>
 
 		<dependency>
@@ -55,6 +65,7 @@
 			<groupId>com.github.npathai</groupId>
 			<artifactId>hamcrest-optional</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>
