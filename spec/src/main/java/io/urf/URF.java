@@ -64,6 +64,46 @@ public class URF {
 			return TOKEN_PATTERN.matcher(requireNonNull(string)).matches();
 		}
 
+		/**
+		 * Confirms that the given string conforms to the rules for an URF name token.
+		 * @param string The string to check.
+		 * @return The given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for an URF name token.
+		 * @see #TOKEN_PATTERN
+		 */
+		public static String checkArgumentValidToken(final String string) {
+			checkArgument(isValidToken(string), "Invalid URF name token \"%s\".", string);
+			return string;
+		}
+
+		/**
+		 * Determines if the given character is a SURF token name begin character. A name token begin character is a Unicode letter.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is a SURF name begin character.
+		 */
+		public static final boolean isTokenBeginCharacter(final int c) {
+			return Character.isLetter(c); //see if this is a letter
+		}
+
+		/**
+		 * Determines if the given character is a SURF name token character. A name token character is a Unicode letter, mark, number, or connector punctuation.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is a SURF name character.
+		 */
+		public static final boolean isTokenCharacter(final int c) {
+			return (((
+			//letter
+			(1 << Character.UPPERCASE_LETTER) | (1 << Character.LOWERCASE_LETTER) | (1 << Character.TITLECASE_LETTER) | (1 << Character.MODIFIER_LETTER)
+					| (1 << Character.OTHER_LETTER) |
+					//mark
+					(1 << Character.NON_SPACING_MARK) | (1 << Character.COMBINING_SPACING_MARK) | (1 << Character.ENCLOSING_MARK) |
+					//digit
+					(1 << Character.DECIMAL_DIGIT_NUMBER) |
+					//connector punctuation
+					(1 << Character.CONNECTOR_PUNCTUATION)) >> Character.getType(c)) & 1) != 0;
+		}
+
 		/** Regular expression pattern to match an URF name . */
 		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(.*))?", TOKEN_PATTERN, NAME_ID_DELIMITER)); //TODO add test; document matching groups
 

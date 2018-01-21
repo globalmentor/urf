@@ -37,8 +37,23 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-itu</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-model</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>turf-spec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
 		</dependency>
 
 		<dependency>
@@ -55,6 +70,7 @@
 			<groupId>com.github.npathai</groupId>
 			<artifactId>hamcrest-optional</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>

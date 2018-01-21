@@ -32,6 +32,11 @@ public interface UrfResourceDescription {
 	/** @return The number of properties this resource has. */
 	public int getPropertyCount();
 
+	/** @return <code>true</code> if this object has at least one property. */
+	public default boolean hasProperties() {
+		return getPropertyCount() > 0;
+	}
+
 	/**
 	 * Retrieves the value of a property by the property tag.
 	 * 

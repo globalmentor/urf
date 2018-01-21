@@ -23,6 +23,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.collections.iterables.ConverterIterable;
+
 /**
  * An implementation of an URF resource that provides access to its own description via a graph of properties.
  * @author Garret Wilson
@@ -37,6 +39,11 @@ public class UrfObject extends AbstractUrfResource implements UrfResourceDescrip
 	}
 
 	@Override
+	public boolean hasProperties() {
+		return !propertyValuesByTag.isEmpty();
+	}
+
+	@Override
 	public Optional<Object> getPropertyValue(final URI propertyTag) {
 		return Optional.ofNullable(propertyValuesByTag.get(requireNonNull(propertyTag)));
 	}
@@ -44,6 +51,11 @@ public class UrfObject extends AbstractUrfResource implements UrfResourceDescrip
 	@Override
 	public Optional<Object> setPropertyValue(final URI propertyTag, final Object propertyValue) {
 		return Optional.ofNullable(propertyValuesByTag.put(requireNonNull(propertyTag), requireNonNull(propertyValue)));
+	}
+
+	/** @return An iterable to the object's properties by tags and their associated values. */
+	public Iterable<Map.Entry<URI, Object>> getProperties() {
+		return new ConverterIterable<>(propertyValuesByTag.entrySet(), AbstractMap.SimpleImmutableEntry::new);
 	}
 
 	//TODO add support for multiple values per property
