@@ -766,7 +766,7 @@ public class TurfSerializer {
 	 * @param urfObject The information to be serialized as an URF object.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#OBJECT_BEGIN
+	 * @see TURF#OBJECT_BEGIN
 	 */
 	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
@@ -782,8 +782,8 @@ public class TurfSerializer {
 	 * @param urfObject The URF object with the description to be serialized.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#DESCRIPTION_BEGIN
-	 * @see SURF#DESCRIPTION_END
+	 * @see TURF#DESCRIPTION_BEGIN
+	 * @see TURF#DESCRIPTION_END
 	 */
 	public void serializeDescription(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
 		appendable.append(DESCRIPTION_BEGIN); //:
@@ -825,7 +825,7 @@ public class TurfSerializer {
 	 * @param bytes The information to be serialized as a binary literal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#BINARY_BEGIN
+	 * @see TURF#BINARY_BEGIN
 	 */
 	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
 		appendable.append(BINARY_BEGIN);
@@ -838,7 +838,7 @@ public class TurfSerializer {
 	 * @param byteBuffer The information to be serialized as a binary literal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#BINARY_BEGIN
+	 * @see TURF#BINARY_BEGIN
 	 */
 	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
 		appendable.append(BINARY_BEGIN);
@@ -872,7 +872,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#CHARACTER_DELIMITER
+	 * @see TURF#CHARACTER_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
 	public static void serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
@@ -894,7 +894,7 @@ public class TurfSerializer {
 	 * @throws IOException if there is an error appending to the appender.
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
 	 *           current character is completely parsed.
-	 * @see SURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
+	 * @see TURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
 	 */
 	public static void serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
 			throws IOException, ParseIOException {
@@ -948,7 +948,7 @@ public class TurfSerializer {
 	 * @param emailAddress The information to be serialized as an email address.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#EMAIL_ADDRESS_BEGIN
+	 * @see TURF#EMAIL_ADDRESS_BEGIN
 	 */
 	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
 		appendable.append(EMAIL_ADDRESS_BEGIN);
@@ -965,7 +965,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given IRI is not a true, absolute IRI with a scheme.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#IRI_BEGIN
+	 * @see TURF#IRI_BEGIN
 	 */
 	public static void serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
 		checkAbsolute(iri);
@@ -1007,7 +1007,7 @@ public class TurfSerializer {
 	 * @param number The information to be serialized as a number.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#NUMBER_DECIMAL_BEGIN
+	 * @see TURF#NUMBER_DECIMAL_BEGIN
 	 */
 	public static void serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
 		final boolean isDecimal = (number instanceof BigDecimal) || (number instanceof BigInteger);
@@ -1023,8 +1023,8 @@ public class TurfSerializer {
 	 * @param regularExpression The information to be serialized as a regular expression.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
-	 * @see SURF#REGULAR_EXPRESSION_ESCAPE
+	 * @see TURF#REGULAR_EXPRESSION_DELIMITER
+	 * @see TURF#REGULAR_EXPRESSION_ESCAPE
 	 */
 	public static void serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
 		appendable.append(REGULAR_EXPRESSION_DELIMITER);
@@ -1053,7 +1053,7 @@ public class TurfSerializer {
 	 * @param charSequence The information to be serialized as a string.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#STRING_DELIMITER
+	 * @see TURF#STRING_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
 	public static void serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
@@ -1082,7 +1082,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @throws IllegalArgumentException if the given telephone number is not in global form.
-	 * @see SURF#TELEPHONE_NUMBER_BEGIN
+	 * @see TURF#TELEPHONE_NUMBER_BEGIN
 	 * @see TelephoneNumber#isGlobal()
 	 */
 	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
@@ -1096,7 +1096,7 @@ public class TurfSerializer {
 	 * @param temporal The information to be serialized as a temporal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#TEMPORAL_BEGIN
+	 * @see TURF#TEMPORAL_BEGIN
 	 */
 	public static void serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
 		appendable.append(TEMPORAL_BEGIN);
@@ -1109,7 +1109,7 @@ public class TurfSerializer {
 	 * @param uuid The information to be serialized as a UUID.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#UUID_BEGIN
+	 * @see TURF#UUID_BEGIN
 	 */
 	public static void serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
 		appendable.append(UUID_BEGIN);
@@ -1127,8 +1127,8 @@ public class TurfSerializer {
 	 * @param list The information to be serialized as a list.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#LIST_BEGIN
-	 * @see SURF#LIST_END
+	 * @see TURF#LIST_BEGIN
+	 * @see TURF#LIST_END
 	 */
 	public void serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
 		appendable.append(LIST_BEGIN); //[
@@ -1151,10 +1151,10 @@ public class TurfSerializer {
 	 * @param map The information to be serialized as a map.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#MAP_BEGIN
-	 * @see SURF#MAP_END
-	 * @see SURF#MAP_KEY_DELIMITER
-	 * @see SURF#ENTRY_KEY_VALUE_DELIMITER
+	 * @see TURF#MAP_BEGIN
+	 * @see TURF#MAP_END
+	 * @see TURF#MAP_KEY_DELIMITER
+	 * @see TURF#ENTRY_KEY_VALUE_DELIMITER
 	 */
 	public void serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
 		appendable.append(MAP_BEGIN); //{
@@ -1204,8 +1204,8 @@ public class TurfSerializer {
 	 * @param set The information to be serialized as a set.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
-	 * @see SURF#SET_BEGIN
-	 * @see SURF#SET_END
+	 * @see TURF#SET_BEGIN
+	 * @see TURF#SET_END
 	 */
 	public void serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
 		appendable.append(SET_BEGIN); //(
