@@ -15,16 +15,6 @@
 	<description>Java definitions for the Uniform Resource Framework (URF).</description>
 	<url>https://urf.io/</url>
 
-	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/urf.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/urf</url>
-	</scm>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
