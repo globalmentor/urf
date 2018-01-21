@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf.turf.serializer;
+package io.urf.turf;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
@@ -48,7 +48,6 @@ import com.globalmentor.text.ASCII;
 
 import io.urf.URF;
 import io.urf.model.UrfObject;
-import io.urf.turf.TURF;
 
 /**
  * Serializer for the Text URF (TURF) document format.
