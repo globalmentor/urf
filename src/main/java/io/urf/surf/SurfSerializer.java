@@ -236,7 +236,7 @@ public class SurfSerializer {
 	 * <p>
 	 * If formatting is turned off, no content will be added.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @throws IOException If there was an error writing the indent.
 	 * @see #isFormatted()
 	 * @see #getIndentSequence()
@@ -283,7 +283,7 @@ public class SurfSerializer {
 	 * <p>
 	 * If formatting is turned off, no content will be added.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @return Whether or not a line separator sequence was actually appended.
 	 * @throws IOException If there was an error writing the line separator.
 	 * @see #isFormatted()
@@ -374,7 +374,7 @@ public class SurfSerializer {
 	/** The map of aliases for objects and collections, with identity keys. */
 	private final Map<Object, String> aliasesByCompoundResource = new IdentityHashMap<>();
 
-	/** The map of aliases for value objects (which become SURF literals), with equality keys. */
+	/** The map of aliases for value objects (which become literals), with equality keys. */
 	private final Map<Object, String> aliasesByValue = new HashMap<>();
 
 	/**
@@ -458,7 +458,7 @@ public class SurfSerializer {
 	/** The set of objects and collections that have been serialized. */
 	private final Set<Object> serializedCompoundResources = Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
 
-	/** The map of value objects (which become SURF literals), that have been serialized. */
+	/** The map of value objects (which become literals), that have been serialized. */
 	private final Set<Object> serializedValues = new HashSet<>();
 
 	/**
@@ -481,7 +481,7 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource graph to a string.
+	 * Serializes a resource graph to a string.
 	 * <p>
 	 * This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after serialization, but
 	 * any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same aliases being used.
@@ -489,9 +489,9 @@ public class SurfSerializer {
 	 * <p>
 	 * This is a convenience method that delegates to {@link #serialize(Appendable, Object)}.
 	 * </p>
-	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
-	 * @throws IOException If there was an error writing the SURF data.
-	 * @return A serialized string representation of the given SURF resource graph.
+	 * @param root The root resource, or <code>null</code> if there is no resource to serialize.
+	 * @throws IOException If there was an error writing the serialized data.
+	 * @return A serialized string representation of the given resource graph.
 	 */
 	public String serialize(@Nonnull @Nullable Object root) throws IOException {
 		discoverResourceReferences(root);
@@ -509,14 +509,14 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource graph to an output stream.
+	 * Serializes a resource graph to an output stream.
 	 * <p>
 	 * This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after serialization, but
 	 * any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same aliases being used.
 	 * </p>
-	 * @param outputStream The output stream to receive SURF data.
-	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
-	 * @throws IOException If there was an error writing the SURF data.
+	 * @param outputStream The output stream to receive serialized data.
+	 * @param root The root resource, or <code>null</code> if there is no resource to serialize.
+	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serialize(@Nonnull final OutputStream outputStream, @Nullable Object root) throws IOException {
 		discoverResourceReferences(root);
@@ -530,16 +530,16 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource graph to a writer.
+	 * Serializes a resource graph to some appendable destination.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param root The root SURF resource, or <code>null</code> if there is no resource to serialize.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param root The root resource, or <code>null</code> if there is no resource to serialize.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
-	 * @throws IOException If there was an error writing the SURF data.
+	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serialize(@Nonnull final Appendable appendable, @Nullable Object root) throws IOException {
+	public void serialize(@Nonnull final Appendable appendable, @Nullable Object root) throws IOException { //TODO rename to serializeRoot() to be easier to translate to other programming languages that do not allow overloading
 		if(root == null) {
 			return;
 		}
@@ -547,14 +547,14 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource to a writer.
+	 * Serializes a resource to some appendable destination.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param resource The SURF resource to serialize to serialize.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param resource The resource to serialize.
 	 * @throws NullPointerException if the given appendable and/or resource is <code>null</code>.
-	 * @throws IOException If there was an error appending the SURF data.
+	 * @throws IOException If there was an error appending the serialized data.
 	 */
 	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
 		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
@@ -717,11 +717,11 @@ public class SurfSerializer {
 	//objects
 
 	/**
-	 * Serializes a SURF object representation <em>without</em> the following description.
+	 * Serializes a object representation <em>without</em> the following description.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param surfObject The information to be serialized as a SURF object.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -733,11 +733,11 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF resource description. The description section, including delimiters, will be serialized even if there are no properties.
+	 * Serializes a resource description. The description section, including delimiters, will be serialized even if there are no properties.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param surfObject The SURF object with the description to be serialized.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -768,8 +768,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a binary literal along with its delimiter from an array of bytes.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param bytes The information to be serialized as a SURF binary literal.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param bytes The information to be serialized as a binary literal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#BINARY_BEGIN
@@ -781,8 +781,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a binary literal along with its delimiter from a byte buffer.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param byteBuffer The information to be serialized as a SURF binary literal.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param byteBuffer The information to be serialized as a binary literal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#BINARY_BEGIN
@@ -802,8 +802,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a Boolean.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param bool The Boolean value to be serialized as a SURF Boolean.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param bool The Boolean value to be serialized as a Boolean.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -814,8 +814,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a character surrounded by character delimiters.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param codePoint The Unicode code point to be serialized as a SURF character.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param codePoint The Unicode code point to be serialized as a character.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -834,7 +834,7 @@ public class SurfSerializer {
 	 * <p>
 	 * This implementation does not escape the solidus (slash) character <code>'/'</code>, which is not required to be escaped.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
 	 * @param codePoint The code point to serialize.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
@@ -891,8 +891,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes an email address along with its delimiter.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param emailAddress The information to be serialized as a SURF email address.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param emailAddress The information to be serialized as an email address.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#EMAIL_ADDRESS_BEGIN
@@ -905,10 +905,10 @@ public class SurfSerializer {
 	/**
 	 * Serializes an IRI along with its delimiters.
 	 * <p>
-	 * This implementation serializes an IRI using a SURF IRI short form if possible.
+	 * This implementation serializes an IRI using an IRI short form if possible.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param iri The information to be serialized as a SURF IRI.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param iri The information to be serialized as an IRI.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given IRI is not a true, absolute IRI with a scheme.
 	 * @throws IOException if there is an error appending to the appendable.
@@ -944,14 +944,14 @@ public class SurfSerializer {
 	/**
 	 * Serializes a number along with its delimiter if should be represented as a decimal.
 	 * <p>
-	 * This implementation represents the following types as SURF decimal:
+	 * This implementation represents the following types as decimal:
 	 * </p>
 	 * <ul>
 	 * <li>{@link BigDecimal}</li>
 	 * <li>{@link BigInteger}</li>
 	 * </ul>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param number The information to be serialized as a SURF number.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param number The information to be serialized as a number.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#NUMBER_DECIMAL_BEGIN
@@ -966,8 +966,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a regular expression along with its delimiters.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param regularExpression The information to be serialized as a SURF regular expression.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param regularExpression The information to be serialized as a regular expression.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
@@ -996,8 +996,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a string surrounded by string delimiters.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param charSequence The information to be serialized as a SURF string.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param charSequence The information to be serialized as a string.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#STRING_DELIMITER
@@ -1024,8 +1024,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a telephone number along with its delimiter.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param telephoneNumber The information to be serialized as a SURF telephone number.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param telephoneNumber The information to be serialized as a telephone number.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @throws IllegalArgumentException if the given telephone number is not in global form.
@@ -1039,8 +1039,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a temporal literal along with its delimiter.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param temporal The information to be serialized as a SURF temporal.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param temporal The information to be serialized as a temporal.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#TEMPORAL_BEGIN
@@ -1052,8 +1052,8 @@ public class SurfSerializer {
 
 	/**
 	 * Serializes a UUID along with its delimiter.
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param uuid The information to be serialized as a SURF UUID.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param uuid The information to be serialized as a UUID.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#UUID_BEGIN
@@ -1066,12 +1066,12 @@ public class SurfSerializer {
 	//collections
 
 	/**
-	 * Serializes a SURF list.
+	 * Serializes a list.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param list The information to be serialized as a SURF list.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param list The information to be serialized as a list.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#LIST_BEGIN
@@ -1090,12 +1090,12 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF map.
+	 * Serializes a map.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param map The information to be serialized as a SURF map.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param map The information to be serialized as a map.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#MAP_BEGIN
@@ -1131,12 +1131,12 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a SURF set.
+	 * Serializes a set.
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
-	 * @param appendable The appendable to which SURF data should be appended.
-	 * @param set The information to be serialized as a SURF set.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param set The information to be serialized as a set.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#SET_BEGIN
@@ -1155,11 +1155,11 @@ public class SurfSerializer {
 	}
 
 	/**
-	 * Serializes a general SURF sequence (such as a list). For each sequence item, {@link IOBiConsumer#accept(Object, Object)} is called, passing the output
+	 * Serializes a general sequence (such as a list). For each sequence item, {@link IOBiConsumer#accept(Object, Object)} is called, passing the output
 	 * {@link Appendable} along with the item to be serialized. The item serialization strategy will return <code>false</code> to indicate that there are no
 	 * further items.
 	 * @param <I> The type of item in the sequence.
-	 * @param appendable The appendable to which SURF data should be appended.
+	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param sequence An iterable representing the sequence to serialize.
 	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization, along with each item to serialize.
 	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.

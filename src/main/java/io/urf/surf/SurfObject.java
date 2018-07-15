@@ -206,4 +206,5 @@ public class SurfObject {
 		return getTag().equals(surfObject.getTag()) && getTypeHandle().equals(surfObject.getTypeHandle()) && getId().equals(surfObject.getId())
 				&& properties.equals(surfObject.properties);
 	}
+
 }

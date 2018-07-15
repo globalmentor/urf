@@ -39,17 +39,17 @@ public class SURF {
 	/** The SURF charset. */
 	public static final Charset CHARSET = UTF_8;
 
-	/** Characters recognized by SURF as whitespace. */
+	/** Characters recognized as whitespace. */
 	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
 			SPACE_CHAR, NO_BREAK_SPACE_CHAR, ZERO_WIDTH_NO_BREAK_SPACE_CHAR);
 
 	/** The character that separates items in a sequence. */
 	public static final char SEQUENCE_DELIMITER = ',';
 
-	/** The SURF sequence separator characters, including the {@link #SEQUENCE_DELIMITER} and the EOL characters. */
+	/** The sequence separator characters, including the {@link #SEQUENCE_DELIMITER} and the EOL characters. */
 	public static final Characters SEQUENCE_SEPARATOR_CHARACTERS = EOL_CHARACTERS.add(SEQUENCE_DELIMITER);
 
-	/** The character indicating the start of a Surf single-line comment. */
+	/** The character indicating the start of a single-line comment. */
 	public static final char LINE_COMMENT_BEGIN = '!';
 
 	/** The delimiter that begins and ends labels (tags, IDs, and aliases). */
@@ -70,7 +70,7 @@ public class SURF {
 
 	/** The delimiter that begins binary literal values. */
 	public static final char BINARY_BEGIN = '%';
-	/** The <cite>RFC 4648</cite> "base64url" alphabet, without padding characters, used by SURF binary literals. */
+	/** The <cite>RFC 4648</cite> "base64url" alphabet, without padding characters, used by binary literals. */
 	public static final Characters BINARY_BASE64URL_CHARACTERS = Characters.of(Characters.ofRange('A', 'Z'), Characters.ofRange('a', 'z'),
 			Characters.ofRange('0', '9'), Characters.of('-', '_'));
 
@@ -87,10 +87,10 @@ public class SURF {
 	public static final char CHARACTER_DELIMITER = '\'';
 	/** The character used for escaping a character. */
 	public static final char CHARACTER_ESCAPE = '\\';
-	/** SURF characters that must be escaped as characters or in strings. */
+	/** Characters that must be escaped as characters or in strings. */
 	public static Characters CHARACTER_REQUIRED_ESCAPED_CHARACTERS = Characters.of(CHARACTER_ESCAPE, BACKSPACE_CHAR, FORM_FEED_CHAR, LINE_FEED_CHAR,
 			CARRIAGE_RETURN_CHAR, CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR);
-	/** Additional SURF characters that may be escaped as characters or in strings. */
+	/** Additional characters that may be escaped as characters or in strings. */
 	public static Characters CHARACTER_OPTIONAL_ESCAPED_CHARACTERS = Characters.of(SOLIDUS_CHAR);
 	//escaped forms of characters
 	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
@@ -199,7 +199,7 @@ public class SURF {
 		public static final Pattern TOKEN_PATTERN = Pattern.compile("\\p{L}[\\p{L}\\p{M}\\p{N}\\p{Pc}]*"); //TODO add test
 
 		/**
-		 * Determines whether the given string conforms to the rules for an URF name token.
+		 * Determines whether the given string conforms to the rules for a SURF name token.
 		 * @param string The string to test.
 		 * @return <code>true</code> if the string is a valid URF name token.
 		 * @throws NullPointerException if the given string is <code>null</code>.
@@ -287,11 +287,11 @@ public class SURF {
 		/** The delimiter used to separate segments of a SURF handle. */
 		public static final char SEGMENT_DELIMITER = '-';
 
-		/** Regular expression pattern to match a SURF handle . */
+		/** Regular expression pattern to match a SURF handle. */
 		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))*", Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN)); //TODO add test; document matching groups
 
 		/**
-		 * Determines if the given character is valid to begin SURF handle. A SURF handle begins with a name token.
+		 * Determines if the given character is valid to begin a SURF handle. A SURF handle begins with a name token.
 		 * @param c The character to check.
 		 * @return <code>true</code> if the character is a SURF handle begin character.
 		 * @see Name#isTokenBeginCharacter(int)

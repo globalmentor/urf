@@ -410,7 +410,7 @@ public class SurfParser {
 		}
 
 		//description (optional)
-		if(allowDescription && resource instanceof SurfObject) {
+		if(allowDescription && resource instanceof SurfObject) { //TODO why the check here, if we check again later?
 			c = peek(reader);
 			if(c == DESCRIPTION_BEGIN) {
 				checkParseIO(reader, resource instanceof SurfObject, "SURF only allows objects to have a description.");
@@ -1202,7 +1202,7 @@ public class SurfParser {
 	}
 
 	/**
-	 * Skips over SURF filler in a reader, including whitespace and line comments.The new position will either be the that of the first non-whitespace character
+	 * Skips over SURF filler in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace character
 	 * or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
