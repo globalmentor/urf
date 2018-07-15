@@ -43,6 +43,77 @@ public class URF {
 
 	/** The delimiter that may appear in an URF name to indicate the start of the ID, if any. */
 	public static final char NAME_ID_DELIMITER = '#';
+	
+	//types
+
+	/** The tag of the <code>urf-Binary</code> type. */
+	public static final URI BINARY_TYPE_TAG = NAMESPACE.resolve("Binary");
+	/** The tag of the <code>urf-Boolean</code> type. */
+	public static final URI BOOLEAN_TYPE_TAG = NAMESPACE.resolve("Boolean");
+	/** The tag of the <code>urf-Character</code> type. */
+	public static final URI CHARACTER_TYPE_TAG = NAMESPACE.resolve("Character");
+	/** The tag of the <code>urf-Decimal</code> type. */
+	public static final URI DECIMAL_TYPE_TAG = NAMESPACE.resolve("Decimal");
+	/** The tag of the <code>urf-EmailAddress</code> type. */
+	public static final URI EMAIL_ADDRESS_TYPE_TAG = NAMESPACE.resolve("EmailAddress");
+	/** The tag of the <code>urf-Element</code> type. */
+	public static final URI ELEMENT_TYPE_TAG = NAMESPACE.resolve("Element");
+	/** The tag of the <code>urf-Instant</code> type. */
+	public static final URI INSTANT_TYPE_TAG = NAMESPACE.resolve("Instant");
+	/** The tag of the <code>urf-Integer</code> type. */
+	public static final URI INTEGER_TYPE_TAG = NAMESPACE.resolve("Integer");
+	/** The tag of the <code>urf-Iri</code> type. */
+	public static final URI IRI_TYPE_TAG = NAMESPACE.resolve("Iri");
+	/** The tag of the <code>urf-LocalDate</code> type. */
+	public static final URI LOCAL_DATE_TYPE_TAG = NAMESPACE.resolve("LocalDate");
+	/** The tag of the <code>urf-LocalDateTime</code> type. */
+	public static final URI LOCAL_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("LocalDateTime");
+	/** The tag of the <code>urf-LocalTime</code> type. */
+	public static final URI LOCAL_TIME_TYPE_TAG = NAMESPACE.resolve("LocalTime");
+	/** The tag of the <code>urf-List</code> type. */
+	public static final URI LIST_TYPE_TAG = NAMESPACE.resolve("List");
+	/** The tag of the <code>urf-Map</code> type. */
+	public static final URI MAP_TYPE_TAG = NAMESPACE.resolve("Map");
+	/** The tag of the <code>urf-MapEntry</code> type. */
+	public static final URI MAP_ENTRY_TYPE_TAG = NAMESPACE.resolve("MapEntry");
+	/** The tag of the <code>urf-Member</code> type. */
+	public static final URI MEMBER_TYPE_TAG = NAMESPACE.resolve("Member");
+	/** The tag of the <code>urf-MonthDay</code> type. */
+	public static final URI MONTH_DAY_TYPE_TAG = NAMESPACE.resolve("MonthDay");
+	/** The tag of the <code>urf-OffsetDate</code> type. */
+	public static final URI OFFSET_DATE_TYPE_TAG = NAMESPACE.resolve("OffsetDate");
+	/** The tag of the <code>urf-OffsetDateTime</code> type. */
+	public static final URI OFFSET_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("OffsetDateTime");
+	/** The tag of the <code>urf-OffsetTime</code> type. */
+	public static final URI OFFSET_TIME_TYPE_TAG = NAMESPACE.resolve("OffsetTime");
+	/** The tag of the <code>urf-Real</code> type. */
+	public static final URI REAL_TYPE_TAG = NAMESPACE.resolve("Real");
+	/** The tag of the <code>urf-RegularExpression</code> type. */
+	public static final URI REGULAR_EXPRESSION_TYPE_TAG = NAMESPACE.resolve("RegularExpression");
+	/** The tag of the <code>urf-Set</code> type. */
+	public static final URI SET_TYPE_TAG = NAMESPACE.resolve("Set");
+	/** The tag of the <code>urf-String</code> type. */
+	public static final URI STRING_TYPE_TAG = NAMESPACE.resolve("String");
+	/** The tag of the <code>urf-TelephoneNumber</code> type. */
+	public static final URI TELEPHONE_NUMBER_TYPE_TAG = NAMESPACE.resolve("TelephoneNumber");
+	/** The tag of the <code>urf-Uuid</code> type. */
+	public static final URI UUID_TYPE_TAG = NAMESPACE.resolve("Uuid");
+	/** The tag of the <code>urf-Year</code> type. */
+	public static final URI YEAR_TYPE_TAG = NAMESPACE.resolve("Year");
+	/** The tag of the <code>urf-YearMonth</code> type. */
+	public static final URI YEAR_MONTH_TYPE_TAG = NAMESPACE.resolve("YearMonth");
+	/** The tag of the <code>urf-ZonedDateTime</code> type. */
+	public static final URI ZONED_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("ZonedDateTime");
+	
+	//instances
+
+	/** The tag of <code>urf-key</code>.*/
+	public static final URI KEY_PROPERTY_TAG = NAMESPACE.resolve("key");
+	/** The tag of <code>urf-member</code>.*/
+	public static final URI MEMBER_PROPERTY_TAG = NAMESPACE.resolve("member");
+	/** The tag of <code>urf-value</code>.*/
+	public static final URI VALUE_PROPERTY_TAG = NAMESPACE.resolve("value");
+
 
 	/**
 	 * Utilities for working with URF names.
@@ -130,6 +201,17 @@ public class URF {
 			checkArgument(isValid(string), "Invalid URF name \"%s\".", string);
 			return string;
 		}
+
+		/**
+		 * Creates a name for an instance of a type.
+		 * @param typeName The type name.
+		 * @param ID The ID identifying the instance of the type.
+		 * @return A name with the given type name and ID.
+		 */
+		public static String forTypeId(@Nonnull String typeName, @Nonnull String id) {
+			return new StringBuilder(requireNonNull(typeName)).append(NAME_ID_DELIMITER).append(encode(requireNonNull(id))).toString(); //TODO check encoding
+		}
+
 	}
 
 	/**
@@ -182,7 +264,7 @@ public class URF {
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @see #getId(URI)
 		 */
-		public static Optional<String> getName(final URI tag) {
+		public static Optional<String> getName(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
 			if(rawPath != null && !rawPath.isEmpty() && !endsWith(rawPath, PATH_SEPARATOR)) { //if there is a raw path that isn't a collection
@@ -207,13 +289,45 @@ public class URF {
 		 * @return The local name of the given URI, or <code>null</code> if the URI has no path or the path ends with a path separator.
 		 * @throws NullPointerException if the given URI is <code>null</code>.
 		 */
-		public static Optional<String> getId(final URI tag) {
+		public static Optional<String> getId(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawFragment = tag.getRawFragment();
 			if(rawFragment != null) {
 				return Optional.of(decode(rawFragment)); //decode the fragment manually for consistency and for better error-handling
 			}
 			return Optional.empty();
+		}
+
+		/**
+		 * Creates a tag for a type.
+		 * @param typeNamespace The type namespace.
+		 * @param typeName The type name.
+		 * @return A tag for the type.
+		 */
+		public static URI forType(@Nonnull final URI typeNamespace, @Nonnull String typeName) {
+			return typeNamespace.resolve(requireNonNull(typeName)); //TODO fix encoding
+		}
+
+		/**
+		 * Creates a tag for an instance of a type by its namespace and name.
+		 * @param typeNamespace The type namespace.
+		 * @param typeName The type name.
+		 * @param ID The ID identifying the instance of the type.
+		 * @return A tag with the given type and ID.
+		 */
+		public static URI forTypeId(@Nonnull final URI typeNamespace, @Nonnull String typeName, @Nonnull String id) {
+			return forTypeId(forType(typeNamespace, typeName), id);
+		}
+
+		/**
+		 * Creates a tag for an instance of a type by its tag.
+		 * @param typeTag The type tag.
+		 * @param ID The ID identifying the instance of the type.
+		 * @return A tag with the given type and ID.
+		 */
+		public static URI forTypeId(@Nonnull final URI typeTag, @Nonnull String id) {
+			//TODO ensure that the type tag has no fragment
+			return URI.create(new StringBuilder(typeTag.toString()).append(NAME_ID_DELIMITER).append(encode(requireNonNull(id))).toString());
 		}
 
 	}
@@ -227,16 +341,40 @@ public class URF {
 		/** The delimiter used to separate ad-hoc namespaces in a TURF handle. */
 		public static final char SEGMENT_DELIMITER = '-';
 
+		/** Regular expression pattern to match a SURF handle. */
+		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))*", Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN)); //TODO add test; add support for namespace prefixes; document matching groups
+
 		/**
-		 * Confirms that the given string conforms to the rules for a TURF handle.
+		 * Determines if the given character is valid to begin an URF handle. An URF handle begins with a name token.
+		 * @param c The character to check.
+		 * @return <code>true</code> if the character is an URF handle begin character.
+		 * @see Name#isTokenBeginCharacter(int)
+		 */
+		public static final boolean isBeginCharacter(final int c) {
+			return Name.isTokenBeginCharacter(c); //see if this is a letter
+		}
+
+		/**
+		 * Determines whether the given string conforms to the rules for an URF handle.
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid SURF handle.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @see #PATTERN
+		 */
+		public static boolean isValid(final String string) {
+			return PATTERN.matcher(requireNonNull(string)).matches();
+		}
+
+		/**
+		 * Confirms that the given string conforms to the rules for an URF handle.
 		 * @param string The string to check.
 		 * @return The given string.
 		 * @throws NullPointerException if the given string is <code>null</code>.
-		 * @throws IllegalArgumentException if the given string does not conform to the rules for a TURF handle.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for an URF handle.
+		 * @see #PATTERN
 		 */
-		//TODO * @see #PATTERN
 		public static String checkArgumentValid(final String string) {
-			//TODO implement checkArgument(isValid(string), "Invalid TURF handle \"%s\".", string);
+			checkArgument(isValid(string), "Invalid URF handle \"%s\".", string);
 			return string;
 		}
 
@@ -299,7 +437,7 @@ public class URF {
 		 * @throws NullPointerException if the given handle is <code>null</code>.
 		 * @throws IllegalArgumentException if the given string is not a valid handle.
 		 */
-		public static URI toTag(@Nonnull final String handle) {
+		public static URI toTag(@Nonnull final String handle) { //TODO add support for IDs
 			checkArgumentValid(handle);
 			//TODO add support for namespace prefixes
 			final String[] handleSegments = handle.split(String.valueOf(SEGMENT_DELIMITER));

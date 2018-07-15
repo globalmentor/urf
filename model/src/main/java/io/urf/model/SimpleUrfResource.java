@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2018 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import javax.annotation.*;
 import io.urf.URF;
 
 /**
- * An implementation of an URF resource that provides access to its own description via a graph of properties.
+ * A plain URF with no description.
  * @author Garret Wilson
  */
-public class UrfObject extends AbstractDescribedUrfResource {
+public class SimpleUrfResource extends BaseUrfResource {
 
 	/** Constructor of a resource with no tag and an unknown type. */
-	public UrfObject() {
+	public SimpleUrfResource() {
 		this(null, (URI)null);
 	}
 
@@ -38,7 +38,7 @@ public class UrfObject extends AbstractDescribedUrfResource {
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
-	public UrfObject(@Nullable final URI tag) {
+	public SimpleUrfResource(@Nullable final URI tag) {
 		this(tag, (URI)null);
 	}
 
@@ -49,7 +49,7 @@ public class UrfObject extends AbstractDescribedUrfResource {
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute URI.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
 	 */
-	public UrfObject(@Nullable final URI tag, @Nullable final String typeHandle) {
+	public SimpleUrfResource(@Nullable final URI tag, @Nullable final String typeHandle) {
 		this(tag, typeHandle != null ? URF.Handle.toTag(typeHandle) : null);
 	}
 
@@ -58,7 +58,7 @@ public class UrfObject extends AbstractDescribedUrfResource {
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
 	 */
-	public UrfObject(@Nullable final String typeHandle) {
+	public SimpleUrfResource(@Nullable final String typeHandle) {
 		this((URI)null, typeHandle);
 	}
 
@@ -68,7 +68,7 @@ public class UrfObject extends AbstractDescribedUrfResource {
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
-	public UrfObject(@Nullable final URI tag, @Nullable final URI typeTag) {
+	public SimpleUrfResource(@Nullable final URI tag, @Nullable final URI typeTag) {
 		super(tag, typeTag);
 	}
 

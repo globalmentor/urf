@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2018 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package io.urf.model;
 
+import static java.util.Objects.*;
+
 import java.net.URI;
 
 import javax.annotation.*;
@@ -23,53 +25,69 @@ import javax.annotation.*;
 import io.urf.URF;
 
 /**
- * An implementation of an URF resource that provides access to its own description via a graph of properties.
+ * An URF resource wrapping an object, along with a description.
+ * @param <T> The type of object decorated by the URF resource.
  * @author Garret Wilson
  */
-public class UrfObject extends AbstractDescribedUrfResource {
+public class DescribedObjectUrfResource<T> extends AbstractDescribedUrfResource implements ObjectUrfResource<T> {
 
-	/** Constructor of a resource with no tag and an unknown type. */
-	public UrfObject() {
-		this(null, (URI)null);
+	private final T object;
+
+	@Override
+	public T getObject() {
+		return object;
+	}
+
+	/**
+	 * Constructor of a resource with no tag and an unknown type.
+	 * @param object The object to be wrapped by this URF resource.
+	 */
+	public DescribedObjectUrfResource(@Nonnull final T object) {
+		this(null, (URI)null, object);
 	}
 
 	/**
 	 * Optional tag constructor.
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
+	 * @param object The object to be wrapped by this URF resource.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
-	public UrfObject(@Nullable final URI tag) {
-		this(tag, (URI)null);
+	public DescribedObjectUrfResource(@Nullable final URI tag, @Nonnull final T object) {
+		this(tag, (URI)null, object);
 	}
 
 	/**
 	 * Optional tag and optional type handle constructor.
 	 * @param tag The identifying object tag, or <code>null</code> if not known.
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
+	 * @param object The object to be wrapped by this URF resource.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute URI.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
 	 */
-	public UrfObject(@Nullable final URI tag, @Nullable final String typeHandle) {
-		this(tag, typeHandle != null ? URF.Handle.toTag(typeHandle) : null);
+	public DescribedObjectUrfResource(@Nullable final URI tag, @Nullable final String typeHandle, @Nonnull final T object) {
+		this(tag, typeHandle != null ? URF.Handle.toTag(typeHandle) : null, object);
 	}
 
 	/**
 	 * Optional type handle constructor.
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
+	 * @param object The object to be wrapped by this URF resource.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
 	 */
-	public UrfObject(@Nullable final String typeHandle) {
-		this((URI)null, typeHandle);
+	public DescribedObjectUrfResource(@Nullable final String typeHandle, @Nonnull final T object) {
+		this((URI)null, typeHandle, object);
 	}
 
 	/**
 	 * Optional tag and optional type name constructor.
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
+	 * @param object The object to be wrapped by this URF resource.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
-	public UrfObject(@Nullable final URI tag, @Nullable final URI typeTag) {
+	public DescribedObjectUrfResource(@Nullable final URI tag, @Nullable final URI typeTag, @Nonnull final T object) {
 		super(tag, typeTag);
+		this.object = requireNonNull(object);
 	}
 
 }

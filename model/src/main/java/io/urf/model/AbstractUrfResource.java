@@ -17,11 +17,6 @@
 package io.urf.model;
 
 import java.net.URI;
-import java.util.*;
-
-import javax.annotation.*;
-
-import io.urf.URF;
 
 /**
  * An abstract base implementation of an URF resource.
@@ -29,33 +24,9 @@ import io.urf.URF;
  */
 public abstract class AbstractUrfResource implements UrfResource {
 
-	private final URI tag;
-
-	@Override
-	public Optional<URI> getTag() {
-		return Optional.ofNullable(tag);
-	}
-
-	private final URI typeTag;
-
-	@Override
-	public Optional<URI> getTypeTag() {
-		return Optional.ofNullable(typeTag);
-	}
-
-	/**
-	 * Optional tag and optional type tag constructor.
-	 * @param tag The identifying resource tag, or <code>null</code> if not known.
-	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
-	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
-	 */
-	public AbstractUrfResource(@Nullable final URI tag, @Nullable final URI typeTag) {
-		this.tag = tag != null ? URF.Tag.checkArgumentValid(tag) : null;
-		this.typeTag = typeTag != null ? URF.Tag.checkArgumentValid(typeTag) : null;
-	}
-
 	@Override
 	public int hashCode() {
+		final URI tag = getTag().orElse(null);
 		//if this object has no tag, return the default hash code to provide wider distribution of hash values
 		return tag != null ? tag.hashCode() : super.hashCode();
 	}
@@ -68,6 +39,7 @@ public abstract class AbstractUrfResource implements UrfResource {
 		if(!(object instanceof UrfResource)) {
 			return false;
 		}
+		final URI tag = getTag().orElse(null);
 		return tag != null && tag.equals(((UrfResource)object).getTag().orElse(null));
 	}
 

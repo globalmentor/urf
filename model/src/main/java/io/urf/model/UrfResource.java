@@ -35,7 +35,11 @@ public interface UrfResource {
 
 	/**
 	 * Determines the name of the resource, based on its tag.
+	 * <p>
+	 * The default implementation determines the name from the tag, if any.
+	 * </p>
 	 * @return The name, if any, of the resource.
+	 * @see #getTag()
 	 * @see URF.Tag#getName(URI)
 	 */
 	public default Optional<String> getName() {
@@ -44,7 +48,11 @@ public interface UrfResource {
 
 	/**
 	 * Determines the ID of the resource, based on its tag.
+	 * <p>
+	 * The default implementation determines the ID from the tag, if any.
+	 * </p>
 	 * @return The ID, if any, of the resource.
+	 * @see #getTag()
 	 * @see URF.Tag#getId(URI)
 	 */
 	public default Optional<String> getId() {
@@ -53,8 +61,5 @@ public interface UrfResource {
 
 	/** @return The tag of the resource type, if known. */
 	public Optional<URI> getTypeTag();
-
-	/** @return The number of properties this resource has. */
-	public int getPropertyCount();
 
 }

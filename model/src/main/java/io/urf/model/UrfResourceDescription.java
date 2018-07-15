@@ -29,10 +29,10 @@ import io.urf.URF;
  */
 public interface UrfResourceDescription {
 
-	/** @return The number of properties this resource has. */
+	/** @return The number of properties the resource has. */
 	public int getPropertyCount();
 
-	/** @return <code>true</code> if this object has at least one property. */
+	/** @return <code>true</code> if the resource has at least one property. */
 	public default boolean hasProperties() {
 		return getPropertyCount() > 0;
 	}
