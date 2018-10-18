@@ -205,7 +205,7 @@ public class URF {
 		/**
 		 * Creates a name for an instance of a type.
 		 * @param typeName The type name.
-		 * @param ID The ID identifying the instance of the type.
+		 * @param id The ID identifying the instance of the type.
 		 * @return A name with the given type name and ID.
 		 */
 		public static String forTypeId(@Nonnull String typeName, @Nonnull String id) {
@@ -312,7 +312,7 @@ public class URF {
 		 * Creates a tag for an instance of a type by its namespace and name.
 		 * @param typeNamespace The type namespace.
 		 * @param typeName The type name.
-		 * @param ID The ID identifying the instance of the type.
+		 * @param id The ID identifying the instance of the type.
 		 * @return A tag with the given type and ID.
 		 */
 		public static URI forTypeId(@Nonnull final URI typeNamespace, @Nonnull String typeName, @Nonnull String id) {
@@ -322,7 +322,7 @@ public class URF {
 		/**
 		 * Creates a tag for an instance of a type by its tag.
 		 * @param typeTag The type tag.
-		 * @param ID The ID identifying the instance of the type.
+		 * @param id The ID identifying the instance of the type.
 		 * @return A tag with the given type and ID.
 		 */
 		public static URI forTypeId(@Nonnull final URI typeTag, @Nonnull String id) {

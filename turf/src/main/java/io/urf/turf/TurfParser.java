@@ -259,8 +259,8 @@ public class TurfParser {
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if there are are no name characters.
-	 * @see SURF.Name#isTokenBeginCharacter(int)
-	 * @see SURF.Name#isTokenCharacter(int)
+	 * @see URF.Name#isTokenBeginCharacter(int)
+	 * @see URF.Name#isTokenCharacter(int)
 	 */
 	protected static String parseNameToken(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder(); //create a string builder for reading the name segment
@@ -509,7 +509,6 @@ public class TurfParser {
 	 * Parses the description properties of a resource. The next character read is expected to be the start of the description {@value TURF#DESCRIPTION_BEGIN}.
 	 * @param reader The reader containing SURF data.
 	 * @param subject The resource to which properties should be added.
-	 * @return The described SURF resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @see TURF#DESCRIPTION_BEGIN
 	 */

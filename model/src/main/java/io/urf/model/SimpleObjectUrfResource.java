@@ -38,7 +38,10 @@ public class SimpleObjectUrfResource<T> extends BaseUrfResource implements Objec
 		return object;
 	}
 
-	/** Constructor of a resource with no tag and an unknown type. */
+	/**
+	 * Constructor of a resource with no tag and an unknown type.
+	 * @param object The object to be wrapped by this URF resource.
+	 */
 	public SimpleObjectUrfResource(@Nonnull final T object) {
 		this(null, (URI)null, object);
 	}

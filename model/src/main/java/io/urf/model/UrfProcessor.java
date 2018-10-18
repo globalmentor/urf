@@ -43,6 +43,7 @@ public interface UrfProcessor {
 	 * </p>
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
+	 * @return The resource instance representing that being processed.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
 	public default UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag) {
