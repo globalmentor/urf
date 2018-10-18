@@ -19,6 +19,7 @@ package io.urf.surf;
 import static com.globalmentor.java.Characters.*;
 
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.ContentType.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
@@ -29,12 +30,19 @@ import java.util.regex.Pattern;
 import javax.annotation.*;
 
 import com.globalmentor.java.Characters;
+import com.globalmentor.net.ContentType;
 
 /**
  * Definitions for the Simple URF (SURF) document format.
  * @author Garret Wilson
  */
 public class SURF {
+
+	/** The content type for SURF: <code>text/surf</code>. */
+	public static final ContentType CONTENT_TYPE = ContentType.create(TEXT_PRIMARY_TYPE, "surf");
+
+	/** An extension for SURF filenames. */
+	public static final String FILENAME_EXTENSION = "surf";
 
 	/** The SURF charset. */
 	public static final Charset CHARSET = UTF_8;
