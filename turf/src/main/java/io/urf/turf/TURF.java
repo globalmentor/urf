@@ -17,17 +17,25 @@
 package io.urf.turf;
 
 import static com.globalmentor.java.Characters.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.globalmentor.net.ContentType.*;
+import static java.nio.charset.StandardCharsets.*;
 
 import java.nio.charset.Charset;
 
 import com.globalmentor.java.Characters;
+import com.globalmentor.net.ContentType;
 
 /**
  * Definitions for the Text URF (TURF) document format.
  * @author Garret Wilson
  */
 public class TURF {
+
+	/** The content type for TURF: <code>text/urf</code>. */
+	public static final ContentType CONTENT_TYPE = ContentType.create(TEXT_PRIMARY_TYPE, "urf");
+
+	/** An extension for TURF filenames. */
+	public static final String FILENAME_EXTENSION = "turf";
 
 	/** The default TURF charset. */
 	public static final Charset DEFAULT_CHARSET = UTF_8;
