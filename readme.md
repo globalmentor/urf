@@ -14,7 +14,7 @@ Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF).
 
 ## Changelog
 
-- v0.2.1: (2018-12-15) Added constants and refactored tests for use with TURF. 
+- v0.2.1: (2018-10-22) Added constants and refactored tests for use with TURF.
 - v0.2.0: (2017-12-15)
 	* [URF-49](https://globalmentor.atlassian.net/browse/JAVA-49): Move SURF test resources into consolidated SURF project as test-jar.
 	* [URF-48](https://globalmentor.atlassian.net/browse/JAVA-48): Add support for objects as map keys.
