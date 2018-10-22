@@ -4,17 +4,18 @@ Reference implementation of the Simple URF (SURF) document format.
 
 ## Download
 
-SURF is available in the Maven Central Repository as [io.urf:surf](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf%22).
+SURF is available in the Maven Central Repository as [io.urf:surf](https://search.maven.org/search?q=g:io.urf%20AND%20a:surf).
 
-SURF test documents are available in the Maven Central Repository as [io.urf:surf:jar:tests](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.urf%22%20AND%20a%3A%22surf%22%20AND%20l%3A%22tests%22).
+SURF test documents are available in the Maven Central Repository as [io.urf:surf:jar:tests](https://search.maven.org/search?q=g:io.urf%20AND%20a:surf%20AND%20l:tests).
 
 ## Issues
 
-Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF/).
+Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF).
 
 ## Changelog
 
-- 0.2.0: (2017-12-15)
+- v0.2.1: (2018-12-15) Added constants and refactored tests for use with TURF. 
+- v0.2.0: (2017-12-15)
 	* [URF-49](https://globalmentor.atlassian.net/browse/JAVA-49): Move SURF test resources into consolidated SURF project as test-jar.
 	* [URF-48](https://globalmentor.atlassian.net/browse/JAVA-48): Add support for objects as map keys.
 	* [URF-47](https://globalmentor.atlassian.net/browse/JAVA-47): Use term "label" to refer to SURF construct containing tags, IDs, and aliases.
@@ -29,4 +30,4 @@ Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF/).
 	* [URF-26](https://globalmentor.atlassian.net/browse/JAVA-26): Add support for SURF IRI short forms.
 	* [URF-25](https://globalmentor.atlassian.net/browse/JAVA-25): Move SurfObject to separate model package.
 	* [JAVA-43](https://globalmentor.atlassian.net/browse/JAVA-43): Updated SURF parser methods to reflect improved parser naming conventions.
-- 0.1.0: (2017-05-15) First public release.
+- v0.1.0: (2017-05-15) First public release.
