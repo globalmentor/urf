@@ -10,7 +10,7 @@
 
 	<groupId>io.urf</groupId>
 	<artifactId>surf</artifactId>
-	<version>0.2.1</version>
+	<version>0.3.0-SNAPSHOT</version>
 
 	<name>SURF</name>
 	<description>Reference implementation of the Simple URF (SURF) document format.</description>
