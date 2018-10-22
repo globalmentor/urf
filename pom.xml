@@ -10,7 +10,7 @@
 
 	<groupId>io.urf</groupId>
 	<artifactId>surf</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.2.2</version>
 
 	<name>SURF</name>
 	<description>Reference implementation of the Simple URF (SURF) document format.</description>
@@ -85,4 +85,20 @@
 			<artifactId>hamcrest-optional</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

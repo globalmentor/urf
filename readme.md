@@ -14,6 +14,7 @@ Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/URF).
 
 ## Changelog
 
+- v0.2.2: (2018-10-22) Included test JAR in release.
 - v0.2.1: (2018-10-22) Added constants and refactored tests for use with TURF.
 - v0.2.0: (2017-12-15)
 	* [URF-49](https://globalmentor.atlassian.net/browse/JAVA-49): Move SURF test resources into consolidated SURF project as test-jar.
