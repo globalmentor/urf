@@ -89,7 +89,6 @@
 				<artifactId>surf</artifactId>
 				<version>0.2.2</version>
 				<type>test-jar</type>
-				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
