@@ -43,4 +43,10 @@ public abstract class AbstractUrfResource implements UrfResource {
 		return tag != null && tag.equals(((UrfResource)object).getTag().orElse(null));
 	}
 
+	@Override
+	public String toString() {
+		final URI tag = getTag().orElse(null);
+		return tag != null ? "|<" + tag + ">|" : super.toString();
+	}
+
 }
