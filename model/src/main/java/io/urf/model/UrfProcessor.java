@@ -18,8 +18,7 @@ package io.urf.model;
 
 import java.net.URI;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.*;
 
 /**
  * Something that processes URF statements.
@@ -34,13 +33,9 @@ public interface UrfProcessor {
 
 	/**
 	 * Creates a general, non-container resource.
-	 * <p>
-	 * A parser is not required to call this method to create a resource; it may explicitly create a resource using some other implementation which may be more
-	 * efficient.
-	 * </p>
-	 * <p>
-	 * The default implementation returns an instance of a {@link SimpleUrfResource}.
-	 * </p>
+	 * @apiNote A parser is not required to call this method to create a resource; it may explicitly create a resource using some other implementation which may
+	 *          be more efficient.
+	 * @implSpec The default implementation returns an instance of a {@link SimpleUrfResource}.
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
 	 * @return The resource instance representing that being processed.
@@ -48,20 +43,6 @@ public interface UrfProcessor {
 	 */
 	public default UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag) {
 		return new SimpleUrfResource(tag, typeTag);
-	}
-
-	//TODO document
-
-	public default UrfResource createListResource(@Nullable final URI tag, @Nullable final URI typeTag) {
-		return createResource(tag, typeTag);
-	}
-
-	public default UrfResource createMapResource(@Nullable final URI tag, @Nullable final URI typeTag) {
-		return createResource(tag, typeTag);
-	}
-
-	public default UrfResource createSetResource(@Nullable final URI tag, @Nullable final URI typeTag) {
-		return createResource(tag, typeTag);
 	}
 
 	/**

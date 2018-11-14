@@ -25,11 +25,21 @@ import java.util.*;
  * Processes URF statements by constructing a graph of simple objects. Tags and descriptions are not supported for collections and value objects.
  * @author Garret Wilson
  */
-public class SimpleGraphUrfProcessor implements UrfProcessor {
+public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
+
+	private UrfResource rootResource = null;
+
+	/**
+	 * Returns a root resource of the processed graph. If there is more than one root, it is not specified which root will resource will be returned.
+	 * @return One of the root resources, which may be empty if non resources were processed.
+	 */
+	public Optional<UrfResource> getRootResource() {
+		return Optional.ofNullable(rootResource);
+	}
 
 	/** {@inheritDoc} This implementation returns an instance of {@link UrfObject}. */
 	@Override
-	public UrfResource createResource(final URI tag, final URI typeTag) {
+	public UrfResource createDefaultResource(final URI tag, final URI typeTag) {
 		return new UrfObject(tag, typeTag);
 	}
 
@@ -83,8 +93,13 @@ public class SimpleGraphUrfProcessor implements UrfProcessor {
 			final UrfResourceDescription description = (UrfResourceDescription)subject;
 			//TODO finalize how to support properties with values
 			description.setPropertyValue(propertyTag, propertyValueObject);
-
 		}
+
+		//TODO testing approach to remember root resource
+		if(rootResource == null || rootResource == propertyValue) { //TODO fix; this won't work if the caller isn't required to re-use resources
+			rootResource = subject;
+		}
+
 	}
 
 }
