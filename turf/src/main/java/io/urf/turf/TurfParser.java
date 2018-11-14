@@ -124,7 +124,7 @@ public class TurfParser {
 	 * @param tag The global IRI identifier tag of the resource.
 	 * @return The object associated with the given tag, if any.
 	 */
-	public Optional<UrfObject> findObjectByTag(@Nonnull final URI tag) {
+	public Optional<UrfObject> findObjectByTag(@Nonnull final URI tag) { //TODO these will probably have to change to just `UrfResource` in TurfParser
 		return Optional.ofNullable((UrfObject)labeledResources.get(requireNonNull(tag)));
 	}
 
@@ -492,15 +492,15 @@ public class TurfParser {
 		} else {
 			typeHandle = null;
 		}
-		final UrfObject resource; //create a resource based upon the type of label
+		final UrfResource resource; //create a resource based upon the type of label
 		if(label instanceof URI) { //tag
-			resource = new UrfObject((URI)label, typeHandle);
+			resource = getProcessor().createResource((URI)label, Handle.toTag(typeHandle));
 			// TODO add support for IDs
 			//		} else if(label instanceof String) { //ID
 			//			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", label);
 			//			resource = new UrfObject(typeHandle, (String)label);
 		} else { //no tag or ID
-			resource = new UrfObject(typeHandle); //the type may be null
+			resource = getProcessor().createResource(null, typeHandle != null ? Handle.toTag(typeHandle) : null); //the type may be null 
 		}
 		return resource;
 	}
@@ -1161,7 +1161,7 @@ public class TurfParser {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseListResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource listResource = getProcessor().createListResource(null, LIST_TYPE_TAG); //TODO maybe allow tagged lists 
+		final UrfResource listResource = getProcessor().createResource(null, LIST_TYPE_TAG); //TODO maybe allow tagged lists 
 		if(alias != null) {
 			labeledResources.put(alias, listResource);
 		}
@@ -1188,7 +1188,7 @@ public class TurfParser {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseMapResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource mapResource = getProcessor().createMapResource(null, MAP_TYPE_TAG); //TODO maybe allow tagged maps 
+		final UrfResource mapResource = getProcessor().createResource(null, MAP_TYPE_TAG); //TODO maybe allow tagged maps 
 		if(alias != null) {
 			labeledResources.put(alias, mapResource);
 		}
@@ -1230,7 +1230,7 @@ public class TurfParser {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseSetResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource setResource = getProcessor().createSetResource(null, SET_TYPE_TAG); //TODO maybe allow tagged sets 
+		final UrfResource setResource = getProcessor().createResource(null, SET_TYPE_TAG); //TODO maybe allow tagged sets 
 		if(alias != null) {
 			labeledResources.put(alias, setResource);
 		}
