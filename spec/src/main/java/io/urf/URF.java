@@ -43,8 +43,8 @@ public class URF {
 
 	/** The delimiter that may appear in an URF name to indicate the start of the ID, if any. */
 	public static final char NAME_ID_DELIMITER = '#';
-	
-	//types
+
+	//#types
 
 	/** The tag of the <code>urf-Binary</code> type. */
 	public static final URI BINARY_TYPE_TAG = NAMESPACE.resolve("Binary");
@@ -90,6 +90,8 @@ public class URF {
 	public static final URI REAL_TYPE_TAG = NAMESPACE.resolve("Real");
 	/** The tag of the <code>urf-RegularExpression</code> type. */
 	public static final URI REGULAR_EXPRESSION_TYPE_TAG = NAMESPACE.resolve("RegularExpression");
+	/** The tag of the <code>urf-Resource</code> type. */
+	public static final URI RESOURCE_TYPE_TAG = NAMESPACE.resolve("Resource");
 	/** The tag of the <code>urf-Set</code> type. */
 	public static final URI SET_TYPE_TAG = NAMESPACE.resolve("Set");
 	/** The tag of the <code>urf-String</code> type. */
@@ -104,16 +106,30 @@ public class URF {
 	public static final URI YEAR_MONTH_TYPE_TAG = NAMESPACE.resolve("YearMonth");
 	/** The tag of the <code>urf-ZonedDateTime</code> type. */
 	public static final URI ZONED_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("ZonedDateTime");
-	
-	//instances
 
-	/** The tag of <code>urf-key</code>.*/
+	//#properties
+
+	//##intrinsic properties
+
+	/** The tag of <code>urf-type</code>. */
+	public static final URI TYPE_PROPERTY_TAG = NAMESPACE.resolve("type");
+
+	//##description
+
+	/** The tag of <code>urf-key</code>. */
 	public static final URI KEY_PROPERTY_TAG = NAMESPACE.resolve("key");
-	/** The tag of <code>urf-member</code>.*/
-	public static final URI MEMBER_PROPERTY_TAG = NAMESPACE.resolve("member");
-	/** The tag of <code>urf-value</code>.*/
+	/** The tag of <code>urf-value</code>. */
 	public static final URI VALUE_PROPERTY_TAG = NAMESPACE.resolve("value");
 
+	//##aggregation
+
+	/** The tag of <code>urf-member</code>. */
+	public static final URI MEMBER_PROPERTY_TAG = NAMESPACE.resolve("member");
+
+	//##content
+
+	/** The tag of <code>urf-content</code>. */
+	public static final URI CONTENT_PROPERTY_TAG = NAMESPACE.resolve("content");
 
 	/**
 	 * Utilities for working with URF names.
