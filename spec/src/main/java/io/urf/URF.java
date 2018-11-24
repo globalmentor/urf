@@ -19,14 +19,17 @@ package io.urf;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.java.Characters;
 import com.globalmentor.net.URIs;
 
 /**
@@ -40,9 +43,6 @@ public class URF {
 
 	/** The URF ontology namespace. */
 	public static final URI NAMESPACE = URI.create("https://urf.name/urf/");
-
-	/** The delimiter that may appear in an URF name to indicate the start of the ID, if any. */
-	public static final char NAME_ID_DELIMITER = '#';
 
 	//#types
 
@@ -137,8 +137,14 @@ public class URF {
 	 */
 	public static final class Name {
 
-		/** Regular expression pattern to match an URF name token . */
+		/** Regular expression pattern to match an URF name token. */
 		public static final Pattern TOKEN_PATTERN = Pattern.compile("\\p{L}[\\p{L}\\p{M}\\p{N}\\p{Pc}]*"); //TODO add test
+
+		/** Regular expression pattern to match an URF name ID token. */
+		public static final Pattern ID_TOKEN_PATTERN = Pattern.compile("[\\p{L}\\p{M}\\p{N}\\p{Pc}]+"); //TODO add test
+
+		/** The delimiter that may appear in an URF name to indicate the start of the ID, if any. */
+		public static final char ID_DELIMITER = '#';
 
 		/**
 		 * Determines whether the given string conforms to the rules for an URF name token.
@@ -192,7 +198,7 @@ public class URF {
 		}
 
 		/** Regular expression pattern to match an URF name . */
-		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(.*))?", TOKEN_PATTERN, NAME_ID_DELIMITER)); //TODO add test; document matching groups
+		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(.*))?", TOKEN_PATTERN, ID_DELIMITER)); //TODO add test; document matching groups
 
 		/**
 		 * Determines whether the given string conforms to the rules for an URF name.
@@ -225,7 +231,7 @@ public class URF {
 		 * @return A name with the given type name and ID.
 		 */
 		public static String forTypeId(@Nonnull String typeName, @Nonnull String id) {
-			return new StringBuilder(requireNonNull(typeName)).append(NAME_ID_DELIMITER).append(encode(requireNonNull(id))).toString(); //TODO check encoding
+			return new StringBuilder(requireNonNull(typeName)).append(ID_DELIMITER).append(encode(requireNonNull(id))).toString(); //TODO check encoding
 		}
 
 	}
@@ -287,7 +293,7 @@ public class URF {
 				String name = decode(URIs.getName(rawPath));
 				final String rawFragment = tag.getRawFragment();
 				if(rawFragment != null) { //see if there is an ID to append
-					name = name + NAME_ID_DELIMITER + decode(rawFragment);
+					name = name + Name.ID_DELIMITER + decode(rawFragment);
 				}
 				if(Name.isValid(name)) { //make sure the supposed name is valid
 					return Optional.of(name);
@@ -343,7 +349,7 @@ public class URF {
 		 */
 		public static URI forTypeId(@Nonnull final URI typeTag, @Nonnull String id) {
 			//TODO ensure that the type tag has no fragment
-			return URI.create(new StringBuilder(typeTag.toString()).append(NAME_ID_DELIMITER).append(encode(requireNonNull(id))).toString());
+			return URI.create(new StringBuilder(typeTag.toString()).append(FRAGMENT_SEPARATOR).append(encode(requireNonNull(id))).toString());
 		}
 
 	}
@@ -354,11 +360,49 @@ public class URF {
 	 */
 	public static final class Handle {
 
+		/** The delimiter used to separate a namespace alias prefix from the rest of a TURF handle. */
+		public static final char NAMESPACE_ALIAS_DELIMITER = '/';
+
 		/** The delimiter used to separate ad-hoc namespaces in a TURF handle. */
 		public static final char SEGMENT_DELIMITER = '-';
 
-		/** Regular expression pattern to match a SURF handle. */
-		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))*", Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN)); //TODO add test; add support for namespace prefixes; document matching groups
+		/** All the possible delimiters used by a TURF handle. */
+		public static final Characters DELIMITERS = Characters.of(NAMESPACE_ALIAS_DELIMITER, SEGMENT_DELIMITER, Name.ID_DELIMITER);
+
+		/**
+		 * Regular expression pattern to match an URF handle.
+		 * <p>
+		 * Matching groups:
+		 * </p>
+		 * <dl>
+		 * <dt>1</dt>
+		 * <dd>namespace alias (optional)</dd>
+		 * <dt>2</dt>
+		 * <dd>segments</dd>
+		 * <dt>3</dt>
+		 * <dd>ID (optional)</dd>
+		 * </dl>
+		 */
+		public static final Pattern PATTERN = Pattern.compile(String.format("(?:(%s)%s)?(%s(?:%s%s)*)(?:%s(%s))?", Name.TOKEN_PATTERN, NAMESPACE_ALIAS_DELIMITER,
+				Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN, Name.ID_DELIMITER, Name.ID_TOKEN_PATTERN));
+
+		/**
+		 * The pattern matching group for the optional namespace alias.
+		 * @see #PATTERN
+		 */
+		public final static int PATTERN_NAMESPACE_ALIAS_GROUP = 1;
+
+		/**
+		 * The pattern matching group for the handle segments.
+		 * @see #PATTERN
+		 */
+		public final static int PATTERN_SEGEMENTS_GROUP = 2;
+
+		/**
+		 * The pattern matching group for the optional ID.
+		 * @see #PATTERN
+		 */
+		public final static int PATTERN_ID_GROUP = 3;
 
 		/**
 		 * Determines if the given character is valid to begin an URF handle. An URF handle begins with a name token.
@@ -392,6 +436,20 @@ public class URF {
 		public static String checkArgumentValid(final String string) {
 			checkArgument(isValid(string), "Invalid URF handle \"%s\".", string);
 			return string;
+		}
+
+		/**
+		 * Confirms that the given string conforms to the rules for an URF handle, returning a matcher
+		 * @param string The string to check.
+		 * @return A matcher that has successfully matched the given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for an URF handle.
+		 * @see #PATTERN
+		 */
+		public static Matcher checkArgumentMatchesValid(final String string) {
+			final Matcher matcher = PATTERN.matcher(requireNonNull(string));
+			checkArgument(matcher.matches(), "Invalid URF handle \"%s\".", string);
+			return matcher;
 		}
 
 		//TODO decide whether encoding/decoding is needed, as IRIs are used
@@ -445,18 +503,33 @@ public class URF {
 
 		/**
 		 * Produces the tag that a handle represents.
-		 * <p>
-		 * This implementation does not yet support formal namespaces.
-		 * </p>
+		 * @apiNote This method does not support formal namespaces.
 		 * @param handle The handle for which a tag should be determined.
 		 * @return The tag that the given handle represents.
 		 * @throws NullPointerException if the given handle is <code>null</code>.
 		 * @throws IllegalArgumentException if the given string is not a valid handle.
+		 * @see #PATTERN
 		 */
-		public static URI toTag(@Nonnull final String handle) { //TODO add support for IDs
-			checkArgumentValid(handle);
-			//TODO add support for namespace prefixes
-			final String[] handleSegments = handle.split(String.valueOf(SEGMENT_DELIMITER));
+		public static URI toTag(@Nonnull final String handle) {
+			return toTag(handle, emptyMap());
+		}
+
+		/**
+		 * Produces the tag that a handle represents.
+		 * @param handle The handle for which a tag should be determined.
+		 * @param namespaces The registered namespaces, associated with their aliases.
+		 * @return The tag that the given handle represents.
+		 * @throws NullPointerException if the given handle and/or namespaces map is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string is not a valid handle.
+		 * @throws IllegalArgumentException if the given handle refers to an unregistered namespace alias.
+		 * @see #PATTERN
+		 */
+		public static URI toTag(@Nonnull final String handle, @Nonnull final Map<String, URI> namespaces) {
+			final Matcher matcher = checkArgumentMatchesValid(handle);
+			final String namespaceAlias = matcher.group(PATTERN_NAMESPACE_ALIAS_GROUP);
+			final URI namespace = namespaceAlias == null ? AD_HOC_NAMESPACE : namespaces.get(namespaceAlias);
+			checkArgument(namespace != null, "Unregistered namespace alias %s in handle %s.", namespaceAlias, handle);
+			final String[] handleSegments = matcher.group(PATTERN_SEGEMENTS_GROUP).split(String.valueOf(SEGMENT_DELIMITER));
 			assert handleSegments.length > 0; //a valid handle always has at least one segment
 			final StringBuilder adHocRelativePathBuilder = new StringBuilder();
 			for(final String handleSegment : handleSegments) {
@@ -466,7 +539,11 @@ public class URF {
 				//TODO determine whether to encode for IRI
 				adHocRelativePathBuilder.append(handleSegment); //token
 			}
-			return AD_HOC_NAMESPACE.resolve(adHocRelativePathBuilder.toString());
+			final String id = matcher.group(PATTERN_ID_GROUP); //TODO determine whether/how the ID should be encoded
+			if(id != null) {
+				adHocRelativePathBuilder.append(FRAGMENT_SEPARATOR).append(id);
+			}
+			return namespace.resolve(adHocRelativePathBuilder.toString());
 		}
 
 	}

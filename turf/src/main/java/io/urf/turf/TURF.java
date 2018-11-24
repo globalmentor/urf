@@ -40,6 +40,12 @@ public class TURF {
 	/** The default TURF charset. */
 	public static final Charset DEFAULT_CHARSET = UTF_8;
 
+	/** The delimiter signaling a parser directive. */
+	public static final char DIRECTIVE_DELIMITER = '\\';
+
+	/** The signature for a TURF file with a header. */
+	public static final String SIGNATURE = "\\URF\\";
+
 	/** Characters recognized as whitespace. */
 	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
 			SPACE_CHAR, NO_BREAK_SPACE_CHAR, ZERO_WIDTH_NO_BREAK_SPACE_CHAR);
@@ -55,6 +61,11 @@ public class TURF {
 
 	/** The delimiter that begins and ends labels (tags, IDs, and aliases). */
 	public static final char LABEL_DELIMITER = '|';
+
+	//directives
+
+	/** The directive property handle for namespace alias definitions. */
+	public static final String DIRECTIVE_NAMESPACES_HANDLE = "namespaces";
 
 	//objects
 

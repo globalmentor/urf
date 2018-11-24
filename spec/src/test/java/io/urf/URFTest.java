@@ -17,10 +17,11 @@
 package io.urf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
+import java.util.*;
 
 import org.junit.*;
 
@@ -32,6 +33,8 @@ import org.junit.*;
 public class URFTest {
 
 	//TODO add name tests
+
+	//#URF.Tag
 
 	/** @see URF.Tag#getNamespace(URI) */
 	@Test
@@ -84,6 +87,35 @@ public class URFTest {
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo/123/Example")), isEmpty());
 	}
 
+	//#URF.Handle
+
+	/** @see URF.Handle#PATTERN */
+	@Test
+	public void testHandlePattern() {
+		//TODO test the groups
+		assertThat(URF.Handle.PATTERN.matcher("Example").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("Example#foo").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("Example#123").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("Bad Example").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("Bad Example#foo").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("Bad Example#123").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("foo").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("foo-bar").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("foo-bar-Example").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("foo-bar-Example#test123").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/Example").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/Example#foo").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/Example#123").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/Bad Example").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("test/Bad Example#foo").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("test/Bad Example#123").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("test/foo").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/foo-bar").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/foo-bar-Example").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/foo-bar-Example#foo").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("test/foo-bar-Example#123").matches(), is(true));
+	}
+
 	/** @see URF.Handle#fromTag(URI) */
 	@Test
 	public void testHandleFromTag() {
@@ -102,13 +134,24 @@ public class URFTest {
 	/** @see URF.Handle#toTag(String) */
 	@Test
 	public void testHandleToTag() {
+		final Map<String, URI> namespaces = new HashMap<>();
+		namespaces.put("fake", URI.create("https://example.com/fake/"));
 		assertThat(URF.Handle.toTag("Example"), is(URI.create("https://urf.name/Example")));
-		//TODO fix assertThat(URF.Handle.toTag("Example#foo"), is(URI.create("https://urf.name/Example#foo")));
-		//TODO fix assertThat(URF.Handle.toTag("Example#123"), is(URI.create("https://urf.name/Example#123")));
+		assertThat(URF.Handle.toTag("Example#foo"), is(URI.create("https://urf.name/Example#foo")));
+		assertThat(URF.Handle.toTag("Example#123"), is(URI.create("https://urf.name/Example#123")));
 		assertThat(URF.Handle.toTag("test"), is(URI.create("https://urf.name/test")));
 		assertThat(URF.Handle.toTag("foo-bar"), is(URI.create("https://urf.name/foo/bar")));
 		assertThat(URF.Handle.toTag("foo-bar-Example"), is(URI.create("https://urf.name/foo/bar/Example")));
-		//TODO fix assertThat(URF.Handle.toTag("foo-bar-Example#test123"), is(URI.create("https://urf.name/foo/bar/Example#test123")));
+		assertThat(URF.Handle.toTag("foo-bar-Example#foo"), is(URI.create("https://urf.name/foo/bar/Example#foo")));
+		assertThat(URF.Handle.toTag("foo-bar-Example#123"), is(URI.create("https://urf.name/foo/bar/Example#123")));
+		assertThat(URF.Handle.toTag("fake/Example", namespaces), is(URI.create("https://example.com/fake/Example")));
+		assertThat(URF.Handle.toTag("fake/Example#foo", namespaces), is(URI.create("https://example.com/fake/Example#foo")));
+		assertThat(URF.Handle.toTag("fake/Example#123", namespaces), is(URI.create("https://example.com/fake/Example#123")));
+		assertThat(URF.Handle.toTag("fake/test", namespaces), is(URI.create("https://example.com/fake/test")));
+		assertThat(URF.Handle.toTag("fake/foo-bar", namespaces), is(URI.create("https://example.com/fake/foo/bar")));
+		assertThat(URF.Handle.toTag("fake/foo-bar-Example", namespaces), is(URI.create("https://example.com/fake/foo/bar/Example")));
+		assertThat(URF.Handle.toTag("fake/foo-bar-Example#foo", namespaces), is(URI.create("https://example.com/fake/foo/bar/Example#foo")));
+		assertThat(URF.Handle.toTag("fake/foo-bar-Example#123", namespaces), is(URI.create("https://example.com/fake/foo/bar/Example#123")));
 	}
 
 }
