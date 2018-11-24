@@ -751,7 +751,7 @@ public class TurfSerializer {
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
-	public void serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException {
+	public void serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
 		ifPresentOrElse​(URF.Handle.fromTag(tag), throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 	}
 

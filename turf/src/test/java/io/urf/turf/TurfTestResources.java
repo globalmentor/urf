@@ -16,6 +16,10 @@
 
 package io.urf.turf;
 
+import static com.globalmentor.collections.Sets.*;
+
+import java.util.Set;
+
 /**
  * Defines available TURF test resources.
  * @author Garret Wilson
@@ -23,6 +27,10 @@ package io.urf.turf;
 public class TurfTestResources {
 
 	//#namespaces
-	public static final String OK_NAMESPACES = "ok-namespaces.turf";
+	public static final String OK_NAMESPACES_RESOURCE_NAME = "ok-namespaces.turf";
+	public static final String OK_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-namespaces-aliases.turf";
+
+	/** Names of TURF document resources semantically equivalent to {@value #OK_NAMESPACES_RESOURCE_NAME}. */
+	public static Set<String> OK_NAMESPACES_RESOURCE_NAMES = immutableSetOf(OK_NAMESPACES_RESOURCE_NAME, OK_NAMESPACES_ALIASES_RESOURCE_NAME);
 
 }

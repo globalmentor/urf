@@ -62,20 +62,25 @@ public class TurfParserTest {
 				.map(object -> object instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object);
 	}
 
+	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
 	@Test
 	public void testOkNamespaces() throws IOException {
-		final Optional<Object> object = parseTestResource(OK_NAMESPACES);
-		final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(AssertionError::new);
-		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://example.com/foo.bar")));
-		assertThat(urfObject.getPropertyValue(URF.AD_HOC_NAMESPACE.resolve("foo")), isPresentAndIs("bar"));
-		assertThat(urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/title")), isPresentAndIs("An Example Resource"));
-		assertThat(urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/creator")), isPresentAndIs("Jane Doe"));
-		assertThat(urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/date")), isPresentAndIs(Year.of(2018)));
-		final UrfObject maker = urfObject.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/maker")).map(UrfObject.class::cast)
-				.orElseThrow(AssertionError::new);
-		assertThat(maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/firstName")), isPresentAndIs("Jane"));
-		assertThat(maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/lastName")), isPresentAndIs("Doe"));
-		assertThat(maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")), isPresentAndIs(URI.create("https://janedoe.example.com/")));
+		for(final String okNamespacesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
+			final Optional<Object> object = parseTestResource(okNamespacesResourceName);
+			final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(AssertionError::new);
+			assertThat(okNamespacesResourceName, urfObject.getTag(), isPresentAndIs(URI.create("https://example.com/foo.bar")));
+			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URF.AD_HOC_NAMESPACE.resolve("foo")), isPresentAndIs("bar"));
+			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/title")),
+					isPresentAndIs("An Example Resource"));
+			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/creator")), isPresentAndIs("Jane Doe"));
+			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/date")), isPresentAndIs(Year.of(2018)));
+			final UrfObject maker = urfObject.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/maker")).map(UrfObject.class::cast)
+					.orElseThrow(AssertionError::new);
+			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/firstName")), isPresentAndIs("Jane"));
+			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/lastName")), isPresentAndIs("Doe"));
+			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")),
+					isPresentAndIs(URI.create("https://janedoe.example.com/")));
+		}
 	}
 
 }
