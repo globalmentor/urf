@@ -41,13 +41,13 @@ public class TurfParserTest {
 
 	/**
 	 * Loads and parses an object graph by parsing the indicated TURF document resource.
-	 * @implSpec The default implementation defaults to {@link #parseTestResource(InputStream)}.
+	 * @implSpec The default implementation defaults to {@link #parse(InputStream)}.
 	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
 	 * @return The optional resource instance parsed from the named TURF document resource.
 	 */
 	protected Optional<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
 		try (final InputStream inputStream = TurfTestResources.class.getResourceAsStream(testResourceName)) {
-			return parseTestResource(inputStream);
+			return parse(inputStream);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class TurfParserTest {
 	 * @param inputStream The input stream containing the TURF document for testing.
 	 * @return The optional resource instance parsed from the given TURF document input stream.
 	 */
-	protected Optional<Object> parseTestResource(@Nonnull final InputStream inputStream) throws IOException {
+	protected Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
 		return new TurfParser(new SimpleGraphUrfProcessor()).parse(inputStream)
 				//map any object wrappers to their wrapped objects TODO make sure the wrappers have no description
 				.map(object -> object instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object);
@@ -76,6 +76,7 @@ public class TurfParserTest {
 			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URI.create("http://purl.org/dc/elements/1.1/date")), isPresentAndIs(Year.of(2018)));
 			final UrfObject maker = urfObject.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/maker")).map(UrfObject.class::cast)
 					.orElseThrow(AssertionError::new);
+			assertThat(okNamespacesResourceName, maker.getTypeTag(), isPresentAndIs(URI.create("http://xmlns.com/foaf/0.1/Person")));
 			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/firstName")), isPresentAndIs("Jane"));
 			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/lastName")), isPresentAndIs("Doe"));
 			assertThat(okNamespacesResourceName, maker.getPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")),

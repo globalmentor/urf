@@ -459,15 +459,27 @@ public class URF {
 		 * <p>
 		 * Not every tag has a handle. A tag with no namespace or no name has no handle.
 		 * </p>
-		 * <p>
-		 * This implementation does not yet support formal namespaces.
-		 * </p>
 		 * @param tag The tag for which a handle should be determined.
 		 * @return The TURF handle representing the given tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
 		public static Optional<String> fromTag(@Nonnull final URI tag) {
+			return fromTag(tag, emptyMap());
+		}
+
+		/**
+		 * Determines the TURF handle to represent the given resource tag.
+		 * <p>
+		 * Not every tag has a handle. A tag with no namespace or no name, or for which no namespace alias is registered, has no handle.
+		 * </p>
+		 * @param tag The tag for which a handle should be determined.
+		 * @param namespaceAliases The registered namespace aliases, associated with their namespaces.
+		 * @return The TURF handle representing the given tag.
+		 * @throws NullPointerException if the given tag and/or namespace alias is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 */
+		public static Optional<String> fromTag(@Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases) {
 			Tag.checkArgumentValid(tag);
 			final Optional<String> optionalName = Tag.getName(tag);
 			//if there is a name, convert it to a handle based on the namespace
@@ -476,7 +488,11 @@ public class URF {
 				return Tag.getNamespace(tag).flatMap(namespace -> {
 					final URI adHocNamespaceRelativeURI = AD_HOC_NAMESPACE.relativize(namespace);
 					if(adHocNamespaceRelativeURI.equals(namespace)) { //if the namespace is not relative to the ad-hoc namespace
-						return Optional.empty(); //there is no handle TODO add support for namespace prefixes
+						final String alias = namespaceAliases.get(namespace);
+						if(alias == null) {
+							return Optional.empty(); //there is no handle
+						}
+						return Optional.of(alias + NAMESPACE_ALIAS_DELIMITER + name);
 					}
 					assert !adHocNamespaceRelativeURI.isAbsolute();
 					assert !URIs.hasAbsolutePath(adHocNamespaceRelativeURI);
@@ -531,6 +547,7 @@ public class URF {
 			checkArgument(namespace != null, "Unregistered namespace alias %s in handle %s.", namespaceAlias, handle);
 			final String[] handleSegments = matcher.group(PATTERN_SEGEMENTS_GROUP).split(String.valueOf(SEGMENT_DELIMITER));
 			assert handleSegments.length > 0; //a valid handle always has at least one segment
+			checkArgument(handleSegments.length == 1 || namespaceAlias == null, "Handles with multiple segments %s only allowed in the ad-hoc namespace.", handle);
 			final StringBuilder adHocRelativePathBuilder = new StringBuilder();
 			for(final String handleSegment : handleSegments) {
 				if(adHocRelativePathBuilder.length() > 0) {
