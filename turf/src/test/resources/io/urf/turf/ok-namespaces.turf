@@ -1,0 +1,12 @@
+|<https://example.com/foo.bar>|*:
+  foo = "bar"
+  |<http://purl.org/dc/elements/1.1/title>| = "An Example Resource"
+  |<http://purl.org/dc/elements/1.1/creator>| = "Jane Doe"
+    |<http://xmlns.com/foaf/0.1/maker>| = *|<http://xmlns.com/foaf/0.1/Person>|:
+      |<http://xmlns.com/foaf/0.1/firstName>| = "Jane",
+      |<http://xmlns.com/foaf/0.1/lastName>| = "Doe",
+    |<http://xmlns.com/foaf/0.1/homepage>| = <https://janedoe.example.com/>
+  ;
+  !TODO bring back: |<http://purl.org/dc/elements/1.1/language>|  =  ~en-US
+  |<http://purl.org/dc/elements/1.1/date>| = @2018
+;

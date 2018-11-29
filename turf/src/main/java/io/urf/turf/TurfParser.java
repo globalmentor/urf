@@ -25,6 +25,7 @@ import static io.urf.URF.Name;
 import static io.urf.URF.Tag;
 import static io.urf.turf.TURF.*;
 import static io.urf.turf.TURF.WHITESPACE_CHARACTERS;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.io.*;
@@ -102,8 +103,6 @@ public class TurfParser {
 	 * <dl>
 	 * <dt>tag</dt>
 	 * <dd>A {@link URI} containing the tag IRI.</dd>
-	 * <dt>ID</dt>
-	 * <dd>A {@link Map.Entry} containing the type handle as {@link Map.Entry#getKey()} and the ID as {@link Map.Entry#getValue()}.</dd>
 	 * <dt>alias</dt>
 	 * <dd>An {@link Alias} containing the alias string.</dd>
 	 * </dl>
@@ -125,31 +124,26 @@ public class TurfParser {
 	 * @return The object associated with the given tag, if any.
 	 */
 	public Optional<UrfObject> findObjectByTag(@Nonnull final URI tag) { //TODO these will probably have to change to just `UrfResource` in TurfParser
-		return Optional.ofNullable((UrfObject)labeledResources.get(requireNonNull(tag)));
+		return Optional.ofNullable(getObjectByTag(tag));
 	}
 
 	/**
-	 * Returns a parsed object by its type handle and ID.
-	 * @param typeHandle The handle of the object's type.
-	 * @param id The object ID for the indicated type.
-	 * @return The typed object with the given ID, if any.
+	 * Returns a parsed object by its tag.
+	 * @param tag The global IRI identifier tag of the resource.
+	 * @return The object associated with the given tag, or <code>null</code> if the tagged object has not yet been parsed.
 	 */
-	public Optional<UrfObject> findObjectById(@Nonnull final String typeHandle, @Nonnull final String id) {
-		return Optional.ofNullable(getObjectById(typeHandle, id));
+	protected UrfObject getObjectByTag(@Nonnull final URI tag) { //TODO these will probably have to change to just `UrfResource` in TurfParser
+		return (UrfObject)labeledResources.get(requireNonNull(tag));
 	}
 
-	/**
-	 * Returns a parsed object by its type handle and ID.
-	 * @param typeHandle The handle of the object's type.
-	 * @param id The object ID for the indicated type.
-	 * @return The object with the given ID, or <code>null</code> if no such object was found.
-	 */
-	protected UrfObject getObjectById(@Nonnull final String typeHandle, @Nonnull final String id) {
-		//TODO switch to Java 9 Map.entry()
-		return (UrfObject)labeledResources.get(new AbstractMap.SimpleImmutableEntry<String, String>(requireNonNull(typeHandle), requireNonNull(id)));
+	private Map<String, URI> namepaces = emptyMap();
+
+	/** @return The known namespace mappings, keyed to aliases */
+	protected Map<String, URI> getNamespaces() {
+		return namepaces;
 	}
 
-	private final UrfProcessor processor;
+	private UrfProcessor processor;
 
 	/** @return The strategy for processing the parsed URF graph. */
 	protected UrfProcessor getProcessor() {
@@ -200,9 +194,60 @@ public class TurfParser {
 	 */
 	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		Object resource = null;
-		while(skipLineBreaks(reader) >= 0) { //skip whitespace, comments, and line breaks until we reach the end of the stream
-			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
+		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
+		boolean nextItemProhibited = false;
+		int c;
+		if((c = skipLineBreaks(reader)) >= 0) {
+			if(c == DIRECTIVE_DELIMITER) {
+				//TODO consider allowing line breaks inside "\ URF \"
+				check(reader, SIGNATURE); //\URF\
+				c = skipFiller(reader);
+				if(c == DESCRIPTION_BEGIN) { //\URF\:;
+					//TODO improve; replacing the current processor is a kludge, and raises risks of aliasing something from the directives, etc.
+					final UrfObject directives = new UrfObject();
+					final UrfProcessor oldProcessor = processor;
+					processor = new SimpleGraphUrfProcessor();
+					try {
+						parseDescription(reader, directives);
+					} finally {
+						processor = oldProcessor;
+					}
+					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
+					if(namespaces != null) {
+						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
+						@SuppressWarnings("unchecked")
+						final Map<String, URI> namespacesByAlias = (Map<String, URI>)namespaces;
+						this.namepaces = namespacesByAlias;
+					}
+				}
+				final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
+				if(requireItem.isPresent()) {
+					nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
+					nextItemProhibited = false;
+				} else {
+					nextItemRequired = false;
+					nextItemProhibited = true;
+				}
+				c = peek(reader);
+			}
+		}
+		//parse resources
+		while(c >= 0 || nextItemRequired) {
+			if(c >= 0 && nextItemProhibited) {
+				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
+			}
 			resource = parseResource(reader);
+			//TODO add resource as root resource in processor
+			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
+			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
+			if(requireItem.isPresent()) {
+				nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
+				nextItemProhibited = false;
+			} else {
+				nextItemRequired = false;
+				nextItemProhibited = true;
+			}
+			c = peek(reader);
 		}
 		return Optional.ofNullable(resource);
 	}
@@ -283,6 +328,36 @@ public class TurfParser {
 	}
 
 	/**
+	 * Parses a name ID token composed of name token characters. The current position must be that of the first name token character. The new position will be
+	 * that immediately after the last name token character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return The name token parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if there are are no name characters.
+	 * @see URF.Name#isTokenCharacter(int)
+	 */
+	protected static String parseNameIdToken(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final StringBuilder stringBuilder = new StringBuilder(); //create a string builder for reading the name segment
+		int c = reader.read(); //read the first name ID character
+		if(!Name.isTokenCharacter(c)) { //if the name doesn't start with a name token character
+			checkReaderNotEnd(reader, c); //make sure we're not at the end of the reader
+			throw new ParseIOException(reader, String.format("Expected name token character; found %s.", Characters.getLabel(c)));
+		}
+		do {
+			stringBuilder.append((char)c); //append the character
+			reader.mark(1); //mark our current position
+			c = reader.read(); //read another character
+		} while(Name.isTokenCharacter(c)); //keep reading and appending until we reach a non-name token character
+		if(c >= 0) { //if we didn't reach the end of the stream
+			reader.reset(); //reset to the last mark, which was set right before the non-name character we found
+		}
+		final String nameToken = stringBuilder.toString();
+		checkParseIO(reader, Name.isValidToken(nameToken), "Invalid name ID token %s.", nameToken);
+		return nameToken;
+	}
+
+	/**
 	 * Parses a handle composed of a name token followed by zero or more name tokens, separated by handle segment delimiters. The current position must be that of
 	 * the first handle character. The new position will be that immediately after the last handle character.
 	 * @param reader The reader the contents of which to be parsed.
@@ -294,13 +369,43 @@ public class TurfParser {
 	public static String parseHandle(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(parseNameToken(reader)); //there should always be one name token
+		if(confirm(reader, Handle.NAMESPACE_ALIAS_DELIMITER)) { //if this was a namespace delimiter
+			stringBuilder.append(Handle.NAMESPACE_ALIAS_DELIMITER); ///
+			stringBuilder.append(parseNameToken(reader)); //there will always be one name token after the namespace delimiter
+		}
 		while(confirm(reader, Handle.SEGMENT_DELIMITER)) { //read another handle segments if present
 			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
-			stringBuilder.append(parseNameToken(reader)); //nameToken
+			stringBuilder.append(parseNameToken(reader)); //name token
+		}
+		if(confirm(reader, Name.ID_DELIMITER)) { //see if there is an ID
+			stringBuilder.append(Name.ID_DELIMITER); //#
+			stringBuilder.append(parseNameIdToken(reader)); //name ID Token
 		}
 		final String handle = stringBuilder.toString();
 		checkParseIO(reader, Handle.isValid(handle), "Invalid handle %s.", handle);
 		return handle;
+	}
+
+	/**
+	 * Parses a reference to a resource. A reference is either a handle or a tag label. The current position must be that of the first reference character. The
+	 * new position will be that immediately after the last reference character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return The tag representing the resource reference parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if there are are no reference characters; or if a non-tag label was encountered.
+	 * @see #parseHandle(Reader)
+	 * @see #parseLabel(Reader)
+	 */
+	public URI parseTagReference(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		if(peek(reader) == LABEL_DELIMITER) {
+			final Object label = parseLabel(reader);
+			checkParseIO(reader, label instanceof URI, "Non-tag label %s encountered as reference.", label);
+			return (URI)label;
+		} else {
+			final String handle = parseHandle(reader);
+			return Handle.toTag(handle, getNamespaces());
+		}
 	}
 
 	/**
@@ -478,29 +583,33 @@ public class TurfParser {
 		check(reader, OBJECT_BEGIN); //*
 		int c = skipFiller(reader);
 		//type (optional)
-		final String typeHandle;
-		if(c >= 0 && Handle.isBeginCharacter((char)c)) {
-			typeHandle = parseHandle(reader);
+		final URI typeTag;
+		if(c >= 0 && (c == LABEL_DELIMITER || Handle.isBeginCharacter((char)c))) {
+			typeTag = parseTagReference(reader);
 			//if a type#id was already defined return it
+			//TODO check for actual IDs in handle; somewhere, perhaps in caller
 			if(label instanceof String) {
-				final UrfObject objectById = getObjectById(typeHandle, (String)label);
+				//TODO add to specification
+				//TODO add bad TURF document to tests
+				checkParseIO(reader, typeTag.getRawFragment() == null, "Type tag %s with fragment may not be used with additional ID %s.", typeTag, label);
+				final UrfObject objectById = getObjectByTag(Tag.forTypeId(typeTag, (String)label));
 				if(objectById != null) {
 					return objectById;
 				}
 			}
 			c = skipFiller(reader);
 		} else {
-			typeHandle = null;
+			typeTag = null;
 		}
 		final UrfResource resource; //create a resource based upon the type of label
 		if(label instanceof URI) { //tag
-			resource = getProcessor().createResource((URI)label, Handle.toTag(typeHandle));
+			resource = getProcessor().createResource((URI)label, typeTag);
 			// TODO add support for IDs
 			//		} else if(label instanceof String) { //ID
 			//			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", label);
 			//			resource = new UrfObject(typeHandle, (String)label);
 		} else { //no tag or ID
-			resource = getProcessor().createResource(null, typeHandle != null ? Handle.toTag(typeHandle) : null); //the type may be null 
+			resource = getProcessor().createResource(null, typeTag); //the type may be null 
 		}
 		return resource;
 	}
@@ -516,8 +625,8 @@ public class TurfParser {
 		requireNonNull(subject);
 		check(reader, DESCRIPTION_BEGIN); //:
 		parseSequence(reader, DESCRIPTION_END, r -> {
-			final String propertyHandle = parseHandle(reader);
-			final UrfResource property = getProcessor().createResource(URF.Handle.toTag(propertyHandle), null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
+			final URI propertyTag = parseTagReference(reader);
+			final UrfResource property = getProcessor().createResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			skipLineBreaks(reader);
 			check(reader, PROPERTY_VALUE_DELIMITER); //=
 			skipLineBreaks(reader);
