@@ -1,0 +1,17 @@
+*:
+	empty = ""
+	foo = "bar"
+	quote = "\""
+	backslash = "\\"
+	solidus = "\/"
+	backspace = "\b"
+	ff = "\f"
+	lf = "\n"
+	cr = "\r"
+	tab = "\t"
+	vtab = "\v"
+	devanagari-ma = "म" !character outside ISO-8859-1
+	devanagari-maEscaped = "\u092e" !code point U+092E; tests lowercase hex
+	tearsOfJoy = "😂" !character outside BMP
+	tearsOfJoyEscaped = "\uD83D\uDE02" !code point U+1F602 outside BMP; also tests uppercase hex
+;

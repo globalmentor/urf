@@ -1,0 +1,14 @@
+{
+	"foo": "bar"
+	123: "number"
+	false: "Boolean"
+	\true\: "Boolean"
+	[1, 2, 3]: $1.23
+	"map": {
+		"ping": ['p', 'o', 'n', 'g']
+	}
+	("foo", false): true
+	|"pingpong"|*Game: "ping pong"
+	\*Point:x=0,y=0;\: "Bull's Eye"
+	{"ITTF": "International Table Tennis Federation"}: "abbr"
+}
