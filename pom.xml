@@ -49,6 +49,7 @@
 	<modules>
 		<module>model</module>
 		<module>spec</module>
+		<module>surf</module>
 		<module>turf</module>
 	</modules>
 
@@ -64,6 +65,12 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-itu</artifactId>
 				<version>0.5.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr</artifactId>
+				<version>0.7.0</version>
 			</dependency>
 
 			<dependency>
