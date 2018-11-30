@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.net.URI;
 import java.time.Year;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
 
@@ -61,7 +61,8 @@ public class TurfSerializerTest {
 	 * @return The optional resource instance parsed from the given TURF document input stream.
 	 */
 	protected Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
-		return new TurfParser(new SimpleGraphUrfProcessor()).parseDocument(inputStream).map(ObjectUrfResource::unwrap);
+		//TODO improve for multiple roots; update comments
+		return new TurfParser<Set<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findAny().map(ObjectUrfResource::unwrap);
 	}
 
 	/**

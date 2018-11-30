@@ -17,7 +17,7 @@
 package io.urf.turf;
 
 import java.io.*;
-import java.util.Optional;
+import java.util.*;
 
 import io.urf.URF;
 import io.urf.model.*;
@@ -32,7 +32,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 
 	@Override
 	protected Optional<Object> parseTestResource(InputStream inputStream) throws IOException {
-		return new TurfParser(new SimpleGraphUrfProcessor()).parseDocument(inputStream).map(ObjectUrfResource::unwrap);
+		return new TurfParser<Set<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findAny().map(ObjectUrfResource::unwrap);
 	}
 
 	@Override

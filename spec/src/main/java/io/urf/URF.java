@@ -23,8 +23,7 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.*;
 
 import javax.annotation.*;

@@ -64,9 +64,11 @@ import io.urf.model.*;
  * <p>
  * This implementation is not thread safe.
  * </p>
+ * @param <R> The type of result returned by the parser, based upon the {@link UrfProcessor} used.
  * @author Garret Wilson
+ * @see UrfProcessor
  */
-public class TurfParser {
+public class TurfParser<R> {
 
 	/**
 	 * Represents an alias label parsed in a SURF document.
@@ -143,10 +145,10 @@ public class TurfParser {
 		return namepaces;
 	}
 
-	private UrfProcessor processor;
+	private final UrfProcessor<R> processor;
 
 	/** @return The strategy for processing the parsed URF graph. */
-	protected UrfProcessor getProcessor() {
+	protected UrfProcessor<R> getProcessor() {
 		return processor;
 	}
 
@@ -154,7 +156,7 @@ public class TurfParser {
 	 * Constructor.
 	 * @param processor The strategy for processing the parsed URF graph.
 	 */
-	public TurfParser(@Nonnull final UrfProcessor processor) {
+	public TurfParser(@Nonnull final UrfProcessor<R> processor) {
 		this.processor = requireNonNull(processor);
 	}
 
@@ -165,11 +167,11 @@ public class TurfParser {
 	 * </p>
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param string The string containing SURF data.
-	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
 		try (final Reader stringReader = new StringReader(string)) {
 			return parseDocument(stringReader);
 		}
@@ -179,11 +181,11 @@ public class TurfParser {
 	 * Parses a SURF resource from an input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param inputStream The input stream containing SURF data.
-	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
 		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)));
 	}
 
@@ -191,11 +193,11 @@ public class TurfParser {
 	 * Parses SURF resources from a reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param reader The reader containing SURF data.
-	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		Object lastRootResource = null;
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
 		boolean nextItemProhibited = false;
@@ -206,15 +208,10 @@ public class TurfParser {
 				check(reader, SIGNATURE); //\URF\
 				c = skipFiller(reader);
 				if(c == DESCRIPTION_BEGIN) { //\URF\:;
-					//TODO improve; replacing the current processor is a kludge, and raises risks of aliasing something from the directives, etc.
 					final UrfObject directives = new UrfObject();
-					final UrfProcessor oldProcessor = processor;
-					processor = new SimpleGraphUrfProcessor();
-					try {
-						parseDescription(reader, directives);
-					} finally {
-						processor = oldProcessor;
-					}
+					final TurfParser<Set<Object>> directivesProcessor = new TurfParser<>(new SimpleGraphUrfProcessor());
+					//TODO maybe turn on SURF compliance for directives
+					directivesProcessor.parseDescription(reader, directives);
 					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
 					if(namespaces != null) {
 						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
@@ -253,7 +250,7 @@ public class TurfParser {
 			}
 			c = peek(reader);
 		}
-		return Optional.ofNullable(lastRootResource);
+		return getProcessor().getResult();
 	}
 
 	/**

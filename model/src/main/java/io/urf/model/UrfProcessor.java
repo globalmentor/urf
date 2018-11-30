@@ -22,14 +22,20 @@ import javax.annotation.*;
 
 /**
  * Something that processes URF statements.
+ * @param <R> The type of result returned by the processor.
  * @author Garret Wilson
  */
-public interface UrfProcessor {
+public interface UrfProcessor<R> {
 
 	/** An URF processor that does nothing. */
-	public static final UrfProcessor NOP = new AbstractUrfProcessor() {
+	public static final UrfProcessor<Void> NOP = new AbstractUrfProcessor<Void>() {
 		@Override
 		public void process(final UrfResource subject, final UrfResource property, final UrfResource propertyValue) {
+		}
+
+		@Override
+		public Void getResult() {
+			return null;
 		}
 	};
 
@@ -70,5 +76,8 @@ public interface UrfProcessor {
 	 * @param propertyValue The URF resource representing the property value of the statement.
 	 */
 	public void process(@Nonnull UrfResource subject, @Nonnull UrfResource property, @Nonnull UrfResource propertyValue);
+
+	/** @return The result of the processing. */
+	public R getResult();
 
 }

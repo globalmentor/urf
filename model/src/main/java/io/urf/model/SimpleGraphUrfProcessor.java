@@ -33,11 +33,11 @@ import com.globalmentor.collections.*;
  * This implementation does not support described properties, collections, or value objects.
  * </p>
  * <p>
- * This implementation collects roots objects, retrievable via {@link #getRegisteredRoots()}.
+ * This implementation collects roots objects, retrievable via {@link #getRegisteredRoots()}, and returns them as {@link #getResult()} as well.
  * </p>
  * @author Garret Wilson
  */
-public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
+public class SimpleGraphUrfProcessor extends BaseUrfProcessor<Set<Object>> {
 
 	private Object inferredRoot = null;
 
@@ -142,4 +142,13 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the registered roots.
+	 * @see #getRegisteredRoots()
+	 */
+	@Override
+	public Set<Object> getResult() {
+		return getRegisteredRoots();
+	}
 }

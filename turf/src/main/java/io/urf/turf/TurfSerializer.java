@@ -627,6 +627,10 @@ public class TurfSerializer {
 		serializeRoots(appendable, singleton(root));
 	}
 
+	//TODO add a count of how many root resources we have serialized, so that we can arbitrarily add more roots later
+
+	//TODO add a flag for always serializing roots or not
+
 	/**
 	 * Serializes resource graphs to an appendable such as a writer.
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.

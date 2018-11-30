@@ -26,9 +26,10 @@ import io.urf.URF;
 
 /**
  * A base URF processor that knows how to create different types of resources based upon the type.
+ * @param <R> The type of result returned by the processor.
  * @author Garret Wilson
  */
-public abstract class BaseUrfProcessor extends AbstractUrfProcessor {
+public abstract class BaseUrfProcessor<R> extends AbstractUrfProcessor<R> {
 
 	/**
 	 * {@inheritDoc}

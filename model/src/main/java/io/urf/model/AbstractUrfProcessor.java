@@ -20,9 +20,10 @@ import java.net.URI;
 
 /**
  * Abstract base class with some useful default implementations for an URF processor.
+ * @param <R> The type of result returned by the processor.
  * @author Garret Wilson
  */
-public abstract class AbstractUrfProcessor implements UrfProcessor {
+public abstract class AbstractUrfProcessor<R> implements UrfProcessor<R> {
 
 	/**
 	 * {@inheritDoc}
