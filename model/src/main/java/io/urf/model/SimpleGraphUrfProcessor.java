@@ -64,7 +64,7 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<Set<Object>> {
 	}
 
 	/**
-	 * Returns any registered roots. If any resources wrapped objects such as value objects or collections, those objects will be
+	 * Returns any registered roots. If any resources wrapped objects such as value objects or collections, those objects will be unwrapped.
 	 * @return The roots that were registered during processing, if any.
 	 */
 	public Set<Object> getRegisteredRoots() {
