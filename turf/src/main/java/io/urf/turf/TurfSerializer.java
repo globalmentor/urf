@@ -496,7 +496,6 @@ public class TurfSerializer {
 
 	/**
 	 * Determines whether a given resource has already been serialized.
-	 * 
 	 * @param resource The resource to check.
 	 * @return <code>true</code> if the resource has already been serialized.
 	 */
@@ -615,8 +614,13 @@ public class TurfSerializer {
 		serializeDescription(appendable, directives);
 	}
 
+	long serializedRootCount = 0;
+
 	/**
-	 * Serializes a resource graph to an appendable such as a writer.
+	 * Serializes a resource graph to an appendable such as a writer. The root will be reserialized as a reference if it has already been serialized.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
@@ -624,15 +628,31 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
-		serializeRoots(appendable, singleton(root));
+		serializeRoot(appendable, root, true);
 	}
 
-	//TODO add a count of how many root resources we have serialized, so that we can arbitrarily add more roots later
-
-	//TODO add a flag for always serializing roots or not
+	/**
+	 * Serializes a resource graph to an appendable such as a writer.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
+	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param root The root resource.
+	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
+	 *          skipped.
+	 * @throws NullPointerException if the given appendable and/or root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root, final boolean includeDuplicates) throws IOException {
+		serializeRoots(appendable, singleton(root), includeDuplicates);
+	}
 
 	/**
-	 * Serializes resource graphs to an appendable such as a writer.
+	 * Serializes resource graphs to an appendable such as a writer. Roots are reserialized as references if they have already been serialized.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
@@ -640,21 +660,38 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
+		serializeRoots(appendable, roots, true);
+	}
+
+	/**
+	 * Serializes resource graphs to an appendable such as a writer.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
+	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param roots The root resources, if any.
+	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
+	 *          skipped.
+	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots, final boolean includeDuplicates) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
-		final Iterator<Object> rootIterator = roots.iterator();
-		while(rootIterator.hasNext()) {
-			final Object root = rootIterator.next();
-
-			//TODO should we detect if a root is already serialized and skip it? probably add an option for this as a parameter
+		for(final Object root : roots) {
+			if(!includeDuplicates && isSerialized(root)) {
+				continue;
+			}
+			if(serializedRootCount > 0) { //separate roots
+				if(sequenceSeparatorRequired) { //add a separator if one is required
+					appendable.append(SEQUENCE_DELIMITER);
+				}
+				if(!formatNewLine(appendable) && !sequenceSeparatorRequired) {
+					appendable.append(SEQUENCE_DELIMITER);
+				}
+			}
 			serializeResource(appendable, root);
-
-			final boolean hasNext = rootIterator.hasNext();
-			if(sequenceSeparatorRequired && hasNext) { //add a separator if one is required
-				appendable.append(SEQUENCE_DELIMITER);
-			}
-			if(!formatNewLine(appendable) && !sequenceSeparatorRequired && hasNext) {
-				appendable.append(SEQUENCE_DELIMITER);
-			}
+			serializedRootCount++;
 		}
 	}
 
