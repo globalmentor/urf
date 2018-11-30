@@ -57,9 +57,7 @@ public class TurfParserTest {
 	 * @return The optional resource instance parsed from the given TURF document input stream.
 	 */
 	protected Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
-		return new TurfParser(new SimpleGraphUrfProcessor()).parse(inputStream)
-				//map any object wrappers to their wrapped objects TODO make sure the wrappers have no description
-				.map(object -> object instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object);
+		return new TurfParser(new SimpleGraphUrfProcessor()).parseDocument(inputStream).map(ObjectUrfResource::unwrap);
 	}
 
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */

@@ -32,9 +32,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 
 	@Override
 	protected Optional<Object> parseTestResource(InputStream inputStream) throws IOException {
-		return new TurfParser(new SimpleGraphUrfProcessor()).parse(inputStream)
-				//map any object wrappers to their wrapped objects TODO make sure the wrappers have no description
-				.map(object -> object instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object);
+		return new TurfParser(new SimpleGraphUrfProcessor()).parseDocument(inputStream).map(ObjectUrfResource::unwrap);
 	}
 
 	@Override

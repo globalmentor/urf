@@ -159,41 +159,44 @@ public class TurfParser {
 	}
 
 	/**
-	 * Parses a SURF resource from a string.
+	 * Parses a SURF document from a string.
 	 * <p>
-	 * This is a convenience method that delegates to {@link #parse(Reader)}.
+	 * This is a convenience method that delegates to {@link #parseDocument(Reader)}.
 	 * </p>
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param string The string containing SURF data.
-	 * @return The last root SURF resource parsed, which may be empty if the document was empty.
+	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parse(@Nonnull final String string) throws IOException, ParseIOException {
+	public Optional<Object> parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
 		try (final Reader stringReader = new StringReader(string)) {
-			return parse(stringReader);
+			return parseDocument(stringReader);
 		}
 	}
 
 	/**
 	 * Parses a SURF resource from an input stream.
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param inputStream The input stream containing SURF data.
-	 * @return The last root SURF resource parsed, which may be empty if the document was empty.
+	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
-		return parse(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)));
+	public Optional<Object> parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
+		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)));
 	}
 
 	/**
 	 * Parses SURF resources from a reader.
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
 	 * @param reader The reader containing SURF data.
-	 * @return The last root SURF resource parsed, which may be empty if the document was empty.
+	 * @return One of the root resources parsed, possibly created by the processor, which may be empty if the document was empty;
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		Object resource = null;
+	public Optional<Object> parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		Object lastRootResource = null;
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
 		boolean nextItemProhibited = false;
 		int c;
@@ -231,13 +234,14 @@ public class TurfParser {
 				c = peek(reader);
 			}
 		}
-		//parse resources
+		//parse root resources
 		while(c >= 0 || nextItemRequired) {
 			if(c >= 0 && nextItemProhibited) {
 				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
 			}
-			resource = parseResource(reader);
-			//TODO add resource as root resource in processor
+			final UrfResource rootResource = parseResource(reader);
+			getProcessor().registerRootResource(rootResource); //register the resource as a root
+			lastRootResource = rootResource;
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
 			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
 			if(requireItem.isPresent()) {
@@ -249,7 +253,7 @@ public class TurfParser {
 			}
 			c = peek(reader);
 		}
-		return Optional.ofNullable(resource);
+		return Optional.ofNullable(lastRootResource);
 	}
 
 	/**
