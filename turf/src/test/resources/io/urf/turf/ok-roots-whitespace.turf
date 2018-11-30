@@ -1,0 +1,42 @@
+
+|<https://example.com/object1>|*:
+	info = "first"
+;
+
+|<https://example.com/object2>|*:
+	info = "second"
+	extra = *Stuff:
+		test = 222
+	;
+;
+
+|<https://example.com/object3>|*:
+	info = "third"
+	extra = |more|*Stuff:
+		test = 333
+	;
+;
+
+*:
+	info = "fourth"
+;
+
+!TODO bring back after TURF label references are fixed |<https://example.com/object2>|
+
+|<https://example.com/object5>|*:
+	info = "fifth"
+;
+
+!TODO bring back after TURF label references are fixed |more|
+
+! distinct resource; really the sixth distinct root 
+*: 
+	info = "fourth"
+;
+
+"foobar"
+
+
+*:
+	info = "eighth"
+;

@@ -33,4 +33,7 @@ public class TurfTestResources {
 	/** Names of TURF document resources semantically equivalent to {@value #OK_NAMESPACES_RESOURCE_NAME}. */
 	public static Set<String> OK_NAMESPACES_RESOURCE_NAMES = immutableSetOf(OK_NAMESPACES_RESOURCE_NAME, OK_NAMESPACES_ALIASES_RESOURCE_NAME);
 
+	//#roots
+	public static final String OK_ROOTS_WHITESPACE_RESOURCE_NAME = "ok-roots-whitespace.turf";
+
 }
