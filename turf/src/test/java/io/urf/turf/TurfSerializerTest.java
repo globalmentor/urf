@@ -62,7 +62,7 @@ public class TurfSerializerTest {
 	 */
 	protected Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
 		//TODO improve for multiple roots; update comments
-		return new TurfParser<Set<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findAny().map(ObjectUrfResource::unwrap);
+		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findAny().map(ObjectUrfResource::unwrap);
 	}
 
 	/**

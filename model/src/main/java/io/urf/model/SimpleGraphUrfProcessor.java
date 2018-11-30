@@ -33,11 +33,11 @@ import com.globalmentor.collections.*;
  * This implementation does not support described properties, collections, or value objects.
  * </p>
  * <p>
- * This implementation collects roots objects, retrievable via {@link #getRegisteredRoots()}, and returns them as {@link #getResult()} as well.
+ * This implementation collects roots objects, retrievable via {@link #getReportedRoots()}, and returns them as {@link #getResult()} as well.
  * </p>
  * @author Garret Wilson
  */
-public class SimpleGraphUrfProcessor extends BaseUrfProcessor<Set<Object>> {
+public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 
 	private Object inferredRoot = null;
 
@@ -52,23 +52,25 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<Set<Object>> {
 		return Optional.ofNullable(inferredRoot);
 	}
 
-	private Set<Object> registeredRoots = new LinkedHashSet<>();
+	private List<Object> reportedRoots = new ArrayList<>();
 
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version unwraps any object wrapped by the resource.
 	 */
 	@Override
-	public void registerRootResource(final UrfResource root) {
-		registeredRoots.add(ObjectUrfResource.unwrap(root));
+	public void reportRootResource(final UrfResource root) {
+		reportedRoots.add(ObjectUrfResource.unwrap(root));
 	}
 
 	/**
-	 * Returns any registered roots. If any resources wrapped objects such as value objects or collections, those objects will be unwrapped.
-	 * @return The roots that were registered during processing, if any.
+	 * Returns any reported roots. If any resources wrapped objects such as value objects or collections, those objects will be unwrapped.
+	 * @apiNote The returned roots may include the same object more than once, as the same resource may appear as a root multiple times, e.g. as a reference, in
+	 *          some contexts.
+	 * @return The roots that were reported during processing, if any.
 	 */
-	public Set<Object> getRegisteredRoots() {
-		return unmodifiableSet(registeredRoots);
+	public List<Object> getReportedRoots() {
+		return unmodifiableList(reportedRoots);
 	}
 
 	private Set<Object> processedSubjects = new IdentityHashSet<>();
@@ -145,10 +147,12 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<Set<Object>> {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation returns the registered roots.
-	 * @see #getRegisteredRoots()
+	 * @implNote The returned roots may include the same object more than once, as the same resource may appear as a root multiple times, e.g. as a reference, in
+	 *           some contexts.
+	 * @see #getReportedRoots()
 	 */
 	@Override
-	public Set<Object> getResult() {
-		return getRegisteredRoots();
+	public List<Object> getResult() {
+		return getReportedRoots();
 	}
 }

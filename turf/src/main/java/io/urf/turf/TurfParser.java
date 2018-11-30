@@ -198,7 +198,6 @@ public class TurfParser<R> {
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		Object lastRootResource = null;
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
 		boolean nextItemProhibited = false;
 		int c;
@@ -209,7 +208,7 @@ public class TurfParser<R> {
 				c = skipFiller(reader);
 				if(c == DESCRIPTION_BEGIN) { //\URF\:;
 					final UrfObject directives = new UrfObject();
-					final TurfParser<Set<Object>> directivesProcessor = new TurfParser<>(new SimpleGraphUrfProcessor());
+					final TurfParser<List<Object>> directivesProcessor = new TurfParser<>(new SimpleGraphUrfProcessor());
 					//TODO maybe turn on SURF compliance for directives
 					directivesProcessor.parseDescription(reader, directives);
 					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
@@ -237,8 +236,7 @@ public class TurfParser<R> {
 				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
 			}
 			final UrfResource rootResource = parseResource(reader);
-			getProcessor().registerRootResource(rootResource); //register the resource as a root
-			lastRootResource = rootResource;
+			getProcessor().reportRootResource(rootResource); //register the resource as a root
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
 			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
 			if(requireItem.isPresent()) {

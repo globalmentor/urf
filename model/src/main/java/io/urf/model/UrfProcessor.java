@@ -51,7 +51,7 @@ public interface UrfProcessor<R> {
 	public UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag);
 
 	/**
-	 * Registers a resource as a "root" in the URF data being processed.
+	 * Reports a resource as a "root" in the URF data being processed.
 	 * <p>
 	 * This method provides a hint to processor, providing it with more information about the processing. This may help the processor better utilize the
 	 * resources. For example, if the processor decides to serialize the information again later, knowing which resources were the root may help it arrange the
@@ -60,10 +60,10 @@ public interface UrfProcessor<R> {
 	 * <p>
 	 * There is no guarantee that this method will ever be called during processing.
 	 * </p>
-	 * @apiNote Registering a resource as a root imputes no additional semantics on the resource.
+	 * @apiNote Reporting a resource as a root imputes no additional semantics on the resource.
 	 * @param root The resource being marked as a root resource.
 	 */
-	public void registerRootResource(@Nonnull final UrfResource root);
+	public void reportRootResource(@Nonnull final UrfResource root);
 
 	/**
 	 * Processes an URF statement.

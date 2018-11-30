@@ -39,7 +39,7 @@ public abstract class AbstractUrfProcessor<R> implements UrfProcessor<R> {
 	 * @implSpec This version does nothing.
 	 */
 	@Override
-	public void registerRootResource(final UrfResource root) {
+	public void reportRootResource(final UrfResource root) {
 	}
 
 }
