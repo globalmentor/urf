@@ -137,24 +137,20 @@ public class TurfSerializerTest {
 		maker.setPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage"), URI.create("https://janedoe.example.com/"));
 		urfObject.setPropertyValue(URI.create("http://xmlns.com/foaf/0.1/maker"), maker);
 		for(final boolean formatted : asList(false, true)) {
-			final TurfSerializer serializer = new TurfSerializer();
-			serializer.registerNamespace(URI.create("http://purl.org/dc/elements/1.1/"), "dc");
-			serializer.registerNamespace(URI.create("http://xmlns.com/foaf/0.1/"), "foaf");
-			serializer.setFormatted(formatted);
-			final String serialization = serializer.serializeDocument(urfObject);
-			for(final String okObjectNoPropertiesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
-				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
+			for(final boolean useAliases : asList(false, true)) {
+				final TurfSerializer serializer = new TurfSerializer();
+				if(useAliases) {
+					serializer.registerNamespace(URI.create("http://purl.org/dc/elements/1.1/"), "dc");
+					serializer.registerNamespace(URI.create("http://xmlns.com/foaf/0.1/"), "foaf");
+				}
+				serializer.setFormatted(formatted);
+				final String serialization = serializer.serializeDocument(urfObject);
+				for(final String okObjectNoPropertiesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
+					assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
+				}
 			}
 		}
 	}
-
-	/* TODO create test for namespace aliases
-			final TurfSerializer serializer = new TurfSerializer();
-			serializer.registerNamespace(URI.create("http://purl.org/dc/elements/1.1/"), "dc");
-			serializer.registerNamespace(URI.create("http://xmlns.com/foaf/0.1/"), "foaf");
-			serializer.setFormatted(true);
-			System.out.println(serializer.serializeDocument(urfObject));
-	 */
 
 	/** @see TurfTestResources#OK_ROOTS_WHITESPACE_RESOURCE_NAME */
 	@Test
