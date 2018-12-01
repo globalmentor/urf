@@ -73,11 +73,18 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 		return unmodifiableList(reportedRoots);
 	}
 
-	private Set<Object> processedSubjects = new IdentityHashSet<>();
+	private Set<UrfResource> createdResources = new IdentityHashSet<>();
 
-	/** @return The subject objects that were processed. */
-	public Set<Object> getProcessedSubjects() {
-		return unmodifiableSet(processedSubjects);
+	/** @return The resources that were created. */
+	public Set<UrfResource> getCreatedResources() {
+		return unmodifiableSet(createdResources);
+	}
+
+	@Override
+	public UrfResource createResource(final URI tag, final URI typeTag) {
+		final UrfResource resource = super.createResource(tag, typeTag);
+		createdResources.add(resource);
+		return resource;
 	}
 
 	/** {@inheritDoc} This implementation returns an instance of {@link UrfObject}. */
@@ -106,9 +113,6 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 		final Object subjectObject = ObjectUrfResource.unwrap(subject);
 		final URI propertyTag = property.getTag().orElseThrow(IllegalArgumentException::new);
 		final Object propertyValueObject = ObjectUrfResource.unwrap(propertyValue);
-
-		//collect the subjects
-		processedSubjects.add(subjectObject);
 
 		//add to collections
 		if(subjectObject instanceof Collection) {

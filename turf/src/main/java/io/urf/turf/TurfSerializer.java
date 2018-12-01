@@ -572,7 +572,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graphs.
 	 */
-	public String serializeDocument(@Nonnull Iterable<Object> roots) throws IOException {
+	public String serializeDocument(@Nonnull Iterable<?> roots) throws IOException {
 		try (final Writer stringWriter = new StringWriter()) {
 			serializeDocument(stringWriter, roots);
 			return stringWriter.toString();
@@ -633,7 +633,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<Object> roots) throws IOException {
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<?> roots) throws IOException {
 		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, DEFAULT_CHARSET));
 		serializeDocument(writer, roots);
 		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
@@ -652,7 +652,7 @@ public class TurfSerializer {
 	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
 		serializeDocument(appendable, simpleGraphUrfProcessor.getReportedRoots()); //if roots were reported (not all sources report roots), always make them roots in the output
 		serializeRoot(appendable, simpleGraphUrfProcessor.getInferredRoot(), false); //if there was an inferred root, serialize it if it hasn't been serialized already
-		serializeRoots(appendable, simpleGraphUrfProcessor.getProcessedSubjects(), false); //finally make sure that all resources have been serialized
+		serializeRoots(appendable, simpleGraphUrfProcessor.getCreatedResources(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**
@@ -695,7 +695,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
 		//header
 		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
 		if(includeHeader) {
@@ -781,7 +781,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
+	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
 		serializeRoots(appendable, roots, true);
 	}
 
@@ -798,7 +798,7 @@ public class TurfSerializer {
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots, final boolean includeDuplicates) throws IOException {
+	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots, final boolean includeDuplicates) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		for(final Object root : roots) {
 			if(!includeDuplicates && isSerialized(root)) {

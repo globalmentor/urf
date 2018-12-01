@@ -40,9 +40,11 @@ public interface UrfProcessor<R> {
 	};
 
 	/**
-	 * Creates a general, non-container resource.
-	 * @apiNote A parser is not required to call this method to create a resource; it may explicitly create a resource using some other implementation which may
-	 *          be more efficient.
+	 * Creates a general resource.
+	 * <p>
+	 * A parser is not required to call this method to create a value resource; it may explicitly create a value resource using some other implementation which
+	 * may be more efficient.
+	 * </p>
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
 	 * @return The resource instance representing that being processed.
