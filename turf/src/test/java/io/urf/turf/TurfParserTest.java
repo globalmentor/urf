@@ -59,7 +59,6 @@ public class TurfParserTest {
 	 * @return The list of TURF document roots parsed.
 	 */
 	protected List<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
-		//TODO improve for multiple roots; update comments
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
@@ -116,6 +115,7 @@ public class TurfParserTest {
 
 			final UrfObject object5 = (UrfObject)roots.get(4);
 			assertThat(object5.getTag(), isPresentAndIs(URI.create("https://example.com/object5")));
+			assertThat(object5.getTypeTag(), isPresentAndIs(URF.Handle.toTag("foo-Bar")));
 			assertThat(object5.getPropertyValue("info"), isPresentAndIs("fifth"));
 
 			final UrfObject object6 = (UrfObject)roots.get(5);

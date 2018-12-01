@@ -23,7 +23,7 @@
 
 !TODO bring back after TURF label references are fixed |<https://example.com/object2>|
 
-|<https://example.com/object5>|*:
+|<https://example.com/object5>|*foo-Bar:
 	info = "fifth"
 ;
 

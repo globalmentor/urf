@@ -23,7 +23,8 @@ import static com.globalmentor.util.Optionals.*;
 import static io.urf.URF.*;
 import static io.urf.turf.TURF.*;
 import static java.nio.charset.StandardCharsets.*;
-import static java.util.Collections.singleton;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -312,7 +313,7 @@ public class TurfSerializer {
 	}
 
 	/**
-	 * Separates lines by adding a line separation character sequence if formatting is enabled.
+	 * Separates lines by adding a single line separation character sequence if formatting is enabled.
 	 * <p>
 	 * If formatting is turned off, no content will be added.
 	 * </p>
@@ -323,9 +324,27 @@ public class TurfSerializer {
 	 * @see #getLineSeparator()
 	 */
 	protected boolean formatNewLine(@Nonnull final Appendable appendable) throws IOException {
+		return formatNewLine(appendable, 1);
+	}
+
+	/**
+	 * Separates lines by adding one or more line separation character sequences if formatting is enabled.
+	 * <p>
+	 * If formatting is turned off, no content will be added.
+	 * </p>
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param newlineCount The number of newlines to add.
+	 * @return Whether or not a line separator sequence was actually appended.
+	 * @throws IOException If there was an error writing the line separator.
+	 * @see #isFormatted()
+	 * @see #getLineSeparator()
+	 */
+	protected boolean formatNewLine(@Nonnull final Appendable appendable, final int newlineCount) throws IOException {
 		final boolean isNewlineAppended = isFormatted();
 		if(isNewlineAppended) {
-			appendable.append(lineSeparator);
+			for(int count = 1; count <= newlineCount; count++) {
+				appendable.append(lineSeparator);
+			}
 		}
 		return isNewlineAppended;
 	}
@@ -524,13 +543,41 @@ public class TurfSerializer {
 	 * @return A serialized string representation of the given resource graph.
 	 */
 	public String serializeDocument(@Nonnull Object root) throws IOException {
+		return serializeDocument(singleton(root));
+	}
+
+	/**
+	 * Serializes a TURF document to a string.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @implSpec This is a convenience method that delegates to {@link #serializeRoot(Appendable, Object)}.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the roots and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the data.
+	 * @return A serialized string representation of the given resource graphs.
+	 */
+	public String serializeDocument(@Nonnull Object... roots) throws IOException {
+		return serializeDocument(asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to a string.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @implSpec This is a convenience method that delegates to {@link #serializeRoot(Appendable, Object)}.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the roots iterable and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the data.
+	 * @return A serialized string representation of the given resource graphs.
+	 */
+	public String serializeDocument(@Nonnull Iterable<Object> roots) throws IOException {
 		try (final Writer stringWriter = new StringWriter()) {
-			serializeDocument(stringWriter, root);
+			serializeDocument(stringWriter, roots);
 			return stringWriter.toString();
 		}
 	}
-
-	//TODO add analogous methods for serializing several objects; add varargs version
 
 	/**
 	 * Serializes a resource graph to an output stream.
@@ -571,13 +618,28 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given appendable, roots, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object... roots) throws IOException {
+		serializeDocument(appendable, asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to an appendable such as a writer.
+	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
 		//header
-		//TODO add option(s) to force a header
-		if(!namespaceAliases.isEmpty()) {
+		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
+		if(includeHeader) {
 			serializeHeader(appendable);
 		}
 
@@ -589,9 +651,10 @@ public class TurfSerializer {
 				discoverResourceReferences(root);
 			}
 			if(rootCount > 0) {
-				//separate the header from the roots
-				if(!formatNewLine(appendable) || isSequenceSeparatorRequired()) {
-					appendable.append(SEQUENCE_DELIMITER);
+				if(includeHeader) { //separate the header from the roots with a blank line
+					if(!formatNewLine(appendable, 2) || isSequenceSeparatorRequired()) {
+						appendable.append(SEQUENCE_DELIMITER);
+					}
 				}
 				serializeRoots(appendable, roots);
 			}
@@ -686,7 +749,8 @@ public class TurfSerializer {
 				if(sequenceSeparatorRequired) { //add a separator if one is required
 					appendable.append(SEQUENCE_DELIMITER);
 				}
-				if(!formatNewLine(appendable) && !sequenceSeparatorRequired) {
+				//separate root objects with a blank line
+				if(!formatNewLine(appendable, 2) && !sequenceSeparatorRequired) {
 					appendable.append(SEQUENCE_DELIMITER);
 				}
 			}
