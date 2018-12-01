@@ -50,7 +50,7 @@ import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
 import io.urf.URF;
-import io.urf.model.UrfObject;
+import io.urf.model.*;
 
 /**
  * Serializer for the Text URF (TURF) document format.
@@ -580,19 +580,79 @@ public class TurfSerializer {
 	}
 
 	/**
-	 * Serializes a resource graph to an output stream.
+	 * Serializes the result of URF processing as a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param simpleGraphUrfProcessor The simple graph URF processor that has already processed some URF content..
+	 * @throws NullPointerException if the given output stream and/or processor is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
+		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, DEFAULT_CHARSET));
+		serializeDocument(writer, simpleGraphUrfProcessor);
+		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+	}
+
+	/**
+	 * Serializes a TURF document to an output stream.
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param root The root resource.
-	 * @throws NullPointerException if the root resource is <code>null</code>.
+	 * @throws NullPointerException if the given output stream and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object root) throws IOException {
+		serializeDocument(outputStream, singleton(root));
+	}
+
+	/**
+	 * Serializes a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given output stream, roots, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object... roots) throws IOException {
+		serializeDocument(outputStream, asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<Object> roots) throws IOException {
 		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, DEFAULT_CHARSET));
-		serializeDocument(writer, root);
+		serializeDocument(writer, roots);
 		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+	}
+
+	/**
+	 * Serializes the result of URF processing as a TURF document to an appendable such as a writer.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param simpleGraphUrfProcessor The simple graph URF processor that has already processed some URF content..
+	 * @throws NullPointerException if the given appendable and/or processor is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
+		serializeDocument(appendable, simpleGraphUrfProcessor.getReportedRoots()); //if roots were reported (not all sources report roots), always make them roots in the output
+		serializeRoot(appendable, simpleGraphUrfProcessor.getInferredRoot(), false); //if there was an inferred root, serialize it if it hasn't been serialized already
+		serializeRoots(appendable, simpleGraphUrfProcessor.getProcessedSubjects(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**
@@ -627,7 +687,6 @@ public class TurfSerializer {
 
 	/**
 	 * Serializes a TURF document to an appendable such as a writer.
-	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
