@@ -17,24 +17,74 @@
 package io.urf.model;
 
 import static io.urf.URF.*;
+import static java.util.Collections.*;
 
 import java.net.URI;
 import java.util.*;
 
+import com.globalmentor.collections.*;
+
 /**
  * Processes URF statements by constructing a graph of simple objects. Tags and descriptions are not supported for collections and value objects.
+ * <p>
+ * This processor wraps value objects and collections using an instance of {@link ObjectUrfResource}.
+ * </p>
+ * <p>
+ * This implementation does not support described properties, collections, or value objects.
+ * </p>
+ * <p>
+ * This implementation collects roots objects, retrievable via {@link #getReportedRoots()}, and returns them as {@link #getResult()} as well.
+ * </p>
  * @author Garret Wilson
  */
-public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
+public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 
-	private UrfResource rootResource = null;
+	private Object inferredRoot = null;
 
 	/**
-	 * Returns a root resource of the processed graph. If there is more than one root, it is not specified which root will resource will be returned.
-	 * @return One of the root resources, which may be empty if non resources were processed.
+	 * Returns the inferred root object of the processed graph. If there was at least one resource processed, there is guaranteed to be an inferred root. If there
+	 * is more than one possible root, it is not specified which will be returned.
+	 * @apiNote The returned object, if any, is not guaranteed to describe the entire graph; that is, there may be other roots describing graphs that are not
+	 *          connected to the graph this root describes.
+	 * @return The inferred roots, which may be empty if no resources were processed.
 	 */
-	public Optional<UrfResource> getRootResource() {
-		return Optional.ofNullable(rootResource);
+	public Optional<Object> getInferredRoot() {
+		return Optional.ofNullable(inferredRoot);
+	}
+
+	private List<Object> reportedRoots = new ArrayList<>();
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version unwraps any object wrapped by the resource.
+	 */
+	@Override
+	public void reportRootResource(final UrfResource root) {
+		reportedRoots.add(ObjectUrfResource.unwrap(root));
+	}
+
+	/**
+	 * Returns any reported roots. If any resources wrapped objects such as value objects or collections, those objects will be unwrapped.
+	 * @apiNote The returned roots may include the same object more than once, as the same resource may appear as a root multiple times, e.g. as a reference, in
+	 *          some contexts.
+	 * @return The roots that were reported during processing, if any.
+	 */
+	public List<Object> getReportedRoots() {
+		return unmodifiableList(reportedRoots);
+	}
+
+	private Set<UrfResource> createdResources = new IdentityHashSet<>();
+
+	/** @return The resources that were created. */
+	public Set<UrfResource> getCreatedResources() {
+		return unmodifiableSet(createdResources);
+	}
+
+	@Override
+	public UrfResource createResource(final URI tag, final URI typeTag) {
+		final UrfResource resource = super.createResource(tag, typeTag);
+		createdResources.add(resource);
+		return resource;
 	}
 
 	/** {@inheritDoc} This implementation returns an instance of {@link UrfObject}. */
@@ -60,33 +110,28 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
 
 	@Override
 	public void process(final UrfResource subject, final UrfResource property, final UrfResource propertyValue) {
+		final Object subjectObject = ObjectUrfResource.unwrap(subject);
 		final URI propertyTag = property.getTag().orElseThrow(IllegalArgumentException::new);
-		//unwrap any property value
-		final Object propertyValueObject = propertyValue instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)propertyValue).getObject() : propertyValue;
+		final Object propertyValueObject = ObjectUrfResource.unwrap(propertyValue);
 
 		//add to collections
-		if(subject instanceof ObjectUrfResource) {
-			final Object subjectObject = ((ObjectUrfResource<?>)subject).getObject();
-			if(subjectObject instanceof Collection) {
-				@SuppressWarnings("unchecked")
-				final Collection<Object> collection = (Collection<Object>)subjectObject;
-				//TODO make sure is was actually a member; otherwise, add to description
-				collection.add(propertyValueObject); //TODO document; ensure correct order; fix for set and map
-				return;
-			} else if(subjectObject instanceof Map) {
-				@SuppressWarnings("unchecked")
-				final Map<Object, Object> map = (Map<Object, Object>)subjectObject;
-				//TODO make sure is was actually a member; otherwise, add to description
-				//TODO make sure the property value is of type urf-MapEntry
-				//TODO make sure the property value is a description
-				final UrfResourceDescription mapEntry = (UrfResourceDescription)propertyValue;
-				final Object keyObject = mapEntry.getPropertyValue(KEY_PROPERTY_TAG)
-						.map(key -> key instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)key).getObject() : key).orElseThrow(IllegalArgumentException::new);
-				final Object valueObject = mapEntry.getPropertyValue(VALUE_PROPERTY_TAG)
-						.map(value -> value instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)value).getObject() : value).orElseThrow(IllegalArgumentException::new);
-				map.put(keyObject, valueObject);
-				return;
-			}
+		if(subjectObject instanceof Collection) {
+			@SuppressWarnings("unchecked")
+			final Collection<Object> collection = (Collection<Object>)subjectObject;
+			//TODO make sure is was actually a member; otherwise, add to description
+			collection.add(propertyValueObject); //TODO document; ensure correct order; fix for set and map
+			return;
+		} else if(subjectObject instanceof Map) {
+			@SuppressWarnings("unchecked")
+			final Map<Object, Object> map = (Map<Object, Object>)subjectObject;
+			//TODO make sure is was actually a member; otherwise, add to description
+			//TODO make sure the property value is of type urf-MapEntry
+			//TODO make sure the property value is a description
+			final UrfResourceDescription mapEntry = (UrfResourceDescription)propertyValue;
+			final Object keyObject = mapEntry.getPropertyValue(KEY_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
+			final Object valueObject = mapEntry.getPropertyValue(VALUE_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
+			map.put(keyObject, valueObject);
+			return;
 		}
 
 		if(subject instanceof UrfResourceDescription) { //if the resource can be described
@@ -95,11 +140,23 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor {
 			description.setPropertyValue(propertyTag, propertyValueObject);
 		}
 
-		//TODO testing approach to remember root resource
-		if(rootResource == null || rootResource == propertyValue) { //TODO fix; this won't work if the caller isn't required to re-use resources
-			rootResource = subject;
-		}
+		//TODO test and throw an error if a property, value object, or collection is attempted to be described
 
+		//try to infer at least one root
+		if(inferredRoot == null || inferredRoot == propertyValueObject) { //TODO fix; this won't work if the caller isn't required to re-use resources
+			inferredRoot = subjectObject;
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the registered roots.
+	 * @implNote The returned roots may include the same object more than once, as the same resource may appear as a root multiple times, e.g. as a reference, in
+	 *           some contexts.
+	 * @see #getReportedRoots()
+	 */
+	@Override
+	public List<Object> getResult() {
+		return getReportedRoots();
+	}
 }

@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.net.URI;
 import java.time.Year;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
 
@@ -44,43 +44,54 @@ import io.urf.model.*;
 public class TurfSerializerTest {
 
 	/**
-	 * Loads and parses an object graph by parsing the indicated TURF document resource.
+	 * Loads and parses the indicated TURF document resource.
 	 * @implSpec The default implementation defaults to {@link #parse(InputStream)}.
 	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
-	 * @return The optional resource instance parsed from the named TURF document resource.
+	 * @return The list of TURF document roots parsed.
 	 */
-	protected Optional<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
+	protected List<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
 		try (final InputStream inputStream = TurfTestResources.class.getResourceAsStream(testResourceName)) {
 			return parse(inputStream);
 		}
 	}
 
 	/**
-	 * Loads and parses an object graph by parsing the indicated TURF document resource.
+	 * Loads and parses the indicated TURF document resource.
 	 * @param inputStream The input stream containing the TURF document for testing.
-	 * @return The optional resource instance parsed from the given TURF document input stream.
+	 * @return The list of TURF document roots parsed.
 	 */
-	protected Optional<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
-		return new TurfParser(new SimpleGraphUrfProcessor()).parse(inputStream)
-				//map any object wrappers to their wrapped objects TODO make sure the wrappers have no description
-				.map(object -> object instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object);
+	protected List<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
+		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
 	/**
-	 * Loads and parses an object graph by parsing the indicated TURF document resource.
+	 * Loads and parses the TURF document indicated by the given string.
 	 * @param string The string containing the TURF document for testing.
-	 * @return The optional resource instance parsed from the given TURF document input stream.
+	 * @return The list of TURF document roots parsed.
 	 */
-	protected Optional<Object> parse(@Nonnull final String string) throws IOException {
+	protected List<Object> parse(@Nonnull final String string) throws IOException {
 		try (final InputStream inputStream = new ByteArrayInputStream(string.getBytes(TURF.DEFAULT_CHARSET))) {
 			return parse(inputStream);
 		}
 	}
 
 	/**
+	 * Compares two lists of URF object graphs for equality.
+	 * @param reason additional information about the error.
+	 * @param objects1 The first list of URF object graphs to test.
+	 * @param objects2 The URF object graphs to test with the first, in the same order.
+	 */
+	protected void assertGraphsEqual(@Nonnull final String reason, @Nonnull final List<Object> objects1, @Nonnull final List<Object> objects2) { //TODO move to UrfTests; create analogous version for SURF parser
+		assertThat(reason + ": number of roots", objects1, hasSize(objects2.size()));
+		for(int i = 0, length = objects1.size(); i < length; i++) { //TODO use new zipping function when created
+			assertGraphsEqual(reason, objects1.get(i), objects2.get(i));
+		}
+	}
+
+	/**
 	 * Compares two URF object graphs for equality.
 	 * @implNote This implementation doesn't yet support collections.
-	 * @param reason additional information about the error
+	 * @param reason additional information about the error.
 	 * @param object1 The first URF object graph to test.
 	 * @param object2 The URF object graph to test with the first.
 	 */
@@ -94,7 +105,7 @@ public class TurfSerializerTest {
 
 	/**
 	 * Compares two URF object graphs for equality.
-	 * @param reason additional information about the error
+	 * @param reason additional information about the error.
 	 * @param object1 The first URF object graph to test.
 	 * @param object2 The URF object graph to test with the first.
 	 */
@@ -132,8 +143,7 @@ public class TurfSerializerTest {
 			serializer.setFormatted(formatted);
 			final String serialization = serializer.serializeDocument(urfObject);
 			for(final String okObjectNoPropertiesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
-				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization).orElseThrow(AssertionError::new),
-						parseTestResource(okObjectNoPropertiesResourceName).orElseThrow(AssertionError::new));
+				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
 			}
 		}
 	}
@@ -145,4 +155,48 @@ public class TurfSerializerTest {
 			serializer.setFormatted(true);
 			System.out.println(serializer.serializeDocument(urfObject));
 	 */
+
+	/** @see TurfTestResources#OK_ROOTS_WHITESPACE_RESOURCE_NAME */
+	@Test
+	public void testOkRoots() throws IOException {
+		final UrfObject object1 = new UrfObject(URI.create("https://example.com/object1"));
+		object1.setPropertyValue("info", "first");
+
+		final UrfObject object2 = new UrfObject(URI.create("https://example.com/object2"));
+		object2.setPropertyValue("info", "second");
+		final UrfObject object2Stuff = new UrfObject(null, "Stuff");
+		object2Stuff.setPropertyValue("test", 222);
+		object2.setPropertyValue("extra", object2Stuff);
+
+		final UrfObject object3 = new UrfObject(URI.create("https://example.com/object3"));
+		object3.setPropertyValue("info", "third");
+		final UrfObject object3Stuff = new UrfObject(null, URF.Handle.toTag("Stuff"));
+		object3Stuff.setPropertyValue("test", 333);
+		object3.setPropertyValue("extra", object3Stuff);
+
+		final UrfObject object4 = new UrfObject();
+		object4.setPropertyValue("info", "fourth");
+
+		final UrfObject object5 = new UrfObject(URI.create("https://example.com/object5"), "foo-Bar");
+		object5.setPropertyValue("info", "fifth");
+
+		final UrfObject object6 = new UrfObject();
+		object6.setPropertyValue("info", "fourth");
+
+		final String string = "foobar";
+
+		final UrfObject object7 = new UrfObject();
+		object7.setPropertyValue("info", "eighth");
+
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(object1, object2, object3, object4, object5, object6, string, object7);
+			for(final String okObjectNoPropertiesResourceName : asList(OK_ROOTS_WHITESPACE_RESOURCE_NAME)) { //TODO add non-whitespace variation
+				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
+			}
+		}
+
+	}
+
 }

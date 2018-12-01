@@ -16,12 +16,28 @@
 
 package io.urf.model;
 
+import static java.util.Objects.*;
+
+import javax.annotation.*;
+
 /**
  * An URF resource that wraps an object, which may be a mutable collection or an immutable value object.
  * @param <T> The type of object decorated by the URF resource.
  * @author Garret Wilson
  */
 public interface ObjectUrfResource<T> extends UrfResource {
+
+	/**
+	 * Unwraps an object that may be an object resource. If the given resource is an {@link ObjectUrfResource}, the resource's object is returned; otherwise, the
+	 * object can't be unwrapped, and the object itself is returned.
+	 * @param object The object to unwrap.
+	 * @return The object or, if the object is an {@link ObjectUrfResource}, the object contained in the resource.
+	 * @throws NullPointerException if the given object is <code>null</code>.
+	 * @see #getObject()
+	 */
+	public static Object unwrap(@Nonnull final Object object) {
+		return requireNonNull(object) instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object;
+	}
 
 	/** @return The wrapped object. */
 	public T getObject();

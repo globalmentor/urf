@@ -23,7 +23,8 @@ import static com.globalmentor.util.Optionals.*;
 import static io.urf.URF.*;
 import static io.urf.turf.TURF.*;
 import static java.nio.charset.StandardCharsets.*;
-import static java.util.Collections.singleton;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -49,7 +50,7 @@ import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
 import io.urf.URF;
-import io.urf.model.UrfObject;
+import io.urf.model.*;
 
 /**
  * Serializer for the Text URF (TURF) document format.
@@ -312,7 +313,7 @@ public class TurfSerializer {
 	}
 
 	/**
-	 * Separates lines by adding a line separation character sequence if formatting is enabled.
+	 * Separates lines by adding a single line separation character sequence if formatting is enabled.
 	 * <p>
 	 * If formatting is turned off, no content will be added.
 	 * </p>
@@ -323,9 +324,27 @@ public class TurfSerializer {
 	 * @see #getLineSeparator()
 	 */
 	protected boolean formatNewLine(@Nonnull final Appendable appendable) throws IOException {
+		return formatNewLine(appendable, 1);
+	}
+
+	/**
+	 * Separates lines by adding one or more line separation character sequences if formatting is enabled.
+	 * <p>
+	 * If formatting is turned off, no content will be added.
+	 * </p>
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param newlineCount The number of newlines to add.
+	 * @return Whether or not a line separator sequence was actually appended.
+	 * @throws IOException If there was an error writing the line separator.
+	 * @see #isFormatted()
+	 * @see #getLineSeparator()
+	 */
+	protected boolean formatNewLine(@Nonnull final Appendable appendable, final int newlineCount) throws IOException {
 		final boolean isNewlineAppended = isFormatted();
 		if(isNewlineAppended) {
-			appendable.append(lineSeparator);
+			for(int count = 1; count <= newlineCount; count++) {
+				appendable.append(lineSeparator);
+			}
 		}
 		return isNewlineAppended;
 	}
@@ -496,7 +515,6 @@ public class TurfSerializer {
 
 	/**
 	 * Determines whether a given resource has already been serialized.
-	 * 
 	 * @param resource The resource to check.
 	 * @return <code>true</code> if the resource has already been serialized.
 	 */
@@ -525,28 +543,116 @@ public class TurfSerializer {
 	 * @return A serialized string representation of the given resource graph.
 	 */
 	public String serializeDocument(@Nonnull Object root) throws IOException {
+		return serializeDocument(singleton(root));
+	}
+
+	/**
+	 * Serializes a TURF document to a string.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @implSpec This is a convenience method that delegates to {@link #serializeRoot(Appendable, Object)}.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the roots and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the data.
+	 * @return A serialized string representation of the given resource graphs.
+	 */
+	public String serializeDocument(@Nonnull Object... roots) throws IOException {
+		return serializeDocument(asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to a string.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @implSpec This is a convenience method that delegates to {@link #serializeRoot(Appendable, Object)}.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the roots iterable and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the data.
+	 * @return A serialized string representation of the given resource graphs.
+	 */
+	public String serializeDocument(@Nonnull Iterable<?> roots) throws IOException {
 		try (final Writer stringWriter = new StringWriter()) {
-			serializeDocument(stringWriter, root);
+			serializeDocument(stringWriter, roots);
 			return stringWriter.toString();
 		}
 	}
 
-	//TODO add analogous methods for serializing several objects; add varargs version
+	/**
+	 * Serializes the result of URF processing as a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param simpleGraphUrfProcessor The simple graph URF processor that has already processed some URF content..
+	 * @throws NullPointerException if the given output stream and/or processor is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
+		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, DEFAULT_CHARSET));
+		serializeDocument(writer, simpleGraphUrfProcessor);
+		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+	}
 
 	/**
-	 * Serializes a resource graph to an output stream.
+	 * Serializes a TURF document to an output stream.
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param root The root resource.
-	 * @throws NullPointerException if the root resource is <code>null</code>.
+	 * @throws NullPointerException if the given output stream and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object root) throws IOException {
+		serializeDocument(outputStream, singleton(root));
+	}
+
+	/**
+	 * Serializes a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given output stream, roots, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object... roots) throws IOException {
+		serializeDocument(outputStream, asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to an output stream.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param outputStream The output stream to receive the serialized data.
+	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<?> roots) throws IOException {
 		final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, DEFAULT_CHARSET));
-		serializeDocument(writer, root);
+		serializeDocument(writer, roots);
 		writer.flush(); //flush what we wrote, because the caller doesn't have access to the writer we created
+	}
+
+	/**
+	 * Serializes the result of URF processing as a TURF document to an appendable such as a writer.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param simpleGraphUrfProcessor The simple graph URF processor that has already processed some URF content..
+	 * @throws NullPointerException if the given appendable and/or processor is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
+		serializeDocument(appendable, simpleGraphUrfProcessor.getReportedRoots()); //if roots were reported (not all sources report roots), always make them roots in the output
+		serializeRoot(appendable, simpleGraphUrfProcessor.getInferredRoot(), false); //if there was an inferred root, serialize it if it hasn't been serialized already
+		serializeRoots(appendable, simpleGraphUrfProcessor.getCreatedResources(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**
@@ -572,13 +678,27 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
+	 * @throws NullPointerException if the given appendable, roots, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object... roots) throws IOException {
+		serializeDocument(appendable, asList(roots));
+	}
+
+	/**
+	 * Serializes a TURF document to an appendable such as a writer.
+	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
+	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
+	 *          aliases being used.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
+	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
 		//header
-		//TODO add option(s) to force a header
-		if(!namespaceAliases.isEmpty()) {
+		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
+		if(includeHeader) {
 			serializeHeader(appendable);
 		}
 
@@ -590,9 +710,10 @@ public class TurfSerializer {
 				discoverResourceReferences(root);
 			}
 			if(rootCount > 0) {
-				//separate the header from the roots
-				if(!formatNewLine(appendable) || isSequenceSeparatorRequired()) {
-					appendable.append(SEQUENCE_DELIMITER);
+				if(includeHeader) { //separate the header from the roots with a blank line
+					if(!formatNewLine(appendable, 2) || isSequenceSeparatorRequired()) {
+						appendable.append(SEQUENCE_DELIMITER);
+					}
 				}
 				serializeRoots(appendable, roots);
 			}
@@ -615,8 +736,13 @@ public class TurfSerializer {
 		serializeDescription(appendable, directives);
 	}
 
+	long serializedRootCount = 0;
+
 	/**
-	 * Serializes a resource graph to an appendable such as a writer.
+	 * Serializes a resource graph to an appendable such as a writer. The root will be reserialized as a reference if it has already been serialized.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
@@ -624,33 +750,71 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
-		serializeRoots(appendable, singleton(root));
+		serializeRoot(appendable, root, true);
 	}
 
 	/**
-	 * Serializes resource graphs to an appendable such as a writer.
+	 * Serializes a resource graph to an appendable such as a writer.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
+	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param root The root resource.
+	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
+	 *          skipped.
+	 * @throws NullPointerException if the given appendable and/or root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root, final boolean includeDuplicates) throws IOException {
+		serializeRoots(appendable, singleton(root), includeDuplicates);
+	}
+
+	/**
+	 * Serializes resource graphs to an appendable such as a writer. Roots are reserialized as references if they have already been serialized.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<Object> roots) throws IOException {
+	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
+		serializeRoots(appendable, roots, true);
+	}
+
+	/**
+	 * Serializes resource graphs to an appendable such as a writer.
+	 * <p>
+	 * This method may be called multiple times to serialize additional roots.
+	 * </p>
+	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param roots The root resources, if any.
+	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
+	 *          skipped.
+	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
+	 * @throws IOException If there was an error writing the serialized data.
+	 */
+	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots, final boolean includeDuplicates) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
-		final Iterator<Object> rootIterator = roots.iterator();
-		while(rootIterator.hasNext()) {
-			final Object root = rootIterator.next();
-
-			//TODO should we detect if a root is already serialized and skip it? probably add an option for this as a parameter
+		for(final Object root : roots) {
+			if(!includeDuplicates && isSerialized(root)) {
+				continue;
+			}
+			if(serializedRootCount > 0) { //separate roots
+				if(sequenceSeparatorRequired) { //add a separator if one is required
+					appendable.append(SEQUENCE_DELIMITER);
+				}
+				//separate root objects with a blank line
+				if(!formatNewLine(appendable, 2) && !sequenceSeparatorRequired) {
+					appendable.append(SEQUENCE_DELIMITER);
+				}
+			}
 			serializeResource(appendable, root);
-
-			final boolean hasNext = rootIterator.hasNext();
-			if(sequenceSeparatorRequired && hasNext) { //add a separator if one is required
-				appendable.append(SEQUENCE_DELIMITER);
-			}
-			if(!formatNewLine(appendable) && !sequenceSeparatorRequired && hasNext) {
-				appendable.append(SEQUENCE_DELIMITER);
-			}
+			serializedRootCount++;
 		}
 	}
 
