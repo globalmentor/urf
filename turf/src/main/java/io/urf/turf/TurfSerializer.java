@@ -651,7 +651,9 @@ public class TurfSerializer {
 	 */
 	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
 		serializeDocument(appendable, simpleGraphUrfProcessor.getReportedRoots()); //if roots were reported (not all sources report roots), always make them roots in the output
-		serializeRoot(appendable, simpleGraphUrfProcessor.getInferredRoot(), false); //if there was an inferred root, serialize it if it hasn't been serialized already
+		simpleGraphUrfProcessor.getInferredRoot().ifPresent(throwingConsumer(inferredRoot -> {
+			serializeRoot(appendable, inferredRoot, false); //if there was an inferred root, serialize it if it hasn't been serialized already
+		}));
 		serializeRoots(appendable, simpleGraphUrfProcessor.getCreatedResources(), false); //finally make sure that all resources have been serialized
 	}
 
