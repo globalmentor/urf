@@ -251,7 +251,7 @@ public class URF {
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
 		public static URI checkArgumentValid(@Nonnull final URI tag) {
-			return checkAbsolute(tag);
+			return checkAbsolute(tag); //TODO have a test to make sure that the tag is not blank in normal circumstances
 		}
 
 		/**
@@ -349,6 +349,46 @@ public class URF {
 		public static URI forTypeId(@Nonnull final URI typeTag, @Nonnull String id) {
 			//TODO ensure that the type tag has no fragment
 			return URI.create(new StringBuilder(typeTag.toString()).append(FRAGMENT_SEPARATOR).append(encode(requireNonNull(id))).toString());
+		}
+
+		/**
+		 * Generates a unique blank tag.
+		 * @return A new blank tag with a unique ID.
+		 */
+		public static URI generateBlank() {
+			return generateBlank(UUID.randomUUID().toString());
+		}
+
+		/**
+		 * Generates a blank tag using the given ID.
+		 * @param id The blank tag ID to use.
+		 * @return A blank tag with the given ID.
+		 * @throws NullPointerException if the given ID is <code>null</code>.
+		 */
+		public static URI generateBlank(@Nonnull final String id) {
+			return AD_HOC_NAMESPACE.resolve(FRAGMENT_SEPARATOR + id); //TODO make more rigorous; test
+		}
+
+		/**
+		 * Determines whether the given tag is a blank tag.
+		 * @param tag The tag to test.
+		 * @return <code>true</code> if the tag is a blank tag.
+		 */
+		public static boolean isBlank(@Nonnull final URI tag) {
+			return !AD_HOC_NAMESPACE.relativize(tag).isAbsolute() && ROOT_PATH.equals(tag.getRawPath()) && tag.getRawQuery() == null && tag.getRawFragment() != null;
+		}
+
+		/**
+		 * Determines ID of a potentially blank tag.
+		 * @param tag The tag, which may be blank.
+		 * @return The ID of the blank tag, which may be empty if the tag is not a blank tag.
+		 */
+		public static Optional<String> getBlankId(@Nonnull final URI tag) {
+			if(!isBlank(tag)) {
+				return Optional.empty();
+			}
+			assert tag.getRawFragment() != null : "Blank tags are expected to have a fragment.";
+			return Optional.of(tag.getFragment()); //use the decoded form
 		}
 
 	}

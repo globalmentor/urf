@@ -27,11 +27,10 @@ public abstract class AbstractUrfProcessor<R> implements UrfProcessor<R> {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation returns an instance of a {@link SimpleUrfResource}.
+	 * @implSpec This version does nothing.
 	 */
 	@Override
-	public UrfResource createResource(URI tag, URI typeTag) {
-		return new SimpleUrfResource(tag, typeTag);
+	public void declareResource(final URI tag, final URI typeTag) {
 	}
 
 	/**

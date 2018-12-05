@@ -654,7 +654,8 @@ public class TurfSerializer {
 		simpleGraphUrfProcessor.getInferredRoot().ifPresent(throwingConsumer(inferredRoot -> {
 			serializeRoot(appendable, inferredRoot, false); //if there was an inferred root, serialize it if it hasn't been serialized already
 		}));
-		serializeRoots(appendable, simpleGraphUrfProcessor.getCreatedResources(), false); //finally make sure that all resources have been serialized
+		//TODO fix this incongruency of having some root objects wrapped; decide on a general policy of whether collections can be wrapped or if we need to make them all "described" resources
+		serializeRoots(appendable, () -> simpleGraphUrfProcessor.getCreatedResources().stream().map(ObjectUrfResource::unwrap).iterator(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**

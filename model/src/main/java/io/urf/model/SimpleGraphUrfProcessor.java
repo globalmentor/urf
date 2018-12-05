@@ -16,13 +16,16 @@
 
 package io.urf.model;
 
+import static com.globalmentor.java.Conditions.*;
 import static io.urf.URF.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.collections.*;
+import io.urf.URF;
+import io.urf.URF.Tag;
 
 /**
  * Processes URF statements by constructing a graph of simple objects. Tags and descriptions are not supported for collections and value objects.
@@ -60,7 +63,13 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 	 */
 	@Override
 	public void reportRootResource(final UrfResource root) {
-		reportedRoots.add(ObjectUrfResource.unwrap(root));
+		final Object rootObject = asValueObject(root).orElseGet(() -> {
+			final UrfResource graphRoot = declaredResources.get(root.getTag().orElseThrow(() -> new IllegalArgumentException("Root resource missing tag.")));
+			checkArgument(graphRoot != null, "Undeclared root with tag %s.", root.getTag().get());
+			return ObjectUrfResource.unwrap(graphRoot); //our own object may have wrapped a Collection, for example 
+		});
+
+		reportedRoots.add(rootObject);
 	}
 
 	/**
@@ -73,18 +82,30 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 		return unmodifiableList(reportedRoots);
 	}
 
-	private Set<UrfResource> createdResources = new IdentityHashSet<>();
+	private Map<URI, UrfResource> declaredResources = new LinkedHashMap<>();
 
 	/** @return The resources that were created. */
-	public Set<UrfResource> getCreatedResources() {
-		return unmodifiableSet(createdResources);
+	public Collection<UrfResource> getCreatedResources() {
+		return unmodifiableCollection(declaredResources.values()); //TODO danger; some of these could be wrapped collections; tidy all this up
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation calls special methods for the following special recognized types:
+	 *           <dl>
+	 *           <dt>{@link #createListResource(URI, URI)}</dt>
+	 *           <dd>{@link URF#LIST_TYPE_TAG}</dd>
+	 *           <dt>{@link #createMapResource(URI, URI)}</dt>
+	 *           <dd>{@link URF#MAP_TYPE_TAG}</dd>
+	 *           <dt>{@link #createSetResource(URI, URI)}</dt>
+	 *           <dd>{@link URF#SET_TYPE_TAG}</dd>
+	 *           <dt>{@link #createListResource(URI, URI)}</dt>
+	 *           <dd>{@link URF#LIST_TYPE_TAG}</dd>
+	 *           </dl>
+	 */
 	@Override
-	public UrfResource createResource(final URI tag, final URI typeTag) {
-		final UrfResource resource = super.createResource(tag, typeTag);
-		createdResources.add(resource);
-		return resource;
+	public void declareResource(final URI tag, final URI typeTag) {
+		declaredResources.computeIfAbsent(requireNonNull(tag), resourceTag -> createResource(!Tag.isBlank(resourceTag) ? resourceTag : null, typeTag));
 	}
 
 	/** {@inheritDoc} This implementation returns an instance of {@link UrfObject}. */
@@ -110,42 +131,64 @@ public class SimpleGraphUrfProcessor extends BaseUrfProcessor<List<Object>> {
 
 	@Override
 	public void process(final UrfResource subject, final UrfResource property, final UrfResource propertyValue) {
-		final Object subjectObject = ObjectUrfResource.unwrap(subject);
+		final UrfResource graphSubject = declaredResources.get(subject.getTag().orElseThrow(() -> new IllegalArgumentException("Subject resource missing tag.")));
+		checkArgument(graphSubject != null, "Undeclared subject with tag %s.", subject.getTag().get());
+		final Object graphSubjectObject = ObjectUrfResource.unwrap(graphSubject);
+
 		final URI propertyTag = property.getTag().orElseThrow(IllegalArgumentException::new);
-		final Object propertyValueObject = ObjectUrfResource.unwrap(propertyValue);
+
+		//only look up our own resource/object if no value object was supplied;
+		//by trusting the caller to supply value objects, it prevents us from needlessly creating their tags
+		final Object propertyObject = asValueObject(propertyValue).orElseGet(() -> {
+			final UrfResource graphPropertyValue = declaredResources
+					.get(propertyValue.getTag().orElseThrow(() -> new IllegalArgumentException("Property value resource missing tag.")));
+			checkArgument(graphPropertyValue != null, "Undeclared property value with tag %s.", propertyValue.getTag().get());
+			return ObjectUrfResource.unwrap(graphPropertyValue); //our own object may have wrapped a Collection, for example 
+		});
 
 		//add to collections
-		if(subjectObject instanceof Collection) {
+		if(graphSubjectObject instanceof Collection) {
 			@SuppressWarnings("unchecked")
-			final Collection<Object> collection = (Collection<Object>)subjectObject;
+			final Collection<Object> collection = (Collection<Object>)graphSubjectObject;
 			//TODO make sure is was actually a member; otherwise, add to description
-			collection.add(propertyValueObject); //TODO document; ensure correct order; fix for set and map
+			collection.add(propertyObject); //TODO document; ensure correct order; fix for set and map
 			return;
-		} else if(subjectObject instanceof Map) {
+		} else if(graphSubjectObject instanceof Map) {
 			@SuppressWarnings("unchecked")
-			final Map<Object, Object> map = (Map<Object, Object>)subjectObject;
+			final Map<Object, Object> map = (Map<Object, Object>)graphSubjectObject;
 			//TODO make sure is was actually a member; otherwise, add to description
 			//TODO make sure the property value is of type urf-MapEntry
 			//TODO make sure the property value is a description
-			final UrfResourceDescription mapEntry = (UrfResourceDescription)propertyValue;
+			final UrfResourceDescription mapEntry = (UrfResourceDescription)propertyObject;
 			final Object keyObject = mapEntry.getPropertyValue(KEY_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
 			final Object valueObject = mapEntry.getPropertyValue(VALUE_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
 			map.put(keyObject, valueObject);
 			return;
 		}
 
-		if(subject instanceof UrfResourceDescription) { //if the resource can be described
-			final UrfResourceDescription description = (UrfResourceDescription)subject;
+		if(graphSubject instanceof UrfResourceDescription) { //if the resource can be described
+			final UrfResourceDescription description = (UrfResourceDescription)graphSubject;
 			//TODO finalize how to support properties with values
-			description.setPropertyValue(propertyTag, propertyValueObject);
+			description.setPropertyValue(propertyTag, propertyObject);
 		}
 
 		//TODO test and throw an error if a property, value object, or collection is attempted to be described
 
 		//try to infer at least one root
-		if(inferredRoot == null || inferredRoot == propertyValueObject) { //TODO fix; this won't work if the caller isn't required to re-use resources
-			inferredRoot = subjectObject;
+		if(inferredRoot == null || inferredRoot == propertyObject) { //TODO fix; this won't work if the caller isn't required to re-use resources
+			inferredRoot = graphSubjectObject;
 		}
+	}
+
+	//TODO document; basically this says that we trust the source to provide value objects
+	protected Optional<Object> asValueObject(UrfResource resource) { //TODO refactor to use ValueSupport
+		if(requireNonNull(resource) instanceof ObjectUrfResource) {
+			final Object object = ((ObjectUrfResource<?>)resource).getObject();
+			if(!(object instanceof Collection) && !(object instanceof Map)) {
+				return Optional.of(object);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**

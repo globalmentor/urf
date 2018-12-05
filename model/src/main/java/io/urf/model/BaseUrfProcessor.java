@@ -31,8 +31,10 @@ import io.urf.URF;
  */
 public abstract class BaseUrfProcessor<R> extends AbstractUrfProcessor<R> {
 
+	//TODO improve names; document
+
 	/**
-	 * {@inheritDoc}
+	 * TODO
 	 * @implSpec This implementation calls special methods for the following special recognized types:
 	 *           <dl>
 	 *           <dt>{@link #createListResource(URI, URI)}</dt>
@@ -44,8 +46,11 @@ public abstract class BaseUrfProcessor<R> extends AbstractUrfProcessor<R> {
 	 *           <dt>{@link #createListResource(URI, URI)}</dt>
 	 *           <dd>{@link URF#LIST_TYPE_TAG}</dd>
 	 *           </dl>
+	 * @param tag The tag of the resource to create, or <code>null</code> if the resource has no tag.
+	 * @param typeTag The type of the resource to crate, or <code>null</code> if the resource should have no type.
+	 * @return A new instance for the processor to use to represent the resource.
 	 */
-	public UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag) {
+	protected UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag) { //TODO refactor all these methods; perhaps discard class
 		if(typeTag != null) {
 			if(typeTag.equals(LIST_TYPE_TAG)) { //TODO create isList(), etc. methods for flexibility; then make method final?
 				return createListResource(tag, typeTag);
@@ -58,22 +63,20 @@ public abstract class BaseUrfProcessor<R> extends AbstractUrfProcessor<R> {
 		return createDefaultResource(tag, typeTag);
 	}
 
-	//TODO document
-
-	public UrfResource createDefaultResource(@Nullable final URI tag, @Nullable final URI typeTag) {
+	protected UrfResource createDefaultResource(@Nullable final URI tag, @Nullable final URI typeTag) {
 		return new SimpleUrfResource(tag, typeTag);
 	}
 
-	public UrfResource createListResource(@Nullable final URI tag, @Nullable final URI typeTag) {
+	protected UrfResource createListResource(@Nullable final URI tag, @Nullable final URI typeTag) {
 		return createDefaultResource(tag, typeTag);
 	}
 
-	public UrfResource createMapResource(@Nullable final URI tag, @Nullable final URI typeTag) {
+	protected UrfResource createMapResource(@Nullable final URI tag, @Nullable final URI typeTag) {
 		return createDefaultResource(tag, typeTag);
 	}
 
-	public UrfResource createSetResource(@Nullable final URI tag, @Nullable final URI typeTag) {
-		return createResource(tag, typeTag);
+	protected UrfResource createSetResource(@Nullable final URI tag, @Nullable final URI typeTag) {
+		return createDefaultResource(tag, typeTag);
 	}
 
 }

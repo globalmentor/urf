@@ -40,17 +40,13 @@ public interface UrfProcessor<R> {
 	};
 
 	/**
-	 * Creates a general resource.
-	 * <p>
-	 * A parser is not required to call this method to create a value resource; it may explicitly create a value resource using some other implementation which
-	 * may be more efficient.
-	 * </p>
-	 * @param tag The identifying resource tag, or <code>null</code> if not known.
+	 * Declares the existence of a resource.
+	 * @apiNote The resource is not guaranteed to be referenced again during processing. It may not have a type or even a description.
+	 * @param tag The identifying resource tag, which may be a blank tag if the resource has no tag.
 	 * @param typeTag The tag of the resource type, or <code>null</code> if not known.
-	 * @return The resource instance representing that being processed.
 	 * @throws IllegalArgumentException if a tag is given that is not an absolute IRI.
 	 */
-	public UrfResource createResource(@Nullable final URI tag, @Nullable final URI typeTag);
+	public void declareResource(@Nonnull final URI tag, @Nullable final URI typeTag);
 
 	/**
 	 * Reports a resource as a "root" in the URF data being processed.
