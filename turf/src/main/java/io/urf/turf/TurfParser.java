@@ -638,7 +638,7 @@ public class TurfParser<R> {
 			check(reader, PROPERTY_VALUE_DELIMITER); //=
 			skipLineBreaks(reader);
 			final UrfResource value = parseResource(reader);
-			getProcessor().process(subject, property, value);
+			getProcessor().processStatement(subject, property, value);
 			/*TODO transfer to TurfGraphProcessor
 						final Optional<Object> oldValue = subject.setPropertyValue(propertyHandle, value);
 						checkParseIO(reader, !oldValue.isPresent(), "Resource has duplicate definition for property %s.", propertyHandle);
@@ -1290,7 +1290,7 @@ public class TurfParser<R> {
 			//TODO final UrfResource property = getProcessor().declareResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index)), null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			final UrfResource property = new SimpleUrfResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index))); //TODO decide whether to declare properties
 			final UrfResource element = parseResource(r);
-			getProcessor().process(listResource, property, element);
+			getProcessor().processStatement(listResource, property, element);
 		});
 		check(reader, LIST_END); //]
 		return listResource;
@@ -1334,9 +1334,9 @@ public class TurfParser<R> {
 			final URI blankMapEntryTag = Tag.generateBlank();
 			getProcessor().declareResource(blankMapEntryTag, MAP_ENTRY_TYPE_TAG);
 			final UrfResource mapEntryResource = new SimpleUrfResource(blankMapEntryTag, MAP_ENTRY_TYPE_TAG);
-			getProcessor().process(mapEntryResource, keyProperty, key);
-			getProcessor().process(mapEntryResource, valueProperty, value);
-			getProcessor().process(mapResource, memberProperty, mapEntryResource);
+			getProcessor().processStatement(mapEntryResource, keyProperty, key);
+			getProcessor().processStatement(mapEntryResource, valueProperty, value);
+			getProcessor().processStatement(mapResource, memberProperty, mapEntryResource);
 		});
 		check(reader, MAP_END); //}
 		return mapResource;
@@ -1360,11 +1360,11 @@ public class TurfParser<R> {
 			labeledResources.put(alias, setResource);
 		}
 		check(reader, SET_BEGIN); //[
-		getProcessor().declareResource(MEMBER_TYPE_TAG, null);
-		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_TYPE_TAG);
+		getProcessor().declareResource(MEMBER_PROPERTY_TAG, null);
+		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_PROPERTY_TAG);
 		parseSequence(reader, SET_END, r -> {
 			final UrfResource member = parseResource(r);
-			getProcessor().process(setResource, memberProperty, member);
+			getProcessor().processStatement(setResource, memberProperty, member);
 		});
 		check(reader, SET_END); //]
 		return setResource;

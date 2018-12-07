@@ -654,8 +654,7 @@ public class TurfSerializer {
 		simpleGraphUrfProcessor.getInferredRoot().ifPresent(throwingConsumer(inferredRoot -> {
 			serializeRoot(appendable, inferredRoot, false); //if there was an inferred root, serialize it if it hasn't been serialized already
 		}));
-		//TODO fix this incongruency of having some root objects wrapped; decide on a general policy of whether collections can be wrapped or if we need to make them all "described" resources
-		serializeRoots(appendable, () -> simpleGraphUrfProcessor.getCreatedResources().stream().map(ObjectUrfResource::unwrap).iterator(), false); //finally make sure that all resources have been serialized
+		serializeRoots(appendable, () -> simpleGraphUrfProcessor.getDeclaredObjects().iterator(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**
@@ -1010,7 +1009,7 @@ public class TurfSerializer {
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
 	public void serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		ifPresentOrElse(URF.Handle.fromTag(tag, getNamespaceAliases()), throwingConsumer(appendable::append),
+		ifPresentOrElse​(URF.Handle.fromTag(tag, getNamespaceAliases()), throwingConsumer(appendable::append),
 				throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 	}
 

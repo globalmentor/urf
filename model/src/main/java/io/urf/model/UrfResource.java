@@ -24,14 +24,11 @@ import io.urf.URF;
 /**
  * Represents a resource with an optional identifying tag.
  * <p>
- * URF resources are considered equal if and only if they both have a tag and those tags are equal.
+ * URF resources are considered equal if and only if they both of type {@link UrfResource}, they both have a tag, and those tags are equal.
  * </p>
  * @author Garret Wilson
  */
-public interface UrfResource {
-
-	/** @return The resource identifier tag, if any. */
-	public Optional<URI> getTag();
+public interface UrfResource extends UrfReference {
 
 	/**
 	 * Determines the name of the resource, based on its tag.
