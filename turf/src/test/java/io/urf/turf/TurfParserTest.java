@@ -66,7 +66,7 @@ public class TurfParserTest {
 	@Test
 	public void testOkNamespaces() throws IOException {
 		for(final String okNamespacesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
-			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().findAny().map(ObjectUrfResource::unwrap); //TODO require no more than one resource
+			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().findAny(); //TODO require no more than one resource
 			final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(AssertionError::new);
 			assertThat(okNamespacesResourceName, urfObject.getTag(), isPresentAndIs(URI.create("https://example.com/foo.bar")));
 			assertThat(okNamespacesResourceName, urfObject.getPropertyValue(URF.AD_HOC_NAMESPACE.resolve("foo")), isPresentAndIs("bar"));
