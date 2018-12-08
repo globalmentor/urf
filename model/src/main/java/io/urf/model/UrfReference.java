@@ -17,28 +17,15 @@
 package io.urf.model;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
- * Abstract base class with some useful default implementations for an URF processor.
- * @param <R> The type of result returned by the processor.
+ * Represents a reference to a resource or the resource itself; an encapsulation of a possible resource tag.
  * @author Garret Wilson
  */
-public abstract class AbstractUrfProcessor<R> implements UrfProcessor<R> {
+public interface UrfReference {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version does nothing.
-	 */
-	@Override
-	public void declareResource(final URI tag, final URI typeTag) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version does nothing.
-	 */
-	@Override
-	public void reportRootResource(final UrfReference root) {
-	}
+	/** @return The resource identifier tag, if any. */
+	public Optional<URI> getTag();
 
 }

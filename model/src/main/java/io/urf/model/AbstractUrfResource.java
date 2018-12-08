@@ -45,8 +45,11 @@ public abstract class AbstractUrfResource implements UrfResource {
 
 	@Override
 	public String toString() {
-		final URI tag = getTag().orElse(null);
-		return tag != null ? "|<" + tag + ">|" : super.toString();
+		final StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("|<");
+		getTag().ifPresent(stringBuilder::append);
+		stringBuilder.append(">|");
+		return stringBuilder.toString();
 	}
 
 }

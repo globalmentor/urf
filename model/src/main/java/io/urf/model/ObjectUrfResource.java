@@ -18,6 +18,8 @@ package io.urf.model;
 
 import static java.util.Objects.*;
 
+import java.util.Optional;
+
 import javax.annotation.*;
 
 /**
@@ -37,6 +39,17 @@ public interface ObjectUrfResource<T> extends UrfResource {
 	 */
 	public static Object unwrap(@Nonnull final Object object) {
 		return requireNonNull(object) instanceof ObjectUrfResource ? ((ObjectUrfResource<?>)object).getObject() : object;
+	}
+
+	/**
+	 * Returns the object of an {@link ObjectUrfResource}, if the given reference is an {@link ObjectUrfResource}.
+	 * @param reference The reference to unwrap.
+	 * @return If the object is an {@link ObjectUrfResource}, the object contained in the resource.
+	 * @throws NullPointerException if the given object is <code>null</code>.
+	 * @see #getObject()
+	 */
+	public static Optional<Object> findObject(@Nonnull final UrfReference reference) {
+		return requireNonNull(reference) instanceof ObjectUrfResource ? Optional.of(((ObjectUrfResource<?>)reference).getObject()) : Optional.empty();
 	}
 
 	/** @return The wrapped object. */

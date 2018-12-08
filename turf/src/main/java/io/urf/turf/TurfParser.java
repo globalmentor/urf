@@ -207,10 +207,14 @@ public class TurfParser<R> {
 				check(reader, SIGNATURE); //\URF\
 				c = skipFiller(reader);
 				if(c == DESCRIPTION_BEGIN) { //\URF\:;
-					final UrfObject directives = new UrfObject();
-					final TurfParser<List<Object>> directivesProcessor = new TurfParser<>(new SimpleGraphUrfProcessor());
+					final SimpleGraphUrfProcessor directivesProcessor = new SimpleGraphUrfProcessor();
+					final URI directivesTag = Tag.generateBlank();
+					directivesProcessor.declareResource(directivesTag, null);
+					final TurfParser<List<Object>> directivesParser = new TurfParser<>(directivesProcessor);
 					//TODO maybe turn on SURF compliance for directives
-					directivesProcessor.parseDescription(reader, directives);
+					directivesParser.parseDescription(reader, new SimpleUrfResource(directivesTag));
+					directivesProcessor.reportRootResource(new SimpleUrfResource(directivesTag));
+					final UrfObject directives = directivesProcessor.getResult().stream().findAny().map(UrfObject.class::cast).orElseThrow(IllegalStateException::new); //TODO clean up all these gymnastics
 					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
 					if(namespaces != null) {
 						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
@@ -602,13 +606,16 @@ public class TurfParser<R> {
 		}
 		final UrfResource resource; //create a resource based upon the type of label
 		if(label instanceof URI) { //tag
-			resource = getProcessor().createResource((URI)label, typeTag);
+			getProcessor().declareResource((URI)label, typeTag);
+			resource = new SimpleUrfResource((URI)label, typeTag);
 			// TODO add support for IDs
 			//		} else if(label instanceof String) { //ID
 			//			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", label);
 			//			resource = new UrfObject(typeHandle, (String)label);
 		} else { //no tag or ID
-			resource = getProcessor().createResource(null, typeTag); //the type may be null 
+			final URI blankTag = Tag.generateBlank();
+			getProcessor().declareResource(blankTag, typeTag);
+			resource = new SimpleUrfResource(blankTag, typeTag); //the type may be null 
 		}
 		return resource;
 	}
@@ -625,12 +632,13 @@ public class TurfParser<R> {
 		check(reader, DESCRIPTION_BEGIN); //:
 		parseSequence(reader, DESCRIPTION_END, r -> {
 			final URI propertyTag = parseTagReference(reader);
-			final UrfResource property = getProcessor().createResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
+			//TODO fix; do we want to declare properties? if not, what if they are described? final UrfResource property = getProcessor().declareResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
+			final UrfResource property = new SimpleUrfResource(propertyTag); //TODO decide whether to declare properties
 			skipLineBreaks(reader);
 			check(reader, PROPERTY_VALUE_DELIMITER); //=
 			skipLineBreaks(reader);
 			final UrfResource value = parseResource(reader);
-			getProcessor().process(subject, property, value);
+			getProcessor().processStatement(subject, property, value);
 			/*TODO transfer to TurfGraphProcessor
 						final Optional<Object> oldValue = subject.setPropertyValue(propertyHandle, value);
 						checkParseIO(reader, !oldValue.isPresent(), "Resource has duplicate definition for property %s.", propertyHandle);
@@ -1269,7 +1277,9 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseListResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource listResource = getProcessor().createResource(null, LIST_TYPE_TAG); //TODO maybe allow tagged lists 
+		final URI blankTag = Tag.generateBlank();
+		getProcessor().declareResource(blankTag, LIST_TYPE_TAG);
+		final UrfResource listResource = new SimpleUrfResource(blankTag, LIST_TYPE_TAG); //TODO maybe allow tagged lists 
 		if(alias != null) {
 			labeledResources.put(alias, listResource);
 		}
@@ -1277,9 +1287,10 @@ public class TurfParser<R> {
 		final AtomicLong indexCounter = new AtomicLong(0);
 		parseSequence(reader, LIST_END, r -> {
 			final long index = indexCounter.getAndIncrement();
-			final UrfResource property = getProcessor().createResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index)), null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
+			//TODO final UrfResource property = getProcessor().declareResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index)), null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
+			final UrfResource property = new SimpleUrfResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index))); //TODO decide whether to declare properties
 			final UrfResource element = parseResource(r);
-			getProcessor().process(listResource, property, element);
+			getProcessor().processStatement(listResource, property, element);
 		});
 		check(reader, LIST_END); //]
 		return listResource;
@@ -1296,14 +1307,16 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseMapResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource mapResource = getProcessor().createResource(null, MAP_TYPE_TAG); //TODO maybe allow tagged maps 
+		final URI blankMapTag = Tag.generateBlank();
+		getProcessor().declareResource(blankMapTag, MAP_TYPE_TAG);
+		final UrfResource mapResource = new SimpleUrfResource(blankMapTag, MAP_TYPE_TAG); //TODO maybe allow tagged maps 
 		if(alias != null) {
 			labeledResources.put(alias, mapResource);
 		}
 		check(reader, MAP_BEGIN); //{
-		final UrfResource memberProperty = getProcessor().createResource(MEMBER_PROPERTY_TAG, null);
-		final UrfResource keyProperty = getProcessor().createResource(KEY_PROPERTY_TAG, null);
-		final UrfResource valueProperty = getProcessor().createResource(VALUE_PROPERTY_TAG, null);
+		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_PROPERTY_TAG); //TODO decide whether to declare properties;
+		final UrfResource keyProperty = new SimpleUrfResource(KEY_PROPERTY_TAG); //TODO decide whether to declare properties
+		final UrfResource valueProperty = new SimpleUrfResource(VALUE_PROPERTY_TAG); //TODO decide whether to declare properties
 		parseSequence(reader, MAP_END, r -> {
 			final UrfResource key;
 			if(peek(reader) == MAP_KEY_DELIMITER) {
@@ -1318,10 +1331,12 @@ public class TurfParser<R> {
 			skipLineBreaks(reader);
 			final UrfResource value = parseResource(reader);
 			//simulate the map entry
-			final UrfResource mapEntryResource = getProcessor().createResource(null, MAP_ENTRY_TYPE_TAG);
-			getProcessor().process(mapEntryResource, keyProperty, key);
-			getProcessor().process(mapEntryResource, valueProperty, value);
-			getProcessor().process(mapResource, memberProperty, mapEntryResource);
+			final URI blankMapEntryTag = Tag.generateBlank();
+			getProcessor().declareResource(blankMapEntryTag, MAP_ENTRY_TYPE_TAG);
+			final UrfResource mapEntryResource = new SimpleUrfResource(blankMapEntryTag, MAP_ENTRY_TYPE_TAG);
+			getProcessor().processStatement(mapEntryResource, keyProperty, key);
+			getProcessor().processStatement(mapEntryResource, valueProperty, value);
+			getProcessor().processStatement(mapResource, memberProperty, mapEntryResource);
 		});
 		check(reader, MAP_END); //}
 		return mapResource;
@@ -1338,15 +1353,18 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the SURF data.
 	 */
 	public UrfResource parseSetResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
-		final UrfResource setResource = getProcessor().createResource(null, SET_TYPE_TAG); //TODO maybe allow tagged sets 
+		final URI blankTag = Tag.generateBlank();
+		getProcessor().declareResource(blankTag, SET_TYPE_TAG);
+		final UrfResource setResource = new SimpleUrfResource(blankTag, SET_TYPE_TAG); //TODO maybe allow tagged sets 
 		if(alias != null) {
 			labeledResources.put(alias, setResource);
 		}
 		check(reader, SET_BEGIN); //[
-		final UrfResource memberProperty = getProcessor().createResource(MEMBER_TYPE_TAG, null);
+		getProcessor().declareResource(MEMBER_PROPERTY_TAG, null);
+		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_PROPERTY_TAG);
 		parseSequence(reader, SET_END, r -> {
 			final UrfResource member = parseResource(r);
-			getProcessor().process(setResource, memberProperty, member);
+			getProcessor().processStatement(setResource, memberProperty, member);
 		});
 		check(reader, SET_END); //]
 		return setResource;

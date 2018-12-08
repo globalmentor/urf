@@ -90,4 +90,9 @@ public class SimpleObjectUrfResource<T> extends BaseUrfResource implements Objec
 		this.object = requireNonNull(object);
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " (" + getObject() + ")";
+	}
+
 }
