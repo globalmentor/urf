@@ -29,6 +29,7 @@ import javax.annotation.*;
 
 import com.globalmentor.net.URIs;
 
+import io.urf.URF;
 import io.urf.URF.Tag;
 
 /**
@@ -148,6 +149,10 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		return new UrfObject(tag, typeTag);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation delegates to {@link #declareResource(URI, URI)} if the property tag is {@link URF#TYPE_PROPERTY_TAG}.
+	 */
 	@Override
 	public void processStatement(final UrfReference subject, final UrfReference property, final UrfReference object) {
 		final URI subjectTag = checkArgumentPresent(subject.getTag());

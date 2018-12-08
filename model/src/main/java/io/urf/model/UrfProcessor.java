@@ -20,6 +20,8 @@ import java.net.URI;
 
 import javax.annotation.*;
 
+import io.urf.URF;
+
 /**
  * Something that processes URF statements.
  * @param <R> The type of result returned by the processor.
@@ -70,16 +72,28 @@ public interface UrfProcessor<R> {
 	 * <p>
 	 * There is no guarantee that this method will ever be called during processing.
 	 * </p>
+	 * <p>
+	 * This method must function as if {@link #declareResource(URI)} were called for non-value object resources.
+	 * </p>
 	 * @apiNote Reporting a resource as a root imputes no additional semantics on the resource.
 	 * @param root The reference being marked as a root resource, with a source-declared tag which may be a blank tag.
 	 */
-	public void reportRootResource(@Nonnull UrfReference root); //TODO should this automatically declare resources, or must they be declared separately? but this has to support value objects, too
+	public void reportRootResource(@Nonnull UrfReference root);
 
 	/**
 	 * Processes an URF statement.
 	 * <p>
-	 * None of the parameters are guaranteed to have a tag, name, or ID. However if multiple properties pertain to the same anonymous subject, the same subject
-	 * instance is guaranteed to be used each time this method is called.
+	 * Each parameter {@link UrfReference#getTag()} is guaranteed to return a non-empty value, and each value is guaranteed to be the tag of a resource in a
+	 * statement. Therefore a processor may elect to simply process the statement based upon the three given tags.
+	 * </p>
+	 * <p>
+	 * Nevertheless, the source is required to send value objects wrapped in {@link ObjectUrfResource} instances so that the processor will not have to create
+	 * them afresh. Thus if any of the resources is an instance of {@link ObjectUrfResource}, the processor should ignore the tag (to avoid the tag URI being
+	 * needlessly generated) and use the wrapped {@link ObjectUrfResource#getObject()} value object directly if possible.
+	 * </p>
+	 * <p>
+	 * If the statement has a {@link URF#TYPE_PROPERTY_TAG}, this method must function as if {@link #declareResource(URI, URI)} was called, using the type URI
+	 * given in the object.
 	 * </p>
 	 * @param subject The reference representing the subject of the statement, with a source-declared tag which may be a blank tag.
 	 * @param property The reference representing the property of the statement, with a source-declared tag which may be a blank tag.
