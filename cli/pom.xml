@@ -42,37 +42,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>set-project-base-version</id>
-						<goals>
-							<goal>regex-property</goal>
-						</goals>
-						<configuration>
-							<name>project.baseVersion</name>
-							<value>${project.version}</value>
-							<regex>-SNAPSHOT</regex>
-							<failIfNoMatch>false</failIfNoMatch>
-						</configuration>
-					</execution>
-					<execution>
-						<id>set-build-year</id>
-						<goals>
-							<goal>timestamp-property</goal>
-						</goals>
-						<configuration>
-							<locale>en</locale>
-							<name>build.year</name>
-							<pattern>yyyy</pattern>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<executions>
@@ -113,13 +82,13 @@
 								<minVersion>11</minVersion>
 							</jre>
 							<versionInfo>
-								<fileVersion>${project.baseVersion}.0</fileVersion>
+								<fileVersion>${project.releaseVersion}.0</fileVersion>
 								<txtFileVersion>${project.version}</txtFileVersion>
 								<fileDescription>${project.description}</fileDescription>
 								<copyright>Copyright © ${project.inceptionYear}-${build.year} ${project.organization.name}. All rights reserved.</copyright>
 								<productName>${project.name}</productName>
 								<internalName>${project.artifactId}</internalName>
-								<productVersion>${project.baseVersion}.0</productVersion>
+								<productVersion>${project.releaseVersion}.0</productVersion>
 								<txtProductVersion>${project.version}</txtProductVersion>
 								<originalFilename>urf.exe</originalFilename>
 							</versionInfo>
