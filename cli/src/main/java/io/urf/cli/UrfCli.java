@@ -23,6 +23,7 @@ import javax.annotation.*;
 
 import org.fusesource.jansi.AnsiConsole;
 
+import io.confound.config.file.ResourcesConfigurationManager;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
@@ -30,7 +31,7 @@ import picocli.CommandLine.*;
  * Command-line interface for working with URF data.
  * @author Garret Wilson
  */
-@Command(name = "urf", description = "Command-line interface for working with URF data.", mixinStandardHelpOptions = true)
+@Command(name = "urf", description = "Command-line interface for working with URF data.", versionProvider = UrfCli.VersionProvider.class, mixinStandardHelpOptions = true)
 public class UrfCli implements Runnable {
 
 	/**
@@ -53,4 +54,20 @@ public class UrfCli implements Runnable {
 		System.out.println(List.of(paths)); //TODO implement
 	}
 
+	/**
+	 * Strategy for retrieving a version from the configuration.
+	 * @author Garret Wilson
+	 */
+	static class VersionProvider implements IVersionProvider {
+
+		/** The configuration key containing the version of the program. */
+		public static final String CONFIG_KEY_VERSION = "version";
+
+		@Override
+		public String[] getVersion() throws Exception {
+			return new String[] {ResourcesConfigurationManager.loadConfigurationForClass(UrfCli.class)
+					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException).getString(CONFIG_KEY_VERSION)};
+		}
+
+	}
 }

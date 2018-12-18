@@ -46,6 +46,11 @@
 		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
 
+	<properties>
+		<clogr.version>0.7.0</clogr.version>
+		<confound.version>0.7.0-SNAPSHOT</confound.version>
+	</properties>
+
 	<modules>
 		<module>cli</module>
 		<module>model</module>
@@ -77,7 +82,19 @@
 			<dependency>
 				<groupId>io.clogr</groupId>
 				<artifactId>clogr</artifactId>
-				<version>0.7.0</version>
+				<version>${clogr.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr-logback</artifactId>
+				<version>${clogr.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-file</artifactId>
+				<version>${confound.version}</version>
 			</dependency>
 
 			<dependency>

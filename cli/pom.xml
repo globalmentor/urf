@@ -29,6 +29,16 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.clogr</groupId>
+			<artifactId>clogr-logback</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.confound</groupId>
+			<artifactId>confound-file</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>turf</artifactId>
 		</dependency>
@@ -40,6 +50,13 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
