@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-parent</artifactId>
-		<version>8.2.0</version>
+		<version>8.3.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>io.urf</groupId>
@@ -46,7 +46,13 @@
 		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
 
+	<properties>
+		<clogr.version>0.7.0</clogr.version>
+		<confound.version>0.7.0-SNAPSHOT</confound.version>
+	</properties>
+
 	<modules>
+		<module>cli</module>
 		<module>model</module>
 		<module>spec</module>
 		<module>surf</module>
@@ -68,9 +74,27 @@
 			</dependency>
 
 			<dependency>
+				<groupId>info.picocli</groupId>
+				<artifactId>picocli</artifactId>
+				<version>3.8.2</version>
+			</dependency>
+
+			<dependency>
 				<groupId>io.clogr</groupId>
 				<artifactId>clogr</artifactId>
-				<version>0.7.0</version>
+				<version>${clogr.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr-logback</artifactId>
+				<version>${clogr.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-file</artifactId>
+				<version>${confound.version}</version>
 			</dependency>
 
 			<dependency>
@@ -97,6 +121,30 @@
 				<version>0.3.0-SNAPSHOT</version>
 				<type>test-jar</type>
 			</dependency>
+
+			<dependency>
+				<groupId>org.fusesource.jansi</groupId>
+				<artifactId>jansi</artifactId>
+				<version>1.17.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.akathist.maven.plugins.launch4j</groupId>
+					<artifactId>launch4j-maven-plugin</artifactId>
+					<version>1.7.24</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.2.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>
