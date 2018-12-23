@@ -296,7 +296,7 @@ public class SurfParser {
 	/**
 	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
-	 * @param allowDescription Whether a description is allowed; if <code>false</code>, an following description delimiter will not be considered part of the
+	 * @param allowDescription Whether a description is allowed; if <code>false</code>, any following description delimiter will not be considered part of the
 	 *          resource.
 	 * @return An object representing the SURF resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
@@ -388,16 +388,16 @@ public class SurfParser {
 
 		//check and associate with the label as needed
 		if(label instanceof URI) { //tag
-			checkParseIO(reader, resource instanceof SurfObject, "Tag |%s| can only be used an object.", label);
+			checkParseIO(reader, resource instanceof SurfObject, "Tag |%s| can only be used with an object.", label);
 			assert label.equals(((SurfObject)resource).getTag().orElse(null));
 			labeledResources.put(label, resource);
 		} else if(label instanceof String) { //ID
 			final String id = (String)label;
-			checkParseIO(reader, resource instanceof SurfObject, "ID |%s| can only be used an object.", id);
+			checkParseIO(reader, resource instanceof SurfObject, "ID |%s| can only be used with an object.", id);
 			final SurfObject surfObject = (SurfObject)resource;
 			assert id.equals(((SurfObject)resource).getId().orElse(null));
-			final String typeHandle = surfObject.getTypeHandle()
-					.orElseThrow(() -> new ParseIOException(reader, String.format("Object with ID %s does not indicate a type.", id)));
+			final String typeHandle = surfObject.getTypeHandle() //we already guaranteed a type inside parseObject()
+					.orElseThrow(() -> new AssertionError(String.format("Object with ID %s should have required a type when parsing.", id)));
 			labeledResources.put(new AbstractMap.SimpleImmutableEntry<String, String>(typeHandle, id), resource);
 		} else if(label instanceof Alias) { //alias
 			checkParseIO(reader, resource != null, "Cannot use alias |%s| with null.", label);
