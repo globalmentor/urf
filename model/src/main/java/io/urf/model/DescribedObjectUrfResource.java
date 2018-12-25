@@ -73,7 +73,9 @@ public class DescribedObjectUrfResource<T> extends AbstractDescribedUrfResource 
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
 	 * @param object The object to be wrapped by this URF resource.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
+	 * @deprecated This constructor is too confusing; it makes it seem like a handle is being used for the tag.
 	 */
+	@Deprecated
 	public DescribedObjectUrfResource(@Nullable final String typeHandle, @Nonnull final T object) {
 		this((URI)null, typeHandle, object);
 	}

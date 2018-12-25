@@ -302,18 +302,38 @@ public class URF {
 		}
 
 		/**
-		 * Retrieves the resource ID from the given tag. The name is the decoded fragment of the URI, if any.
+		 * Retrieves the resource type from the given ID tag. The type URI with the fragment removed.
 		 * <p>
-		 * Not every tag has a name. For example, a tag URI without a path has no ID.
+		 * To be considered an ID tag, a URI must have a non-collection path and have a fragment that is not the empty string.
+		 * </p>
+		 * @param tag The ID tag URI from which a type should be retrieved.
+		 * @return The type of the given ID tag URI, which will not be present if the URI does not represent an ID tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 */
+		public static Optional<URI> getIdTypeTag(@Nonnull final URI tag) {
+			checkArgumentValid(tag);
+			final String rawPath = tag.getRawPath();
+			final String rawFragment = tag.getRawFragment();
+			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath) && rawFragment != null && !rawFragment.isEmpty()) {
+				return Optional.of(removeFragment(tag));
+			}
+			return Optional.empty();
+		}
+
+		/**
+		 * Retrieves the resource ID from the given tag. The ID is the decoded fragment of the URI, if any.
+		 * <p>
+		 * To be considered an ID tag, a URI must have a non-collection path and have a fragment that is not the empty string.
 		 * </p>
 		 * @param tag The tag URI from which an ID should be retrieved.
-		 * @return The local name of the given URI, or <code>null</code> if the URI has no path or the path ends with a path separator.
-		 * @throws NullPointerException if the given URI is <code>null</code>.
+		 * @return The ID of the given ID tag URI, which will not be present if the URI does not represent an ID tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 */
 		public static Optional<String> getId(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
+			final String rawPath = tag.getRawPath();
 			final String rawFragment = tag.getRawFragment();
-			if(rawFragment != null) {
+			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath) && rawFragment != null && !rawFragment.isEmpty()) {
 				return Optional.of(decode(rawFragment)); //decode the fragment manually for consistency and for better error-handling
 			}
 			return Optional.empty();

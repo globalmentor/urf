@@ -419,11 +419,14 @@ public class TurfParser<R> {
 			c = skipFiller(reader);
 		}
 
+		UrfResource instanceReference = null; //we'll record whether we parse some instance reference TODO think of better name; one we can use in the specification 
+
 		final UrfResource resource;
 		switch(c) {
 			//objects
 			case OBJECT_BEGIN:
 				resource = parseObject(label, reader);
+				instanceReference = resource;
 				break;
 			//literals
 			case BINARY_BEGIN:
@@ -490,6 +493,7 @@ public class TurfParser<R> {
 					final URI tag = (URI)label;
 					getProcessor().declareResource(tag);
 					resource = new SimpleUrfResource(tag);
+					instanceReference = resource;
 				} else if(label instanceof Alias) {
 					final URI blankTag = Tag.generateBlank(label.toString());
 					getProcessor().declareResource(blankTag);
@@ -497,7 +501,14 @@ public class TurfParser<R> {
 				} else if(label instanceof String) { //ID
 					throw new ParseIOException(reader, String.format("Object with ID %s does not indicate an object and type.", label));
 				} else { //no label at all
-					throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
+					if(Name.isTokenBeginCharacter(c)) {
+						final String handle = parseHandle(reader);
+						final URI tag = Handle.toTag(handle, getNamespaces());
+						resource = new SimpleUrfResource(tag);
+						instanceReference = resource;
+					} else {
+						throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
+					}
 				}
 				break;
 		}
@@ -520,7 +531,23 @@ public class TurfParser<R> {
 			assert findResourceByAlias(label.toString()).isPresent();
 		}
 
-		//TODO maybe delete		getProcessor().process(subject, property, propertyValue);
+		//if there was some object reference, process the object, inferring the type if needed
+		if(instanceReference != null) { //TODO there may be a better way to check; maybe just see if the resource is an instance of SimpleUrfResource, or not an object resource 
+			final URI tag = instanceReference.getTag().orElseThrow(() -> new AssertionError("Parsed object missing tag.")); //TODO don't we have a utility method for this supplier?
+			final URI declaredTypeTag = instanceReference.getTypeTag().orElse(null); //TODO switch to Java 9 Optional.or()
+			final URI idTypeTag = Tag.getIdTypeTag(tag).orElse(null);
+			final URI typeTag;
+			if(idTypeTag != null) { //use the implied type, if any, making sure it doesn't coflict with any declared type
+				if(declaredTypeTag != null) {
+					checkParseIO(reader, declaredTypeTag.equals(idTypeTag), "Resource with ID tag %s cannot have its implicit type redefined from %s to %s.", tag,
+							idTypeTag, declaredTypeTag);
+				}
+				typeTag = idTypeTag;
+			} else {
+				typeTag = declaredTypeTag;
+			}
+			getProcessor().declareResource(tag, typeTag);
+		}
 
 		//description (optional)
 		//TODO decide how much to allow: if(allowDescription && resource instanceof UrfObject) { //TODO make everything an UrfResource, e.g. PojoUrfResource for strings, and allow anything to have a description
@@ -555,6 +582,9 @@ public class TurfParser<R> {
 	 * If the given label indicates an ID, after parsing the object type if an object already exists with the given ID for that type, it will be immediately
 	 * returned.
 	 * </p>
+	 * <p>
+	 * This method only collects the object information; it does not pass them to the URF processor. That is the responsibility of the caller.
+	 * </p>
 	 * @param label The object label; either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an ID.
 	 * @param reader The reader containing SURF data.
 	 * @return The resource read from the reader.
@@ -583,23 +613,19 @@ public class TurfParser<R> {
 		}
 		final UrfResource resource; //create a resource based upon the type of label
 		if(label instanceof URI) { //tag
-			getProcessor().declareResource((URI)label, typeTag);
 			//TODO make sure that any tag label doesn't specify a different type than the object specifies
 			//TODO if an ID tag was _not_ passed, declare the type of the resource with the processor
 			resource = new SimpleUrfResource((URI)label, typeTag);
 		} else if(label instanceof String) { //ID
 			checkParseIO(reader, typeTag != null, "Object with ID %s does not indicate a type.", label);
 			final URI tag = URF.Tag.forTypeId(typeTag, (String)label);
-			getProcessor().declareResource(tag, typeTag);
 			resource = new SimpleUrfResource(tag, typeTag);
 		} else if(label instanceof Alias) { //alias
 			final URI blankTag = Tag.generateBlank(label.toString());
-			getProcessor().declareResource(blankTag, typeTag);
 			resource = new SimpleUrfResource(blankTag, typeTag); //the type may be null 
 		} else { //no tag, ID, or alias
 			assert label == null;
 			final URI blankTag = Tag.generateBlank();
-			getProcessor().declareResource(blankTag, typeTag);
 			resource = new SimpleUrfResource(blankTag, typeTag); //the type may be null 
 		}
 		return resource;
