@@ -20,9 +20,6 @@ import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.net.URIs.*;
 import static io.urf.URF.*;
-import static io.urf.URF.Handle;
-import static io.urf.URF.Name;
-import static io.urf.URF.Tag;
 import static io.urf.turf.TURF.*;
 import static io.urf.turf.TURF.WHITESPACE_CHARACTERS;
 import static java.util.Collections.*;
@@ -537,7 +534,7 @@ public class TurfParser<R> {
 			final URI declaredTypeTag = instanceReference.getTypeTag().orElse(null); //TODO switch to Java 9 Optional.or()
 			final URI idTypeTag = Tag.getIdTypeTag(tag).orElse(null);
 			final URI typeTag;
-			if(idTypeTag != null) { //use the implied type, if any, making sure it doesn't coflict with any declared type
+			if(idTypeTag != null) { //use the implied type, if any, making sure it doesn't conflict with any declared type
 				if(declaredTypeTag != null) {
 					checkParseIO(reader, declaredTypeTag.equals(idTypeTag), "Resource with ID tag %s cannot have its implicit type redefined from %s to %s.", tag,
 							idTypeTag, declaredTypeTag);
