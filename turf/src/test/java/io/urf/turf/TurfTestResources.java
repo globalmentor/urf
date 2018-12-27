@@ -26,6 +26,9 @@ import java.util.Set;
  */
 public class TurfTestResources {
 
+	//#IDs
+	public static final String OK_IDS_RESOURCE_NAME = "ok-ids.turf";
+
 	//#namespaces
 	public static final String OK_NAMESPACES_RESOURCE_NAME = "ok-namespaces.turf";
 	public static final String OK_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-namespaces-aliases.turf";
