@@ -16,7 +16,6 @@
 
 package io.urf;
 
-import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
 import static java.util.Collections.*;
@@ -197,7 +196,7 @@ public class URF {
 		}
 
 		/** Regular expression pattern to match an URF name . */
-		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(.*))?", TOKEN_PATTERN, ID_DELIMITER)); //TODO add test; document matching groups
+		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))?", TOKEN_PATTERN, ID_DELIMITER, ID_TOKEN_PATTERN)); //TODO add test; document matching groups
 
 		/**
 		 * Determines whether the given string conforms to the rules for an URF name.
@@ -261,8 +260,8 @@ public class URF {
 		 * </p>
 		 * @param tag The tag URI from which a namespace should be retrieved.
 		 * @return The namespace of the tag.
-		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
 		public static Optional<URI> getNamespace(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
@@ -281,14 +280,14 @@ public class URF {
 		 * </p>
 		 * @param tag The tag URI from which a name should be retrieved.
 		 * @return The resource name, if any, from its tag.
-		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 * @see #getId(URI)
 		 */
 		public static Optional<String> getName(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
-			if(rawPath != null && !rawPath.isEmpty() && !endsWith(rawPath, PATH_SEPARATOR)) { //if there is a raw path that isn't a collection
+			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath)) { //if there is a raw path that isn't a collection
 				String name = decode(URIs.getName(rawPath));
 				final String rawFragment = tag.getRawFragment();
 				if(rawFragment != null) { //see if there is an ID to append
@@ -302,18 +301,55 @@ public class URF {
 		}
 
 		/**
-		 * Retrieves the resource ID from the given tag. The name is the decoded fragment of the URI, if any.
+		 * Retrieves the resource type from the given ID tag. The type URI with the fragment removed.
 		 * <p>
-		 * Not every tag has a name. For example, a tag URI without a path has no ID.
+		 * To be considered an ID tag, a URI must have a non-collection path and have a fragment that is not the empty string.
+		 * </p>
+		 * @param tag The ID tag URI from which a type should be retrieved.
+		 * @return The type of the given ID tag URI, which will not be present if the URI does not represent an ID tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 */
+		public static Optional<URI> getIdTypeTag(@Nonnull final URI tag) {
+			checkArgumentValid(tag);
+			final String rawPath = tag.getRawPath();
+			final String rawFragment = tag.getRawFragment();
+			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath) && rawFragment != null && !rawFragment.isEmpty()) {
+				return Optional.of(removeFragment(tag));
+			}
+			return Optional.empty();
+		}
+
+		/**
+		 * Indicates whether the given tag has an ID.
+		 * <p>
+		 * To be considered an ID tag, a URI must have a non-collection path and have a fragment that is not the empty string.
 		 * </p>
 		 * @param tag The tag URI from which an ID should be retrieved.
-		 * @return The local name of the given URI, or <code>null</code> if the URI has no path or the path ends with a path separator.
-		 * @throws NullPointerException if the given URI is <code>null</code>.
+		 * @return Whether the given tag URI has ID.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 * @see #getId(URI)
+		 */
+		public static boolean hasId(@Nonnull final URI tag) {
+			return getId(tag).isPresent(); //TODO make more efficient, with tests
+		}
+
+		/**
+		 * Retrieves the resource ID from the given tag. The ID is the decoded fragment of the URI, if any.
+		 * <p>
+		 * To be considered an ID tag, a URI must have a non-collection path and have a fragment that is not the empty string.
+		 * </p>
+		 * @param tag The tag URI from which an ID should be retrieved.
+		 * @return The ID of the given ID tag URI, which will not be present if the URI does not represent an ID tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
 		public static Optional<String> getId(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
+			final String rawPath = tag.getRawPath();
 			final String rawFragment = tag.getRawFragment();
-			if(rawFragment != null) {
+			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath) && rawFragment != null && !rawFragment.isEmpty()) {
 				return Optional.of(decode(rawFragment)); //decode the fragment manually for consistency and for better error-handling
 			}
 			return Optional.empty();

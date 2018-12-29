@@ -57,7 +57,9 @@ public class SimpleUrfResource extends BaseUrfResource {
 	 * Optional type handle constructor.
 	 * @param typeHandle The handle of the object type, or <code>null</code> if not known.
 	 * @throws IllegalArgumentException if the given type handle is not a valid URF handle.
+	 * @deprecated This constructor is too confusing; it makes it seem like a handle is being used for the tag.
 	 */
+	@Deprecated
 	public SimpleUrfResource(@Nullable final String typeHandle) {
 		this((URI)null, typeHandle);
 	}

@@ -237,17 +237,19 @@ public class SurfSerializer {
 	 * If formatting is turned off, no content will be added.
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
+	 * @return The given appendable.
 	 * @throws IOException If there was an error writing the indent.
 	 * @see #isFormatted()
 	 * @see #getIndentSequence()
 	 */
-	protected void formatIndent(@Nonnull final Appendable appendable) throws IOException {
+	protected Appendable formatIndent(@Nonnull final Appendable appendable) throws IOException {
 		if(isFormatted()) {
 			final CharSequence indentSequence = getIndentSequence();
 			for(int i = 0; i < indentLevel; ++i) {
 				appendable.append(indentSequence);
 			}
 		}
+		return appendable;
 	}
 
 	/** Decreases the indention level. No information is appended. */
@@ -536,14 +538,15 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource, or <code>null</code> if there is no resource to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serialize(@Nonnull final Appendable appendable, @Nullable Object root) throws IOException { //TODO rename to serializeRoot() to be easier to translate to other programming languages that do not allow overloading
+	public Appendable serialize(@Nonnull final Appendable appendable, @Nullable Object root) throws IOException { //TODO rename to serializeRoot() to be easier to translate to other programming languages that do not allow overloading
 		if(root == null) {
-			return;
+			return appendable;
 		}
-		serializeResource(appendable, root);
+		return serializeResource(appendable, root);
 	}
 
 	/**
@@ -553,16 +556,17 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param resource The resource to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or resource is <code>null</code>.
 	 * @throws IOException If there was an error appending the serialized data.
 	 */
-	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
+	public Appendable serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
 		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
 		final String alias = determineAliasForResource(resource);
 		if(alias != null) {
 			appendable.append(LABEL_DELIMITER).append(alias).append(LABEL_DELIMITER);
 			if(wasSerialized) { //an aliased resource never has to be serialized twice
-				return;
+				return appendable;
 			}
 		}
 		switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
@@ -669,7 +673,7 @@ public class SurfSerializer {
 						serializeIri(appendable, surfObject.getTag().get());
 						appendable.append(LABEL_DELIMITER);
 						if(wasSerialized) { //an object with a tag never has to be serialized twice
-							return;
+							return appendable;
 						}
 					} else if(surfObject.getId().isPresent()) { //|"id"|
 						appendable.append(LABEL_DELIMITER);
@@ -678,8 +682,8 @@ public class SurfSerializer {
 					}
 					serializeObject(appendable, (SurfObject)resource);
 					if(surfObject.getId().isPresent()) {
-						if(wasSerialized) { //an object with and ID never needs its description serialized again
-							return;
+						if(wasSerialized) { //an object with an ID never needs its description serialized again
+							return appendable;
 						}
 					}
 				} else if(resource instanceof List) { //list
@@ -712,6 +716,8 @@ public class SurfSerializer {
 				serializeDescription(appendable, surfObject);
 			}
 		}
+
+		return appendable;
 	}
 
 	//objects
@@ -723,13 +729,15 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param surfObject The information to be serialized as a SURF object.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#OBJECT_BEGIN
 	 */
-	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
+	public Appendable serializeObject(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
 		surfObject.getTypeHandle().ifPresent(throwingConsumer(appendable::append)); //typeHandle
+		return appendable;
 	}
 
 	/**
@@ -739,12 +747,13 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param surfObject The SURF object with the description to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#DESCRIPTION_BEGIN
 	 * @see SURF#DESCRIPTION_END
 	 */
-	public void serializeDescription(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
+	public Appendable serializeDescription(@Nonnull final Appendable appendable, @Nonnull final SurfObject surfObject) throws IOException {
 		appendable.append(DESCRIPTION_BEGIN); //:
 		formatNewLine(appendable);
 		try (final Closeable indention = increaseIndentLevel()) {
@@ -761,7 +770,7 @@ public class SurfSerializer {
 			});
 		}
 		formatIndent(appendable);
-		appendable.append(DESCRIPTION_END); //;
+		return appendable.append(DESCRIPTION_END); //;
 	}
 
 	//literals
@@ -770,24 +779,26 @@ public class SurfSerializer {
 	 * Serializes a binary literal along with its delimiter from an array of bytes.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param bytes The information to be serialized as a binary literal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#BINARY_BEGIN
 	 */
-	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
+	public static Appendable serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
 		appendable.append(BINARY_BEGIN);
-		appendable.append(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
+		return appendable.append(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
 	}
 
 	/**
 	 * Serializes a binary literal along with its delimiter from a byte buffer.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param byteBuffer The information to be serialized as a binary literal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#BINARY_BEGIN
 	 */
-	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
+	public static Appendable serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
 		appendable.append(BINARY_BEGIN);
 		final ByteBuffer base64ByteBuffer = Base64.getEncoder().withoutPadding().encode(byteBuffer);
 		final byte[] base64Bytes;
@@ -797,36 +808,38 @@ public class SurfSerializer {
 			base64Bytes = new byte[base64ByteBuffer.remaining()];
 			base64ByteBuffer.get(base64Bytes);
 		}
-		appendable.append(new String(base64Bytes, US_ASCII));
+		return appendable.append(new String(base64Bytes, US_ASCII));
 	}
 
 	/**
 	 * Serializes a Boolean.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param bool The Boolean value to be serialized as a Boolean.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
 	 */
-	public static void serializeBoolean(@Nonnull final Appendable appendable, @Nonnull final boolean bool) throws IOException {
-		appendable.append(bool ? BOOLEAN_TRUE_LEXICAL_FORM : BOOLEAN_FALSE_LEXICAL_FORM);
+	public static Appendable serializeBoolean(@Nonnull final Appendable appendable, @Nonnull final boolean bool) throws IOException {
+		return appendable.append(bool ? BOOLEAN_TRUE_LEXICAL_FORM : BOOLEAN_FALSE_LEXICAL_FORM);
 	}
 
 	/**
 	 * Serializes a character surrounded by character delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param codePoint The Unicode code point to be serialized as a character.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#CHARACTER_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
-	public static void serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
+	public static Appendable serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
 		checkArgument(Character.isValidCodePoint(codePoint), "The value %d does not represent is not a valid code point.", codePoint);
 		appendable.append(CHARACTER_DELIMITER);
 		serializeCharacterCodePoint(appendable, CHARACTER_DELIMITER, codePoint);
-		appendable.append(CHARACTER_DELIMITER);
+		return appendable.append(CHARACTER_DELIMITER);
 	}
 
 	/**
@@ -837,13 +850,14 @@ public class SurfSerializer {
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
 	 * @param codePoint The code point to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
 	 *           current character is completely parsed.
 	 * @see SURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
 	 */
-	public static void serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
+	public static Appendable serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
 			throws IOException, ParseIOException {
 		//TODO check for control characters
 		if(codePoint == delimiter || (codePoint <= Character.MAX_VALUE && CHARACTER_REQUIRED_ESCAPED_CHARACTERS.contains((char)codePoint))) {
@@ -876,30 +890,29 @@ public class SurfSerializer {
 					escapeChar = delimiter;
 					break;
 			}
-			appendable.append(escapeChar);
-			return;
+			return appendable.append(escapeChar);
 		}
 		//code points outside the BMP
 		if(Character.isSupplementaryCodePoint(codePoint)) {
-			appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
-			return;
+			return appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
 		}
 		//code points within the BMP
 		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
-		appendable.append((char)codePoint);
+		return appendable.append((char)codePoint);
 	}
 
 	/**
 	 * Serializes an email address along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param emailAddress The information to be serialized as an email address.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#EMAIL_ADDRESS_BEGIN
 	 */
-	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
+	public static Appendable serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
 		appendable.append(EMAIL_ADDRESS_BEGIN);
-		appendable.append(emailAddress.toString());
+		return appendable.append(emailAddress.toString());
 	}
 
 	/**
@@ -909,12 +922,13 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param iri The information to be serialized as an IRI.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given IRI is not a true, absolute IRI with a scheme.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#IRI_BEGIN
 	 */
-	public static void serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
+	public static Appendable serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
 		checkAbsolute(iri);
 		appendable.append(IRI_BEGIN);
 		switch(ASCII.toLowerCase(iri.getScheme()).toString()) {
@@ -938,7 +952,7 @@ public class SurfSerializer {
 				appendable.append(iri.toString());
 				break;
 		}
-		appendable.append(IRI_END);
+		return appendable.append(IRI_END);
 	}
 
 	/**
@@ -952,28 +966,30 @@ public class SurfSerializer {
 	 * </ul>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param number The information to be serialized as a number.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#NUMBER_DECIMAL_BEGIN
 	 */
-	public static void serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
+	public static Appendable serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
 		final boolean isDecimal = (number instanceof BigDecimal) || (number instanceof BigInteger);
 		if(isDecimal) {
 			appendable.append(NUMBER_DECIMAL_BEGIN);
 		}
-		appendable.append(number.toString());
+		return appendable.append(number.toString());
 	}
 
 	/**
 	 * Serializes a regular expression along with its delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param regularExpression The information to be serialized as a regular expression.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#REGULAR_EXPRESSION_DELIMITER
 	 * @see SURF#REGULAR_EXPRESSION_ESCAPE
 	 */
-	public static void serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
+	public static Appendable serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
 		appendable.append(REGULAR_EXPRESSION_DELIMITER);
 		final String regexString = regularExpression.toString();
 		//See if there is anything we need to escape; checking ahead of time will usually be faster than appending each character,
@@ -990,7 +1006,7 @@ public class SurfSerializer {
 		} else { //no escaping needed
 			appendable.append(regexString);
 		}
-		appendable.append(REGULAR_EXPRESSION_DELIMITER);
+		return appendable.append(REGULAR_EXPRESSION_DELIMITER);
 		//TODO add support for flags
 	}
 
@@ -998,12 +1014,13 @@ public class SurfSerializer {
 	 * Serializes a string surrounded by string delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param charSequence The information to be serialized as a string.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#STRING_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
-	public static void serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
+	public static Appendable serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
 		appendable.append(STRING_DELIMITER);
 		final int length = charSequence.length();
 		for(int i = 0; i < length; i++) {
@@ -1019,48 +1036,51 @@ public class SurfSerializer {
 			}
 			serializeCharacterCodePoint(appendable, STRING_DELIMITER, codePoint);
 		}
-		appendable.append(STRING_DELIMITER);
+		return appendable.append(STRING_DELIMITER);
 	}
 
 	/**
 	 * Serializes a telephone number along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param telephoneNumber The information to be serialized as a telephone number.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @throws IllegalArgumentException if the given telephone number is not in global form.
 	 * @see SURF#TELEPHONE_NUMBER_BEGIN
 	 * @see TelephoneNumber#isGlobal()
 	 */
-	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
+	public static Appendable serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
 		checkArgument(telephoneNumber.isGlobal(), "Telephone number %s not in global form.", telephoneNumber);
-		appendable.append(telephoneNumber.toString());
+		return appendable.append(telephoneNumber.toString());
 	}
 
 	/**
 	 * Serializes a temporal literal along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param temporal The information to be serialized as a temporal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#TEMPORAL_BEGIN
 	 */
-	public static void serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
+	public static Appendable serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
 		appendable.append(TEMPORAL_BEGIN);
-		appendable.append(temporal.toString());
+		return appendable.append(temporal.toString());
 	}
 
 	/**
 	 * Serializes a UUID along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param uuid The information to be serialized as a UUID.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#UUID_BEGIN
 	 */
-	public static void serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
+	public static Appendable serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
 		appendable.append(UUID_BEGIN);
-		appendable.append(uuid.toString());
+		return appendable.append(uuid.toString());
 	}
 
 	//collections
@@ -1072,12 +1092,13 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param list The information to be serialized as a list.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#LIST_BEGIN
 	 * @see SURF#LIST_END
 	 */
-	public void serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
+	public Appendable serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
 		appendable.append(LIST_BEGIN); //[
 		if(!list.isEmpty()) {
 			formatNewLine(appendable);
@@ -1086,7 +1107,7 @@ public class SurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(LIST_END); //]
+		return appendable.append(LIST_END); //]
 	}
 
 	/**
@@ -1096,6 +1117,7 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param map The information to be serialized as a map.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#MAP_BEGIN
@@ -1103,7 +1125,7 @@ public class SurfSerializer {
 	 * @see SURF#MAP_KEY_DELIMITER
 	 * @see SURF#ENTRY_KEY_VALUE_DELIMITER
 	 */
-	public void serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
+	public Appendable serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
 		appendable.append(MAP_BEGIN); //{
 		if(!map.isEmpty()) {
 			formatNewLine(appendable);
@@ -1127,7 +1149,7 @@ public class SurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(MAP_END); //}
+		return appendable.append(MAP_END); //}
 	}
 
 	/**
@@ -1137,12 +1159,13 @@ public class SurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param set The information to be serialized as a set.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#SET_BEGIN
 	 * @see SURF#SET_END
 	 */
-	public void serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
+	public Appendable serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
 		appendable.append(SET_BEGIN); //(
 		if(!set.isEmpty()) {
 			formatNewLine(appendable);
@@ -1151,7 +1174,7 @@ public class SurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(SET_END); //)
+		return appendable.append(SET_END); //)
 	}
 
 	/**
@@ -1162,10 +1185,11 @@ public class SurfSerializer {
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param sequence An iterable representing the sequence to serialize.
 	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization, along with each item to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
 	 */
-	protected <I> void serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence,
+	protected <I> Appendable serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence,
 			@Nonnull final IOBiConsumer<Appendable, I> itemSerializer) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		final Iterator<I> iterator = sequence.iterator();
@@ -1184,6 +1208,7 @@ public class SurfSerializer {
 				appendable.append(SEQUENCE_DELIMITER);
 			}
 		}
+		return appendable;
 	}
 
 }

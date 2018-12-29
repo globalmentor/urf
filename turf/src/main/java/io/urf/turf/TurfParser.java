@@ -20,9 +20,6 @@ import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.net.URIs.*;
 import static io.urf.URF.*;
-import static io.urf.URF.Handle;
-import static io.urf.URF.Name;
-import static io.urf.URF.Tag;
 import static io.urf.turf.TURF.*;
 import static io.urf.turf.TURF.WHITESPACE_CHARACTERS;
 import static java.util.Collections.*;
@@ -100,42 +97,16 @@ public class TurfParser<R> {
 		}
 	}
 
-	/**
-	 * The map of resources that have been given a label. Each key is either:
-	 * <dl>
-	 * <dt>tag</dt>
-	 * <dd>A {@link URI} containing the tag IRI.</dd>
-	 * <dt>alias</dt>
-	 * <dd>An {@link Alias} containing the alias string.</dd>
-	 * </dl>
-	 */
-	private final Map<Object, UrfResource> labeledResources = new HashMap<>();
+	/** The map of resource references that have been given an alias */
+	private final Map<Alias, UrfReference> aliasedReferences = new HashMap<>();
 
 	/**
-	 * Returns a parsed resource by its alias.
+	 * Returns a reference to a parsed resource by its alias.
 	 * @param alias The alias used by the resource in the document.
 	 * @return The resource associated with the given alias, if any.
 	 */
-	public Optional<UrfResource> findResourceByAlias(@Nonnull final String alias) {
-		return Optional.ofNullable(labeledResources.get(new Alias(alias))); //TODO be more rigorous here if/when null can be aliased
-	}
-
-	/**
-	 * Returns a parsed object by its tag.
-	 * @param tag The global IRI identifier tag of the resource.
-	 * @return The object associated with the given tag, if any.
-	 */
-	public Optional<UrfObject> findObjectByTag(@Nonnull final URI tag) { //TODO these will probably have to change to just `UrfResource` in TurfParser
-		return Optional.ofNullable(getObjectByTag(tag));
-	}
-
-	/**
-	 * Returns a parsed object by its tag.
-	 * @param tag The global IRI identifier tag of the resource.
-	 * @return The object associated with the given tag, or <code>null</code> if the tagged object has not yet been parsed.
-	 */
-	protected UrfObject getObjectByTag(@Nonnull final URI tag) { //TODO these will probably have to change to just `UrfResource` in TurfParser
-		return (UrfObject)labeledResources.get(requireNonNull(tag));
+	public Optional<UrfReference> findResourceByAlias(@Nonnull final String alias) {
+		return Optional.ofNullable(aliasedReferences.get(new Alias(alias))); //TODO be more rigorous here if/when null can be aliased
 	}
 
 	private Map<String, URI> namepaces = emptyMap();
@@ -239,7 +210,7 @@ public class TurfParser<R> {
 			if(c >= 0 && nextItemProhibited) {
 				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
 			}
-			final UrfResource rootResource = parseResource(reader);
+			final UrfReference rootResource = parseResource(reader);
 			getProcessor().reportRootResource(rootResource); //register the resource as a root
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
 			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
@@ -414,42 +385,45 @@ public class TurfParser<R> {
 	/**
 	 * Parses a resource; either a tag or a resource representation with an optional description. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
-	 * @return The resource read and parsed from the reader.
+	 * @return A reference to the resource read and parsed from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public UrfResource parseResource(@Nonnull final Reader reader) throws IOException {
+	public UrfReference parseResource(@Nonnull final Reader reader) throws IOException {
 		return parseResource(reader, true);
 	}
 
 	/**
 	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
 	 * @param reader The reader containing SURF data.
-	 * @param allowDescription Whether a description is allowed; if <code>false</code>, an following description delimiter will not be considered part of the
+	 * @param allowDescription Whether a description is allowed; if <code>false</code>, any following description delimiter will not be considered part of the
 	 *          resource.
-	 * @return The resource read and parsed from the reader.
+	 * @return A reference to the resource read and parsed from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
-	public UrfResource parseResource(@Nonnull final Reader reader, final boolean allowDescription) throws IOException {
+	public UrfReference parseResource(@Nonnull final Reader reader, final boolean allowDescription) throws IOException {
 		Object label = null;
 		int c = peek(reader);
 		if(c == LABEL_DELIMITER) {
 			label = parseLabel(reader);
-			if(label instanceof URI || label instanceof Alias) { //tag or alias
-				final UrfResource resource = labeledResources.get(label);
-				if(resource != null) {
-					return resource;
+			if(label instanceof Alias) { //the TURF parser keeps track of certain aliased things, so return it if we have it already
+				final UrfReference reference = aliasedReferences.get((Alias)label);
+				if(reference != null) {
+					return reference; //TODO do any of the things the TURF parser keeps track of allow descriptions with the alias?
 				}
 			}
 			c = skipFiller(reader);
 		}
+
+		UrfResource instanceReference = null; //we'll record whether we parse some instance reference TODO think of better name; one we can use in the specification 
 
 		final UrfResource resource;
 		switch(c) {
 			//objects
 			case OBJECT_BEGIN:
 				resource = parseObject(label, reader);
+				instanceReference = resource;
 				break;
 			//literals
 			case BINARY_BEGIN:
@@ -511,36 +485,66 @@ public class TurfParser<R> {
 				resource = parseSetResource((Alias)label, reader);
 				break;
 			default:
-				//TODO the spec currently says a tag MAY have a resource representation; should we create an object if there is none?
-				throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
+				//this must be "bare" label; declare a resource on the fly; TODO refactor; clarify in spec that a reference doesn't need the '*'
+				if(label instanceof URI) { //tag
+					final URI tag = (URI)label;
+					getProcessor().declareResource(tag);
+					resource = new SimpleUrfResource(tag);
+					instanceReference = resource;
+				} else if(label instanceof Alias) {
+					final URI blankTag = Tag.generateBlank(label.toString());
+					getProcessor().declareResource(blankTag);
+					resource = new SimpleUrfResource(blankTag);
+				} else if(label instanceof String) { //ID
+					throw new ParseIOException(reader, String.format("Object with ID %s does not indicate an object and type.", label));
+				} else { //no label at all
+					if(Name.isTokenBeginCharacter(c)) {
+						final String handle = parseHandle(reader);
+						final URI tag = Handle.toTag(handle, getNamespaces());
+						resource = new SimpleUrfResource(tag);
+						instanceReference = resource;
+					} else {
+						throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
+					}
+				}
+				break;
 		}
 
-		/*TODO fix
 		//check and associate with the label as needed
 		if(label instanceof URI) { //tag
-			checkParseIO(reader, resource instanceof SurfObject, "Tag |%s| can only be used an object.", label);
-			assert label.equals(((SurfObject)resource).getTag().orElse(null));
-			labeledResources.put(label, resource);
+			checkParseIO(reader, resource instanceof UrfResource, "Tag |%s| cannot be used with this resource.", label);
+			assert label.equals(((UrfResource)resource).getTag().orElse(null));
 		} else if(label instanceof String) { //ID
-			final String id = (String)label;
-			checkParseIO(reader, resource instanceof SurfObject, "ID |%s| can only be used an object.", id);
-			final SurfObject surfObject = (SurfObject)resource;
-			assert id.equals(((SurfObject)resource).getId().orElse(null));
-			final String typeHandle = surfObject.getTypeHandle()
-					.orElseThrow(() -> new ParseIOException(reader, String.format("Object with ID %s does not indicate a type.", id)));
-			labeledResources.put(new AbstractMap.SimpleImmutableEntry<String, String>(typeHandle, id), resource);
+			checkParseIO(reader, resource instanceof UrfResource, "ID |%s| cannot be used with this resource.", label);
+			final UrfResource urfResource = (UrfResource)resource;
+			assert urfResource.getTag().isPresent() : String.format("Object with ID %s should have been given a tag when parsing.", label);
 		} else if(label instanceof Alias) { //alias
 			checkParseIO(reader, resource != null, "Cannot use alias |%s| with null.", label);
 			if(!(resource instanceof Collection)) { //collections already saved the association
-				labeledResources.put(label, resource);
+				aliasedReferences.put((Alias)label, resource);
 			}
-			//aliases can refer to SurfObjects, collections, or value objects; normally we would want to ensure == for SurfObjects,
+			//aliases can refer to UrfObjects, collections, or value objects; normally we would want to ensure == for SurfObjects,
 			//but value objects are substitutable, so it's not good practice to compare them using ==
 			assert findResourceByAlias(label.toString()).isPresent();
 		}
-		*/
 
-		//TODO maybe delete		getProcessor().process(subject, property, propertyValue);
+		//if there was some object reference, process the object, inferring the type if needed
+		if(instanceReference != null) { //TODO there may be a better way to check; maybe just see if the resource is an instance of SimpleUrfResource, or not an object resource 
+			final URI tag = instanceReference.getTag().orElseThrow(() -> new AssertionError("Parsed object missing tag.")); //TODO don't we have a utility method for this supplier?
+			final URI declaredTypeTag = instanceReference.getTypeTag().orElse(null); //TODO switch to Java 9 Optional.or()
+			final URI idTypeTag = Tag.getIdTypeTag(tag).orElse(null);
+			final URI typeTag;
+			if(idTypeTag != null) { //use the implied type, if any, making sure it doesn't conflict with any declared type
+				if(declaredTypeTag != null) {
+					checkParseIO(reader, declaredTypeTag.equals(idTypeTag), "Resource with ID tag %s cannot have its implicit type redefined from %s to %s.", tag,
+							idTypeTag, declaredTypeTag);
+				}
+				typeTag = idTypeTag;
+			} else {
+				typeTag = declaredTypeTag;
+			}
+			getProcessor().declareResource(tag, typeTag);
+		}
 
 		//description (optional)
 		//TODO decide how much to allow: if(allowDescription && resource instanceof UrfObject) { //TODO make everything an UrfResource, e.g. PojoUrfResource for strings, and allow anything to have a description
@@ -575,6 +579,9 @@ public class TurfParser<R> {
 	 * If the given label indicates an ID, after parsing the object type if an object already exists with the given ID for that type, it will be immediately
 	 * returned.
 	 * </p>
+	 * <p>
+	 * This method only collects the object information; it does not pass them to the URF processor. That is the responsibility of the caller.
+	 * </p>
 	 * @param label The object label; either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an ID.
 	 * @param reader The reader containing SURF data.
 	 * @return The resource read from the reader.
@@ -595,10 +602,7 @@ public class TurfParser<R> {
 				//TODO add to specification
 				//TODO add bad TURF document to tests
 				checkParseIO(reader, typeTag.getRawFragment() == null, "Type tag %s with fragment may not be used with additional ID %s.", typeTag, label);
-				final UrfObject objectById = getObjectByTag(Tag.forTypeId(typeTag, (String)label));
-				if(objectById != null) {
-					return objectById;
-				}
+				//TODO document in the spec that TURF objects can have additional descriptions elsewhere and do not need *
 			}
 			c = skipFiller(reader);
 		} else {
@@ -606,15 +610,19 @@ public class TurfParser<R> {
 		}
 		final UrfResource resource; //create a resource based upon the type of label
 		if(label instanceof URI) { //tag
-			getProcessor().declareResource((URI)label, typeTag);
+			//TODO make sure that any tag label doesn't specify a different type than the object specifies
+			//TODO if an ID tag was _not_ passed, declare the type of the resource with the processor
 			resource = new SimpleUrfResource((URI)label, typeTag);
-			// TODO add support for IDs
-			//		} else if(label instanceof String) { //ID
-			//			checkParseIO(reader, typeHandle != null, "Object with ID %s does not indicate a type.", label);
-			//			resource = new UrfObject(typeHandle, (String)label);
-		} else { //no tag or ID
+		} else if(label instanceof String) { //ID
+			checkParseIO(reader, typeTag != null, "Object with ID %s does not indicate a type.", label);
+			final URI tag = URF.Tag.forTypeId(typeTag, (String)label);
+			resource = new SimpleUrfResource(tag, typeTag);
+		} else if(label instanceof Alias) { //alias
+			final URI blankTag = Tag.generateBlank(label.toString());
+			resource = new SimpleUrfResource(blankTag, typeTag); //the type may be null 
+		} else { //no tag, ID, or alias
+			assert label == null;
 			final URI blankTag = Tag.generateBlank();
-			getProcessor().declareResource(blankTag, typeTag);
 			resource = new SimpleUrfResource(blankTag, typeTag); //the type may be null 
 		}
 		return resource;
@@ -637,7 +645,7 @@ public class TurfParser<R> {
 			skipLineBreaks(reader);
 			check(reader, PROPERTY_VALUE_DELIMITER); //=
 			skipLineBreaks(reader);
-			final UrfResource value = parseResource(reader);
+			final UrfReference value = parseResource(reader);
 			getProcessor().processStatement(subject, property, value);
 			/*TODO transfer to TurfGraphProcessor
 						final Optional<Object> oldValue = subject.setPropertyValue(propertyHandle, value);
@@ -1281,7 +1289,7 @@ public class TurfParser<R> {
 		getProcessor().declareResource(blankTag, LIST_TYPE_TAG);
 		final UrfResource listResource = new SimpleUrfResource(blankTag, LIST_TYPE_TAG); //TODO maybe allow tagged lists 
 		if(alias != null) {
-			labeledResources.put(alias, listResource);
+			aliasedReferences.put(alias, listResource);
 		}
 		check(reader, LIST_BEGIN); //[
 		final AtomicLong indexCounter = new AtomicLong(0);
@@ -1289,7 +1297,7 @@ public class TurfParser<R> {
 			final long index = indexCounter.getAndIncrement();
 			//TODO final UrfResource property = getProcessor().declareResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index)), null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			final UrfResource property = new SimpleUrfResource(URF.Tag.forTypeId(ELEMENT_TYPE_TAG, Long.toString(index))); //TODO decide whether to declare properties
-			final UrfResource element = parseResource(r);
+			final UrfReference element = parseResource(r);
 			getProcessor().processStatement(listResource, property, element);
 		});
 		check(reader, LIST_END); //]
@@ -1311,14 +1319,14 @@ public class TurfParser<R> {
 		getProcessor().declareResource(blankMapTag, MAP_TYPE_TAG);
 		final UrfResource mapResource = new SimpleUrfResource(blankMapTag, MAP_TYPE_TAG); //TODO maybe allow tagged maps 
 		if(alias != null) {
-			labeledResources.put(alias, mapResource);
+			aliasedReferences.put(alias, mapResource);
 		}
 		check(reader, MAP_BEGIN); //{
 		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_PROPERTY_TAG); //TODO decide whether to declare properties;
 		final UrfResource keyProperty = new SimpleUrfResource(KEY_PROPERTY_TAG); //TODO decide whether to declare properties
 		final UrfResource valueProperty = new SimpleUrfResource(VALUE_PROPERTY_TAG); //TODO decide whether to declare properties
 		parseSequence(reader, MAP_END, r -> {
-			final UrfResource key;
+			final UrfReference key;
 			if(peek(reader) == MAP_KEY_DELIMITER) {
 				check(reader, MAP_KEY_DELIMITER); //\
 				key = parseResource(reader, true);
@@ -1329,7 +1337,7 @@ public class TurfParser<R> {
 			skipLineBreaks(reader);
 			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
 			skipLineBreaks(reader);
-			final UrfResource value = parseResource(reader);
+			final UrfReference value = parseResource(reader);
 			//simulate the map entry
 			final URI blankMapEntryTag = Tag.generateBlank();
 			getProcessor().declareResource(blankMapEntryTag, MAP_ENTRY_TYPE_TAG);
@@ -1357,13 +1365,13 @@ public class TurfParser<R> {
 		getProcessor().declareResource(blankTag, SET_TYPE_TAG);
 		final UrfResource setResource = new SimpleUrfResource(blankTag, SET_TYPE_TAG); //TODO maybe allow tagged sets 
 		if(alias != null) {
-			labeledResources.put(alias, setResource);
+			aliasedReferences.put(alias, setResource);
 		}
 		check(reader, SET_BEGIN); //[
 		getProcessor().declareResource(MEMBER_PROPERTY_TAG, null);
 		final UrfResource memberProperty = new SimpleUrfResource(MEMBER_PROPERTY_TAG);
 		parseSequence(reader, SET_END, r -> {
-			final UrfResource member = parseResource(r);
+			final UrfReference member = parseResource(r);
 			getProcessor().processStatement(setResource, memberProperty, member);
 		});
 		check(reader, SET_END); //]

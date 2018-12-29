@@ -98,6 +98,40 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		return getDeclaredResources().map(ObjectUrfResource::unwrap); //unwrap any native collections/maps
 	}
 
+	/**
+	 * Retrieves an object that was created from being declared.
+	 * @param tag The tag of the object to retrieve.
+	 * @return The object, which may not be present if no resource was declared with the given tag.
+	 * @throws NullPointerException if the given tag is <code>null</code>.
+	 */
+	public Optional<Object> findDeclaredObject(@Nonnull final URI tag) {
+		return Optional.ofNullable(declaredResources.get(requireNonNull(tag))).map(ObjectUrfResource::unwrap); //unwrap any native collections/maps
+	}
+
+	/**
+	 * Convenience method to looking up an object by its ID tag, based upon its type tag and ID.
+	 * @implSpec This implementation delegates to {@link #findDeclaredObject(URI)}.
+	 * @param typeTag The tag of the object's type.
+	 * @param id The object ID for the indicated type.
+	 * @return The object with the given ID, if any.
+	 * @see Tag#forTypeId(URI, String)
+	 */
+	public Optional<Object> findDeclaredObjectByTypeId(@Nonnull final URI typeTag, @Nonnull final String id) {
+		return findDeclaredObject(Tag.forTypeId(typeTag, id));
+	}
+
+	/**
+	 * Convenience method to looking up an object by its ID tag, based upon its type handle and ID.
+	 * @implSpec This implementation delegates to {@link #findDeclaredObjectByTypeId(URI, String)}.
+	 * @param typeHandle The handle of the object's type.
+	 * @param id The object ID for the indicated type.
+	 * @return The object with the given ID, if any.
+	 * @see Tag#forTypeId(URI, String)
+	 */
+	public Optional<Object> findDeclaredObjectByTypeId(@Nonnull final String typeHandle, @Nonnull final String id) {
+		return findDeclaredObjectByTypeId(Handle.toTag(typeHandle), id);
+	}
+
 	@Override
 	public void declareResource(final URI declaredTag, final URI typeTag) {
 		determineDeclaredResource(declaredTag, typeTag);

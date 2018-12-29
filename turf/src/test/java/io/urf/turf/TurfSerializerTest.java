@@ -123,6 +123,8 @@ public class TurfSerializerTest {
 		});
 	}
 
+	//#namespaces
+
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
 	@Test
 	public void testOkNamespaces() throws IOException {
@@ -151,6 +153,8 @@ public class TurfSerializerTest {
 			}
 		}
 	}
+
+	//#roots
 
 	/** @see TurfTestResources#OK_ROOTS_WHITESPACE_RESOURCE_NAME */
 	@Test
@@ -192,7 +196,82 @@ public class TurfSerializerTest {
 				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
 			}
 		}
+	}
 
+	//#objects
+
+	/** @see TurfSerializer#serializeObjectReference(Appendable, URI, URI, boolean) */
+	@Test
+	public void TestSerializeObjectReference() throws IOException {
+
+		//Type#id
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo"), URI.create("https://urf.name/Example"), false).toString(),
+				is("Example#foo"));
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#123"), URI.create("https://urf.name/Example"), false).toString(),
+				is("Example#123"));
+		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake").serializeObjectReference(new StringBuilder(),
+				URI.create("https://example.com/fake/Example#foo"), URI.create("https://example.com/fake/Example"), false).toString(), is("fake/Example#foo"));
+
+		//|"id"|*Type
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo:bar"), URI.create("https://urf.name/Example"), false)
+				.toString(), is("|\"foo:bar\"|*Example"));
+		assertThat(
+				new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake").serializeObjectReference(new StringBuilder(),
+						URI.create("https://example.com/fake/Example#foo:bar"), URI.create("https://example.com/fake/Example"), false).toString(),
+				is("|\"foo:bar\"|*fake/Example"));
+		//|"id"|*|<typeTag>|
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test#foo:bar"), URI.create("https://example.com/Test"), false)
+				.toString(), is("|\"foo:bar\"|*|<https://example.com/Test>|"));
+
+		//handle*Type
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example"), URI.create("https://urf.name/SomeType"), false).toString(),
+				is("Example"));
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example"), URI.create("https://urf.name/SomeType"), true).toString(),
+				is("Example*SomeType"));
+		assertThat(
+				new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake").serializeObjectReference(new StringBuilder(),
+						URI.create("https://example.com/fake/Example"), URI.create("https://example.com/fake/SomeType"), true).toString(),
+				is("fake/Example*fake/SomeType"));
+		//handle*|<typeTag>|
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example"), URI.create("https://example.com/SomeType"), false).toString(),
+				is("Example"));
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example"), URI.create("https://example.com/SomeType"), true).toString(),
+				is("Example*|<https://example.com/SomeType>|"));
+		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake")
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/fake/Example"), URI.create("https://example.com/SomeType"), true)
+				.toString(), is("fake/Example*|<https://example.com/SomeType>|"));
+
+		//|<tag>|*Type
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://urf.name/SomeType"), false).toString(),
+				is("|<https://example.com/Test>|"));
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://urf.name/SomeType"), true).toString(),
+				is("|<https://example.com/Test>|*SomeType"));
+		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake")
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/fake/SomeType"), true)
+				.toString(), is("|<https://example.com/Test>|*fake/SomeType"));
+		//|<tag>|*|<typeTag>|
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/SomeType"), false).toString(),
+				is("|<https://example.com/Test>|"));
+		assertThat(
+				new TurfSerializer()
+						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/SomeType"), true).toString(),
+				is("|<https://example.com/Test>|*|<https://example.com/SomeType>|"));
 	}
 
 }

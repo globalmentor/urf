@@ -1,0 +1,5 @@
+*Configuration:
+  foo = "bar"
+  test = 123
+  flag = true
+;

@@ -62,6 +62,54 @@ public class TurfParserTest {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
+	/** @see TurfTestResources#OK_IDS_RESOURCE_NAME */
+	@Test
+	public void testIds() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_IDS_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+
+		final UrfObject asTag = (UrfObject)urfObject.getPropertyValue("asTag").orElseThrow(AssertionError::new);
+		assertThat(asTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar1")));
+		assertThat(asTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
+		assertThat(asTag.getPropertyValue("test"), isPresentAndIs("first"));
+
+		final UrfObject asWithTypeTag = (UrfObject)urfObject.getPropertyValue("asTagWithTypeTag").orElseThrow(AssertionError::new);
+		assertThat(asWithTypeTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar2")));
+		assertThat(asWithTypeTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
+		assertThat(asWithTypeTag.getPropertyValue("test"), isPresentAndIs("second"));
+
+		final UrfObject asLabelAndTag = (UrfObject)urfObject.getPropertyValue("asLabelAndTag").orElseThrow(AssertionError::new);
+		assertThat(asLabelAndTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar3")));
+		assertThat(asLabelAndTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
+		assertThat(asLabelAndTag.getPropertyValue("test"), isPresentAndIs("third"));
+
+		final UrfObject asLabelAndHandle = (UrfObject)urfObject.getPropertyValue("asLabelAndHandle").orElseThrow(AssertionError::new);
+		assertThat(asLabelAndHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar4")));
+		assertThat(asLabelAndHandle.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Foo")));
+		assertThat(asLabelAndHandle.getPropertyValue("test"), isPresentAndIs("fourth"));
+
+		final UrfObject asLabelAndNamespaceHandle = (UrfObject)urfObject.getPropertyValue("asLabelAndNamespaceHandle").orElseThrow(AssertionError::new);
+		assertThat(asLabelAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar5")));
+		assertThat(asLabelAndNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
+		assertThat(asLabelAndNamespaceHandle.getPropertyValue("test"), isPresentAndIs("fifth"));
+
+		final UrfObject asTagAndNamespaceHandle = (UrfObject)urfObject.getPropertyValue("asTagAndNamespaceHandle").orElseThrow(AssertionError::new);
+		assertThat(asTagAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar6")));
+		assertThat(asTagAndNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
+		assertThat(asTagAndNamespaceHandle.getPropertyValue("test"), isPresentAndIs("sixth"));
+
+		final UrfObject asHandle = (UrfObject)urfObject.getPropertyValue("asHandle").orElseThrow(AssertionError::new);
+		assertThat(asHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar7")));
+		assertThat(asHandle.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Foo")));
+		assertThat(asHandle.getPropertyValue("test"), isPresentAndIs("seventh"));
+
+		final UrfObject asNamespaceHandle = (UrfObject)urfObject.getPropertyValue("asNamespaceHandle").orElseThrow(AssertionError::new);
+		assertThat(asNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar8")));
+		assertThat(asNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
+		assertThat(asNamespaceHandle.getPropertyValue("test"), isPresentAndIs("eighth"));
+	}
+
+	//TODO add bad ID test with conflicting type, e.g. 	|<https://example.com/Foo#test>|*|<https://example.com/Bar>|
+
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
 	@Test
 	public void testOkNamespaces() throws IOException {

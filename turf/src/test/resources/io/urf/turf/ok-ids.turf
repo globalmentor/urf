@@ -1,0 +1,41 @@
+\URF\:
+  namespaces = {
+    "count": <https://example.com/one/two/>
+  }
+;
+
+*:
+
+	asTag = |<https://example.com/Foo#bar1>|*:
+	  test = "first"
+	;
+
+	asTagWithTypeTag = |<https://example.com/Foo#bar2>|*|<https://example.com/Foo>|:
+	  test = "second"
+	;
+
+	asLabelAndTag = |"bar3"|*|<https://example.com/Foo>|:
+	  test = "third"
+	;
+
+	asLabelAndHandle = |"bar4"|*Foo:
+	  test = "fourth"
+	;
+
+	asLabelAndNamespaceHandle = |"bar5"|*count/Foo:
+	  test = "fifth"
+	;
+
+	asTagAndNamespaceHandle = |<https://example.com/one/two/Foo#bar6>|*count/Foo:
+	  test = "sixth"
+	;
+
+	asHandle = Foo#bar7:
+	  test = "seventh"
+	;
+
+	asNamespaceHandle = count/Foo#bar8:
+	  test = "eighth"
+	;
+
+;

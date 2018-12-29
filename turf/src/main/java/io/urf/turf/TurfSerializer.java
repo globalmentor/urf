@@ -49,7 +49,6 @@ import com.globalmentor.model.UUIDs;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
-import io.urf.URF;
 import io.urf.model.*;
 
 /**
@@ -222,9 +221,11 @@ public class TurfSerializer {
 	 * Registers a namespace with the given namespace alias. If the namespace was already registered
 	 * @param namespace The namespace to register.
 	 * @param alias The alias to use in place of the namespace
+	 * @return This serializer.
 	 */
-	public void registerNamespace(@Nonnull final URI namespace, @Nonnull final String alias) {
+	public TurfSerializer registerNamespace(@Nonnull final URI namespace, @Nonnull final String alias) {
 		namespaceAliases.put(requireNonNull(namespace), requireNonNull(alias));
+		return this;
 	}
 
 	/** @return The map of namespaces aliases associated with their namespaces. */
@@ -271,17 +272,19 @@ public class TurfSerializer {
 	 * If formatting is turned off, no content will be added.
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
+	 * @return The given appendable.
 	 * @throws IOException If there was an error writing the indent.
 	 * @see #isFormatted()
 	 * @see #getIndentSequence()
 	 */
-	protected void formatIndent(@Nonnull final Appendable appendable) throws IOException {
+	protected Appendable formatIndent(@Nonnull final Appendable appendable) throws IOException {
 		if(isFormatted()) {
 			final CharSequence indentSequence = getIndentSequence();
 			for(int i = 0; i < indentLevel; ++i) {
 				appendable.append(indentSequence);
 			}
 		}
+		return appendable;
 	}
 
 	/** Decreases the indention level. No information is appended. */
@@ -646,15 +649,16 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param simpleGraphUrfProcessor The simple graph URF processor that has already processed some URF content..
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or processor is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
+	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull SimpleGraphUrfProcessor simpleGraphUrfProcessor) throws IOException {
 		serializeDocument(appendable, simpleGraphUrfProcessor.getReportedRoots()); //if roots were reported (not all sources report roots), always make them roots in the output
 		simpleGraphUrfProcessor.getInferredRoot().ifPresent(throwingConsumer(inferredRoot -> {
 			serializeRoot(appendable, inferredRoot, false); //if there was an inferred root, serialize it if it hasn't been serialized already
 		}));
-		serializeRoots(appendable, () -> simpleGraphUrfProcessor.getDeclaredObjects().iterator(), false); //finally make sure that all resources have been serialized
+		return serializeRoots(appendable, () -> simpleGraphUrfProcessor.getDeclaredObjects().iterator(), false); //finally make sure that all resources have been serialized
 	}
 
 	/**
@@ -665,11 +669,12 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
-		serializeDocument(appendable, singleton(root));
+	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
+		return serializeDocument(appendable, singleton(root));
 	}
 
 	/**
@@ -680,11 +685,12 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object... roots) throws IOException {
-		serializeDocument(appendable, asList(roots));
+	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Object... roots) throws IOException {
+		return serializeDocument(appendable, asList(roots));
 	}
 
 	/**
@@ -694,10 +700,11 @@ public class TurfSerializer {
 	 *          aliases being used.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
+	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
 		//header
 		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
 		if(includeHeader) {
@@ -722,20 +729,22 @@ public class TurfSerializer {
 		} finally {
 			resourceHasReferenceMap.clear();
 		}
+		return appendable;
 	}
 
 	/**
 	 * Serializes a TURF document header to a writer, including the TURF signature and namespace declarations, if present.
 	 * @param appendable The appendable to which serialized data should be appended.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeHeader(@Nonnull final Appendable appendable) throws IOException {
+	public Appendable serializeHeader(@Nonnull final Appendable appendable) throws IOException {
 		appendable.append(SIGNATURE); //\SURF\
 		final UrfObject directives = new UrfObject();
 		final Map<String, URI> namespaces = namespaceAliases.entrySet().stream().collect(toMap(Map.Entry::getValue, Map.Entry::getKey)); //TODO improve ReverseMap to supply its reverse view
 		directives.setPropertyValue(DIRECTIVE_NAMESPACES_HANDLE, namespaces);
-		serializeDescription(appendable, directives);
+		return serializeDescription(appendable, directives);
 	}
 
 	long serializedRootCount = 0;
@@ -748,11 +757,12 @@ public class TurfSerializer {
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
-		serializeRoot(appendable, root, true);
+	public Appendable serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root) throws IOException {
+		return serializeRoot(appendable, root, true);
 	}
 
 	/**
@@ -765,11 +775,12 @@ public class TurfSerializer {
 	 * @param root The root resource.
 	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
 	 *          skipped.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root, final boolean includeDuplicates) throws IOException {
-		serializeRoots(appendable, singleton(root), includeDuplicates);
+	public Appendable serializeRoot(@Nonnull final Appendable appendable, @Nonnull Object root, final boolean includeDuplicates) throws IOException {
+		return serializeRoots(appendable, singleton(root), includeDuplicates);
 	}
 
 	/**
@@ -780,11 +791,12 @@ public class TurfSerializer {
 	 * @apiNote All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
-		serializeRoots(appendable, roots, true);
+	public Appendable serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
+		return serializeRoots(appendable, roots, true);
 	}
 
 	/**
@@ -797,10 +809,11 @@ public class TurfSerializer {
 	 * @param roots The root resources, if any.
 	 * @param includeDuplicates <code>true</code> if object should be included again if they have already been serialized, or <code>false</code> if it should be
 	 *          skipped.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
-	public void serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots, final boolean includeDuplicates) throws IOException {
+	public Appendable serializeRoots(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots, final boolean includeDuplicates) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		for(final Object root : roots) {
 			if(!includeDuplicates && isSerialized(root)) {
@@ -818,6 +831,7 @@ public class TurfSerializer {
 			serializeResource(appendable, root);
 			serializedRootCount++;
 		}
+		return appendable;
 	}
 
 	/**
@@ -827,16 +841,17 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param resource The URF resource to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or resource is <code>null</code>.
 	 * @throws IOException If there was an error appending the serialized data.
 	 */
-	public void serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
+	public Appendable serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
 		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
 		final String alias = determineAliasForResource(resource);
 		if(alias != null) {
 			appendable.append(LABEL_DELIMITER).append(alias).append(LABEL_DELIMITER);
 			if(wasSerialized) { //an aliased resource never has to be serialized twice
-				return;
+				return appendable;
 			}
 		}
 		switch(resource.getClass().getName()) { //use shortcut for final classes for efficiency
@@ -937,22 +952,16 @@ public class TurfSerializer {
 			default:
 				//handle general base types and interfaces
 				if(resource instanceof UrfObject) { //objects TODO additionally create class name constant when package stabilizes
-					final UrfObject urfObject = (UrfObject)resource;
-					if(urfObject.getTag().isPresent()) { //|<tag>|
-						serializeTagLabel(appendable, urfObject.getTag().get());
-						if(wasSerialized) { //an object with a tag never has to be serialized twice
-							return;
+					final UrfResource urfObject = (UrfObject)resource;
+					final URI tag = urfObject.getTag().orElse(null);
+					final URI typeTag = urfObject.getTypeTag().orElse(null);
+					if(tag != null) {
+						serializeObjectReference(appendable, tag, typeTag, !wasSerialized); //force a declaration the first time the object is serialized
+						if(wasSerialized) { //an object with a tag of any sort never has to be serialized twice
+							return appendable;
 						}
-					} else if(urfObject.getId().isPresent()) { //|"id"|
-						appendable.append(LABEL_DELIMITER);
-						serializeString(appendable, urfObject.getId().get());
-						appendable.append(LABEL_DELIMITER);
-					}
-					serializeObject(appendable, (UrfObject)resource);
-					if(urfObject.getId().isPresent()) {
-						if(wasSerialized) { //an object with and ID never needs its description serialized again
-							return;
-						}
+					} else {
+						serializeObject(appendable, typeTag);
 					}
 				} else if(resource instanceof List) { //list
 					serializeList(appendable, (List<?>)resource);
@@ -984,51 +993,119 @@ public class TurfSerializer {
 				serializeDescription(appendable, urfObject);
 			}
 		}
+
+		return appendable;
 	}
 
 	/**
 	 * Serializes a label containing a tag.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The tag to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#LABEL_DELIMITER
 	 */
-	public void serializeTagLabel(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException {
+	public Appendable serializeTagLabel(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException {
 		appendable.append(LABEL_DELIMITER);
 		serializeIri(appendable, tag);
-		appendable.append(LABEL_DELIMITER);
+		return appendable.append(LABEL_DELIMITER);
 	}
 
 	/**
 	 * Serializes a reference to resource. The reference will be a handle if possible; otherwise a label will be serialized for the tag.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The tag to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
-	public void serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		ifPresentOrElse​(URF.Handle.fromTag(tag, getNamespaceAliases()), throwingConsumer(appendable::append),
+	public Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
+		ifPresentOrElse​(Handle.fromTag(tag, getNamespaceAliases()), throwingConsumer(appendable::append),
 				throwingRunnable(() -> serializeTagLabel(appendable, tag)));
+		return appendable;
 	}
 
 	//objects
 
 	/**
-	 * Serializes an object representation <em>without</em> the following description.
+	 * Serializes a reference to an object <em>without</em> the following description. An object reference will take one of the following forms, with an optional
+	 * <code>Type</code>:
+	 * <dl>
+	 * <dt>{@code Type#id}</dt>
+	 * <dd>If the object has an ID tag that can be expressed as a handle.</dd>
+	 * <dt>{@code |"id"|*Type}</dt>
+	 * <dd>If the object has an ID tag that cannot be expressed as a handle.</dd>
+	 * <dt>{@code |"id"|*|<typeTag>|}</dt>
+	 * <dd>If the object has an ID tag that cannot be expressed as a handle, and the type tag cannot be expressed as a handle.</dd>
+	 * <dt>{@code handle*Type}</dt>
+	 * <dd>If the object has tag that has no ID, but the tag can be expressed as a handle.</dd>
+	 * <dt>{@code handle*|<typeTag>|}</dt>
+	 * <dd>If the object has tag that has no ID, but the tag can be expressed as a handle; however the type tag cannot be expressed as a handle.</dd>
+	 * <dt>{@code |<tag>|*Type}</dt>
+	 * <dd>If the object has tag that has no ID and the tag cannot be expressed as a handle.</dd>
+	 * <dt>{@code |<tag>|*|<typeTag>|}</dt>
+	 * <dd>If the object has tag that has no ID, and neither the tag nor the type tag can be expressed as a handle.</dd>
+	 * </dl>
 	 * <p>
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
-	 * @param urfObject The information to be serialized as an URF object.
+	 * @param tag The identifying tag of the object.
+	 * @param typeTag The tag identifying object type, or <code>null</code> if the object has no declared type; if the tag is an ID tag and a type is given, the
+	 *          type must match the type implied by the tag.
+	 * @param declaration Whether the object declaration form <code>…*Type</code> should be included, even
+	 * @return The given appendable.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IllegalArgumentException if a type tag was provided that does not match the implied type of an ID tag.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see #serializeObject(Appendable, URI)
+	 */
+	public Appendable serializeObjectReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nullable final URI typeTag,
+			final boolean declaration) throws IOException {
+		final String id = Tag.getId(tag).orElse(null);
+		if(id != null) {
+			if(typeTag != null) { //if a type was given, make sure it matches the implied type
+				final URI idTypeTag = Tag.getIdTypeTag(tag).orElseThrow(() -> new AssertionError("If an tag has an ID, it is assumed to have an implied type."));
+				checkArgument(idTypeTag.equals(typeTag), "Object reference with ID tag %s cannot have its implicit type given as %s to %s.", tag, idTypeTag, typeTag);
+			}
+			final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
+			if(idHandle != null) { //Type#id
+				appendable.append(idHandle);
+			} else { //|"id"|*Type
+				appendable.append(LABEL_DELIMITER);
+				serializeString(appendable, id);
+				appendable.append(LABEL_DELIMITER);
+				serializeObject(appendable, typeTag);
+			}
+		} else { //|<tag>|*Type
+			serializeTagReference(appendable, tag);
+			if(declaration) { //if we should force the full declaration
+				serializeObject(appendable, typeTag);
+			}
+		}
+		return appendable;
+	}
+
+	/**
+	 * Serializes an object representation in the form <code>*Type</code>, <em>without</em> the following description.
+	 * <p>
+	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
+	 * </p>
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param typeTag The tag identifying object type, or <code>null</code> if the object has no declared type.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#OBJECT_BEGIN
 	 */
-	public void serializeObject(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
+	public Appendable serializeObject(@Nonnull final Appendable appendable, @Nullable URI typeTag) throws IOException {
 		appendable.append(OBJECT_BEGIN); //*
-		urfObject.getTypeTag().ifPresent(throwingConsumer(tag -> serializeTagReference(appendable, tag))); //type
+		if(typeTag != null) {
+			serializeTagReference(appendable, typeTag); //type
+		}
+		return appendable;
 	}
 
 	/**
@@ -1038,12 +1115,13 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param urfObject The URF object with the description to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#DESCRIPTION_BEGIN
 	 * @see TURF#DESCRIPTION_END
 	 */
-	public void serializeDescription(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
+	public Appendable serializeDescription(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
 		appendable.append(DESCRIPTION_BEGIN); //:
 		formatNewLine(appendable);
 		try (final Closeable indention = increaseIndentLevel()) {
@@ -1051,6 +1129,7 @@ public class TurfSerializer {
 		}
 		formatIndent(appendable);
 		appendable.append(DESCRIPTION_END); //;
+		return appendable;
 	}
 
 	/**
@@ -1060,10 +1139,11 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param property The property and value pair to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 */
-	public void serializeProperty(@Nonnull final Appendable appendable, @Nonnull final Map.Entry<URI, Object> property) throws IOException {
+	public Appendable serializeProperty(@Nonnull final Appendable appendable, @Nonnull final Map.Entry<URI, Object> property) throws IOException {
 		serializeTagReference(appendable, property.getKey());
 		if(formatted) {
 			appendable.append(SPACE_CHAR);
@@ -1072,7 +1152,7 @@ public class TurfSerializer {
 		if(formatted) {
 			appendable.append(SPACE_CHAR);
 		}
-		serializeResource(appendable, property.getValue());
+		return serializeResource(appendable, property.getValue());
 	}
 
 	//literals
@@ -1081,24 +1161,26 @@ public class TurfSerializer {
 	 * Serializes a binary literal along with its delimiter from an array of bytes.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param bytes The information to be serialized as a binary literal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#BINARY_BEGIN
 	 */
-	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
+	public static Appendable serializeBinary(@Nonnull final Appendable appendable, @Nonnull final byte[] bytes) throws IOException {
 		appendable.append(BINARY_BEGIN);
-		appendable.append(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
+		return appendable.append(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
 	}
 
 	/**
 	 * Serializes a binary literal along with its delimiter from a byte buffer.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param byteBuffer The information to be serialized as a binary literal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#BINARY_BEGIN
 	 */
-	public static void serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
+	public static Appendable serializeBinary(@Nonnull final Appendable appendable, @Nonnull final ByteBuffer byteBuffer) throws IOException {
 		appendable.append(BINARY_BEGIN);
 		final ByteBuffer base64ByteBuffer = Base64.getEncoder().withoutPadding().encode(byteBuffer);
 		final byte[] base64Bytes;
@@ -1108,36 +1190,38 @@ public class TurfSerializer {
 			base64Bytes = new byte[base64ByteBuffer.remaining()];
 			base64ByteBuffer.get(base64Bytes);
 		}
-		appendable.append(new String(base64Bytes, US_ASCII));
+		return appendable.append(new String(base64Bytes, US_ASCII));
 	}
 
 	/**
 	 * Serializes a Boolean.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param bool The Boolean value to be serialized as a Boolean.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
 	 */
-	public static void serializeBoolean(@Nonnull final Appendable appendable, @Nonnull final boolean bool) throws IOException {
-		appendable.append(bool ? BOOLEAN_TRUE_LEXICAL_FORM : BOOLEAN_FALSE_LEXICAL_FORM);
+	public static Appendable serializeBoolean(@Nonnull final Appendable appendable, @Nonnull final boolean bool) throws IOException {
+		return appendable.append(bool ? BOOLEAN_TRUE_LEXICAL_FORM : BOOLEAN_FALSE_LEXICAL_FORM);
 	}
 
 	/**
 	 * Serializes a character surrounded by character delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param codePoint The Unicode code point to be serialized as a character.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given code point is not a valid Unicode code point.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#CHARACTER_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
-	public static void serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
+	public static Appendable serializeCharacter(@Nonnull final Appendable appendable, @Nonnull final int codePoint) throws IOException {
 		checkArgument(Character.isValidCodePoint(codePoint), "The value %d does not represent is not a valid code point.", codePoint);
 		appendable.append(CHARACTER_DELIMITER);
 		serializeCharacterCodePoint(appendable, CHARACTER_DELIMITER, codePoint);
-		appendable.append(CHARACTER_DELIMITER);
+		return appendable.append(CHARACTER_DELIMITER);
 	}
 
 	/**
@@ -1148,13 +1232,14 @@ public class TurfSerializer {
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
 	 * @param codePoint The code point to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
 	 * @throws ParseIOException if a control character was represented, if the character is not escaped correctly, or the reader has no more characters before the
 	 *           current character is completely parsed.
 	 * @see TURF#CHARACTER_REQUIRED_ESCAPED_CHARACTERS
 	 */
-	public static void serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
+	public static Appendable serializeCharacterCodePoint(@Nonnull final Appendable appendable, final char delimiter, final int codePoint)
 			throws IOException, ParseIOException {
 		//TODO check for control characters
 		if(codePoint == delimiter || (codePoint <= Character.MAX_VALUE && CHARACTER_REQUIRED_ESCAPED_CHARACTERS.contains((char)codePoint))) {
@@ -1187,30 +1272,29 @@ public class TurfSerializer {
 					escapeChar = delimiter;
 					break;
 			}
-			appendable.append(escapeChar);
-			return;
+			return appendable.append(escapeChar);
 		}
 		//code points outside the BMP
 		if(Character.isSupplementaryCodePoint(codePoint)) {
-			appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
-			return;
+			return appendable.append(Character.highSurrogate(codePoint)).append(Character.lowSurrogate(codePoint));
 		}
 		//code points within the BMP
 		assert Character.isBmpCodePoint(codePoint); //everything else should be in the BMP and not need escaping
-		appendable.append((char)codePoint);
+		return appendable.append((char)codePoint);
 	}
 
 	/**
 	 * Serializes an email address along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param emailAddress The information to be serialized as an email address.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#EMAIL_ADDRESS_BEGIN
 	 */
-	public static void serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
+	public static Appendable serializeEmailAddress(@Nonnull final Appendable appendable, @Nonnull final EmailAddress emailAddress) throws IOException {
 		appendable.append(EMAIL_ADDRESS_BEGIN);
-		appendable.append(emailAddress.toString());
+		return appendable.append(emailAddress.toString());
 	}
 
 	/**
@@ -1220,12 +1304,13 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param iri The information to be serialized as an IRI.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if the given IRI is not a true, absolute IRI with a scheme.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#IRI_BEGIN
 	 */
-	public static void serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
+	public static Appendable serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
 		checkAbsolute(iri);
 		appendable.append(IRI_BEGIN);
 		switch(ASCII.toLowerCase(iri.getScheme()).toString()) {
@@ -1249,7 +1334,7 @@ public class TurfSerializer {
 				appendable.append(iri.toString());
 				break;
 		}
-		appendable.append(IRI_END);
+		return appendable.append(IRI_END);
 	}
 
 	/**
@@ -1263,28 +1348,30 @@ public class TurfSerializer {
 	 * </ul>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param number The information to be serialized as a number.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#NUMBER_DECIMAL_BEGIN
 	 */
-	public static void serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
+	public static Appendable serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
 		final boolean isDecimal = (number instanceof BigDecimal) || (number instanceof BigInteger);
 		if(isDecimal) {
 			appendable.append(NUMBER_DECIMAL_BEGIN);
 		}
-		appendable.append(number.toString());
+		return appendable.append(number.toString());
 	}
 
 	/**
 	 * Serializes a regular expression along with its delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param regularExpression The information to be serialized as a regular expression.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#REGULAR_EXPRESSION_DELIMITER
 	 * @see TURF#REGULAR_EXPRESSION_ESCAPE
 	 */
-	public static void serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
+	public static Appendable serializeRegularExpression(@Nonnull final Appendable appendable, @Nonnull final Pattern regularExpression) throws IOException {
 		appendable.append(REGULAR_EXPRESSION_DELIMITER);
 		final String regexString = regularExpression.toString();
 		//See if there is anything we need to escape; checking ahead of time will usually be faster than appending each character,
@@ -1301,7 +1388,7 @@ public class TurfSerializer {
 		} else { //no escaping needed
 			appendable.append(regexString);
 		}
-		appendable.append(REGULAR_EXPRESSION_DELIMITER);
+		return appendable.append(REGULAR_EXPRESSION_DELIMITER);
 		//TODO add support for flags
 	}
 
@@ -1309,12 +1396,13 @@ public class TurfSerializer {
 	 * Serializes a string surrounded by string delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param charSequence The information to be serialized as a string.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#STRING_DELIMITER
 	 * @see #serializeCharacterCodePoint(Appendable, char, int)
 	 */
-	public static void serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
+	public static Appendable serializeString(@Nonnull final Appendable appendable, @Nonnull final CharSequence charSequence) throws IOException {
 		appendable.append(STRING_DELIMITER);
 		final int length = charSequence.length();
 		for(int i = 0; i < length; i++) {
@@ -1330,48 +1418,51 @@ public class TurfSerializer {
 			}
 			serializeCharacterCodePoint(appendable, STRING_DELIMITER, codePoint);
 		}
-		appendable.append(STRING_DELIMITER);
+		return appendable.append(STRING_DELIMITER);
 	}
 
 	/**
 	 * Serializes a telephone number along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param telephoneNumber The information to be serialized as a telephone number.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @throws IllegalArgumentException if the given telephone number is not in global form.
 	 * @see TURF#TELEPHONE_NUMBER_BEGIN
 	 * @see TelephoneNumber#isGlobal()
 	 */
-	public static void serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
+	public static Appendable serializeTelephoneNumber(@Nonnull final Appendable appendable, @Nonnull final TelephoneNumber telephoneNumber) throws IOException {
 		checkArgument(telephoneNumber.isGlobal(), "Telephone number %s not in global form.", telephoneNumber);
-		appendable.append(telephoneNumber.toString());
+		return appendable.append(telephoneNumber.toString());
 	}
 
 	/**
 	 * Serializes a temporal literal along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param temporal The information to be serialized as a temporal.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#TEMPORAL_BEGIN
 	 */
-	public static void serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
+	public static Appendable serializeTemporal(@Nonnull final Appendable appendable, @Nonnull final TemporalAccessor temporal) throws IOException {
 		appendable.append(TEMPORAL_BEGIN);
-		appendable.append(temporal.toString());
+		return appendable.append(temporal.toString());
 	}
 
 	/**
 	 * Serializes a UUID along with its delimiter.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param uuid The information to be serialized as a UUID.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#UUID_BEGIN
 	 */
-	public static void serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
+	public static Appendable serializeUuid(@Nonnull final Appendable appendable, @Nonnull final UUID uuid) throws IOException {
 		appendable.append(UUID_BEGIN);
-		appendable.append(uuid.toString());
+		return appendable.append(uuid.toString());
 	}
 
 	//collections
@@ -1383,12 +1474,13 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param list The information to be serialized as a list.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#LIST_BEGIN
 	 * @see TURF#LIST_END
 	 */
-	public void serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
+	public Appendable serializeList(@Nonnull final Appendable appendable, @Nonnull final List<?> list) throws IOException {
 		appendable.append(LIST_BEGIN); //[
 		if(!list.isEmpty()) {
 			formatNewLine(appendable);
@@ -1397,7 +1489,7 @@ public class TurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(LIST_END); //]
+		return appendable.append(LIST_END); //]
 	}
 
 	/**
@@ -1407,6 +1499,7 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param map The information to be serialized as a map.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#MAP_BEGIN
@@ -1414,7 +1507,7 @@ public class TurfSerializer {
 	 * @see TURF#MAP_KEY_DELIMITER
 	 * @see TURF#ENTRY_KEY_VALUE_DELIMITER
 	 */
-	public void serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
+	public Appendable serializeMap(@Nonnull final Appendable appendable, @Nonnull final Map<?, ?> map) throws IOException {
 		appendable.append(MAP_BEGIN); //{
 		if(!map.isEmpty()) {
 			formatNewLine(appendable);
@@ -1423,7 +1516,7 @@ public class TurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(MAP_END); //}
+		return appendable.append(MAP_END); //}
 	}
 
 	/**
@@ -1433,10 +1526,11 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param entry The map key and value pair to be serialized.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 */
-	public void serializeMapEntry(@Nonnull final Appendable appendable, @Nonnull Map.Entry<?, ?> entry) throws IOException {
+	public Appendable serializeMapEntry(@Nonnull final Appendable appendable, @Nonnull Map.Entry<?, ?> entry) throws IOException {
 		final Object key = entry.getKey();
 		final boolean hasDescription = key instanceof UrfObject && ((UrfObject)key).hasProperties();
 		if(hasDescription) {
@@ -1450,7 +1544,7 @@ public class TurfSerializer {
 		if(formatted) {
 			appendable.append(SPACE_CHAR);
 		}
-		serializeResource(appendable, entry.getValue());
+		return serializeResource(appendable, entry.getValue());
 	}
 
 	/**
@@ -1460,12 +1554,13 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param set The information to be serialized as a set.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#SET_BEGIN
 	 * @see TURF#SET_END
 	 */
-	public void serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
+	public Appendable serializeSet(@Nonnull final Appendable appendable, @Nonnull final Set<?> set) throws IOException {
 		appendable.append(SET_BEGIN); //(
 		if(!set.isEmpty()) {
 			formatNewLine(appendable);
@@ -1474,7 +1569,7 @@ public class TurfSerializer {
 			}
 			formatIndent(appendable);
 		}
-		appendable.append(SET_END); //)
+		return appendable.append(SET_END); //)
 	}
 
 	/**
@@ -1485,10 +1580,11 @@ public class TurfSerializer {
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param sequence An iterable representing the sequence to serialize.
 	 * @param itemSerializer The serialization strategy, which is passed the {@link Appendable} to use for serialization, along with each item to serialize.
+	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable and/or item serializer is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appender.
 	 */
-	protected <I> void serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence,
+	protected <I> Appendable serializeSequence(@Nonnull final Appendable appendable, @Nonnull Iterable<I> sequence,
 			@Nonnull final IOBiConsumer<Appendable, I> itemSerializer) throws IOException {
 		final boolean sequenceSeparatorRequired = isSequenceSeparatorRequired();
 		final Iterator<I> iterator = sequence.iterator();
@@ -1507,6 +1603,7 @@ public class TurfSerializer {
 				appendable.append(SEQUENCE_DELIMITER);
 			}
 		}
+		return appendable;
 	}
 
 }
