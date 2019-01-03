@@ -56,6 +56,7 @@
 		<module>config-file-format-turf</module>
 		<module>config-file-format-turf-provider</module>
 		<module>config-urf</module>
+		<module>csv</module>
 		<module>model</module>
 		<module>spec</module>
 		<module>surf</module>
@@ -133,6 +134,12 @@
 			<dependency>
 				<groupId>io.urf</groupId>
 				<artifactId>config-urf</artifactId>
+				<version>0.3.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>urf-csv</artifactId>
 				<version>0.3.0-SNAPSHOT</version>
 			</dependency>
 

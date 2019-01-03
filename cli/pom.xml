@@ -45,6 +45,11 @@
 
 		<dependency>
 			<groupId>io.urf</groupId>
+			<artifactId>urf-csv</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
 			<artifactId>turf</artifactId>
 		</dependency>
 
