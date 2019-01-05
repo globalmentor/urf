@@ -25,6 +25,8 @@ import static java.util.Objects.*;
 
 import java.io.*;
 import java.net.*;
+import java.time.*;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -42,15 +44,11 @@ import io.urf.turf.*;
 
 /**
  * Parser for the URF CSV document format.
- * <p>
- * This parser is meant to be used once for parsing a single URF CSV document. It should not be used to parse multiple documents, as it maintains parsing state.
- * </p>
- * <p>
- * The parser should be released after use so as not to leak memory.
- * </p>
- * <p>
- * This implementation is not thread safe.
- * </p>
+ * @apiNote This parser is meant to be used once for parsing a single URF CSV document. It should not be used to parse multiple documents, as it maintains
+ *          parsing state.
+ * @apiNote The parser should be released after use so as not to leak memory.
+ * @implSpec This implementation is not thread safe.
+ * @implNote Support has not yet been added for all URF types.
  * @param <R> The type of result returned by the parser, based upon the {@link UrfProcessor} used.
  * @author Garret Wilson
  * @see UrfProcessor
@@ -248,20 +246,88 @@ public class UrfCsvParser<R> implements Clogged {
 			final URI propertyTag = TurfParser.parseTagReference(reader, emptyMap()); //e.g. propertyHandle or |<propertyUri>|
 			c = skip(reader, TURF.WHITESPACE_CHARACTERS);
 			final URI typeTag; //the type representing the type of the column (the _range_ of the property), not the type of the property
-			if(c == TURF.MAP_KEY_DELIMITER) { //:
-				check(reader, TURF.MAP_KEY_DELIMITER);
+			if(c == TURF.ENTRY_KEY_VALUE_DELIMITER) { //:
+				check(reader, TURF.ENTRY_KEY_VALUE_DELIMITER);
 				typeTag = TurfParser.parseTagReference(reader, emptyMap()); //e.g. typeHandle or |<typeUri>|
 				c = skip(reader, TURF.WHITESPACE_CHARACTERS);
 			} else {
 				typeTag = null; //no type specified
 			}
+
 			//TODO detect unexpected trailing characters, allowing for a comment
 			final IOFunction<String, UrfReference> parseStrategy; //determine how to parse the column based on the type
 			if(typeTag == null) { //if no type is specified, use the field as-is
 				parseStrategy = field -> new DefaultValueUrfResource<>(STRING_TYPE_TAG, field);
 				//				return new DefaultColumn(headerIndex, header, propertyTag, typeTag, IOFunction.identity());
 			} else {
-				throw new ParseIOException("Unsupported type: " + typeTag); //TODO implement the other types
+				//TODO create a more efficient way to check the types; probably using a common ValueStrategy
+				if(BOOLEAN_TYPE_TAG.equals(typeTag)) {
+					//TODO implement a CharSequenceReader that doesn't have the synchronization overhead of StringReader
+					parseStrategy = field -> new DefaultValueUrfResource<>(typeTag, TurfParser.parseBoolean(new StringReader(field)));
+				} else if(INTEGER_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final Long longValue;
+						try {
+							longValue = Long.valueOf(field);
+						} catch(final NumberFormatException numberFormatException) {
+							throw new ParseIOException(reader, "Invalid number format: " + field, numberFormatException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, longValue);
+					};
+				} else if(LOCAL_DATE_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final LocalDate localDate;
+						try {
+							localDate = LocalDate.parse(field);
+						} catch(final DateTimeParseException dateTimeParseException) {
+							throw new ParseIOException(dateTimeParseException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, localDate);
+					};
+				} else if(LOCAL_TIME_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final LocalTime localTime;
+						try {
+							localTime = LocalTime.parse(field);
+						} catch(final DateTimeParseException dateTimeParseException) {
+							throw new ParseIOException(dateTimeParseException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, localTime);
+					};
+				} else if(REAL_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final Double number;
+						try {
+							number = Double.valueOf(field);
+						} catch(final NumberFormatException numberFormatException) {
+							throw new ParseIOException(reader, "Invalid number format: " + field, numberFormatException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, number);
+					};
+				} else if(INSTANT_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final Instant instant;
+						try {
+							instant = Instant.parse(field);
+						} catch(final DateTimeParseException dateTimeParseException) {
+							throw new ParseIOException(dateTimeParseException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, instant);
+					};
+				} else if(IRI_TYPE_TAG.equals(typeTag)) {
+					parseStrategy = field -> {
+						final URI iri;
+						try {
+							iri = new URI(field);
+						} catch(final URISyntaxException uriSyntaxException) {
+							throw new ParseIOException("Invalid IRI: " + field, uriSyntaxException);
+						}
+						return new DefaultValueUrfResource<>(typeTag, iri);
+					};
+				} else {
+					//TODO verify that the type tag isn't an `urf-` type, because we should have taken care of all those (when this implementation is finished)
+					return new IdReferenceColumn(headerIndex, header, propertyTag, typeTag);
+				}
 			}
 			return new DefaultColumn(headerIndex, header, propertyTag, typeTag, parseStrategy);
 		}
@@ -316,6 +382,7 @@ public class UrfCsvParser<R> implements Clogged {
 		}
 	}
 
+	//TODO document
 	protected interface Column {
 
 		/** @return The index of the column. */
@@ -333,7 +400,7 @@ public class UrfCsvParser<R> implements Clogged {
 		/**
 		 * Parses a field in the column.
 		 * @implNote This method should never throw an {@link IOException} that is not an instance of {@link ParseIOException}.
-		 * @param field
+		 * @param field The RFC 4180 decoded field value to parse.
 		 * @return A reference to the object, which will be a {@link ObjectUrfResource} for any value objects.
 		 * @throws IOException If there was an error reading the data.
 		 * @throws ParseIOException if the parsed data was invalid.
@@ -410,6 +477,7 @@ public class UrfCsvParser<R> implements Clogged {
 
 	}
 
+	//TODO document
 	protected static abstract class BaseColumn extends AbstractColumn {
 
 		private final Optional<UrfReference> property;
@@ -430,7 +498,7 @@ public class UrfCsvParser<R> implements Clogged {
 		 * Constructor.
 		 * @param index The index of the column.
 		 * @param header The original literal header of the CSV document.
-		 * @param property The tag of the property, or <code>null</code> if this column doesn't represent a property.
+		 * @param propertyTag The tag of the property, or <code>null</code> if this column doesn't represent a property.
 		 * @param typeTag The tag of the column type, or <code>null</code> if no type was specified.
 		 * @throws NullPointerException if the header is <code>null</code>.
 		 * @throws IllegalArgumentException if the given index is negative.
@@ -443,6 +511,7 @@ public class UrfCsvParser<R> implements Clogged {
 
 	}
 
+	//TODO document
 	protected static class DefaultColumn extends BaseColumn {
 
 		private final IOFunction<String, UrfReference> parseStrategy;
@@ -488,8 +557,7 @@ public class UrfCsvParser<R> implements Clogged {
 		 * @throws NullPointerException if the header and/or type tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given index is negative.
 		 */
-		public IdReferenceColumn(@Nonnegative final int index, @Nonnull final String header, @Nullable final URI propertyTag, @Nullable final URI typeTag,
-				@Nonnull final IOFunction<String, UrfReference> parseStrategy) {
+		public IdReferenceColumn(@Nonnegative final int index, @Nonnull final String header, @Nullable final URI propertyTag, @Nullable final URI typeTag) {
 			super(index, header, propertyTag, typeTag);
 			this.typeTag = requireNonNull(typeTag); //store the type tag locally for efficient lookup without requiring Optional overhead, as we know there must be a type
 		}

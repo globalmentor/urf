@@ -1020,7 +1020,7 @@ public class TurfParser<R> {
 			} else {
 				if(hasFraction || hasExponent) { //if there was a fraction or exponent
 					typeTag = REAL_TYPE_TAG;
-					value = Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it
+					value = Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it TODO this can be changed to simply Double.valueOf(numberString)
 				} else { //if there is no fraction or exponent
 					typeTag = INTEGER_TYPE_TAG;
 					final long longValue = Long.parseLong(numberString);

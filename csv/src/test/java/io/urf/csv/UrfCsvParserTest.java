@@ -64,9 +64,12 @@ public class UrfCsvParserTest {
 		final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor();
 		final List<Object> result = new UrfCsvParser<List<Object>>(urfProcessor).parseDocument(inputStream, subjectTypeTag);
 
-		final TurfSerializer turfSerializer = new TurfSerializer(); //TODO delete; testing
+		/*TODO delete; testing
+		final TurfSerializer turfSerializer = new TurfSerializer(); //
 		turfSerializer.setFormatted(true);
+		turfSerializer.registerNamespace(URI.create("http://xmlns.com/foaf/0.1/"), "foaf");
 		System.out.println(turfSerializer.serializeDocument(new StringBuilder(), urfProcessor));
+		*/
 
 		return result;
 	}

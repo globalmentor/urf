@@ -33,6 +33,7 @@ public interface UrfReference {
 	/**
 	 * Creates a reference from a tag.
 	 * @param tag The identifying resource tag; must not be <code>null</code>.
+	 * @return A reference with the given tag.
 	 * @throws NullPointerException if the given tag is <code>null</code>.
 	 * @throws IllegalArgumentException if a tag is given that is not a valid tag, for example, not it is not an absolute IRI.
 	 */
