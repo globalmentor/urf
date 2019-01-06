@@ -98,29 +98,34 @@ public class UrfCli implements Runnable, Clogged {
 	@Command(description = "Converts one or more files to some URF file format.")
 	public void convert(@Option(names = {"--out", "-o"}) final Path output, @Parameters(paramLabel = "<file>", arity = "1..*") @Nonnull final Path[] paths) {
 		//TODO precondition paths length check
-		final Path path = paths[0];
-		//TODO precondition check filename
-		final String typeHandle = Filenames.getBaseFilename(path.getFileName().toString());
-		final URI typeTag = Handle.toTag(typeHandle);
+		//TODO detect a glob as the first path, for shells that don't enumerate the file automatically
 
 		final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor();
-		final UrfCsvParser<List<Object>> urfCsvParser = new UrfCsvParser<>(urfProcessor);
 
 		try {
-			try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {
-				urfCsvParser.parseDocument(inputStream, typeTag);
+			for(final Path path : paths) { //parse each file using the same processor
+				System.out.println(String.format("Converting file %s...", path.getFileName()));
+				//TODO precondition check filename
+				final String typeHandle = Filenames.getBaseFilename(path.getFileName().toString());
+				final URI typeTag = Handle.toTag(typeHandle);
+
+				final UrfCsvParser<List<Object>> urfCsvParser = new UrfCsvParser<>(urfProcessor);
+				try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {
+					//TODO provide updates to the user during parsing and when writing
+					urfCsvParser.parseDocument(inputStream, typeTag);
+				}
 			}
-			//TODO provide updates to the user during parsing and when writing
 			final TurfSerializer turfSerializer = new TurfSerializer();
 			turfSerializer.setFormatted(true);
 			if(output != null) {
+				System.out.println(String.format("Writing output file %s...", output.getFileName()));
 				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(output))) {
 					turfSerializer.serializeDocument(outputStream, urfProcessor);
 				}
 			} else {
 				turfSerializer.serializeDocument((Appendable)System.out, urfProcessor); //TODO improve varargs in signature to prevent need for cast
 			}
-			System.out.println("\nConversion finished.");
+			System.out.println("Conversion finished.");
 		} catch(final IOException ioException) {
 			getLogger().error("Error converting file.", ioException);
 			System.err.println(ioException.getMessage());
