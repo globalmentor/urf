@@ -15,9 +15,9 @@
 		<aside class="important far side">Draft version.</aside>
 		<dl>
 			<dt>Author</dt>
-			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
+			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-12-14</dd>
+			<dd>Draft 2019-01-07</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -47,7 +47,7 @@
 	<aside class="note far third">The separate TURF format allows other encodings such as UTF-16 and UTF-32.</aside>
 	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
 	<h2>Structure</h2>
-	<p>The content of a SURF document encodes a a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
+	<p>The content of a SURF document encodes a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
 	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
@@ -61,7 +61,7 @@
 		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
 	</ul>
 	<h3>Line Endings</h3>
-	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF processor <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF parser <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul>
 		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
 		<li><code class="name">cr</code> ⇒ <code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</li>
@@ -117,8 +117,8 @@
 	<aside class="annotation far half">The SURF prefix delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes"><cite class="see">HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="see"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The SURF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="see"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
 	<p>A <dfn>name</dfn>, which is a name token, may be introduced by one or more <dfn>prefixes</dfn>, each itself a name token. These <dfn>segments</dfn> are separated by the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>), and together are referred to as a <dfn>handle</dfn>. An example of a handle is <code>example-FooBar</code>.</p>
 	<ul class="spec-production">
-		<li><code class="name">handle</code> ⇒ (<code class="name">prefix</code> '-')* <code class="name">name</code></li>
-		<li><code class="name">prefix</code> ⇒ <code class="name">name_token</code></li>
+		<li><code class="name">handle</code> ⇒ (<code class="name">segment</code> '-')* <code class="name">name</code></li>
+		<li><code class="name">segment</code> ⇒ <code class="name">name_token</code></li>
 		<li><code class="name">name</code> ⇒ <code class="name">name_token</code></li>
 	</ul>
 	<p>Authors of SURF documents <span class="spec-should">should</span> use prefixes corresponding to a reverse series of domain name components for a domain that author controls or has authority to use, either starting the the top-level domain or the second-level domain. The owner of the <code>example.com</code> domain, for example, might create a handle <code>com-example-FooBar</code> or <code>example-FooBar</code>.</p>
@@ -318,7 +318,8 @@
 		<li><code class="name">local_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code></li>
 		<li><code class="name">local_date</code> ⇒ <code class="name">date</code></li>
 		<li><code class="name">local_time</code> ⇒ <code class="name">time</code></li>
-		<li><code class="name">year_month</code> ⇒ <code class="name">YYYY</code> '-' <code class="name">MM</code></li>
+		<li><code class="name">year</code> ⇒ <code class="name">YYYY</code><code class="name"></code></li>
+		<li><code class="name">year_month</code> ⇒ <code class="name">year</code> '-' <code class="name">MM</code></li>
 		<li><code class="name">month_day</code> ⇒ '-' '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
 		<li><code class="name">date</code> ⇒ <code class="name">YYYY</code> '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
 		<li><code class="name">time</code> ⇒ <code class="name">hh</code> ':' <code class="name">mm</code> ':' <code class="name">ss</code> ['.' <code class="name">s</code>]</li>
@@ -431,7 +432,7 @@
 		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
 		<dd><a href="http://unicode.org/reports/tr15/"><cite>Unicode® Standard Annex #15: Unicode Normalization Forms</cite></a>, Mark Davis, Ken Whistler. The Unicode Consortium.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
+	<footer><small>Copyright © 2016–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 

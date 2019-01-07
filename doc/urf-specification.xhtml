@@ -15,9 +15,9 @@
 		<aside class="important far side">Draft version.</aside>
 		<dl>
 			<dt>Author</dt>
-			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
+			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-11-04</dd>
+			<dd>Draft 2019-01-07</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -30,12 +30,14 @@
 		<dd>The canonical text serialization.</dd>
 		<dt><dfn>SURF</dfn></dt>
 		<dd>A simplified text serialization.</dd>
-		<dt><dfn>CURF</dfn></dt>
+		<dt><dfn>COLURF</dfn></dt>
 		<dd>A space-efficient, comma-separated, tabular text format.</dd>
-		<dt><dfn>3URF</dfn></dt>
+		<dt><dfn>NURF</dfn></dt>
 		<dd>A propositional statement-oriented representation.</dd>
+		<dt>CSV URF</dt>
+		<dd>A rigorous format for representing URF in a standard CSV format; intended primarily for importing legacy data.</dd>
 	</dl>
-	<p>Examples in this document may present URF instances in TURF and/or 3URF for illustration purposes.</p>
+	<p>Examples in this document may present URF instances in TURF and/or NURF for illustration purposes.</p>
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Model</h2>
@@ -49,12 +51,14 @@
 			<li>The integer 5.</li>
 		</ul>
 	</aside>
-	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. Each resource is the instance of some <dfn>type</dfn>. A resource <span class="spec-may">may</span> also be identified by a <dfn>tag</dfn>.</p>
+	<p>Everything that is described in URF is referred to as a <dfn>resource</dfn>. Each resource is the instance of some <dfn>type</dfn>. A resource <span class="spec-may">may</span> also be uniquely identified globally by a <dfn>tag</dfn>.</p>
 	<figure>
-		<figcaption>A resource.</figcaption> <img src="images/resource-diagram.svg" alt="URF resource." /> </figure>
+		<figcaption>A resource.</figcaption> <img src="images/resource-diagram.svg" alt="URF resource." />
+	</figure>
 	<h3>Statements </h3>
 	<figure class="far third">
-		<figcaption>Statements assert that resources have property values.</figcaption> <img src="images/resource-property-value-diagram.svg" alt="URF resource, property, and value." /> </figure>
+		<figcaption>Statements assert that resources have property values.</figcaption> <img src="images/resource-property-value-diagram.svg" alt="URF resource, property, and value." />
+	</figure>
 	<p>Resources are described by a set of <dfn>statements</dfn>, each claiming that some resource <dfn>subject</dfn> has a <dfn>property</dfn> with some <dfn>property value</dfn>.</p>
 	<p>A particular group of statements is called an <dfn>URF instance</dfn>. Each statement exists in some URF <dfn>knowledge community</dfn>. The root statements of an URF instance are part of the <dfn>instance community</dfn> and may be considered to be asserted in the same knowledge community as the instance community of all other URF instances.</p>
 	<aside class="note near">Examples of statements:
@@ -78,104 +82,171 @@
 			<dd>The Boolean value <code>true</code>.</dd>
 		</dl>
 	</aside>
-	<p>URF identifies a resource using using a tag, which takes the form of an IRI as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. <span class="note">Although a tag may be a URL, this specification does not define whether the location indicated by the tag indicates any actual, retrievable content; an URF tag functions solely as an identifier.</span></p>
+	<p>URF identifies a resource using using a <dfn>tag</dfn>, which takes the form of an IRI as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. <span class="note">Although a tag may be a URL, this specification does not define whether the location indicated by the tag indicates any actual, retrievable content; an URF tag functions solely as an identifier.</span> A resource with no identifying tag is referred to an an <dfn>anonymous resource</dfn>.</p>
 	<h4>Names</h4>
-	<p>If a resource has a hierarchical tag using a path, the last path component, along with the IRI fragment if present, is considered the <dfn>name</dfn> of the resource if the non-fragment begins with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category. The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
-	<p>A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the decoded fragment part of the name is considered the <dfn>ID</dfn> of the resource. <span class="warning">A resource ID will likely not be globally unique for resources of other types.</span></p>
-	<p>For example, the resource with the tag <code>https://urf/name/Tree</code> has the name <code>Tree</code>, and the resource with the tag <code>https://urf/name/Tree#456</code> has the name <code>Tree#456</code>.</p>
+	<p>If a resource has a hierarchical tag using a path, the last path component, along with the decoded IRI fragment if present, is considered the <dfn>name</dfn> of the resource if it meets all of the following criteria:</p>
+	<ul>
+		<li>The non-fragment portion begins with a character from the Unicode <code class="name">Letter</code> (<code>L</code>) category; followed by zero or more characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category.</li>
+		<li>The decoded fragment portion, if any, contains only characters each from the <code class="name">Letter</code> (<code>L</code>) category, from the <code class="name">Mark</code> (<code>M</code>) category, from the <code class="name">Decimal_Number</code> (<code>Nd</code>) category, and/or from the <code class="name">Connector_Punctuation</code> (<code>Pc</code>) category.</li>
+	</ul>
+	<p>The sequence of Unicode code points in a name <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>.</p>
+	<ul class="spec-production">
+		<li><code class="name">name_id_token</code> ⇒ (<code class="name">Letter</code> | <code class="name">Mark</code> | <code class="name">Decimal_Number</code> | <code class="name">Connector_Punctuation</code>)+</li>
+		<li><code class="name">name_token</code> ⇒ <code class="name">Letter</code> <code class="name">name_id_token</code>?</li>
+		<li><code class="name">name</code> ⇒ <code class="name">name_token</code> ['#' <code class="name">name_id_token</code>]</li>
+	</ul>
+	<p>For example, the resource with the tag <code>https://urf.name/Tree</code> has the name <code>Tree</code>, and the resource with the tag <code>https://urf.name/Tree#456</code> has the name <code>Tree#456</code>. However the resource with the tag <code>https://urf.name/urf/String#foo%20bar</code> has no name, because the decoded fragment <code>foo bar</code> does not meet the production of <code class="name">name_id_token</code> above.</p>
+	<h4>IDs</h4>
+	<p>A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the decoded fragment part of the name is considered the <dfn>ID</dfn> of the resource, whether or the resource has a name. Thus  the resource with the tag <code>https://urf.name/Tree#456</code> has the ID <code>456</code>, the the resource <code>https://urf.name/urf/String#foo:bar</code> has the ID <code>foo:bar</code>, even though the latter resource has no name.</p>
 	<h4>Namespaces</h4>
 	<aside class="annotation far half">The URF definition of a namespace implies that a namespace must end in the slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). <span class="error">This disallows namespaces ending in the <code class="name">NUMBER SIGN</code> character <code>#</code> (<code class="unicode">U+0023</code>) such as <code>http://www.w3.org/2001/XMLSchema#</code>, which appears in other specifications such as XML and RDF.</span></aside>
 	<p>For those resources with names, the remaining part of the tag path (the part before the last path component) is considered the <dfn>namespace</dfn> of the resource. Namespaces <span class="spec-should">should</span> be used to group resources with related semantics.</p>
 	<p>Each additional path component of a tag path indicates a <dfn>subnamespace</dfn> inside the previous namespace. Thus the namespace identified by the IRI <code>https://urf.name/bio/</code> is a subnamespace of that identified by <code>https://urf.name/</code>. Each subnamespace path component <span class="spec-should">should</span> follow the syntax rules of a base name.</p>
-	<h5>Ad-Hoc Namespace</h5>
-	<p>The namespace <code>https://urf.name/</code> is the <dfn>ad-hoc namespace</dfn>. Applications that need a low-overhead naming scheme <span class="spec-may">may</span> use resource names placed directly within this namespace. <span class="warning">Names placed in the ad-hoc namespace have the potential to clash if used with other vocabularies that also use the ad-hoc namespace.</span> The ad-hoc namespace <span class="spec-should">should</span> only be used for applications for which the identity of the resource is unambiguous in the context.</p>
-	<p>The resource with tag <code>https://urf/name/Tree#456</code> is an example of a resource in the ad-hoc namespace.</p>
+	<h5>Ad Hoc Namespace</h5>
+	<p>The namespace <code>https://urf.name/</code> is the <dfn>ad hoc namespace</dfn>. Applications that need a low-overhead naming scheme <span class="spec-may">may</span> use resource names placed directly within this namespace. <span class="warning">Names placed in the ad hoc namespace have the potential to clash if used with other vocabularies that also use the ad hoc namespace.</span> The ad hoc namespace <span class="spec-should">should</span> only be used for applications for which the identity of the resource is unambiguous in the context.</p>
+	<p>The resource with tag <code>https://urf/name/Tree#456</code> is an example of a resource in the ad hoc namespace.</p>
 	<h5>Informal Namespaces </h5>
-	<p>Subnamespaces of the ad-hoc namespace are considered <dfn>informal namespaces</dfn>. Applications that to mix vocabularies but still do not require or desire the overhead of formal namespace definition <span class="spec-may">may</span> use resource names placed within informal namespaces. Informal namespaces <span class="spec-should">should</span> attempt to avoid name clashes by using subnamespace components that reflect well-known vocabulary identifiers (such as <code>https://urf.name/refseq/</code> to annotate information in the <a href="https://www.ncbi.nlm.nih.gov/refseq/" class="external">NCBI Reference Sequence Database</a>); or by using subnamespace components corresponding to domain components which the vocabulary author controls (such as <code>https://urf.name/globalmentor</code> for <a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>, which controls the <code>globalmentor.com</code> domain).</p>
+	<p>Subnamespaces of the ad hoc namespace are considered <dfn>informal namespaces</dfn>. Applications that to mix vocabularies but still do not require or desire the overhead of formal namespace definition <span class="spec-may">may</span> use resource names placed within informal namespaces. Informal namespaces <span class="spec-should">should</span> attempt to avoid name clashes by using subnamespace components that reflect well-known vocabulary identifiers (such as <code>https://urf.name/refseq/</code> to annotate information in the <a href="https://www.ncbi.nlm.nih.gov/refseq/" class="external">NCBI Reference Sequence Database</a>); or by using subnamespace components corresponding to domain components which the vocabulary author controls (such as <code>https://urf.name/globalmentor</code> for <a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>, which controls the <code>globalmentor.com</code> domain).</p>
 	<p>The following namespaces which would otherwise be informal namespaces are reserved:</p>
 	<dl>
 		<dt><code>https://urf.name/example/</code></dt>
 		<dd>Reserved for use as examples in documentation or for private testing.</dd>
+		<dt><code>https://urf.name/space/</code></dt>
+		<dd>Reserved for declaring namespaces using directives in several URF formats.</dd>
 		<dt><code>https://urf.name/urf/</code></dt>
 		<dd>Reserved for use by the URF specifications.</dd>
 	</dl>
 	<h5>Formal Namespaces</h5>
 	<p>All other namespaces constitute <dfn>formal namespaces</dfn> defined by third parties. For example, the <a href="http://dublincore.org/" class="external">Dublin Core Metadata Initiative</a> defines the formal namespace <code>http://purl.org/dc/elements/1.1/</code> for information in the <a href="http://www.dublincore.org/documents/dces/" class="external"><cite>Dublin Core Metadata Element Set, Version 1.1</cite></a>.</p>
-	<aside class="info">As a convenience the rest of this specification uses SURF/TURF <dfn>handles</dfn> to identify resources. A handle is identical to the resource name, except that <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>) is used to indicate informal namespace hierarchies. Here are some non-normative examples, along with the IRIs they represent.
+	<h4>Handles</h4>
+	<aside class="note far half">Examples of handles along with the IRIs they represent.
 		<dl>
-			<dt><code>label</code></dt>
-			<dd><code>https://urf.name/label</code></dd>
+			<dt><code>color</code></dt>
+			<dd><code>https://urf.name/color</code></dd>
 			<dt><code>Tree</code></dt>
 			<dd><code>https://urf.name/Tree</code></dd>
 			<dt><code>Tree#456</code></dt>
 			<dd><code>https://urf.name/Tree#456</code></dd>
 			<dt><code>urf-Resource</code></dt>
 			<dd><code>https://urf.name/urf/Resource</code></dd>
+			<dt><code>foo-bar-Example#test</code></dt>
+			<dd><code>https://urf.name/foo/bar/Example#test</code></dd>
 			<dt><code>gencode-level</code></dt>
 			<dd><code>https://urf.name/gencode/level</code></dd>
 		</dl>
 	</aside>
+	<p>A <dfn>handle</dfn> represents a shorter yet unambiguous string representation of a resource tag. For tags in the <code>https://urf.name/urf/</code> namespace or one of its subnamespaces, the resource handle is the same as its name, with zero or more <dfn>segments</dfn> prepended, each separated by the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>). Each segment represents the decoded path statement of the <code>https://urf.name/urf/</code> (sub)namespace, provided each segment meets the <code class="name">name_token</code> production.</p>
+	<p>For tags not in the <code>https://urf.name/urf/</code> namespace or one of its subnamespaces, it may have a handle consisting of its name and some namespace alias prefix, separated by the <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>), provided every character in the namespace alias meets the <code class="name">name_token</code> production. A handle with a namespace alias <span class="spec-must">must</span> only be used is only in a context in which the namespace alias has been associated with a valid namespace, and <span class="spec-must-not">must not</span> contain any segments.</p>
+	<ul class="spec-production">
+		<li><code class="name">handle</code> ⇒ [<code class="name">namespace_alias</code> '/'] (<code class="name">segment</code> '-')* <code class="name">name</code></li>
+		<li><code class="name">namespace_alias</code> ⇒ <code class="name">name_token</code></li>
+		<li><code class="name">segment</code> ⇒ <code class="name">name_token</code></li>
+		<li><code class="name">name</code> ⇒ <code class="name">name_token</code></li>
+	</ul>
+	<h4>Blank Tags</h4>
+	<aside class="annotation far third">RDF has an analogous concept to a blank tag, which it calls a “<a href="https://www.w3.org/TR/rdf11-concepts/#section-skolemization" class="external">Skolem IRI</a>”.</aside>
+	<p>If a resource has no tag, but a system has a need for some stronger identification in some context, a system may generate a <dfn>blank tag</dfn> to represent the resource. A blank tag is formed by resolving some IRI fragment identifier to the IRI <code>https://urf.name/urf/</code>. The fragment identifier <span class="spec-must">must</span> be unique for all blank tags within the context with which the blank tag will be shared. For example, a system might choose to generate a UUID according to <a href="#ref-rfc4122" class="ref">RFC 4122</a> as the fragment identifier, forming the blank tag <code>https://urf.name/urf/#330dca65-c7aa-49ab-b691-70af2b60ce03</code>. <span class="note">Although blank tags have IDs, they are not in the <code>https://urf.name/urf/</code> namespace—and indeed have no namespace—as blank tags have no names.</span></p>
 	<h3>Types</h3>
 	<p>Each URF resource is the instance of some type. If a resource is not an instance of any more specific type, it is of type <code>urf-Resource</code>.</p>
 	<h4>ID Tag Types</h4>
-	<p>An ID tag indicates both the unique tag and the type of the resource, with the type being the part of the tag with the fragment removed. For example, the resource identified by the tag <code>https://urf.name/Tree#456</code> (<code>Tree#456</code>) is of type <code>Tree</code> (itself a resource, identified by the tag <code>https://urf.name/Tree</code>). The resource ID <span class="spec-must">must</span> be globally unique across all resources of the same type.</p>
+	<p>An ID tag indicates both the unique tag and the type of the resource, with the type being the part of the tag with the fragment removed. For example, the resource identified by the tag <code>https://urf.name/Tree#456</code> (<code>Tree#456</code>) is of type <code>Tree</code> (itself a resource, identified by the tag <code>https://urf.name/Tree</code>). The resource ID <span class="spec-must">must</span> be globally unique across all resources of the same type. <span class="warning">A resource ID will likely not be globally unique for resources of other types.</span></p>
 	<h4>Lexical ID Types</h4>
 	<aside class="annotation far half">URF, unlike RDF, has no so-called “literal” type. All things described in URF are resources, plain and simple. The integer 5 is just as much a resource as the web page <code>https://www.example.com/trees.html</code>. The integer 5 does have a convenient tag <code>https://urf.name/urf/urf-Integer#5</code> which indicates both its type and lexical representation, but that does not make it a different “thing” in the URF model.</aside>
-	<p>The resources of some types are identified by ID tags that use the canonical lexical representation of the resource as the resource ID. For example, the <code>urf-Boolean</code> value <code>true</code> is identified by the tag <code>https://urf.name/urf/Boolean#true</code>. Similarly the integer <code>5</code>, which in URF is an instance of the <code>urf-Integer</code> type, is identified by the tag <code>https://urf.name/urf/urf-Integer#5</code>.</p>
+	<p>The resources of some types are identified by ID tags that use the canonical lexical representation of the resource as the resource ID. For example, the <code>urf-Boolean</code> value <code>true</code> is identified by the tag <code>https://urf.name/urf/Boolean#true</code> (<code>urf-Boolean#true</code>). Similarly the integer <code>5</code>, which in URF is an instance of the <code>urf-Integer</code> type, is identified by the tag <code>https://urf.name/urf/urf-Integer#5</code> (<code>urf-Integer#5</code>).</p>
 	<h4>Classes</h4>
 	<p>Resources that define types are called <dfn>classes</dfn> and are instances of the resource <code>urf-Class</code>, which is itself instance of <code>urf-Class</code>. A class can be a specialization or <dfn>subclass</dfn> of another class. The class <code>urf-Integer</code>, for example, is a subclass of <code>urf-Number</code>. The class <code>urf-Class</code> is a subclass of <code>urf-Resource</code>.</p>
 	<h3>Properties</h3>
-	<p>TODO</p>
+	<p>Each resource has zero or more properties. Each property is a resource and must have a tag. Each property of a resource is associated with a single property value, a resource which may be anonymous. A resource may not have multiple occurrences of the same property, with the exception of the property <code>urf-member</code>, for which this specification does not define a maximum number of occurrences.</p>
 	<h2>Ontologies</h2>
 	<h3>URF Ontology <code>&lt;https://urf.name/urf/&gt;</code></h3>
 	<p><strong>Namespace:</strong> <code>https://urf.name/urf/</code></p>
-	<h4><code>urf-Binary</code></h4>
+	<h4 id="urf-Binary"><code>urf-Binary</code></h4>
 	<p>Represents an arbitrary sequence of octets. This is a lexical ID type. The canonical lexical form is the Base 64 encoding of the bytes as defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, using the “base64url” alphabet with no padding.</p>
-	<h4><code>urf-Boolean</code></h4>
+	<h4 id="urf-Boolean"><code>urf-Boolean</code></h4>
 	<p>Represents a Boolean value of true or false. This is a lexical ID type. The canonical lexical forms are <code>true</code> and <code>false</code>, respectively.</p>
-	<h4><code>urf-Character</code></h4>
+	<h4 id="urf-Character"><code>urf-Character</code></h4>
 	<p>Represents a Unicode code point. This is a lexical ID type. The canonical lexical form is the character represented by the code point.</p>
-	<h4><code>urf-Class</code></h4>
+	<h4 id="urf-Class"><code>urf-Class</code></h4>
 	<p>A type for generalizing instances of resources. Not every resource used as a class is an instance of the class <code>urf-Class</code>, but a resource may be declared to be of the class type to further specify its semantics. The class <code>urf-Class</code> is a subclass of the class <code>urf-Resource</code> and and instance of the <code>urf-Class</code> itself.</p>
 	<h4 id="urf-Decimal"><code>urf-Decimal</code></h4>
 	<p>Decimal numbers consist of all rational numbers that have a finite decimal representation. The semantics of this type prohibit rounding the fractional part within the supported range.</p>
 	<p>This is a lexical ID type. The canonical lexical form is identical to that of <a href="#urf-Rational"><code>urf-Rational</code></a>; nonetheless <a href="#urf-Decimal"><code>urf-Decimal</code></a> is a distinct type, a subclass of the class <a href="#urf-Number"><code>urf-Number</code></a>.</p>
-	<h4><code>urf-Duration</code></h4>
+	<h4 id="urf-Duration"><code>urf-Duration</code></h4>
 	<p>TODO Duration resources represent lengths of time. They use an inline namespace with a lexical form consistent with [<a href="#rfc2445">RFC 2445</a>] and [<a href="#iso8601">ISO 8601</a>] of <code>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong></code>, where <var>n</var> is some positive number of roman digits and at least the date or time section is present.</p>
-	<h4><code>urf-Email</code></h4>
+	<h4 id="urf-EmailAddress"><code>urf-EmailAddress</code></h4>
 	<p>Represents an email address. This is a lexical ID type. The canonical lexical form is the “addr-spec” format specified in <a href="#ref-rfc5322" class="ref">RFC 5322</a>. The email <span class="spec-must-not">must not</span> include any obsolete elements (those starting with the prefix “obs-”) in <cite>RFC 5322</cite>. The lexical form <span class="spec-must-not">must not</span> include any “comments” or “folding white space” as defined by <cite>RFC 5322</cite>.</p>
-	<h4><code>urf-Instant</code></h4>
-	<p>TODO A date time resource represents a time of day on a particular calendar date. They use an inline namespace with a lexical form combining the lexical forms of <code>urf.Date</code> and <code>urf.Time</code> separated by <code>T</code>: <code><var>YYYY</var>-<var>MM</var>-<var>DD</var>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO 8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</p>
-	<h4><code>urf-Integer</code></h4>
+	<h4 id="urf-Instant"><code>urf-Instant</code></h4>
+	<p>An <dfn>instant</dfn> represents a normalized time of day on a particular calendar date. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
+	</ul>
+	<h4 id="urf-Integer"><code>urf-Integer</code></h4>
 	<p>Integer resources are the positive whole numbers, the negative whole numbers, and zero. This is a lexical ID type. The canonical lexical form is defined by the production rule:</p>
 	<ul class="spec-production">
 		<li>['-'] <code class="name">digit</code>+</li>
 	</ul>
 	<p>This class is a subclass of the class <a href="#urf-Number"><code>urf-Number</code></a>.</p>
-	<h4><code>urf-Iri</code></h4>
+	<h4 id="urf-Iri"><code>urf-Iri</code></h4>
 	<p>Represents an <dfn>Internationalized Resource Identifier</dfn> (<abbr>IRI</abbr>) as defined in <a href="#ref-rfc3987" class="ref">RFC 3987</a>. This is a lexical ID type, and the canonical lexical form is the string representation of the IRI itself.</p>
 	<h4><code>urf-Language</code></h4>
 	<p>TODO Language resources represent human langages and use inline namespace URIs. The lexical form of each is the corresponding <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC 4646</a>].</p>
 	<h4><code>urf-List</code></h4>
 	<p>List resources are resources that contain other <dfn>element</dfn> resources at certain <dfn>indexes</dfn> of the list. A list, like normal resources, may have any property, but the properties representing the elements of the list are of type <code>urf-Ordinal</code>, each representing the ordinal index of the element. That is, if a list contains an element at index 5, the element resource will appear as a value of the property <code>urf-Ordinal#5</code>. Although many uses cases will prefer a continuous, unduplicated sequence of index properties beginning with <code>urf-Ordinal#5</code>, this is not an URF requirement.</p>
-	<h4><code>urf-LocalDate</code></h4>
-	<p>TODO Date resources represent calendar dates in terms of calendar year, calendar month, and calendar day of month. They use an inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>YYYY</var>-<var>MM</var>-<var>DD</var></code> as defined in [<a href="#iso8601">ISO 8601</a>].</p>
-	<h4><code>urf-LocalTime</code></h4>
-	<p>TODO Time resources represent time of day. They use a inline namespace with a lexical form consistent with [<a href="#rfc3339">RFC 3339</a>] of <code><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code> with optional UTC offset as defined in [<a href="#iso8601">ISO 8601</a>]. A form without the optional UTC offset is said to be <dfn>floating</dfn> as defined in [<a href="#rfc2445">RFC 2445</a>], and should not be used unless a time independent of a time zone is to be specified. In most cases a <dfn>fixed time</dfn> is appropriate and a form with the UTC offset should be used. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</p>
+	<h4 id="urf-LocalDate"><code>urf-LocalDate</code></h4>
+	<p>Represents a date with floating offset as per <a href="#ref-rfc2445" class="ref">RFC 2445</a>. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">local_date</code> ⇒ <code class="name">date</code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
+	<h4 id="urf-LocalDateTime"><code>urf-LocalDateTime</code></h4>
+	<p>Represents a date and time with floating offset as per <a href="#ref-rfc2445" class="ref">RFC 2445</a>. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">local_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code><code class="name"></code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
+	<h4 id="urf-LocalTime"><code>urf-LocalTime</code></h4>
+	<p>Represents a time with floating offset as per <a href="#ref-rfc2445" class="ref">RFC 2445</a>. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">local_time</code> ⇒ <code class="name">time</code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
 	<h4><code>urf-Map</code></h4>
 	<p>TODO A resource containing associations between keys and values. Each association is represented by an instance of <code>urf.MapEntry</code>, which indicates a value for the property <code>urf.key</code> and the property <code>urf.value</code>. Each map entry is the value of an <code>urf.entry</code> property of the map resource.</p>
+	<h4 id="urf-MonthDay"><code>urf-MonthDay</code></h4>
+	<aside class="note far third">The format for <code>month_day</code> conforms to an older version of <cite>ISO 8601</cite>; the most recent version does not mention a month+day format. </aside>
+	<p>Represents a calendar month and day without respect to any time zone. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">month_day</code> ⇒ '-' '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
+	</ul>
 	<h4 id="urf-Number"><code>urf-Number</code></h4>
 	<p>The base class for all numerical values. Numbers include <a href="#urf-Decimal"><code>urf-Decimal</code></a>, <a href="#urf-Integer"><code>urf-Integer</code></a> and <a href="#urf-Integer"><code>urf-Rational</code></a>.</p>
-	<h4><code>urf-Ordinal</code></h4>
+	<h4 id="urf-OffsetDate"><code>urf-OffsetDate</code></h4>
+	<p>Represents a date with a fixed offset from UTC. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">offset_date</code> ⇒ <code class="name">date</code> <code class="name">offset</code></li>
+	</ul>
+	<h4 id="urf-OffsetDateTime"><code>urf-OffsetDateTime</code></h4>
+	<p>Represents a date and time with a fixed offset from UTC. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">offset_date_time</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> <code class="name">offset</code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code>urf-OffsetTime</code></h4>
+	<p>Represents a time with a fixed offset from UTC. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">offset_time</code> ⇒ <code class="name">time</code> <code class="name">offset</code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
+	<h4 id="urf-ZonedDateTime"><code></code></h4>
+	<h4 id="urf-Ordinal"><code>urf-Ordinal</code></h4>
 	<p>Ordinal resources are numbers that represent the position of an element in a sequence. URF currently only supports finite ordinals, which means that there will be a corresponding ordinal for every positive whole numbers and zero. This is a lexical ID type. The canonical lexical form is defined by the production rule: </p>
 	<ul class="spec-production">
 		<li><code class="name">digit</code>+</li>
 	</ul>
 	<p>This class is a subclass of the class <code>urf-Number</code>.</p>
-	<h4><code>urf-Property</code></h4>
-	<p>TODO Not every resource used as a predicate is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the property type to further specify its semantics and expected domain and range. The class <code>urf.Property</code> is a subclass of the class <code>urf.Class</code>.</p>
+	<h4 id="urf-Property"><code>urf-Property</code></h4>
+	<p>Not every resource used as a property is an instance of the class <code>urf.Property</code>, but a resource may be declared to be of the <code>urf-Property</code> type to further specify its semantics and expected domain and range. The class <code>urf-Property</code> is a subclass of the class <code>urf-Class</code>.</p>
 	<h4 id="urf-Rational"><code>urf-Rational</code></h4>
-	<p>Rational number are all of the measuring numbers and may include decimal fractional parts. This is a lexical ID type. The canonical lexical form follows the production rules below:</p>
+	<p>TODO update; reconcile with <code>urf-Number</code> Rational number are all of the measuring numbers and may include decimal fractional parts. This is a lexical ID type. The canonical lexical form follows the production rules below:</p>
 	<ul class="spec-production">
 		<li>['-'] <code class="name">integer</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">integer</code> ⇒ <code class="name">digit</code>+</li>
@@ -190,23 +261,52 @@
 	<p>This class is a subclass of the class <a href="#urf-Number"><code>urf-Number</code></a>.</p>
 	<ul>
 	</ul>
-	<h4><code>urf-RegularExpression</code></h4>
+	<h4 id="urf-RegularExpression"><code>urf-RegularExpression</code></h4>
 	<p>Represents a regular expression, a text-based pattern that define rules for the content of strings. This is a lexical ID type, and the canonical lexical form is the string representation of the regular expression itself. TODO add support for flags</p>
-	<h4><code>urf-Resource</code></h4>
-	<p>Every resource is implicitly an instance of the class <code>urf.Resource</code> or one of its descendant classes.</p>
+	<h4 id="urf-Resource"><code>urf-Resource</code></h4>
+	<p>Every resource is implicitly an instance of the class <code>urf-Resource</code> or one of its descendant classes.</p>
 	<h4><code>urf-Set</code></h4>
 	<p>TODO Set resources are resources that contain at most one instance of other <dfn>element</dfn> resources. A set, like normal resources, may have any property, but the properties representing the elements of the set appear as values of the <code>urf.element</code> property.</p>
-	<h4><code>urf-String</code></h4>
+	<h4 id="urf-String"><code>urf-String</code></h4>
 	<p>Represents a sequence of Unicode code points. This is a lexical ID type, and the canonical lexical form is the string itself.</p>
-	<h4><code>urf-Telephone</code></h4>
+	<h4 id="urf-TelephoneNumber"><code>urf-TelephoneNumber</code></h4>
 	<p>Represents a telephone number. This is a lexical ID type. The canonical lexical form is the “global number” format prescribed by <a href="#ref-rfc3966" class="ref">RFC 3966</a>. The canonical representation <span class="spec-must-not">must not</span> include any “visual separators” as defined by <cite>RFC 3966</cite>.</p>
-	<h4><code>urf-Temporal</code></h4>
-	<p>The base class for all time-related types: <code>urf-Instant</code>, <code>urf-ZonedDateTime</code>, <code>urf-OffsetDateTime</code>, <code>urf-OffsetDate</code>, <code>urf-OffsetTime</code>, <code>urf-LocalDateTime</code>, <code>urf-LocalDate</code>, <code>urf-LocalTime</code>, <code>urf-YearMonth</code>, <code>urf-MonthDate</code>, <code>urf-Year</code>. TODO duration etc. URF temporal types are based on <a href="#ref-iso8601" class="ref">ISO 8601</a>.</p>
-	<h4><code>urf-UtcOffset</code></h4>
-	<p>TODO UTC offset resources represent an offset from UTC to local time. They use an inline namespace with a lexical form of <strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var> with semantics corresponding to the UTC offset described in [<a href="#rfc2426">RFC 2426</a>] and [<a href="#rfc2445">RFC 2445</a>]. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead.</p>
+	<h4 id="urf-Temporal"><code>urf-Temporal</code></h4>
+	<p>The parent class of all the <dfn>temporal</dfn> types, representing date and/or time information based on <a href="#ref-iso8601" class="ref">ISO 8601</a>. These are all lexical ID types and follow the productions below combined with their own productions. Time zone names <code class="name">tz</code> are from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database and are case-sensitive.</p>
+	<ul class="spec-production">
+		<li><code class="name">date</code> ⇒ <code class="name">YYYY</code> '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
+		<li><code class="name">time</code> ⇒ <code class="name">hh</code> ':' <code class="name">mm</code> ':' <code class="name">ss</code> ['.' <code class="name">s</code>]</li>
+		<li><code class="name">offset</code> ⇒ ('+' | '-') <code class="name">hh</code> ':' <code class="name">mm</code></li>
+		<li><code class="name">YYYY</code> ⇒ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">MM</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">DD</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">hh</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">mm</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">ss</code> ⇒ <code class="name">digit</code> <code class="name">digit</code></li>
+		<li><code class="name">s</code> ⇒ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> [ <code class="name">digit</code> <code class="name">digit</code> <code class="name">digit</code> ] ]</li>
+	</ul>
 	<h4><code></code></h4>
-	<h4><code>urf-Uuid</code></h4>
+	<h4 id="urf-Uuid"><code>urf-Uuid</code></h4>
 	<p>Represents a <dfn>Universally Unique IDentifier</dfn> (<abbr>UUID</abbr>) adhering to the requirements of <a href="#ref-rfc4122" class="ref">RFC 4122</a>. This is a lexical ID type. The canonical lexical form is the “UUID” production given in <cite>RFC 4122</cite>.</p>
+	<h4 id="urf-Year"><code>urf-Year</code></h4>
+	<p>Represents a calendar year without respect to any time zone. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">year</code> ⇒ <code class="name">YYYY</code><code class="name"></code><code class="name"></code><code class="name"></code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
+	<h4 id="urf-ZonedDateTime"><code></code></h4>
+	<h4 id="urf-YearMonth"><code>urf-YearMonth</code></h4>
+	<p>Represents a calendar year and a month without respect to any time zone. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">year_month</code> ⇒ <code class="name">year</code> '-' <code class="name">MM</code></li>
+	</ul>
+	<h4 id="urf-OffsetTime"><code></code></h4>
+	<h4 id="urf-ZonedDateTime"><code>urf-ZonedDateTime</code></h4>
+	<aside class="annotation far half">The format for <code class="name">zoned_date_time</code> is an extension to the <cite>ISO 8601</cite> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="see"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
+	<p>Represents a date and time relative to a specific IANA <a href="#ref-iso8601" class="ref">TZ</a> time zoneThis is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
+	<ul class="spec-production">
+		<li><code class="name">zoned_date_time</code> ⇒ <code class="name">offset_date_time</code> '[' <code class="name">tz</code> ']'</li>
+	</ul>
 	<h3> Content <code>&lt;https://urf.name/content/&gt;</code></h3>
 	<h4><code><span style="color: #222222;">content-Charset</span></code></h4>
 	<p>TODO The name of the mapping of integer values to a set of characters. This is equivalent to the <dfn>charset</dfn> Internet media type parameter described by [<a href="#rfc2046">RFC 2046</a>] and further elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset encapsulates both the concept of a <dfn>coded character set</dfn> and a <dfn>character encoding scheme</dfn>, as specified in [<a href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA Charset Registry</a>], such as <code>UTF-16BE</code>.</p>
@@ -232,8 +332,8 @@
 		<dd>C. Weider, C. Preston, K. Simonsen, H. Alvestrand, R. Atkinson, M. Crispin, and P. Svanberg. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2130: The Report of the IAB Character Set Workshop held 29 February - 1 March, 1996</cite></a>. Internet Engineering Task Force, 1997.</dd>
 		<dt>RFC 2278</dt>
 		<dd>N. Freed and J. Postel. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2278: IANA Charset Registration Procedures</cite></a>. Internet Engineering Task Force, 1998.</dd>
-		<dt>RFC 2445</dt>
-		<dd>F. Dawson and and D. Stenerson. <a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2445: Internet Calendaring and Scheduling Core Object Specification (iCalendar)</cite></a>. Internet Engineering Task Force, 1998.</dd>
+		<dt id="ref-rfc2445" class="ref-target">RFC 2445</dt>
+		<dd><a href="http://www.ietf.org/rfc/rfc2426.txt"><cite>RFC 2445: Internet Calendaring and Scheduling Core Object Specification (iCalendar)</cite></a>, F. Dawson, D. Stenerson. IETF.</dd>
 		<dt>RFC 3339</dt>
 		<dd>G. Klyne and C. Newman. <a href="http://www.ietf.org/rfc/rfc3339.txt"><cite>RFC 3339: Date and Time on the Internet: Timestamps</cite></a>. Internet Engineering Task Force, 2002.</dd>
 		<dt id="ref-rfc3966" class="ref-target">RFC 3966</dt>
@@ -252,6 +352,8 @@
 		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson (SJD). IETF.</dd>
 		<dt id="ref-rfc5322" class="ref-target">RFC 5322</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc5322"><cite>Internet Message Format</cite></a>, P. Resnick, Ed. (Qualcomm Incorporated). IETF.</dd>
+		<dt id="ref-tz" class="ref-target">TZ</dt>
+		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
 		<dd><a href="http://unicode.org/reports/tr15/"><cite>Unicode® Standard Annex #15: Unicode Normalization Forms</cite></a>, Mark Davis, Ken Whistler. The Unicode Consortium.</dd>
 		<dt>Unicode BOM FAQ</dt>
@@ -262,8 +364,11 @@
 		<dd>Paul V. Biron and Ashok Malhotra. <a href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2: Datatypes Second Edition</cite></a>. World Wide Web Consortium, 2004-10-28.</dd>
 	</dl>
 	<h2>Acknowledgements</h2>
-	<p>Brad Neuberg encouraged the creation of an alternate RDF serialization; Frank Manola made convincing arguments for using ordinals instead of integers as list element predicates.</p>
-	<footer><small>Copyright © 2007–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
+	<ul>
+		<li>Brad Neuberg encouraged the creation of an alternate RDF serialization.</li>
+		<li>Frank Manola made convincing arguments for using ordinals instead of integers as list element properties.</li>
+	</ul>
+	<footer><small>Copyright © 2007–2019 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
