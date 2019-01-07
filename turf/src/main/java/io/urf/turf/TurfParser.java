@@ -361,24 +361,47 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a reference to a resource. A reference is either a handle or a tag label. The current position must be that of the first reference character. The
-	 * new position will be that immediately after the last reference character.
+	 * Parses a reference to a resource. A reference is either a handle (e.g. {@code example-fooBar}) or a tag label ({@code |<https://example.com/fooBar>|}. The
+	 * current position must be that of the first reference character. The new position will be that immediately after the last reference character.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The tag representing the resource reference parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if there are are no reference characters; or if a non-tag label was encountered.
+	 * @throws ParseIOException if there are are no reference characters, if a non-tag label was encountered, or if a handle refers to an unregistered namespace
+	 *           alias.
 	 * @see #parseHandle(Reader)
 	 * @see #parseLabel(Reader)
 	 */
-	public URI parseTagReference(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	protected URI parseTagReference(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		return parseTagReference(reader, getNamespaces());
+	}
+
+	/**
+	 * Parses a reference to a resource. A reference is either a handle (e.g. {@code example-fooBar}) or a tag label ({@code |<https://example.com/fooBar>|}. The
+	 * current position must be that of the first reference character. The new position will be that immediately after the last reference character.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @param namespaces The registered namespaces, associated with their aliases.
+	 * @return The tag representing the resource reference parsed from the reader.
+	 * @throws NullPointerException if the given reader and/or namespaces map is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if there are are no reference characters, if a non-tag label was encountered, or if a handle refers to an unregistered namespace
+	 *           alias.
+	 * @see #parseHandle(Reader)
+	 * @see #parseLabel(Reader)
+	 */
+	public static URI parseTagReference(@Nonnull final Reader reader, @Nonnull final Map<String, URI> namespaces) throws IOException, ParseIOException {
+		requireNonNull(namespaces);
 		if(peek(reader) == LABEL_DELIMITER) {
 			final Object label = parseLabel(reader);
 			checkParseIO(reader, label instanceof URI, "Non-tag label %s encountered as reference.", label);
 			return (URI)label;
 		} else {
 			final String handle = parseHandle(reader);
-			return Handle.toTag(handle, getNamespaces());
+			try {
+				return Handle.toTag(handle, namespaces);
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
+			}
 		}
 	}
 
@@ -997,7 +1020,7 @@ public class TurfParser<R> {
 			} else {
 				if(hasFraction || hasExponent) { //if there was a fraction or exponent
 					typeTag = REAL_TYPE_TAG;
-					value = Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it
+					value = Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it TODO this can be changed to simply Double.valueOf(numberString)
 				} else { //if there is no fraction or exponent
 					typeTag = INTEGER_TYPE_TAG;
 					final long longValue = Long.parseLong(numberString);

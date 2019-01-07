@@ -16,8 +16,12 @@
 
 package io.urf.cli;
 
-import java.nio.file.Path;
+import static io.urf.URF.*;
+import static java.nio.file.Files.*;
 
+import java.io.*;
+import java.net.URI;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.annotation.*;
@@ -25,8 +29,13 @@ import javax.annotation.*;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.event.Level;
 
-import io.clogr.Clogr;
+import com.globalmentor.io.Filenames;
+
+import io.clogr.*;
 import io.confound.config.file.ResourcesConfigurationManager;
+import io.urf.csv.UrfCsvParser;
+import io.urf.model.*;
+import io.urf.turf.TurfSerializer;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
@@ -35,7 +44,7 @@ import picocli.CommandLine.*;
  * @author Garret Wilson
  */
 @Command(name = "urf", description = "Command-line interface for working with URF data.", versionProvider = UrfCli.VersionProvider.class, mixinStandardHelpOptions = true)
-public class UrfCli implements Runnable {
+public class UrfCli implements Runnable, Clogged {
 
 	private boolean debug;
 
@@ -43,7 +52,7 @@ public class UrfCli implements Runnable {
 	 * Enables or disables debug mode, which is disabled by default.
 	 * @param debug The new state of debug mode.
 	 */
-	@Option(names = {"-d", "--debug"}, description = "Turns on debug level logging.")
+	@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.")
 	protected void setDebug(final boolean debug) {
 		this.debug = debug;
 		updateLogLevel();
@@ -87,8 +96,40 @@ public class UrfCli implements Runnable {
 	}
 
 	@Command(description = "Converts one or more files to some URF file format.")
-	public void convert(@Parameters(paramLabel = "<file>", arity = "1..*") Path[] paths) {
-		System.out.println(List.of(paths)); //TODO implement
+	public void convert(@Option(names = {"--out", "-o"}) final Path output, @Parameters(paramLabel = "<file>", arity = "1..*") @Nonnull final Path[] paths) {
+		//TODO precondition paths length check
+		//TODO detect a glob as the first path, for shells that don't enumerate the file automatically
+
+		final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor();
+
+		try {
+			for(final Path path : paths) { //parse each file using the same processor
+				System.out.println(String.format("Converting file %s...", path.getFileName()));
+				//TODO precondition check filename
+				final String typeHandle = Filenames.getBaseFilename(path.getFileName().toString());
+				final URI typeTag = Handle.toTag(typeHandle);
+
+				final UrfCsvParser<List<Object>> urfCsvParser = new UrfCsvParser<>(urfProcessor);
+				try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {
+					//TODO provide updates to the user during parsing and when writing
+					urfCsvParser.parseDocument(inputStream, typeTag);
+				}
+			}
+			final TurfSerializer turfSerializer = new TurfSerializer();
+			turfSerializer.setFormatted(true);
+			if(output != null) {
+				System.out.println(String.format("Writing output file %s...", output.getFileName()));
+				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(output))) {
+					turfSerializer.serializeDocument(outputStream, urfProcessor);
+				}
+			} else {
+				turfSerializer.serializeDocument((Appendable)System.out, urfProcessor); //TODO improve varargs in signature to prevent need for cast
+			}
+			System.out.println("Conversion finished.");
+		} catch(final IOException ioException) {
+			getLogger().error("Error converting file.", ioException);
+			System.err.println(ioException.getMessage());
+		}
 	}
 
 	/**

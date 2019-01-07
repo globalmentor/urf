@@ -85,7 +85,7 @@ public class URF {
 	/** The tag of the <code>urf-OffsetTime</code> type. */
 	public static final URI OFFSET_TIME_TYPE_TAG = NAMESPACE.resolve("OffsetTime");
 	/** The tag of the <code>urf-Real</code> type. */
-	public static final URI REAL_TYPE_TAG = NAMESPACE.resolve("Real");
+	public static final URI REAL_TYPE_TAG = NAMESPACE.resolve("Real"); //TODO rename to simply "Number"
 	/** The tag of the <code>urf-RegularExpression</code> type. */
 	public static final URI REGULAR_EXPRESSION_TYPE_TAG = NAMESPACE.resolve("RegularExpression");
 	/** The tag of the <code>urf-Resource</code> type. */
@@ -104,6 +104,11 @@ public class URF {
 	public static final URI YEAR_MONTH_TYPE_TAG = NAMESPACE.resolve("YearMonth");
 	/** The tag of the <code>urf-ZonedDateTime</code> type. */
 	public static final URI ZONED_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("ZonedDateTime");
+
+	/** A set of the tags of all the temporal types. */
+	public static Set<URI> TEMPORAL_TYPE_TAGS = unmodifiableSet( //TODO switch to Java 9 Set.of()
+			new HashSet<>(Arrays.asList(INSTANT_TYPE_TAG, LOCAL_DATE_TYPE_TAG, LOCAL_DATE_TIME_TYPE_TAG, LOCAL_TIME_TYPE_TAG, OFFSET_DATE_TYPE_TAG,
+					OFFSET_DATE_TIME_TYPE_TAG, OFFSET_TIME_TYPE_TAG, YEAR_TYPE_TAG, YEAR_MONTH_TYPE_TAG, ZONED_DATE_TIME_TYPE_TAG)));
 
 	//#properties
 

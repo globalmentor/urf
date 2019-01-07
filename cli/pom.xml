@@ -24,6 +24,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.univocity</groupId>
+			<artifactId>univocity-parsers</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
 		</dependency>
@@ -36,6 +41,11 @@
 		<dependency>
 			<groupId>io.confound</groupId>
 			<artifactId>confound-file</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-csv</artifactId>
 		</dependency>
 
 		<dependency>
@@ -92,8 +102,7 @@
 						<configuration>
 							<headerType>console</headerType>
 							<outfile>${project.build.directory}/urf.exe</outfile>
-							<jar>${project.artifactId}-${project.version}-exe.jar</jar>
-							<dontWrapJar>true</dontWrapJar>
+							<jar>${project.build.directory}/${project.artifactId}-${project.version}-exe.jar</jar>
 							<errTitle>${project.name}</errTitle>
 							<jre>
 								<minVersion>11</minVersion>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.urf</groupId>
+		<artifactId>urf</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>urf-csv</artifactId>
+
+	<name>URF CSV</name>
+	<description>Parser and serializer for the URF CSV document format.</description>
+	<url>https://urf.io/csv/</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.univocity</groupId>
+			<artifactId>univocity-parsers</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-itu</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.clogr</groupId>
+			<artifactId>clogr</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-model</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>turf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
+		</dependency>
+
+	</dependencies>
+</project>

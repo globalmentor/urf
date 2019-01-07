@@ -1,0 +1,3 @@
+#username,name,authenticated:urf-Boolean,|<http://xmlns.com/foaf/0.1/homepage>|:urf-Iri,!foo bar,loginCount:urf-Integer,lastContact:urf-Instant,manager:User
+jdoe,Jane Doe,"true",https://janedoe.example.com/,foo,3,2016-08-26T21:54:22.892Z,
+jsmith,John Smith,false,https://johnsmith.example.com/,bar,12,,jdoe

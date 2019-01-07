@@ -17,28 +17,35 @@
 package io.urf.model;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
 
+import io.urf.URF;
+
 /**
- * Represents a reference to a resource or the resource itself; an encapsulation of a possible resource tag.
+ * A simple reference to a resource based on its tag.
+ * @apiNote References on their own do not support {@link #hashCode()} and {@link #equals(Object)}, although certain subtypes such as {@link UrfReference}
+ *          provide such guarantees.
  * @author Garret Wilson
  */
-public interface UrfReference {
+public final class SimpleUrfReference implements UrfReference {
 
-	/** @return The resource identifier tag, if any. */
-	public Optional<URI> getTag();
+	private final URI tag;
+
+	@Override
+	public Optional<URI> getTag() {
+		return Optional.ofNullable(tag);
+	}
 
 	/**
-	 * Creates a reference from a tag.
+	 * Tag constructor.
 	 * @param tag The identifying resource tag; must not be <code>null</code>.
-	 * @return A reference with the given tag.
 	 * @throws NullPointerException if the given tag is <code>null</code>.
 	 * @throws IllegalArgumentException if a tag is given that is not a valid tag, for example, not it is not an absolute IRI.
 	 */
-	public static UrfReference ofTag(@Nonnull final URI tag) {
-		return new SimpleUrfReference(tag);
+	public SimpleUrfReference(@Nonnull final URI tag) {
+		this.tag = URF.Tag.checkArgumentValid(tag);
 	}
 
 }
