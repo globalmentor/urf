@@ -15,31 +15,143 @@
 		<aside class="important far side">Draft version.</aside>
 		<dl>
 			<dt>Author</dt>
-			<dd><a href="http://www.garretwilson.com/">Garret Wilson</a> (<a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>)</dd>
+			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2017-09-25</dd>
+			<dd>Draft 2019-01-11</dd>
 		</dl>
 	</header>
+	<h2>Introduction</h2>
 	<p>TURF is the text interchange format for URF. TURF emphasizes terseness and consistency while maintaining human readability, with a preference for using symbols from existing interchange formats such as JSON and programming languages such as Java and C#. TURF has several useful properties, including:</p>
 	<ul>
-		<li>TURF has a signature character sequence, <code>`URF</code>, for easy recognition.</li>
-		<li>TURF has unambiguous beginning and end delimiters, allowing TURF to be embedded in existing text-based content.</li>
+		<li>TURF has an optional signature character sequence, <code>\URF</code>, for easy recognition.</li>
+		<li>TURF has an optional unambiguous end delimiter sequence <code>\.</code>, allowing TURF to be embedded in existing text-based content.</li>
 		<li>Whitespace separators and comments may be removed with no loss of semantics, resulting in an extremely compact representation.</li>
-		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, <code>&lt;…&gt;</code> for URIs, <code>#…#</code> for numbers, and <code>º…º</code> for ordinals.</li>
+		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, <code>&lt;…&gt;</code> for IRIs, and <code>#…</code> for decimal numbers.</li>
 	</ul>
+	<h3>Conventions Used in this Document</h3>
+	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
-	<p>The Internet media type [<a href="#rfc2046">RFC 2046</a>] of general URF information encoded as TURF is:</p>
-	<figure>
-		<p><code>text/urf</code></p>
-	</figure>
-	<p>TURF differs from general [<a href="draft.xhtml#rfc2046">RFC 2046</a>] text media types in the following:</p>
+	<aside class="note far third">The charset of a TURF document may therefore be deduced by examining the bytes of the document. If those bytes match the TURF signature in some charset, that is the charset of the document; otherwise, the charset is UTF-8.</aside>
+	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a TURF document <span class="spec-must">shall</span> be <code>text/urf</code> and <span class="spec-must">must</span> be encoded in UTF-8, UTF-16, or UTF-32. A TURF document <span class="spec-must-not">must not</span> begin with a byte order mark (<abbr>BOM</abbr>) or UTF-8 signature. If encoded in any encoding other than UTF-8, a TURF document <span class="spec-must">must</span> begin with a TURF <a href="#signature">signature</a>.</p>
+	<p>TURF differs from general <a href="#ref-rfc2046" class="ref">RFC 2046</a> text media types in the following: </p>
 	<ul>
-		<li>The default charset of TURF is UTF-8 rather that US-ASCII.</li>
-		<li>TURF allows any Unicode newline character [<a href="draft.xhtml#utr13">UTR #13</a>] to represent newlines rather than only <code>CRLF</code>.</li>
+		<li>The default charset of TURF is UTF-8 rather that ASCII.</li>
+		<li>TURF allows any Unicode newline character (<a href="#ref-utr13" class="ref">UTR #13</a>) to represent newlines rather than only <code>CRLF</code>.</li>
 	</ul>
-	<p>For any application-specific URF data encoded as TURF should be represented as <code>application/<var>applicationName</var>+turf</code> to allow the data to be recognized as such, where <var>applicationName</var> is the application-specific identifier for the URF information. <em>Note: These Internet media types have yet to be registered with the IANA.</em></p>
-	<h2>Encoding</h2>
-	<p>TURF may use any encoding in a closed environment in which all relevant parties are aware of the encoding being used. In situations where the encoding may not be readily known to a processor, such as in a general file stored in a file system, TURF must use the UTF-8 character encoding. TURF interchange document files should use a UTF-8 U+FEFF sequence (the so-called UTF-8 Byte Order Mark or BOM) at their beginning to notify general text processing agents that may not be aware of TURF that UTF-8 encoding is being used [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
+	<p>For any application-specific URF data encoded as TURF <span class="spec-should">should</span> be represented as <code>application/<var>applicationName</var>+turf</code> to allow the data to be recognized as such, where <code><var>applicationName</var></code> is the application-specific identifier for the URF information.</p>
+	<h2>Document</h2>
+	<p>A TURF <dfn>document</dfn> encodes an <dfn>URF instance</dfn> (TODO reference URF) as one or more graphs of <dfn>resources</dfn> representing URF statements. A TURF document <span class="spec-may">may</span> be contain no resource representations, in which case it representing no URF statements.</p>
+	<h2>Syntax</h2>
+	<h3>Whitespace</h3>
+	<aside class="note far third">TURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<p>TURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
+	<ul class="spec-production">
+		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
+		<li><code class="name">tab</code> ⇒ <code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</li>
+		<li><code class="name">vtab</code> ⇒ <code class="name">LINE TABULATION</code> (<code class="unicode">U+000B</code>)</li>
+		<li><code class="name">ff</code> ⇒ <code class="name">FORM FEED (FF)</code> (<code class="unicode">U+000C</code>)</li>
+		<li><code class="name">sp</code> ⇒ <code class="name">SPACE</code> (<code class="unicode">U+0020</code>)</li>
+		<li><code class="name">nbsp</code> ⇒ <code class="name">NO-BREAK SPACE</code> (<code class="unicode">U+00A0</code>)</li>
+		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
+	</ul>
+	<h3>Line Endings</h3>
+	<p>TURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A TURF parser <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A TURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
+	<ul class="spec-production">
+		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
+		<li><code class="name">cr</code> ⇒ <code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</li>
+		<li><code class="name">lf</code> ⇒ <code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</li>
+	</ul>
+	<h3>Comments</h3>
+	<h4>Line Comments</h4>
+	<p>A line comment <span class="spec-may">may</span> appear before the end of any line. A line comment begins with the <code class="name">EXCLAMATION MARK</code> character <code>!</code> (<code class="unicode">U+0021</code>) and proceeds to the next line ending character.</p>
+	<ul class="spec-production">
+		<li><code class="name">line_comment</code> ⇒ '!' [^<code class="name">eol</code>]*</li>
+	</ul>
+	<h3>Filler</h3>
+	<aside class="note far third">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
+	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
+	<ul class="spec-production">
+		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
+	</ul>
+	<h3>Line Breaks</h3>
+	<aside class="tip far third">A parser <span class="spec-may">may</span> simply discard line comments and parse the TURF document as if they were not present.</aside>
+	<p>A <dfn>line break</dfn> is any end of line surrounded on either side by filler.</p>
+	<ul class="spec-production">
+		<li><code class="name">line_break</code> ⇒ · <code class="name">eol</code> ·</li>
+	</ul>
+	<h3 id="sequence">Sequences</h3>
+	<p>Several TURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
+	<aside class="note far third">The sequence separator is a TURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
+	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
+	<ul class="spec-production">
+		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
+		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
+		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
+	</ul>
+	<h2>Structure</h2>
+	<p>A TURF document is divided into two sections: a <dfn>header</dfn> and a <dfn>body</dfn>, both of which are optional. If a header is included, it <span class="spec-must">must</span> appear starting at the first character of the document.</p>
+	<ul class="spec-production">
+		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">body</code>?</li>
+	</ul>
+	<h3>Header</h3>
+	<figure class="far half">
+		<figcaption>Example TURF document header.</figcaption>
+		<pre class="line-numbers"><code class="language-turf">\URF
+! Example TURF document.
+\:
+  space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
+  space-foaf = &lt;http://xmlns.com/foaf/0.1/&gt;
+:
+
+! body of document …</code></pre>
+	</figure>
+	<h4 id="signature">Signature</h4>
+	<p>The header of a document, if present, <span class="spec-must">must</span> begin with a TURF <dfn>signature</dfn>, the character sequence <code>\URF</code> at the beginning of the document. It <span class="spec-may">may</span> optionally be followed, on the same or different line, with a <dfn>directives</dfn> declaration.</p>
+	<h4>Directives</h4>
+	<p>The directives are a sequence of name-value pairs, with each name an URF handle and a value a TURF literal. <span class="note">The production rules for the description contents are described later in this specification.</span></p>
+	<ul class="spec-production">
+		<li><code class="name">header</code> ⇒ <code class="name">signature</code> <code class="name">line_break</code>* <code class="name">directives</code>?</li>
+		<li><code class="name">signature</code> ⇒ "\URF"</li>
+		<li><code class="name">directives</code> ⇒ ':' <code class="name">directive-sequence</code> ';'</li>
+		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
+	</ul>
+	<p>A directory handle <span class="spec-must-not">must not</span> use a namespace alias prefix. For example a fictional directive <code>foo/bar</code> is not allowed.</p>
+	<h5>Namespace Declaration</h5>
+	<p>For every directive corresponding a tag in the <code>https://urf.name/space/</code> namespace, the tag name declares a namespace alias prefix to be used with handles within the document body, and the value, which <span class="spec-must">must</span> be an <code>urf-Iri</code> literal, designates the namespace with which the alias is associated.</p>
+	<p>For example a directive handle <code>space-dc</code> indicates that <code>dc</code> is to be used as a namespace alias prefix. The example TURF document header in the figure above associates that prefix with the <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> namespace. Thus if <code>dc/creator</code> were to be used within the body of the example document above, it would indicate the tag <code>&lt;http://purl.org/dc/elements/1.1/creator&gt;</code>.</p>
+	<h3>Body</h3>
+	<p>The document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
+	<h2>Resources</h2>
+	<p>A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
+	<ul class="spec-production">
+		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> | <code class="name">label</code></li>
+		<li><code class="name">described_resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> · [<code class="name">description</code>] | <code class="name">label</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
+		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
+		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
+	</ul>
+	<p> A label consists of an identifier; which is either an URF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph. </p>
+	<ul class="spec-production">
+		<li><code class="name">label</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
+		<li><code class="name">alias</code> ⇒ <code class="name">name_token</code></li>
+		<li><code class="name">id</code> ⇒ <code class="name">string</code></li>
+		<li><code class="name">tag</code> ⇒ <code class="name">iri</code></li>
+	</ul>
+	<p>If a label uses an URF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the TURF document. If the identifier is an IRI, it represents the URF <dfn>tag</dfn> of the resource.</p>
+	<p>A string as the identifier indicates the URF <dfn>ID</dfn> for a resource. The ID <span class="spec-must">shall</span> be combined with the tag of the resource type to form the resource tag, as prescribed by the URF specification. This implies that an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object, and that the object <span class="spec-must">must</span> indicate a type if an ID is present. Furthermore because of the URF formula for creating resource tags given an ID and a type tag, if a label indicates an ID the object type <span class="spec-must-not">must not</span> itself also indicate an ID.</p>
+	<h3>Objects</h3>
+	<p>Objects are are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
+	<ul class="spec-production">
+		<li><code class="name">object</code> ⇒ '*' · [<code class="name">type</code>]</li>
+		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
+	</ul>
+	<h3>Descriptions</h3>
+	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<ul class="spec-production">
+		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
+		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+	</ul>
+	<p>TODO update rest of document</p>
 	<h2>Signature</h2>
 	<p>Every TURF interchange document must begin with the signature character sequence, <code>`URF</code>, which must appear as the first characters of the document after the Byte Order Mark (BOM), if any [<a href="#unicodeBOMFAQ">Unicode BOM FAQ</a>].</p>
 	<h2>Grammar</h2>
@@ -133,8 +245,7 @@
 	</figure>
 	<p>A temporal short form consists of the lexical form of a temporal resource such as <code>urf.Date</code>, <code>urf.DateTime</code>, <code>urf.Duration</code>, <code>urf.Time</code>, or <code>urf.UTCOffset</code>, surrounded by matching at signs (<code>'@'</code>). An <code>urf.Duration</code> requires at least the date or the time section to be present. The hours component represents midnight as <code>00</code> and must not have a value larger than <code>23</code>. The UTC offset <code>-00:00</code> is not allowed; <code>+00:00</code> must be used instead. A temporal short form is equivalent to a resource of the corresponding urf.Temporal type, based upon the specific lexical form used. The temporal short form <code>@1999-03-04@</code> is the equivalent of the number resource <code>«(urf.Date)"1999-03-04"»</code>, for example.</p>
 	<figure>
-		<p><code><var>temporalshort</var> ⇒ @<strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><strong>)</strong> <strong>|</strong> <strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><code>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code><strong>)</strong> <strong>|</strong> <strong>(</strong><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code>
-		</p>
+		<p><code><var>temporalshort</var> ⇒ @<strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><strong>)</strong> <strong>|</strong> <strong>(</strong><var>YYYY</var>-<var>MM</var>-<var>DD</var><code>T<var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong></code><strong>)</strong> <strong>|</strong> <strong>(</strong><var>hh:</var><var>mm</var>:ss<strong>[</strong>.s<strong>+</strong><strong>]</strong><strong>[</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong>P<strong>[</strong><var>n</var>Y<var>n</var>M<var>n</var>D<strong>]</strong><strong>[</strong>T<var>n</var>H<var>n</var>M<var>n</var><strong>[</strong>.<var>n</var><strong>]</strong>S<strong>]</strong><strong>)</strong> <strong>|</strong> <strong>(</strong><strong>(</strong>+<strong>|</strong>-<strong>)</strong><var>hh</var>:<var>mm</var><strong>)</strong>@</code> </p>
 	</figure>
 	<p>The types declaration consists of one or more resource references, each preceded by an asterisk <code>'*'</code>. Each type reference is equivalent to the reference asserted as the object of the <code>urf.type</code> property. Each type reference may optionally specify comma-separated selector resources between parentheses characters <code>'('</code> and <code>')'</code> following the type reference. The selector resources are equivalent to the values of <code>urf.List</code> value of a scoped <code>urf.selector</code> property in the context of the resource's <code>urf.type</code> property for which the type is a value.</p>
 	<figure>
@@ -346,7 +457,8 @@ convertButton.setName("conversionButton");
 convertButton.setLabel("Convert");
 conversionPanel.add(convertButton);
 navigationPanel.add(conversionPanel);
-</code></pre> </figure>
+</code></pre>
+	</figure>
 	<h3>RDF/XML</h3>
 	<p>URF is a semantic superset of RDF, and can represent any construct available in RDF. URF presents equivalents of many RDF classes as well. In terms of representation formats, TURF can represent any semantic information that is available using [<a href="#rdfxml">RDF/XML</a>], yet is more flexible and has less restrictions. The following is a sample RDF/XML representation of an RDF data instance using many of the capabilities available in RDF/XML:</p>
 	<figure>
@@ -491,8 +603,10 @@ END:vCard</code></pre>
 		<dd><cite>ISO 8601:2004(E): Data elements and interchange formats — Information interchange — Representation of dates and times</cite>. International Organization for Standardization, 2004-12-01.</dd>
 		<dt>RDF/XML</dt>
 		<dd>Dave Beckett. <a href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax Specification (Revised)</cite></a>. World Wide Web Consortium, 2006-02-10.</dd>
-		<dt>RFC 2046</dt>
-		<dd>N. Freed and N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>. Internet Engineering Task Force, 1996.</dd>
+		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed (Innosoft), N. Borenstein. IETF.</dd>
+		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt>RFC 2130</dt>
 		<dd>C. Weider, C. Preston, K. Simonsen, H. Alvestrand, R. Atkinson, M. Crispin, and P. Svanberg. <a href="http://www.ietf.org/rfc/rfc2278.txt"><cite>RFC 2130: The Report of the IAB Character Set Workshop held 29 February - 1 March, 1996</cite></a>. Internet Engineering Task Force, 1997.</dd>
 		<dt>RFC 2278</dt>
@@ -513,10 +627,12 @@ END:vCard</code></pre>
 		<dd>A. Phillips and M. Davis. <a href="http://www.ietf.org/rfc/rfc4646.txt"><cite>RFC 4646: Tags for Identifying Languages</cite></a>. Internet Engineering Task Force, 2006.</dd>
 		<dt>RFC 4648</dt>
 		<dd>S. Josefsson. <a href="http://www.ietf.org/rfc/rfc4648.txt"><cite>RFC 4648: The Base16, Base32, and Base64 Data Encodings</cite></a>. Internet Engineering Task Force, 2006.</dd>
+		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov (Isode Limited), J. Reschke (greenbytes). IETF.</dd>
 		<dt>Unicode BOM FAQ</dt>
 		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd>
-		<dt>UTR #13</dt>
-		<dd>Mark Davis. <a href="http://unicode.org/unicode/standard/reports/tr13/tr13-5.html"><cite>Unicode Technical Report #13: Unicode Newline Guidelines</cite><cite></cite></a>. Unicode, Inc., 1999.</dd>
+		<dt id="ref-utr13" class="ref-target">UTR #13</dt>
+		<dd><a href="http://unicode.org/unicode/standard/reports/tr13/tr13-5.html"><cite>Unicode Technical Report #13: Unicode Newline Guidelines</cite><cite></cite></a>, Mark Davis. Unicode, Inc.</dd>
 		<dt>XML Schema 2</dt>
 		<dd>Paul V. Biron and Ashok Malhotra. <a href="http://www.w3.org/TR/xmlschema-2/"><cite>XML Schema Part 2: Datatypes Second Edition</cite></a>. World Wide Web Consortium, 2004-10-28.</dd>
 	</dl>
@@ -684,7 +800,7 @@ END:vCard</code></pre>
 			</ul>
 		</dd>
 	</dl>
-	<footer><small>Copyright © 2007–2017 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
+	<footer><small>Copyright © 2007–2019 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodifed form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 

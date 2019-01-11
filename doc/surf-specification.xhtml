@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-07</dd>
+			<dd>Draft 2019-01-11</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -51,7 +51,7 @@
 	<h3>Whitespace</h3>
 	<aside class="note far third">SURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>SURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
-	<ul>
+	<ul class="spec-production">
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
 		<li><code class="name">tab</code> ⇒ <code class="name">CHARACTER TABULATION</code> (<code class="unicode">U+0009</code>)</li>
 		<li><code class="name">vtab</code> ⇒ <code class="name">LINE TABULATION</code> (<code class="unicode">U+000B</code>)</li>
@@ -62,7 +62,7 @@
 	</ul>
 	<h3>Line Endings</h3>
 	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF parser <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
-	<ul>
+	<ul class="spec-production">
 		<li><code class="name">eol</code> ⇒ <code class="name">cr</code> | <code class="name">lf</code> | <code class="name">Line_Separator</code> | <code class="name">Paragraph_Separator</code></li>
 		<li><code class="name">cr</code> ⇒ <code class="name">CARRIAGE RETURN (CR)</code> (<code class="unicode">U+000D</code>)</li>
 		<li><code class="name">lf</code> ⇒ <code class="name">LINE FEED (LF)</code> (<code class="unicode">U+000A</code>)</li>
@@ -76,7 +76,7 @@
 	<h3>Filler</h3>
 	<aside class="note far third">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
 	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
-	<ul>
+	<ul class="spec-production">
 		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
 	</ul>
 	<h3>Line Breaks</h3>
@@ -132,7 +132,7 @@
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
-	<p> A label consists of an identifier; which is either a SURF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
+	<p> A label consists of an identifier; which is either a SURF name, a string, or an IRI; surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
 	<ul class="spec-production">
 		<li><code class="name">label</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
 		<li><code class="name">alias</code> ⇒ <code class="name">name_token</code></li>
@@ -142,15 +142,13 @@
 	<p>If a label uses a SURF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the SURF document. If the identifier is an IRI, it is a <dfn>tag</dfn> and provides a unique identifier for the resource across all SURF documents. A SURF tag <span class="spec-must-not">must not</span> contain an IRI fragment. A string as the identifier functions as an <dfn>ID</dfn> for an object, unique only for a certain object type.</p>
 	<p>A tag or an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object. An ID <span class="spec-must-not">must not</span> appear in front of a resource representation without an indicated type. A SURF parser <span class="spec-must">must</span> provide tags and IDs as part of the parsed data.</p>
 	<h3>Objects</h3>
-	<p>Objects are are general resources with an optional type, an optional ID, and that <span class="spec-may">may</span> be described by properties.</p>
+	<p>Objects are are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
 	<ul class="spec-production">
 		<li><code class="name">object</code> ⇒ '*' · [<code class="name">type</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
-		<li><code class="name">properties</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<h3>Descriptions</h3>
-	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF processor <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
 		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
@@ -348,7 +346,7 @@
 	<h3>Collections</h3>
 	<p>Collection resources represent abstract data types that can hold other resources.</p>
 	<h4>List</h4>
-	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
+	<aside class="note far third">Examples of list types SURF parsers <span class="spec-may">may</span> use include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/6sh2ey19.aspx" class="see"><code>System.Collections.Generic.List&lt;T&gt;</code></a></dd>
@@ -365,7 +363,7 @@
 		<li><code class="name">list</code> ⇒ '[' <code class="name">described_resource-sequence</code> ']'</li>
 	</ul>
 	<h4>Map</h4>
-	<aside class="note far third">Examples of map types SURF processors <span class="spec-may">may</span> use include:
+	<aside class="note far third">Examples of map types SURF parsers <span class="spec-may">may</span> use include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/xfhwa508.aspx" class="see"><code>System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;</code></a></dd>
@@ -387,7 +385,7 @@
 		<li><code class="name">value</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
 	<h4>Set</h4>
-	<aside class="note far third">Examples of list types SURF processors <span class="spec-may">may</span> use include:
+	<aside class="note far third">Examples of list types SURF parsers <span class="spec-may">may</span> use include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/bb359438.aspx" class="see"><code>System.Collections.Generic.HashSet&lt;T&gt;</code></a></dd>
