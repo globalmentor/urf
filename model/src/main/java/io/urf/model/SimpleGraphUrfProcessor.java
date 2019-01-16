@@ -223,8 +223,8 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 				//TODO make sure the property value is a description
 				final UrfResourceDescription mapEntry = (UrfResourceDescription)propertyValue;
 				//TODO fix; this currently only works for the TURF parser, which creates an actual map entry object; will need to be upgraded to support lookup of these items 
-				final Object keyObject = mapEntry.getPropertyValue(KEY_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
-				final Object valueObject = mapEntry.getPropertyValue(VALUE_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
+				final Object keyObject = mapEntry.findPropertyValue(KEY_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
+				final Object valueObject = mapEntry.findPropertyValue(VALUE_PROPERTY_TAG).map(ObjectUrfResource::unwrap).orElseThrow(IllegalArgumentException::new);
 				map.put(keyObject, valueObject); //TODO note somewhere that this will leave orphaned map entry objects
 			} else {
 				throw new IllegalArgumentException(

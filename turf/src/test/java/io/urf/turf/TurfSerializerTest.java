@@ -116,7 +116,7 @@ public class TurfSerializerTest {
 		object1.getProperties().forEach(property -> {
 			final URI propertyTag = property.getKey();
 			final Object propertyValue1 = property.getValue();
-			final Object propertyValue2 = object2.getPropertyValue(propertyTag)
+			final Object propertyValue2 = object2.findPropertyValue(propertyTag)
 					.orElseThrow(() -> new AssertionError(reason + ": missing property value " + propertyTag));
 			//TODO add convenience method for creating a property tag reference to provide more tag/typeTag info
 			assertGraphsEqual(reason + ", " + propertyTag, propertyValue1, propertyValue2);

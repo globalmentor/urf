@@ -66,7 +66,7 @@ public class UrfConfiguration extends AbstractObjectConfiguration {
 				continue;
 			}
 			if(object instanceof UrfObject) {
-				object = ((UrfObject)object).getPropertyValue(keySegment).orElse(null);
+				object = ((UrfObject)object).findPropertyValueByHandle(keySegment).orElse(null);
 			} else if(object instanceof Map) {
 				object = ((Map<?, ?>)object).get(requireNonNull(keySegment));
 			} else {

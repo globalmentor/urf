@@ -27,6 +27,7 @@ import java.util.regex.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Characters;
 import com.globalmentor.net.URIs;
 
@@ -149,6 +150,9 @@ public class URF {
 		/** The delimiter that may appear in an URF name to indicate the start of the ID, if any. */
 		public static final char ID_DELIMITER = '#';
 
+		/** The delimiter that may appear at the end of an URF name to indicate n-arity (one-to-many). */
+		public static final char NARY_DELIMITER = '+';
+
 		/**
 		 * Determines whether the given string conforms to the rules for an URF name token.
 		 * @param string The string to test.
@@ -200,8 +204,40 @@ public class URF {
 					(1 << Character.CONNECTOR_PUNCTUATION)) >> Character.getType(c)) & 1) != 0;
 		}
 
-		/** Regular expression pattern to match an URF name . */
-		public static final Pattern PATTERN = Pattern.compile(String.format("(%s)(?:%s(%s))?", TOKEN_PATTERN, ID_DELIMITER, ID_TOKEN_PATTERN)); //TODO add test; document matching groups
+		/**
+		 * Regular expression pattern to match an URF name.
+		 * <p>
+		 * Matching groups:
+		 * </p>
+		 * <dl>
+		 * <dt>1</dt>
+		 * <dd>base name (with no ID)</dd>
+		 * <dt>2</dt>
+		 * <dd>n-ary delimiter (optional)</dd>
+		 * <dt>3</dt>
+		 * <dd>ID (optional)</dd>
+		 * </dl>
+		 */
+		public static final Pattern PATTERN = Pattern
+				.compile(String.format("(%s(%s)?)(?:%s(%s))?", TOKEN_PATTERN, "\\" + NARY_DELIMITER, ID_DELIMITER, ID_TOKEN_PATTERN)); //TODO add test; document matching groups
+
+		/**
+		 * The pattern matching group for the base name (the part without the ID, if any).
+		 * @see #PATTERN
+		 */
+		public final static int BASE_NAME_GROUP = 1;
+
+		/**
+		 * The pattern matching group for the optional n-ary delimiter.
+		 * @see #PATTERN
+		 */
+		public final static int NARY_GROUP = 2;
+
+		/**
+		 * The pattern matching group for the optional ID.
+		 * @see #PATTERN
+		 */
+		public final static int PATTERN_ID_GROUP = 3;
 
 		/**
 		 * Determines whether the given string conforms to the rules for an URF name.
@@ -323,6 +359,24 @@ public class URF {
 				return Optional.of(removeFragment(tag));
 			}
 			return Optional.empty();
+		}
+
+		/**
+		 * Determines whether the given tag is an n-ary tag (representing a one-to-many relationship)
+		 * <p>
+		 * To be considered a n-ary ID tag, a tag must have a name, and the base name (without the ID) must end in the n-ary delimiter.
+		 * </p>
+		 * @param tag The tag URI to check for n-arity.
+		 * @return Whether this tag is considered an n-arity tag.
+		 * @throws NullPointerException if the given tag is <code>null</code>.
+		 * @throws IllegalArgumentException if the given URI is not a valid tag.
+		 * @see #getName(URI)
+		 */
+		public static boolean isNary(@Nonnull final URI tag) {
+			checkArgumentValid(tag);
+			final String rawPath = tag.getRawPath();
+			final boolean maybeNary = rawPath != null && CharSequences.endsWith(rawPath, Name.NARY_DELIMITER);
+			return maybeNary && getName(tag).isPresent(); //if we find the n-ary delimiter, make sure this is a valid name
 		}
 
 		/**
@@ -460,11 +514,14 @@ public class URF {
 		 * <dt>2</dt>
 		 * <dd>segments</dd>
 		 * <dt>3</dt>
+		 * <dd>n-ary delimiter (optional)</dd>
+		 * <dt>4</dt>
 		 * <dd>ID (optional)</dd>
 		 * </dl>
 		 */
-		public static final Pattern PATTERN = Pattern.compile(String.format("(?:(%s)%s)?(%s(?:%s%s)*)(?:%s(%s))?", Name.TOKEN_PATTERN, NAMESPACE_ALIAS_DELIMITER,
-				Name.TOKEN_PATTERN, SEGMENT_DELIMITER, Name.TOKEN_PATTERN, Name.ID_DELIMITER, Name.ID_TOKEN_PATTERN));
+		public static final Pattern PATTERN = Pattern
+				.compile(String.format("(?:(%s)%s)?(%s(?:%s%s)*(%s)?)(?:%s(%s))?", Name.TOKEN_PATTERN, NAMESPACE_ALIAS_DELIMITER, Name.TOKEN_PATTERN, SEGMENT_DELIMITER,
+						Name.TOKEN_PATTERN, "\\" + Name.NARY_DELIMITER, Name.ID_DELIMITER, Name.ID_TOKEN_PATTERN));
 
 		/**
 		 * The pattern matching group for the optional namespace alias.
@@ -479,10 +536,16 @@ public class URF {
 		public final static int PATTERN_SEGEMENTS_GROUP = 2;
 
 		/**
+		 * The pattern matching group for the optional n-ary delimiter.
+		 * @see #PATTERN
+		 */
+		public final static int NARY_GROUP = 3;
+
+		/**
 		 * The pattern matching group for the optional ID.
 		 * @see #PATTERN
 		 */
-		public final static int PATTERN_ID_GROUP = 3;
+		public final static int PATTERN_ID_GROUP = 4;
 
 		/**
 		 * Determines if the given character is valid to begin an URF handle. An URF handle begins with a name token.

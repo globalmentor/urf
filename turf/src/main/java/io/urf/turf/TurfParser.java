@@ -186,7 +186,7 @@ public class TurfParser<R> {
 					directivesParser.parseDescription(reader, new SimpleUrfResource(directivesTag));
 					directivesProcessor.reportRootResource(new SimpleUrfResource(directivesTag));
 					final UrfObject directives = directivesProcessor.getResult().stream().findAny().map(UrfObject.class::cast).orElseThrow(IllegalStateException::new); //TODO clean up all these gymnastics
-					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
+					final Object namespaces = directives.findPropertyValueByHandle(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
 					if(namespaces != null) {
 						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
 						@SuppressWarnings("unchecked")
