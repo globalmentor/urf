@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-13</dd>
+			<dd>Draft 2019-01-15</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -142,7 +142,7 @@
 	<p>If a label uses a SURF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the SURF document. If the identifier is an IRI, it is a <dfn>tag</dfn> and provides a unique identifier for the resource across all SURF documents. A SURF tag <span class="spec-must-not">must not</span> contain an IRI fragment. A string as the identifier functions as an <dfn>ID</dfn> for an object, unique only for a certain object type.</p>
 	<p>A tag or an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object. An ID <span class="spec-must-not">must not</span> appear in front of a resource representation without an indicated type. A SURF parser <span class="spec-must">must</span> provide tags and IDs as part of the parsed data.</p>
 	<h3>Objects</h3>
-	<p>Objects are are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
+	<p>Objects are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
 	<ul class="spec-production">
 		<li><code class="name">object</code> ⇒ '*' · [<code class="name">type</code>]</li>
 		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
