@@ -89,6 +89,7 @@ public class UrfCsvParserTest {
 		assertThat(jdoe.findPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")), isPresentAndIs(URI.create("https://janedoe.example.com/")));
 		assertThat(jdoe.findPropertyValueByHandle("loginCount"), isPresentAndIs(3L));
 		assertThat(jdoe.findPropertyValueByHandle("lastContact"), isPresentAndIs(Instant.parse("2016-08-26T21:54:22.892Z")));
+		assertThat(jdoe.getPropertyValuesByHandle("many+"), containsInAnyOrder("test"));
 		assertThat(jdoe.findPropertyValueByHandle("manager"), not(isPresent()));
 
 		final UrfObject jsmith = (UrfObject)resources.get(1);
@@ -99,6 +100,7 @@ public class UrfCsvParserTest {
 		assertThat(jsmith.findPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")), isPresentAndIs(URI.create("https://johnsmith.example.com/")));
 		assertThat(jsmith.findPropertyValueByHandle("loginCount"), isPresentAndIs(12L));
 		assertThat(jsmith.findPropertyValueByHandle("lastContact"), not(isPresent()));
+		assertThat(jsmith.getPropertyValuesByHandle("many+"), empty());
 		assertThat(jsmith.findPropertyValueByHandle("manager"), isPresentAnd(sameInstance(jdoe)));
 	}
 
