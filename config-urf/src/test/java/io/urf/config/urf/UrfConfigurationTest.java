@@ -36,19 +36,19 @@ public class UrfConfigurationTest {
 	@Test
 	public void testRootUrfObject() {
 		final UrfObject urfObject = new UrfObject("Configuration");
-		urfObject.setPropertyValue("foo", "bar");
-		urfObject.setPropertyValue("flag", Boolean.TRUE);
+		urfObject.setPropertyValueByHandle("foo", "bar");
+		urfObject.setPropertyValueByHandle("flag", Boolean.TRUE);
 
 		final UrfObject org = new UrfObject("Company");
-		org.setPropertyValue("name", "Acme Company");
-		org.setPropertyValue("size", 123);
+		org.setPropertyValueByHandle("name", "Acme Company");
+		org.setPropertyValueByHandle("size", 123);
 
 		final UrfObject address = new UrfObject();
-		address.setPropertyValue("state", "NY");
-		address.setPropertyValue("country", "USA");
+		address.setPropertyValueByHandle("state", "NY");
+		address.setPropertyValueByHandle("country", "USA");
 
-		org.setPropertyValue("address", address);
-		urfObject.setPropertyValue("organization", org);
+		org.setPropertyValueByHandle("address", address);
+		urfObject.setPropertyValueByHandle("organization", org);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
 		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));

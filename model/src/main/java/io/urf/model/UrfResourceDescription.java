@@ -57,6 +57,7 @@ public interface UrfResourceDescription {
 	 * @return The values of the property.
 	 * @throws NullPointerException if the given property handle is <code>null</code>.
 	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #getPropertyValues(URI)
 	 */
 	public default Set<Object> getPropertyValuesByHandle(@Nonnull String propertyHandle) {
 		return getPropertyValues(Handle.toTag(propertyHandle));
@@ -79,6 +80,7 @@ public interface UrfResourceDescription {
 	 * @return The value of the property, if any.
 	 * @throws NullPointerException if the given property handle is <code>null</code>.
 	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #findPropertyValue(URI)
 	 */
 	public default Optional<Object> findPropertyValueByHandle(@Nonnull String propertyHandle) {
 		return findPropertyValue(Handle.toTag(propertyHandle));
@@ -95,6 +97,20 @@ public interface UrfResourceDescription {
 	public Optional<Object> setPropertyValue(@Nonnull URI propertyTag, @Nonnull Object propertyValue);
 
 	/**
+	 * Sets a property value by the property handle.
+	 * @implSpec The default implementation delegates to {@link #setPropertyValue(URI, Object)}.
+	 * @param propertyHandle The handle of the property.
+	 * @param propertyValue The new value of the property.
+	 * @return The previous value of the property, if any.
+	 * @throws NullPointerException if the given property property tag and/or property value is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #setPropertyValue(URI, Object)
+	 */
+	public default Optional<Object> setPropertyValueByHandle(@Nonnull String propertyHandle, @Nonnull Object propertyValue) {
+		return setPropertyValue(Handle.toTag(propertyHandle), propertyValue);
+	}
+
+	/**
 	 * Adds an property value. Any existing value for the property will not change.
 	 * @param propertyTag The name of the property.
 	 * @param propertyValue The additional value of the property.
@@ -105,6 +121,21 @@ public interface UrfResourceDescription {
 	 * @see Tag#isNary(URI)
 	 */
 	public boolean addPropertyValue(@Nonnull URI propertyTag, @Nonnull Object propertyValue);
+
+	/**
+	 * Adds an property value by the property handle. Any existing value for the property will not change.
+	 * @implSpec The default implementation delegates to {@link #addPropertyValue(URI, Object)}.
+	 * @param propertyHandle The handle of the property.
+	 * @param propertyValue The additional value of the property.
+	 * @return <code>true</code> if the added value was unique.
+	 * @throws NullPointerException if the given property handle and/or property value is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @throws IllegalStateException if object the already has a value for the given property and the property is not an n-ary property.
+	 * @see #addPropertyValue(URI, Object)
+	 */
+	public default boolean addPropertyValueByHandle(@Nonnull String propertyHandle, @Nonnull Object propertyValue) {
+		return addPropertyValue(Handle.toTag(propertyHandle), propertyValue);
+	}
 
 	/**
 	 * Merges a property and value into the object. If the property is an n-ary property, the property value will be added to whatever value (if any) the object
@@ -129,6 +160,22 @@ public interface UrfResourceDescription {
 		}
 	}
 
+	/**
+	 * Merges a property and value into the object by the property handle. If the property is an n-ary property, the property value will be added to whatever
+	 * value (if any) the object has for the property. If the property is a non n-ary property (a binary property), the value (if any) will be replaced with the
+	 * given value.
+	 * @implSpec The default implementation delegates to {@link #addPropertyValue(URI, Object)}.
+	 * @param propertyHandle The handle of the property.
+	 * @param propertyValue The value of the property to add or set.
+	 * @return <code>true</code> if the merged value resulted in a change.
+	 * @throws NullPointerException if the given property handle and/or property value is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #mergePropertyValue(URI, Object)
+	 */
+	public default boolean mergePropertyValueByHandle(@Nonnull String propertyHandle, @Nonnull Object propertyValue) {
+		return mergePropertyValue(Handle.toTag(propertyHandle), propertyValue);
+	}
+
 	/** @return An iterable to the resource's tagged properties and their values. */
 	//TODO add, but use name that won't be confused with URF property "name": public Iterable<NameValuePair<String, Object>> getPropertyNameValuePairs();
 
@@ -141,15 +188,4 @@ public interface UrfResourceDescription {
 		properties.forEach(this::setPropertyValue);
 	}
 
-	/**
-	 * Sets a property value by the property handle.
-	 * @param propertyHandle The handle of the property.
-	 * @param propertyValue The new value of the property.
-	 * @return The previous value of the property, if any.
-	 * @throws NullPointerException if the given property property tag and/or property value is <code>null</code>.
-	 * @throws IllegalArgumentException if the given string is not a valid handle.
-	 */
-	public default Optional<Object> setPropertyValue(@Nonnull String propertyHandle, @Nonnull Object propertyValue) {
-		return setPropertyValue(Handle.toTag(propertyHandle), propertyValue);
-	}
 }

@@ -62,6 +62,8 @@ public class TurfParserTest {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
+	//#IDs
+
 	/** @see TurfTestResources#OK_IDS_RESOURCE_NAME */
 	@Test
 	public void testIds() throws IOException {
@@ -110,6 +112,8 @@ public class TurfParserTest {
 
 	//TODO add bad ID test with conflicting type, e.g. 	|<https://example.com/Foo#test>|*|<https://example.com/Bar>|
 
+	//#namespaces
+
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
 	@Test
 	public void testOkNamespaces() throws IOException {
@@ -131,6 +135,8 @@ public class TurfParserTest {
 					isPresentAndIs(URI.create("https://janedoe.example.com/")));
 		}
 	}
+
+	//#roots
 
 	/** @see TurfTestResources#OK_ROOTS_WHITESPACE_RESOURCE_NAME */
 	@Test
@@ -175,6 +181,60 @@ public class TurfParserTest {
 			final UrfObject object7 = (UrfObject)roots.get(7);
 			assertThat(object7.getTag(), isEmpty());
 			assertThat(object7.findPropertyValueByHandle("info"), isPresentAndIs("eighth"));
+		}
+	}
+
+	//#n-ary properties
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyOneValue() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getPropertyCount(), is(1));
+		assertThat(urfObject.getPropertyValueCount(), is(1));
+		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example"));
+	}
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyTwoValues() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getPropertyCount(), is(1));
+		assertThat(urfObject.getPropertyValueCount(), is(2));
+		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test"));
+	}
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyThreeValues() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME).stream().findAny()
+				.orElseThrow(AssertionError::new);
+		assertThat(urfObject.getPropertyCount(), is(1));
+		assertThat(urfObject.getPropertyValueCount(), is(3));
+		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test", Year.of(1999)));
+	}
+
+	/** @see TurfTestResources#OK_NARY_TWO_PROPERTIES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryTwoProperties() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_TWO_PROPERTIES_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getPropertyCount(), is(2));
+		assertThat(urfObject.getPropertyValueCount(), is(7));
+		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test", Year.of(1999)));
+		assertThat(urfObject.getPropertyValuesByHandle("nary+"), containsInAnyOrder("first", "second", "third", "fourth"));
+	}
+
+	/** @see TurfTestResources#OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES */
+	@Test
+	public void testOkNaryMixedProperties() throws IOException {
+		for(final String okNamespacesResourceName : OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES) {
+			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().findAny(); //TODO require no more than one resource
+			final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(AssertionError::new);
+			assertThat(urfObject.getPropertyCount(), is(3));
+			assertThat(urfObject.getPropertyValueCount(), is(8));
+			assertThat(urfObject.findPropertyValueByHandle("foo"), isPresentAndIs("bar"));
+			assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test", Year.of(1999)));
+			assertThat(urfObject.getPropertyValuesByHandle("nary+"), containsInAnyOrder("first", "second", "third", "fourth"));
 		}
 	}
 

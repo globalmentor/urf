@@ -351,6 +351,9 @@ public class TurfParser<R> {
 			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
 			stringBuilder.append(parseNameToken(reader)); //name token
 		}
+		if(confirm(reader, Name.NARY_DELIMITER)) { //see if there is an n-ary delimiter
+			stringBuilder.append(Name.NARY_DELIMITER); //+
+		}
 		if(confirm(reader, Name.ID_DELIMITER)) { //see if there is an ID
 			stringBuilder.append(Name.ID_DELIMITER); //#
 			stringBuilder.append(parseNameIdToken(reader)); //name ID Token

@@ -250,7 +250,8 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		checkArgument(subjectResource instanceof UrfResourceDescription, "Processor does not allow %s of type %s to be described with property %s.", subjectTag,
 				subjectResource.getTypeTag().orElse(null), propertyTag);
 
-		((UrfResourceDescription)subjectResource).setPropertyValue(propertyTag, propertyValue);
+		//merge in the property value, accounting for n-ary (one-to-many) properties
+		((UrfResourceDescription)subjectResource).mergePropertyValue(propertyTag, propertyValue);
 
 		//try to infer at least one root
 		if(inferredRoot == null || inferredRoot == propertyValue) {

@@ -1,0 +1,4 @@
+*:
+	many+="example"
+	|<https://urf.name/many+>|="test"
+;

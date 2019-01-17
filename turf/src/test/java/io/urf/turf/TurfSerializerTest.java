@@ -18,6 +18,7 @@ package io.urf.turf;
 
 import static io.urf.turf.TurfTestResources.*;
 import static java.util.Arrays.*;
+import static java.util.stream.StreamSupport.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -31,6 +32,7 @@ import javax.annotation.*;
 import org.junit.Test;
 
 import io.urf.URF;
+import io.urf.URF.Tag;
 import io.urf.model.*;
 
 /**
@@ -105,6 +107,7 @@ public class TurfSerializerTest {
 
 	/**
 	 * Compares two URF object graphs for equality.
+	 * @implNote This implementation does not yet deep comparison of n-ary property values (i.e. n-ary property values must be value objects for comparison).
 	 * @param reason additional information about the error.
 	 * @param object1 The first URF object graph to test.
 	 * @param object2 The URF object graph to test with the first.
@@ -113,13 +116,26 @@ public class TurfSerializerTest {
 		assertThat(reason + ": tag", object1.getTag(), is(object2.getTag()));
 		assertThat(reason + ": type", object1.getTypeTag(), is(object2.getTypeTag()));
 		assertThat(reason + ": property count", object1.getPropertyCount(), is(object2.getPropertyCount()));
+		assertThat(reason + ": property value count", object1.getPropertyValueCount(), is(object2.getPropertyValueCount()));
+
+		//TODO make this entire graph comparison more efficient; this was just quick-and-dirty
+
+		//test the non n-ary properties
 		object1.getProperties().forEach(property -> {
 			final URI propertyTag = property.getKey();
-			final Object propertyValue1 = property.getValue();
-			final Object propertyValue2 = object2.findPropertyValue(propertyTag)
-					.orElseThrow(() -> new AssertionError(reason + ": missing property value " + propertyTag));
-			//TODO add convenience method for creating a property tag reference to provide more tag/typeTag info
-			assertGraphsEqual(reason + ", " + propertyTag, propertyValue1, propertyValue2);
+			if(!Tag.isNary(propertyTag)) {
+				final Object propertyValue1 = property.getValue();
+				final Object propertyValue2 = object2.findPropertyValue(propertyTag)
+						.orElseThrow(() -> new AssertionError(reason + ": missing property value " + propertyTag));
+				//TODO add convenience method for creating a property tag reference to provide more tag/typeTag info
+				assertGraphsEqual(reason + ", " + propertyTag, propertyValue1, propertyValue2);
+			}
+		});
+
+		//test the n-ary properties
+		//TODO get the property tags in a more efficient way; add to UrfObject API
+		stream(object1.getProperties().spliterator(), false).map(Map.Entry::getKey).filter(Tag::isNary).forEach(naryPropertyTag -> {
+			assertThat(reason + ", " + naryPropertyTag, object1.getPropertyValues(naryPropertyTag), is(object2.getPropertyValues(naryPropertyTag)));
 		});
 	}
 
@@ -160,33 +176,33 @@ public class TurfSerializerTest {
 	@Test
 	public void testOkRoots() throws IOException {
 		final UrfObject object1 = new UrfObject(URI.create("https://example.com/object1"));
-		object1.setPropertyValue("info", "first");
+		object1.setPropertyValueByHandle("info", "first");
 
 		final UrfObject object2 = new UrfObject(URI.create("https://example.com/object2"));
-		object2.setPropertyValue("info", "second");
+		object2.setPropertyValueByHandle("info", "second");
 		final UrfObject object2Stuff = new UrfObject(null, "Stuff");
-		object2Stuff.setPropertyValue("test", 222);
-		object2.setPropertyValue("extra", object2Stuff);
+		object2Stuff.setPropertyValueByHandle("test", 222);
+		object2.setPropertyValueByHandle("extra", object2Stuff);
 
 		final UrfObject object3 = new UrfObject(URI.create("https://example.com/object3"));
-		object3.setPropertyValue("info", "third");
+		object3.setPropertyValueByHandle("info", "third");
 		final UrfObject object3Stuff = new UrfObject(null, URF.Handle.toTag("Stuff"));
-		object3Stuff.setPropertyValue("test", 333);
-		object3.setPropertyValue("extra", object3Stuff);
+		object3Stuff.setPropertyValueByHandle("test", 333);
+		object3.setPropertyValueByHandle("extra", object3Stuff);
 
 		final UrfObject object4 = new UrfObject();
-		object4.setPropertyValue("info", "fourth");
+		object4.setPropertyValueByHandle("info", "fourth");
 
 		final UrfObject object5 = new UrfObject(URI.create("https://example.com/object5"), "foo-Bar");
-		object5.setPropertyValue("info", "fifth");
+		object5.setPropertyValueByHandle("info", "fifth");
 
 		final UrfObject object6 = new UrfObject();
-		object6.setPropertyValue("info", "fourth");
+		object6.setPropertyValueByHandle("info", "fourth");
 
 		final String string = "foobar";
 
 		final UrfObject object7 = new UrfObject();
-		object7.setPropertyValue("info", "eighth");
+		object7.setPropertyValueByHandle("info", "eighth");
 
 		for(final boolean formatted : asList(false, true)) {
 			final TurfSerializer serializer = new TurfSerializer();
@@ -272,6 +288,92 @@ public class TurfSerializerTest {
 				new TurfSerializer()
 						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/SomeType"), true).toString(),
 				is("|<https://example.com/Test>|*|<https://example.com/SomeType>|"));
+	}
+
+	//#n-ary properties
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyOneValue() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.addPropertyValueByHandle("many+", "example");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME, parse(serialization), parseTestResource(OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyTwoValues() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.addPropertyValueByHandle("many+", "example");
+		urfObject.addPropertyValueByHandle("many+", "test");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME, parse(serialization), parseTestResource(OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryOnePropertyThreeValues() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.addPropertyValueByHandle("many+", "example");
+		urfObject.addPropertyValueByHandle("many+", "test");
+		urfObject.addPropertyValueByHandle("many+", Year.of(1999));
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME, parse(serialization),
+					parseTestResource(OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_NARY_TWO_PROPERTIES_RESOURCE_NAME */
+	@Test
+	public void testOkNaryTwoProperties() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.addPropertyValueByHandle("many+", "example");
+		urfObject.addPropertyValueByHandle("many+", "test");
+		urfObject.addPropertyValueByHandle("many+", Year.of(1999));
+		urfObject.addPropertyValueByHandle("nary+", "first");
+		urfObject.addPropertyValueByHandle("nary+", "second");
+		urfObject.addPropertyValueByHandle("nary+", "third");
+		urfObject.addPropertyValueByHandle("nary+", "fourth");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_NARY_TWO_PROPERTIES_RESOURCE_NAME, parse(serialization), parseTestResource(OK_NARY_TWO_PROPERTIES_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES */
+	@Test
+	public void testOkNaryMixedProperties() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.setPropertyValueByHandle("foo", "bar");
+		urfObject.addPropertyValueByHandle("many+", "example");
+		urfObject.addPropertyValueByHandle("many+", "test");
+		urfObject.addPropertyValueByHandle("many+", Year.of(1999));
+		urfObject.addPropertyValueByHandle("nary+", "first");
+		urfObject.addPropertyValueByHandle("nary+", "second");
+		urfObject.addPropertyValueByHandle("nary+", "third");
+		urfObject.addPropertyValueByHandle("nary+", "fourth");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			for(final String okNaryMixedPropertiesResourceName : OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES) {
+				assertGraphsEqual(okNaryMixedPropertiesResourceName, parse(serialization), parseTestResource(okNaryMixedPropertiesResourceName));
+			}
+		}
 	}
 
 }
