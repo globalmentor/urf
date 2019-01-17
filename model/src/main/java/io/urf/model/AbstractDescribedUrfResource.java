@@ -16,11 +16,9 @@
 
 package io.urf.model;
 
-import static com.globalmentor.java.Conditions.checkState;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
+import static com.globalmentor.java.Conditions.*;
+import static java.lang.Math.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
@@ -74,7 +72,7 @@ public abstract class AbstractDescribedUrfResource extends BaseUrfResource imple
 			assert !many.isEmpty() : "The implementation should not allow an empty many as a value.";
 			return unmodifiableSet(new HashSet<>(many.asSet())); //TODO switch to Java 9 Set.copyOf()
 		}
-		return singleton(value); //TODO switch to Java 9 Set.of() 
+		return value != null ? singleton(value) : emptySet(); //TODO switch to Java 9 Set.of() 
 	}
 
 	@Override

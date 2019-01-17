@@ -42,7 +42,8 @@ public interface UrfResourceDescription {
 	public int getPropertyValueCount();
 
 	/**
-	 * Retrieves all values of a property by the property tag, whether the property is a binary property or an n-ary property.
+	 * Retrieves all values of a property by the property tag, whether the property is a binary property or an n-ary property. If the property does not exist, an
+	 * empty set is returned.
 	 * @param propertyTag The tag of the property.
 	 * @return The values of the property.
 	 * @throws NullPointerException if the given property tag is <code>null</code>.
@@ -51,7 +52,8 @@ public interface UrfResourceDescription {
 	public Set<Object> getPropertyValues(@Nonnull URI propertyTag);
 
 	/**
-	 * Retrieves all values of a property by the property handle, whether the property is a binary property or an n-ary property.
+	 * Retrieves all values of a property by the property handle, whether the property is a binary property or an n-ary property. If the property does not exist,
+	 * an empty set is returned.
 	 * @implSpec The default implementation delegates to {@link #getPropertyValues(URI)}.
 	 * @param propertyHandle The handle of the property.
 	 * @return The values of the property.

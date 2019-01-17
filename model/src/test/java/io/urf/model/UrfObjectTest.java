@@ -38,6 +38,8 @@ public class UrfObjectTest {
 
 	private static final URI TEST_MANY_PROPERTY_TAG = Handle.toTag("test+");
 
+	private static final URI TEST_MISSING_PROPERTY_TAG = Handle.toTag("missing");
+
 	@Test
 	public void testGetPropertyValue() {
 		final UrfObject urfObject = new UrfObject();
@@ -54,6 +56,16 @@ public class UrfObjectTest {
 
 		final Optional<Object> optionalJoined = urfObject.findPropertyValueByHandle("joined");
 		assertThat(optionalJoined, isPresentAndIs(LocalDate.parse("2016-01-23")));
+	}
+
+	/**
+	 * Tests that retrieving all the values of a property that doesn't exist returns an empty set.
+	 * @see UrfObject#getPropertyValues(URI)
+	 */
+	@Test
+	public void testGetPropertyValuesEmptyIfNoProperty() {
+		final UrfObject urfObject = new UrfObject();
+		assertThat(urfObject.getPropertyValues(TEST_MISSING_PROPERTY_TAG), empty());
 	}
 
 	/**
