@@ -380,8 +380,9 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a reference to a resource. A reference is either a handle (e.g. {@code example-fooBar}) or a tag label ({@code |<https://example.com/fooBar>|}. The
-	 * current position must be that of the first reference character. The new position will be that immediately after the last reference character.
+	 * Parses a reference to a resource tag. A tag reference is either a handle (e.g. {@code example-fooBar}) or a tag label
+	 * ({@code |<https://example.com/fooBar>|}. The current position must be that of the first reference character. The new position will be that immediately
+	 * after the last reference character.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param namespaces The registered namespaces, associated with their aliases.
 	 * @return The tag representing the resource reference parsed from the reader.

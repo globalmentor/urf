@@ -75,8 +75,6 @@ public class URF {
 	public static final URI MAP_TYPE_TAG = NAMESPACE.resolve("Map");
 	/** The tag of the <code>urf-MapEntry</code> type. */
 	public static final URI MAP_ENTRY_TYPE_TAG = NAMESPACE.resolve("MapEntry");
-	/** The tag of the <code>urf-Member</code> type. */
-	public static final URI MEMBER_TYPE_TAG = NAMESPACE.resolve("Member");
 	/** The tag of the <code>urf-MonthDay</code> type. */
 	public static final URI MONTH_DAY_TYPE_TAG = NAMESPACE.resolve("MonthDay");
 	/** The tag of the <code>urf-OffsetDate</code> type. */
@@ -127,8 +125,8 @@ public class URF {
 
 	//##aggregation
 
-	/** The tag of <code>urf-member</code>. */
-	public static final URI MEMBER_PROPERTY_TAG = NAMESPACE.resolve("member");
+	/** The tag of <code>urf-member+</code>. */
+	public static final URI MEMBER_PROPERTY_TAG = NAMESPACE.resolve("member+");
 
 	//##content
 
