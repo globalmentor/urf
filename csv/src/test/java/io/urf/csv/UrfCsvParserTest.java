@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.URI;
+import java.time.Instant;
 import java.util.*;
 
 import javax.annotation.*;
@@ -78,7 +79,27 @@ public class UrfCsvParserTest {
 	@Test
 	public void testUsers() throws IOException {
 		final List<Object> resources = parseTestResource(USER_RESOURCE_NAME);
-		//TODO test the results
+		assertThat(resources.size(), is(2));
+
+		final UrfObject jdoe = (UrfObject)resources.get(0);
+		assertThat(jdoe.getTag(), isPresentAndIs(URI.create("https://urf.name/User#jdoe")));
+		assertThat(jdoe.findPropertyValueByHandle("username"), isPresentAndIs("jdoe"));
+		assertThat(jdoe.findPropertyValueByHandle("name"), isPresentAndIs("Jane Doe"));
+		assertThat(jdoe.findPropertyValueByHandle("authenticated"), isPresentAndIs(true));
+		assertThat(jdoe.findPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")), isPresentAndIs(URI.create("https://janedoe.example.com/")));
+		assertThat(jdoe.findPropertyValueByHandle("loginCount"), isPresentAndIs(3L));
+		assertThat(jdoe.findPropertyValueByHandle("lastContact"), isPresentAndIs(Instant.parse("2016-08-26T21:54:22.892Z")));
+		assertThat(jdoe.findPropertyValueByHandle("manager"), not(isPresent()));
+
+		final UrfObject jsmith = (UrfObject)resources.get(1);
+		assertThat(jsmith.getTag(), isPresentAndIs(URI.create("https://urf.name/User#jsmith")));
+		assertThat(jsmith.findPropertyValueByHandle("username"), isPresentAndIs("jsmith"));
+		assertThat(jsmith.findPropertyValueByHandle("name"), isPresentAndIs("John Smith"));
+		assertThat(jsmith.findPropertyValueByHandle("authenticated"), isPresentAndIs(false));
+		assertThat(jsmith.findPropertyValue(URI.create("http://xmlns.com/foaf/0.1/homepage")), isPresentAndIs(URI.create("https://johnsmith.example.com/")));
+		assertThat(jsmith.findPropertyValueByHandle("loginCount"), isPresentAndIs(12L));
+		assertThat(jsmith.findPropertyValueByHandle("lastContact"), not(isPresent()));
+		assertThat(jsmith.findPropertyValueByHandle("manager"), isPresentAnd(sameInstance(jdoe)));
 	}
 
 }

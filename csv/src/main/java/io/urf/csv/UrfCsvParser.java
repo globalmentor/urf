@@ -354,6 +354,7 @@ public class UrfCsvParser<R> implements Clogged {
 			urfProcessor.declareResource(subjectTag, subjectTypeTag);
 
 			final UrfResource subject = new SimpleUrfResource(subjectTag, subjectTypeTag);
+			urfProcessor.reportRootResource(subject); //register the row resource as a root
 
 			//process the properties
 			for(int columnIndex = 0; columnIndex < row.length; columnIndex++) {
