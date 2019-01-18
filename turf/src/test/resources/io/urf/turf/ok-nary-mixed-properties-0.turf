@@ -1,0 +1,10 @@
+*:
+	foo="bar"
+	nary+="first"
+	many+="example"
+	|<https://urf.name/many+>|="test"
+	nary+="second"
+	many+=@1999
+	nary+="third"
+	nary+="fourth"
+;

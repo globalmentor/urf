@@ -743,7 +743,7 @@ public class TurfSerializer {
 		appendable.append(SIGNATURE); //\SURF\
 		final UrfObject directives = new UrfObject();
 		final Map<String, URI> namespaces = namespaceAliases.entrySet().stream().collect(toMap(Map.Entry::getValue, Map.Entry::getKey)); //TODO improve ReverseMap to supply its reverse view
-		directives.setPropertyValue(DIRECTIVE_NAMESPACES_HANDLE, namespaces);
+		directives.setPropertyValueByHandle(DIRECTIVE_NAMESPACES_HANDLE, namespaces);
 		return serializeDescription(appendable, directives);
 	}
 

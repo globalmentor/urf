@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-13</dd>
+			<dd>Draft 2019-01-17</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -42,6 +42,7 @@
 	<h2>Document</h2>
 	<p>A TURF <dfn>document</dfn> encodes an <dfn>URF instance</dfn> (TODO reference URF) as one or more graphs of <dfn>resources</dfn> representing URF statements. A TURF document <span class="spec-may">may</span> be contain no resource representations, in which case it representing no URF statements.</p>
 	<h2>Syntax</h2>
+	<p>The production rules in this specification reference and build upon those already defined in <a href="#ref-urf" class="ref">URF</a></p>
 	<h3>Whitespace</h3>
 	<aside class="note far third">TURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>TURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
@@ -92,8 +93,8 @@
 	<p>A TURF document is divided into two sections: a <dfn>header</dfn> and a <dfn>body</dfn>, both of which are optional. If a header is included, it <span class="spec-must">must</span> appear starting at the first character of the document.</p>
 	<ul class="spec-production">
 		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">body</code>?</li>
-    </ul>
-    <p>TODO document footer/terminator <code>\.</code></p>
+	</ul>
+	<p>TODO document footer/terminator <code>\.</code></p>
 	<h3>Header</h3>
 	<figure class="far half">
 		<figcaption>Example TURF document header.</figcaption>
@@ -125,15 +126,18 @@
 	<h2>Resources</h2>
 	<p>A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
-		<li><code class="name">resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> | <code class="name">label</code></li>
-		<li><code class="name">described_resource</code> ⇒ [<code class="name">label</code>] · <code class="name">resource_representation</code> · [<code class="name">description</code>] | <code class="name">label</code></li>
+		<li><code class="name">resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> | <code class="name">label</code></li>
+		<li><code class="name">described_resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> · <code class="name">description</code>? | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
 	<p> A label consists of an identifier; which is either an URF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph. </p>
 	<ul class="spec-production">
-		<li><code class="name">label</code> ⇒ '|' <code class="name">alias</code> | <code class="name">id</code> | <code class="name">tag</code> '|'</li>
+		<li><code class="name">label</code> ⇒ <code class="name">alias_label</code> | <code class="name">id_label</code> | <code class="name">tag_label</code></li>
+		<li><code class="name">alias_label</code> ⇒ '|' <code class="name">alias</code> '|'</li>
+		<li><code class="name">id_label</code> ⇒ '|' <code class="name">id</code> '|'</li>
+		<li><code class="name">tag_label</code> ⇒ '|' <code class="name">tag</code> '|'</li>
 		<li><code class="name">alias</code> ⇒ <code class="name">name_token</code></li>
 		<li><code class="name">id</code> ⇒ <code class="name">string</code></li>
 		<li><code class="name">tag</code> ⇒ <code class="name">iri</code></li>
@@ -143,14 +147,17 @@
 	<h3>Objects</h3>
 	<p>Objects are are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
 	<ul class="spec-production">
-		<li><code class="name">object</code> ⇒ '*' · [<code class="name">type</code>]</li>
-		<li><code class="name">type</code> ⇒ <code class="name">handle</code></li>
+		<li><code class="name">object</code> ⇒ '*' · <code class="name">type</code>?</li>
+		<li><code class="name">type</code> ⇒ <code class="name">tag_reference</code></li>
+		<li><code class="name">tag_reference</code> ⇒ <code class="name">tag_label</code> | <code class="name">handle</code></li>
 	</ul>
+	<p>If a type is indicated, it represents an URF statement with the object as the subject and the identified type as the value of the <code>urf-type</code> property.</p>
 	<h3>Descriptions</h3>
-	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
+	<aside class="annotation far third">The representation of n-ary property handles combined with syntax of TURF property assignment conveniently results in the form <code class="langauge-turf">foo+="bar"</code> which reflects the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
+	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error. (TODO lift restriction here and in SURF for JSON compatibility) A TURF parser must preserve all distinct values of each n-ary property.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">tag_reference</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
 	</ul>
 	<h3>Literals</h3>
 	<p>TURF <dfn>literals</dfn> are lexical representations of tagged resources with lexical ID types. <span class="note">Any TURF literal can also be represented by indicating the resource's lexical representation in an ID label as     explained above. The literal <code>1.23</code> can also be represented as <code>|"1.23"|*urf-Number</code>, for example. If the resource canonical lexical representation is also an URF name, it may even be represented as a handle. For example the literal "<code>foo"</code> can be represented as <code>urf-String#foo</code>.</span></p>
@@ -334,7 +341,7 @@
 		<li>A statement that a new anonymous resource has an <code>urf-Type</code> of <code>urf-MapEntry</code>.</li>
 		<li>A statement that the <code>urf-key</code> of the <code>urf-MapEntry</code> instance is the key identified in the TURF document.</li>
 		<li>A statement that the <code>urf-value</code> of the <code>urf-MapEntry</code> instance is the value identified in the TURF document.</li>
-		<li>A statement that the <code>urf-MapEntry</code> instance is an <code>urf-member</code> of the <code>urf-Map</code> instance.</li>
+		<li>A statement that the <code>urf-MapEntry</code> instance is an <code>urf-member+</code> of the <code>urf-Map</code> instance.</li>
 	</ol>
 	<h4>Set</h4>
 	<p>A TURF set represents an instance of <code>urf-Set</code> using an <em>unordered</em> sequence of zero or more member resources with optional descriptions, beginning with a <code class="name">LEFT PARENTHESIS</code> character <code>(</code> (<code class="unicode">U+0028</code>) and ending with a <code class="name">RIGHT PARENTHESIS</code> character <code>)</code> (<code class="unicode">U+0029</code>). The same resource <span class="spec-must-not">must not</span> appear more than once in a set.</p>
@@ -342,7 +349,7 @@
 		<li><code class="name">set</code> ⇒ '(' <code class="name">member-sequence</code> ')'</li>
 		<li><code class="name">member</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
-	<p>Each member represents an URF statement that the identified resource is an <code>urf-member</code> of the <code>urf-Set</code> instance.</p>
+	<p>Each member represents an URF statement that the identified resource is an <code>urf-member+</code> of the <code>urf-Set</code> instance.</p>
 	<figure> </figure>
 	<h2>Examples</h2>
 	<p>This section is non-normative.</p>
@@ -548,6 +555,8 @@ END:vCard</code></pre>
 		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray (Google, Inc.). IETF.</dd>
 		<dt>Unicode BOM FAQ</dt>
 		<dd>Asmus Freytag and Mark Davis. <a href="http://www.unicode.org/unicode/faq/utf_bom.html#BOM"><cite>Unicode Byte Order Mark (BOM) FAQ</cite></a>. Unicode, Inc., Retrieved 2006-06-07.</dd>
+		<dt id="ref-urf" class="ref-target">URF</dt>
+		<dd><a href="https://urf.io/spec"><cite>Uniform Resource Framework (URF) Specification</cite></a>, Garret Wilson (GlobalMentor, Inc.).</dd>
 		<dt id="ref-utr13" class="ref-target">UTR #13</dt>
 		<dd><a href="http://unicode.org/unicode/standard/reports/tr13/tr13-5.html"><cite>Unicode Technical Report #13: Unicode Newline Guidelines</cite><cite></cite></a>, Mark Davis. Unicode, Inc.</dd>
 		<dt>XML Schema 2</dt>

@@ -39,4 +39,23 @@ public class TurfTestResources {
 	//#roots
 	public static final String OK_ROOTS_WHITESPACE_RESOURCE_NAME = "ok-roots-whitespace.turf";
 
+	//#n-ary properties
+
+	//##one n-ary property
+	public static final String OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME = "ok-nary-one-property-one-value.turf";
+	public static final String OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME = "ok-nary-one-property-two-values.turf";
+	public static final String OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME = "ok-nary-one-property-three-values.turf";
+
+	//##two n-ary properties
+	public static final String OK_NARY_TWO_PROPERTIES_RESOURCE_NAME = "ok-nary-two-properties.turf";
+
+	//##mixed n-ary and binary properties
+	public static final String OK_NARY_MIXED_PROPERTIES_0_RESOURCE_NAME = "ok-nary-mixed-properties-0.turf";
+	public static final String OK_NARY_MIXED_PROPERTIES_1_RESOURCE_NAME = "ok-nary-mixed-properties-1.turf";
+	public static final String OK_NARY_MIXED_PROPERTIES_2_RESOURCE_NAME = "ok-nary-mixed-properties-2.turf";
+
+	/** Names of TURF document resources semantically equivalent to {@value #OK_NARY_MIXED_PROPERTIES_0_RESOURCE_NAME}. */
+	public static Set<String> OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES = immutableSetOf(OK_NARY_MIXED_PROPERTIES_0_RESOURCE_NAME,
+			OK_NARY_MIXED_PROPERTIES_1_RESOURCE_NAME, OK_NARY_MIXED_PROPERTIES_2_RESOURCE_NAME);
+
 }

@@ -186,7 +186,7 @@ public class TurfParser<R> {
 					directivesParser.parseDescription(reader, new SimpleUrfResource(directivesTag));
 					directivesProcessor.reportRootResource(new SimpleUrfResource(directivesTag));
 					final UrfObject directives = directivesProcessor.getResult().stream().findAny().map(UrfObject.class::cast).orElseThrow(IllegalStateException::new); //TODO clean up all these gymnastics
-					final Object namespaces = directives.getPropertyValue(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
+					final Object namespaces = directives.findPropertyValueByHandle(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
 					if(namespaces != null) {
 						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
 						@SuppressWarnings("unchecked")
@@ -351,6 +351,9 @@ public class TurfParser<R> {
 			stringBuilder.append(Handle.SEGMENT_DELIMITER); //-
 			stringBuilder.append(parseNameToken(reader)); //name token
 		}
+		if(confirm(reader, Name.NARY_DELIMITER)) { //see if there is an n-ary delimiter
+			stringBuilder.append(Name.NARY_DELIMITER); //+
+		}
 		if(confirm(reader, Name.ID_DELIMITER)) { //see if there is an ID
 			stringBuilder.append(Name.ID_DELIMITER); //#
 			stringBuilder.append(parseNameIdToken(reader)); //name ID Token
@@ -377,8 +380,9 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a reference to a resource. A reference is either a handle (e.g. {@code example-fooBar}) or a tag label ({@code |<https://example.com/fooBar>|}. The
-	 * current position must be that of the first reference character. The new position will be that immediately after the last reference character.
+	 * Parses a reference to a resource tag. A tag reference is either a handle (e.g. {@code example-fooBar}) or a tag label
+	 * ({@code |<https://example.com/fooBar>|}. The current position must be that of the first reference character. The new position will be that immediately
+	 * after the last reference character.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param namespaces The registered namespaces, associated with their aliases.
 	 * @return The tag representing the resource reference parsed from the reader.

@@ -16,6 +16,9 @@
 
 package io.urf.model;
 
+import static com.globalmentor.java.Conditions.*;
+import static java.lang.Math.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
@@ -23,10 +26,12 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import com.globalmentor.collections.iterables.ConverterIterable;
+import io.urf.URF.Tag;
 
 /**
  * An implementation of an URF resource that provides access to its own description via a graph of properties.
+ * @implSpec This implementation uses an instance of {@link Many} as the value of n-ary property. The implementation must not allow any property to have an
+ *           empty {@link Many} instance as a value.
  * @author Garret Wilson
  */
 public abstract class AbstractDescribedUrfResource extends BaseUrfResource implements UrfResourceDescription {
@@ -44,18 +49,91 @@ public abstract class AbstractDescribedUrfResource extends BaseUrfResource imple
 	}
 
 	@Override
-	public Optional<Object> getPropertyValue(final URI propertyTag) {
-		return Optional.ofNullable(propertyValuesByTag.get(requireNonNull(propertyTag)));
+	public int getPropertyValueCount() {
+		//TODO create more efficient implementation
+		int propertyValueCount = propertyValuesByTag.size(); //start with the minimums count we could have
+		for(final Object value : propertyValuesByTag.values()) {
+			//TODO check for Integer.MAX_VALUE
+			if(value instanceof Many) { //account for any n-ary values
+				final Many many = (Many)value;
+				assert !many.isEmpty() : "The implementation should not allow an empty many as a value.";
+				propertyValueCount += many.count() - 1; //we already accounted for one of these 
+			}
+		}
+		return propertyValueCount;
+	}
+
+	@Override
+	public Set<Object> getPropertyValues(final URI propertyTag) {
+		final Object value = propertyValuesByTag.get(Tag.checkArgumentValid(propertyTag));
+		if(value instanceof Many) { //support n-ary properties
+			assert Tag.isNary(propertyTag) : "This implementation should not allow a Many instance as the value of a property that is not n-ary.";
+			final Many many = (Many)value;
+			assert !many.isEmpty() : "The implementation should not allow an empty many as a value.";
+			return unmodifiableSet(new HashSet<>(many.asSet())); //TODO switch to Java 9 Set.copyOf()
+		}
+		return value != null ? singleton(value) : emptySet(); //TODO switch to Java 9 Set.of() 
+	}
+
+	@Override
+	public Optional<Object> findPropertyValue(final URI propertyTag) {
+		final Object value = propertyValuesByTag.get(Tag.checkArgumentValid(propertyTag));
+		if(value instanceof Many) { //support n-ary properties
+			assert Tag.isNary(propertyTag) : "This implementation should not allow a Many instance as the value of a property that is not n-ary.";
+			final Many many = (Many)value;
+			assert !many.isEmpty() : "The implementation should not allow an empty many as a value.";
+			return many.findAny();
+		}
+		return Optional.ofNullable(value);
 	}
 
 	@Override
 	public Optional<Object> setPropertyValue(final URI propertyTag, final Object propertyValue) {
-		return Optional.ofNullable(propertyValuesByTag.put(requireNonNull(propertyTag), requireNonNull(propertyValue)));
+		final Object newValue = Tag.isNary(propertyTag) ? Many.of(propertyValue) : requireNonNull(propertyValue);
+		final Object oldValue = propertyValuesByTag.put(propertyTag, newValue);
+		if(oldValue instanceof Many) {
+			assert Tag.isNary(propertyTag) : "This implementation should not allow a Many instance as the value of a property that is not n-ary.";
+			final Many many = (Many)oldValue;
+			assert !many.isEmpty() : "The implementation should not allow an empty many as a value.";
+			return many.findAny();
+		}
+		return Optional.ofNullable(oldValue);
+	}
+
+	@Override
+	public boolean addPropertyValue(final URI propertyTag, final Object propertyValue) {
+		requireNonNull(propertyValue);
+		if(Tag.isNary(propertyTag)) {
+			//Technically it would be slightly safer if we could add the object to the many _before_ putting the many in the map,
+			//but the current approach is more efficient and the logic is easier to understand. 
+			final Many manyValue = (Many)propertyValuesByTag.computeIfAbsent(propertyTag, prop -> new Many());
+			return manyValue.add(propertyValue);
+		} else {
+			final Object oldValue = propertyValuesByTag.putIfAbsent(propertyTag, propertyValue);
+			checkState(oldValue != null, "Cannot add multiple values with non n-ary property %s.", propertyTag);
+			return true; //if this succeeded, and there was no previous value, then we had to have added something
+		}
 	}
 
 	/** @return An iterable to the object's properties by tags and their associated values. */
 	public Iterable<Map.Entry<URI, Object>> getProperties() {
-		return new ConverterIterable<>(propertyValuesByTag.entrySet(), AbstractMap.SimpleImmutableEntry::new);
+		final int propertyCount = propertyValuesByTag.size();
+		final int initialPropertyValueCapacity = max(min(propertyCount * 5, 100), propertyCount); //guess the capacity at 5 times the properties, unless over 100, but at least PropertyCount
+		final List<Map.Entry<URI, Object>> properties = new ArrayList<>(initialPropertyValueCapacity);
+		for(final Map.Entry<URI, Object> propertyValueByTag : propertyValuesByTag.entrySet()) {
+			final URI propertyTag = propertyValueByTag.getKey();
+			final Object value = propertyValueByTag.getValue();
+			if(value instanceof Many) { //support n-ary property values
+				assert Tag.isNary(propertyTag) : "This implementation should not allow a Many instance as the value of a property that is not n-ary.";
+				final Many many = (Many)value;
+				for(final Object propertyValue : many) { //recursively add the many values
+					properties.add(new AbstractMap.SimpleImmutableEntry<>(propertyTag, propertyValue));
+				}
+			} else { //for one-to-one properties
+				properties.add(new AbstractMap.SimpleImmutableEntry<>(propertyValueByTag)); //just a add a copy of this entry
+			}
+		}
+		return properties; //TODO improve implementation to use dynamic iterator by chaining sub-iterators
 	}
 
 	/**
