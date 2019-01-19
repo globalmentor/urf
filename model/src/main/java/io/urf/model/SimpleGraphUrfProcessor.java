@@ -47,6 +47,22 @@ import io.urf.URF.Tag;
  */
 public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> {
 
+	/** The inference strategy installed for this processor. */
+	private final UrfInferencer inferencer;
+
+	/** Constructor with a no inferencing. */
+	public SimpleGraphUrfProcessor() {
+		this(UrfInferencer.NOP);
+	}
+
+	/**
+	 * Inferencer constructor.
+	 * @param inferencer The strategy for performing inferences.
+	 */
+	public SimpleGraphUrfProcessor(@Nonnull final UrfInferencer inferencer) {
+		this.inferencer = requireNonNull(inferencer);
+	}
+
 	private Object inferredRoot = null;
 
 	/**
@@ -257,6 +273,8 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		if(inferredRoot == null || inferredRoot == propertyValue) {
 			inferredRoot = ObjectUrfResource.unwrap(subjectResource);
 		}
+
+		inferencer.processStatement(this, subjectResource, property, object); //let the inferencer make inferences as appropriate
 	}
 
 	//TODO document; basically this says that we trust the source to provide value objects
