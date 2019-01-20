@@ -62,6 +62,32 @@ public class TurfParserTest {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
+	//#object
+
+	//##handles
+
+	/** @see TurfTestResources#OK_OBJECT_HANDLE_RESOURCE_NAMES */
+	@Test
+	public void testObjectHandle() throws IOException {
+		for(final String okObjectHandleResourceName : OK_OBJECT_HANDLE_RESOURCE_NAMES) {
+			final UrfObject urfObject = (UrfObject)parseTestResource(okObjectHandleResourceName).stream().findAny().orElseThrow(AssertionError::new);
+			assertThat(okObjectHandleResourceName, urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
+			assertThat(okObjectHandleResourceName, urfObject.getTypeTag(), not(isPresent()));
+			assertThat(okObjectHandleResourceName, urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
+		}
+	}
+
+	/** @see TurfTestResources#OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME */
+	@Test
+	public void testObjectHandleType() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
+		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
+		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
+	}
+
+	//TODO add bad tests that include both a tag label and a handle; a tag label and a handle; and an alias and a handle (if we continue not to support that) 
+
 	//#IDs
 
 	/** @see TurfTestResources#OK_IDS_RESOURCE_NAME */
