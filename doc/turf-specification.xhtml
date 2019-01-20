@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-17</dd>
+			<dd>Draft 2019-01-19</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -128,11 +128,12 @@
 	<ul class="spec-production">
 		<li><code class="name">resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> | <code class="name">label</code></li>
 		<li><code class="name">described_resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> · <code class="name">description</code>? | <code class="name">label</code></li>
-		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
+		<li><code class="name">resource_representation</code> ⇒ <code class="name">handle</code> · <code class="name">object</code>? | <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
 		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
-	<p> A label consists of an identifier; which is either an URF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph. </p>
+	<p> A label consists of an identifier; which is either an URF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
+	<p>The handles <code>false</code> and <code>true</code> <span class="spec-must-not">must not</span> appear as a handle in a resource representation.</p>
 	<ul class="spec-production">
 		<li><code class="name">label</code> ⇒ <code class="name">alias_label</code> | <code class="name">id_label</code> | <code class="name">tag_label</code></li>
 		<li><code class="name">alias_label</code> ⇒ '|' <code class="name">alias</code> '|'</li>
@@ -142,8 +143,8 @@
 		<li><code class="name">id</code> ⇒ <code class="name">string</code></li>
 		<li><code class="name">tag</code> ⇒ <code class="name">iri</code></li>
 	</ul>
-	<p>If a label uses an URF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the TURF document. If the identifier is an IRI, it represents the URF <dfn>tag</dfn> of the resource.</p>
-	<p>A string as the identifier indicates the URF <dfn>ID</dfn> for a resource. The ID <span class="spec-must">shall</span> be combined with the tag of the resource type to form the resource tag, as prescribed by the URF specification. This implies that an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object, and that the object <span class="spec-must">must</span> indicate a type if an ID is present. Furthermore because of the URF formula for creating resource tags given an ID and a type tag, if a label indicates an ID the object type <span class="spec-must-not">must not</span> itself also indicate an ID.</p>
+	<p>If a label uses an URF name as its identifier, it indicates an <dfn>alias</dfn> for referencing resources only within the confines of the TURF document. If the identifier is an IRI, it represents the URF <dfn>tag</dfn> of the resource. A tag label <span class="spec-must-not">must not</span> introduce any resource representation that itself represents a tag, such as a literal or an object represented by a handle.</p>
+	<p>A string as the identifier indicates the URF <dfn>ID</dfn> for a resource. The ID <span class="spec-must">shall</span> be combined with the tag of the resource type to form the resource tag, as prescribed by the URF specification. This implies that an ID <span class="spec-must-not">must not</span> appear in front of any resource representation other than an object; and if an ID is present an object <span class="spec-must">must</span> indicate a type and <span class="spec-must-not">must not</span> be represented by a handle. Furthermore because of the URF formula for creating resource tags given an ID and a type tag, if a label indicates an ID the object type <span class="spec-must-not">must not</span> itself also indicate an ID.</p>
 	<h3>Objects</h3>
 	<p>Objects are are general resources with an optional type and that <span class="spec-may">may</span> be described by a description.</p>
 	<ul class="spec-production">
@@ -151,7 +152,7 @@
 		<li><code class="name">type</code> ⇒ <code class="name">tag_reference</code></li>
 		<li><code class="name">tag_reference</code> ⇒ <code class="name">tag_label</code> | <code class="name">handle</code></li>
 	</ul>
-	<p>If a type is indicated, it represents an URF statement with the object as the subject and the identified type as the value of the <code>urf-type</code> property.</p>
+	<p>If a type is indicated, it represents an URF statement with the object as the subject and the identified type as the value of the <code>urf-type</code> property. If preceded by a tag reference (that is, a tag label or a equivalently a handle introduces the object), the indicated tag serves as the tag of the object.</p>
 	<h3>Descriptions</h3>
 	<aside class="annotation far third">The representation of n-ary property handles combined with syntax of TURF property assignment conveniently results in the form <code class="langauge-turf">foo+="bar"</code> which reflects the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
 	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error. (TODO lift restriction here and in SURF for JSON compatibility) A TURF parser must preserve all distinct values of each n-ary property.</p>
