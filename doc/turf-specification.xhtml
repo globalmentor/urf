@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-19</dd>
+			<dd>Draft 2019-01-21</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -133,7 +133,7 @@
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
 	<p> A label consists of an identifier; which is either an URF name, a string, or an IRI; a surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
-	<p>The handles <code>false</code> and <code>true</code> <span class="spec-must-not">must not</span> appear as a handle in a resource representation.</p>
+	<p>The tokens <code>false</code> and <code>true</code> <span class="spec-must-not">must not</span> appear as handles in a TURF document.</p>
 	<ul class="spec-production">
 		<li><code class="name">label</code> ⇒ <code class="name">alias_label</code> | <code class="name">id_label</code> | <code class="name">tag_label</code></li>
 		<li><code class="name">alias_label</code> ⇒ '|' <code class="name">alias</code> '|'</li>
