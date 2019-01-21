@@ -47,6 +47,8 @@ public class URFTest {
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/test")), isPresentAndIs(URI.create("https://urf.name/")));
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/test+")), isPresentAndIs(URI.create("https://urf.name/")));
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/test/")), isPresentAndIs(URI.create("https://urf.name/")));
+		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/false")), isPresentAndIs(URI.create("https://urf.name/")));
+		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/true")), isPresentAndIs(URI.create("https://urf.name/")));
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/foo/bar")), isPresentAndIs(URI.create("https://urf.name/foo/")));
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/foo/bar+")), isPresentAndIs(URI.create("https://urf.name/foo/")));
 		assertThat(URF.Tag.getNamespace(URI.create("https://urf.name/foo/bar/")), isPresentAndIs(URI.create("https://urf.name/foo/")));
@@ -69,6 +71,8 @@ public class URFTest {
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/test")), isPresentAndIs("test"));
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/test+")), isPresentAndIs("test+"));
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/test/")), isEmpty());
+		assertThat(URF.Tag.getName(URI.create("https://urf.name/false")), isPresentAndIs("false"));
+		assertThat(URF.Tag.getName(URI.create("https://urf.name/true")), isPresentAndIs("true"));
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/foo/bar")), isPresentAndIs("bar"));
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/foo/bar+")), isPresentAndIs("bar+"));
 		assertThat(URF.Tag.getName(URI.create("https://urf.name/foo/bar/")), isEmpty());
@@ -91,6 +95,8 @@ public class URFTest {
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/test")), is(false));
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/test+")), is(true));
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/test/")), is(false));
+		assertThat(URF.Tag.isNary(URI.create("https://urf.name/false")), is(false));
+		assertThat(URF.Tag.isNary(URI.create("https://urf.name/true")), is(false));
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/foo/bar")), is(false));
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/foo/bar+")), is(true));
 		assertThat(URF.Tag.isNary(URI.create("https://urf.name/foo/bar/")), is(false));
@@ -113,6 +119,8 @@ public class URFTest {
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/test")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/test+")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/test/")), isEmpty());
+		assertThat(URF.Tag.getId(URI.create("https://urf.name/false")), isEmpty());
+		assertThat(URF.Tag.getId(URI.create("https://urf.name/true")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo/bar")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo/bar+")), isEmpty());
 		assertThat(URF.Tag.getId(URI.create("https://urf.name/foo/bar/")), isEmpty());
@@ -147,6 +155,8 @@ public class URFTest {
 		assertThat(URF.Handle.PATTERN.matcher("foo-bar-Example#test123").matches(), is(true));
 		assertThat(URF.Handle.PATTERN.matcher("foo-bar-Example+#test123").matches(), is(true));
 		assertThat(URF.Handle.PATTERN.matcher("foo-bar-Example#test123+").matches(), is(false));
+		assertThat(URF.Handle.PATTERN.matcher("false").matches(), is(true));
+		assertThat(URF.Handle.PATTERN.matcher("true").matches(), is(true));
 		assertThat(URF.Handle.PATTERN.matcher("test/Example").matches(), is(true));
 		assertThat(URF.Handle.PATTERN.matcher("test/Example+").matches(), is(true));
 		assertThat(URF.Handle.PATTERN.matcher("test/Example#foo").matches(), is(true));
@@ -180,6 +190,8 @@ public class URFTest {
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/test"), aliases), isPresentAndIs("test"));
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/test+"), aliases), isPresentAndIs("test+"));
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/test/"), aliases), isEmpty());
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/false"), aliases), isPresentAndIs("false"));
+		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/true"), aliases), isPresentAndIs("true"));
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar"), aliases), isPresentAndIs("foo-bar"));
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar+"), aliases), isPresentAndIs("foo-bar+"));
 		assertThat(URF.Handle.fromTag(URI.create("https://urf.name/foo/bar/"), aliases), isEmpty());
@@ -215,6 +227,8 @@ public class URFTest {
 		assertThat(URF.Handle.toTag("Example#123", namespaces), is(URI.create("https://urf.name/Example#123")));
 		assertThat(URF.Handle.toTag("test", namespaces), is(URI.create("https://urf.name/test")));
 		assertThat(URF.Handle.toTag("test+", namespaces), is(URI.create("https://urf.name/test+")));
+		assertThat(URF.Handle.toTag("false", namespaces), is(URI.create("https://urf.name/false")));
+		assertThat(URF.Handle.toTag("true", namespaces), is(URI.create("https://urf.name/true")));
 		assertThat(URF.Handle.toTag("foo-bar", namespaces), is(URI.create("https://urf.name/foo/bar")));
 		assertThat(URF.Handle.toTag("foo-bar+", namespaces), is(URI.create("https://urf.name/foo/bar+")));
 		assertThat(URF.Handle.toTag("foo-bar-Example", namespaces), is(URI.create("https://urf.name/foo/bar/Example")));

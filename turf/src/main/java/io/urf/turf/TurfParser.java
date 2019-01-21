@@ -448,7 +448,7 @@ public class TurfParser<R> {
 		final UrfResource resource;
 		switch(c) {
 			//objects
-			case OBJECT_BEGIN:
+			case OBJECT_BEGIN: //* type?
 				resource = parseObject(label, reader);
 				instanceReference = resource;
 				break;
@@ -459,10 +459,12 @@ public class TurfParser<R> {
 			case CHARACTER_DELIMITER:
 				resource = new DefaultValueUrfResource<>(CHARACTER_TYPE_TAG, parseCharacter(reader));
 				break;
+			/* TURF support handles, which could begin with `false` or `true`, so they must both be handled along with object handles, below
 			case BOOLEAN_FALSE_BEGIN:
 			case BOOLEAN_TRUE_BEGIN:
 				resource = new DefaultValueUrfResource<>(BOOLEAN_TYPE_TAG, parseBoolean(reader));
 				break;
+			*/
 			case EMAIL_ADDRESS_BEGIN:
 				resource = new DefaultValueUrfResource<>(EMAIL_ADDRESS_TYPE_TAG, parseEmailAddress(reader));
 				break;
@@ -512,27 +514,43 @@ public class TurfParser<R> {
 				resource = parseSetResource((Alias)label, reader);
 				break;
 			default:
-				//this must be "bare" label; declare a resource on the fly; TODO refactor; clarify in spec that a reference doesn't need the '*'
-				if(label instanceof URI) { //tag
+				//object
+				if(Handle.isBeginCharacter(c)) { //false | true | handle [* type]
+					final String handle = parseHandle(reader);
+					//check the special cases of `false` and `true`, which are Boolean representations that are also handles
+					switch(handle) {
+						case BOOLEAN_FALSE_LEXICAL_FORM: //false
+							resource = new DefaultValueUrfResource<>(BOOLEAN_TYPE_TAG, Boolean.FALSE);
+							break;
+						case BOOLEAN_TRUE_LEXICAL_FORM: //true
+							resource = new DefaultValueUrfResource<>(BOOLEAN_TYPE_TAG, Boolean.TRUE);
+							break;
+						default: //handle [* type]
+							checkParseIO(reader, !(label instanceof URI), "Object with tag label %s may not also be represented by handle %s.", label, handle);
+							checkParseIO(reader, !(label instanceof String), "Object with ID label %s may not also be represented by handle %s.", label, handle);
+							final URI handleTag = Handle.toTag(handle, getNamespaces());
+							if(skipFiller(reader) == OBJECT_BEGIN) { //handle * type
+								//TODO this implementation prevents (ignores) an alias for a handle reference; do we want to allow that?
+								resource = parseObject(handleTag, reader);
+							} else { //handle
+								resource = new SimpleUrfResource(handleTag);
+							}
+							instanceReference = resource;
+							break;
+					}
+				} else if(label instanceof URI) { //"bare" tag label
 					final URI tag = (URI)label;
 					getProcessor().declareResource(tag);
 					resource = new SimpleUrfResource(tag);
 					instanceReference = resource;
-				} else if(label instanceof Alias) {
+				} else if(label instanceof Alias) { //"bare" alias label
 					final URI blankTag = Tag.generateBlank(label.toString());
 					getProcessor().declareResource(blankTag);
 					resource = new SimpleUrfResource(blankTag);
-				} else if(label instanceof String) { //ID
+				} else if(label instanceof String) { //"bare" ID label
 					throw new ParseIOException(reader, String.format("Object with ID %s does not indicate an object and type.", label));
 				} else { //no label at all
-					if(Name.isTokenBeginCharacter(c)) {
-						final String handle = parseHandle(reader);
-						final URI tag = Handle.toTag(handle, getNamespaces());
-						resource = new SimpleUrfResource(tag);
-						instanceReference = resource;
-					} else {
-						throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
-					}
+					throw new ParseIOException(reader, "Expected resource; found character: " + Characters.getLabel(c));
 				}
 				break;
 		}
@@ -556,7 +574,7 @@ public class TurfParser<R> {
 		}
 
 		//if there was some object reference, process the object, inferring the type if needed
-		if(instanceReference != null) { //TODO there may be a better way to check; maybe just see if the resource is an instance of SimpleUrfResource, or not an object resource 
+		if(instanceReference != null) { //TODO there may be a better way to check; maybe just see if the resource is an instance of SimpleUrfResource, or not an object resource
 			final URI tag = instanceReference.getTag().orElseThrow(() -> new AssertionError("Parsed object missing tag.")); //TODO don't we have a utility method for this supplier?
 			final URI declaredTypeTag = instanceReference.getTypeTag().orElse(null); //TODO switch to Java 9 Optional.or()
 			final URI idTypeTag = Tag.getIdTypeTag(tag).orElse(null);
@@ -609,7 +627,8 @@ public class TurfParser<R> {
 	 * <p>
 	 * This method only collects the object information; it does not pass them to the URF processor. That is the responsibility of the caller.
 	 * </p>
-	 * @param label The object label; either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an ID.
+	 * @param label The object label (or tag from a handle); either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an
+	 *          ID.
 	 * @param reader The reader containing SURF data.
 	 * @return The resource read from the reader.
 	 * @throws IOException If there was an error reading the SURF data.
