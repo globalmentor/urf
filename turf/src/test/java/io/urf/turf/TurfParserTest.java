@@ -62,9 +62,7 @@ public class TurfParserTest {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
 	}
 
-	//#object
-
-	//##handles
+	//#handles
 
 	/** @see TurfTestResources#OK_OBJECT_HANDLE_RESOURCE_NAMES */
 	@Test
@@ -84,6 +82,45 @@ public class TurfParserTest {
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
+	}
+
+	//##potentially ambiguous handles
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousProperty() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
+		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
+		assertThat(urfObject.findPropertyValueByHandle("true"), isPresentAndIs("test"));
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousTag() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/false")));
+		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
+		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousType() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
+		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/true")));
+		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousValue() throws IOException {
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
+		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
+		final UrfObject value = urfObject.findPropertyValueByHandle("example").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
+		assertThat(value.getTag(), isPresentAndIs(URI.create("https://urf.name/false")));
 	}
 
 	//TODO add bad tests that include both a tag label and a handle; a tag label and a handle; and an alias and a handle (if we continue not to support that) 

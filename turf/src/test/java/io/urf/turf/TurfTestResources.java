@@ -26,8 +26,7 @@ import java.util.Set;
  */
 public class TurfTestResources {
 
-	//#object
-	//##handles
+	//#handles
 	public static final String OK_OBJECT_HANDLE_0_RESOURCE_NAME = "ok-object-handle-0.turf";
 	public static final String OK_OBJECT_HANDLE_1_RESOURCE_NAME = "ok-object-handle-1.turf";
 
@@ -35,6 +34,12 @@ public class TurfTestResources {
 	public static Set<String> OK_OBJECT_HANDLE_RESOURCE_NAMES = immutableSetOf(OK_OBJECT_HANDLE_0_RESOURCE_NAME, OK_OBJECT_HANDLE_1_RESOURCE_NAME);
 
 	public static final String OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME = "ok-object-handle-type.turf";
+
+	//##potentially ambiguous handles
+	public static final String OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME = "ok-handle-ambiguous-property.turf";
+	public static final String OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME = "ok-handle-ambiguous-tag.turf";
+	public static final String OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME = "ok-handle-ambiguous-type.turf";
+	public static final String OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME = "ok-handle-ambiguous-value.turf";
 
 	//#IDs
 	public static final String OK_IDS_RESOURCE_NAME = "ok-ids.turf";
