@@ -1006,7 +1006,7 @@ public class TurfSerializer {
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#LABEL_DELIMITER
 	 */
-	public Appendable serializeTagLabel(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException {
+	public static Appendable serializeTagLabel(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException {
 		appendable.append(LABEL_DELIMITER);
 		serializeIri(appendable, tag);
 		return appendable.append(LABEL_DELIMITER);
@@ -1014,6 +1014,10 @@ public class TurfSerializer {
 
 	/**
 	 * Serializes a reference to resource. The reference will be a handle if possible; otherwise a label will be serialized for the tag.
+	 * <p>
+	 * As per the TURF specification, the handles {@link TURF#BOOLEAN_FALSE_LEXICAL_FORM} and {@link TURF#BOOLEAN_TRUE_LEXICAL_FORM} will be represented as tag
+	 * labels and not as handles.
+	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The tag to be serialized.
 	 * @return The given appendable.
@@ -1022,8 +1026,28 @@ public class TurfSerializer {
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
 	public Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		ifPresentOrElse​(Handle.fromTag(tag, getNamespaceAliases()), throwingConsumer(appendable::append),
-				throwingRunnable(() -> serializeTagLabel(appendable, tag)));
+		return serializeTagReference(appendable, tag, getNamespaceAliases());
+	}
+
+	/**
+	 * Serializes a reference to resource. The reference will be a handle if possible; otherwise a label will be serialized for the tag.
+	 * <p>
+	 * As per the TURF specification, the handles {@link TURF#BOOLEAN_FALSE_LEXICAL_FORM} and {@link TURF#BOOLEAN_TRUE_LEXICAL_FORM} will be represented as tag
+	 * labels and not as handles.
+	 * </p>
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param tag The tag to be serialized.
+	 * @param namespaceAliases The map of namespaces aliases associated with their namespaces.
+	 * @return The given appendable.
+	 * @throws NullPointerException if the given reader and/or namespace aliases map is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see #serializeTagLabel(Appendable, URI)
+	 */
+	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases)
+			throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
+		final Optional<String> handle = Handle.fromTag(tag, namespaceAliases)
+				.filter(tagHandle -> !tagHandle.equals(BOOLEAN_FALSE_LEXICAL_FORM) && !tagHandle.equals(BOOLEAN_TRUE_LEXICAL_FORM));
+		ifPresentOrElse​(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 		return appendable;
 	}
 
@@ -1055,7 +1079,7 @@ public class TurfSerializer {
 	 * @param tag The identifying tag of the object.
 	 * @param typeTag The tag identifying object type, or <code>null</code> if the object has no declared type; if the tag is an ID tag and a type is given, the
 	 *          type must match the type implied by the tag.
-	 * @param declaration Whether the object declaration form <code>…*Type</code> should be included, even
+	 * @param declaration Whether the object declaration form <code>…*Type</code> should be included if there is a type.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IllegalArgumentException if a type tag was provided that does not match the implied type of an ID tag.
@@ -1074,12 +1098,14 @@ public class TurfSerializer {
 			if(idHandle != null) { //Type#id
 				appendable.append(idHandle);
 			} else { //|"id"|*Type
+				//TODO prevent both an alias and ID label from being serialized
 				appendable.append(LABEL_DELIMITER);
 				serializeString(appendable, id);
 				appendable.append(LABEL_DELIMITER);
 				serializeObject(appendable, typeTag);
 			}
 		} else { //|<tag>|*Type
+			//TODO prevent both an alias and tag label from being serialized
 			serializeTagReference(appendable, tag);
 			if(declaration) { //if we should force the full declaration
 				serializeObject(appendable, typeTag);

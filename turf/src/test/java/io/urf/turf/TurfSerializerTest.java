@@ -139,6 +139,154 @@ public class TurfSerializerTest {
 		});
 	}
 
+	/** @see TurfSerializer#serializeTagReference(Appendable, URI) */
+	@Test
+	public void testSerializeTagReference() throws IOException {
+		final Map<URI, String> aliases = new HashMap<>();
+		aliases.put(URI.create("https://example.com/fake/"), "fake");
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/"), aliases).toString(), is("|<https://urf.name/>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example"), aliases).toString(), is("Example"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example+"), aliases).toString(), is("Example+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example#foo"), aliases).toString(), is("Example#foo"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example#123"), aliases).toString(), is("Example#123"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example#foo:bar"), aliases).toString(),
+				is("|<https://urf.name/Example#foo:bar>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/test"), aliases).toString(), is("test"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/test+"), aliases).toString(), is("test+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/test/"), aliases).toString(),
+				is("|<https://urf.name/test/>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/false"), aliases).toString(),
+				is("|<https://urf.name/false>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/true"), aliases).toString(),
+				is("|<https://urf.name/true>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar"), aliases).toString(), is("foo-bar"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar+"), aliases).toString(), is("foo-bar+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar/"), aliases).toString(),
+				is("|<https://urf.name/foo/bar/>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar/Example"), aliases).toString(),
+				is("foo-bar-Example"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar/Example+"), aliases).toString(),
+				is("foo-bar-Example+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/foo/bar/Example#test123"), aliases).toString(),
+				is("foo-bar-Example#test123"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example"), aliases).toString(),
+				is("fake/Example"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example+"), aliases).toString(),
+				is("fake/Example+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example#foo"), aliases).toString(),
+				is("fake/Example#foo"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example#123"), aliases).toString(),
+				is("fake/Example#123"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example#foo:bar"), aliases).toString(),
+				is("|<https://example.com/fake/Example#foo:bar>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/test"), aliases).toString(), is("fake/test"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/test+"), aliases).toString(), is("fake/test+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example"), aliases).toString(),
+				is("fake/Example"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/Example+"), aliases).toString(),
+				is("fake/Example+"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar+"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar+>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar/Example"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar/Example>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar/Example+"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar/Example+>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar/Example#foo"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar/Example#foo>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar/Example#123"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar/Example#123>|"));
+		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://example.com/fake/foo/bar/Example#foo:bar"), aliases).toString(),
+				is("|<https://example.com/fake/foo/bar/Example#foo:bar>|"));
+	}
+
+	//#handles
+
+	/** @see TurfTestResources#OK_OBJECT_HANDLE_RESOURCE_NAMES */
+	@Test
+	public void testObjectHandle() throws IOException {
+		for(final String okObjectHandleResourceName : OK_OBJECT_HANDLE_RESOURCE_NAMES) {
+			final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/foo"));
+			urfObject.setPropertyValueByHandle("example", "test");
+			for(final boolean formatted : asList(false, true)) {
+				final TurfSerializer serializer = new TurfSerializer();
+				serializer.setFormatted(formatted);
+				final String serialization = serializer.serializeDocument(urfObject);
+				assertGraphsEqual(okObjectHandleResourceName, parse(serialization), parseTestResource(okObjectHandleResourceName));
+			}
+		}
+	}
+
+	/** @see TurfTestResources#OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME */
+	@Test
+	public void testObjectHandleType() throws IOException {
+		final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/foo"), URI.create("https://urf.name/Bar"));
+		urfObject.setPropertyValueByHandle("example", "test");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME, parse(serialization), parseTestResource(OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME));
+		}
+	}
+
+	//##potentially ambiguous handles
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousProperty() throws IOException {
+		final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/foo"), URI.create("https://urf.name/Bar"));
+		urfObject.setPropertyValueByHandle("true", "test");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME, parse(serialization), parseTestResource(OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousTag() throws IOException {
+		final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/false"), URI.create("https://urf.name/Bar"));
+		urfObject.setPropertyValueByHandle("example", "test");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME, parse(serialization), parseTestResource(OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousType() throws IOException {
+		final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/foo"), URI.create("https://urf.name/true"));
+		urfObject.setPropertyValueByHandle("example", "test");
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME, parse(serialization), parseTestResource(OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME));
+		}
+	}
+
+	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME */
+	@Test
+	public void testHandleAmbiguousValue() throws IOException {
+		final UrfObject urfObject = new UrfObject(URI.create("https://urf.name/foo"), URI.create("https://urf.name/Bar"));
+		urfObject.setPropertyValueByHandle("example", new UrfObject(URI.create("https://urf.name/false")));
+		for(final boolean formatted : asList(false, true)) {
+			final TurfSerializer serializer = new TurfSerializer();
+			serializer.setFormatted(formatted);
+			final String serialization = serializer.serializeDocument(urfObject);
+			assertGraphsEqual(OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME, parse(serialization), parseTestResource(OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME));
+		}
+	}
+
+	//TODO add serializer tests for IDs
+
 	//#namespaces
 
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
