@@ -295,7 +295,7 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 			inferredRoot = ObjectUrfResource.unwrap(subjectResource);
 		}
 
-		inferencer.processStatement(this, subjectResource, property, object); //let the inferencer make inferences as appropriate
+		inferencer.processStatement(this, subject, property, object); //let the inferencer make inferences as appropriate
 	}
 
 	//TODO document; basically this says that we trust the source to provide value objects
