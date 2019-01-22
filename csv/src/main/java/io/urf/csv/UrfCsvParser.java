@@ -241,8 +241,10 @@ public class UrfCsvParser<R> implements Clogged {
 			if(isIdColumn) {
 				check(reader, Name.ID_DELIMITER);
 				c = skip(reader, TURF.WHITESPACE_CHARACTERS);
+				if(c < 0) { //if this is a "bare" ID column with no property
+					return new IgnoredColumn(headerIndex, header); //ignore the column (except for purposes of identifying the row resources) TODO rename column type					
+				}
 			}
-			//TODO detect/allow a missing property if this is an ID column
 			final URI propertyTag = TurfParser.parseTagReference(reader, emptyMap()); //e.g. propertyHandle or |<propertyUri>|
 			c = skip(reader, TURF.WHITESPACE_CHARACTERS);
 			final URI typeTag; //the type representing the type of the column (the _range_ of the property), not the type of the property
@@ -558,7 +560,7 @@ public class UrfCsvParser<R> implements Clogged {
 		 * @throws NullPointerException if the header and/or type tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given index is negative.
 		 */
-		public IdReferenceColumn(@Nonnegative final int index, @Nonnull final String header, @Nullable final URI propertyTag, @Nullable final URI typeTag) {
+		public IdReferenceColumn(@Nonnegative final int index, @Nonnull final String header, @Nullable final URI propertyTag, @Nonnull final URI typeTag) {
 			super(index, header, propertyTag, typeTag);
 			this.typeTag = requireNonNull(typeTag); //store the type tag locally for efficient lookup without requiring Optional overhead, as we know there must be a type
 		}
