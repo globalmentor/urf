@@ -561,7 +561,7 @@ public class SurfSerializer {
 	 * @throws IOException If there was an error appending the serialized data.
 	 */
 	public Appendable serializeResource(@Nonnull final Appendable appendable, @Nullable Object resource) throws IOException {
-		final boolean wasSerialized = setSerialized(resource); //mark this resource has having been serialized
+		final boolean wasSerialized = setSerialized(resource); //mark this resource as having been serialized
 		final String alias = determineAliasForResource(resource);
 		if(alias != null) {
 			appendable.append(LABEL_DELIMITER).append(alias).append(LABEL_DELIMITER);
