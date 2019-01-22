@@ -131,6 +131,9 @@ public class UrfCli implements Runnable, Clogged {
 					//TODO provide updates to the user during parsing and when writing
 					urfCsvParser.parseDocument(inputStream, typeTag);
 				}
+
+				//only record root resources for the first file, to prevent forcing references to be serialized as roots from other aggregated files
+				urfProcessor.setRootsRecorded(false);
 			}
 			final TurfSerializer turfSerializer = new TurfSerializer();
 			turfSerializer.setFormatted(true);
