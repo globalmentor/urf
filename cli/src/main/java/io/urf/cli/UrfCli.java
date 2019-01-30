@@ -35,6 +35,7 @@ import io.clogr.*;
 import io.confound.config.file.ResourcesConfigurationManager;
 import io.urf.csv.UrfCsvParser;
 import io.urf.model.*;
+import io.urf.turf.TurfParser;
 import io.urf.turf.TurfSerializer;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
@@ -96,13 +97,29 @@ public class UrfCli implements Runnable, Clogged {
 	}
 
 	@Command(description = "Converts one or more files to some URF file format.")
-	public void convert(@Option(names = {"--out", "-o"}) final Path output, @Parameters(paramLabel = "<file>", arity = "1..*") @Nonnull final Path[] paths) {
+	public void convert(
+			@Option(names = {"--schema", "-s"}, description = "Indicates a schema file for validation and making inferences.") @Nonnull final Path schemaPath,
+			@Option(names = {"--out", "-o"}) final Path outputPath, @Parameters(paramLabel = "<file>", arity = "1..*") @Nonnull final Path[] paths) {
 		//TODO precondition paths length check
 		//TODO detect a glob as the first path, for shells that don't enumerate the file automatically
 
-		final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor();
-
 		try {
+
+			//load schema if requested
+			final UrfInferencer urfInferencer;
+			if(schemaPath != null) {
+				try (final InputStream inputStream = new BufferedInputStream(newInputStream(schemaPath))) {
+					final SimpleGraphUrfProcessor schemaProcessor = new SimpleGraphUrfProcessor();
+					new TurfParser<>(schemaProcessor).parseDocument(inputStream);
+					urfInferencer = new ExperimentalUrfInferencer(() -> schemaProcessor.getDeclaredObjects().iterator());
+				}
+			} else {
+				urfInferencer = UrfInferencer.NOP;
+			}
+
+			final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor(urfInferencer);
+
+			//process files		
 			for(final Path path : paths) { //parse each file using the same processor
 				System.out.println(String.format("Converting file %s...", path.getFileName()));
 				//TODO precondition check filename
@@ -114,12 +131,15 @@ public class UrfCli implements Runnable, Clogged {
 					//TODO provide updates to the user during parsing and when writing
 					urfCsvParser.parseDocument(inputStream, typeTag);
 				}
+
+				//only record root resources for the first file, to prevent forcing references to be serialized as roots from other aggregated files
+				urfProcessor.setRootsRecorded(false);
 			}
 			final TurfSerializer turfSerializer = new TurfSerializer();
 			turfSerializer.setFormatted(true);
-			if(output != null) {
-				System.out.println(String.format("Writing output file %s...", output.getFileName()));
-				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(output))) {
+			if(outputPath != null) {
+				System.out.println(String.format("Writing output file %s...", outputPath.getFileName()));
+				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(outputPath))) {
 					turfSerializer.serializeDocument(outputStream, urfProcessor);
 				}
 			} else {

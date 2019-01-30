@@ -133,6 +133,11 @@ public class URF {
 	/** The tag of <code>urf-content</code>. */
 	public static final URI CONTENT_PROPERTY_TAG = NAMESPACE.resolve("content");
 
+	//##ontology
+
+	/** The tag of <code>urf-inverse</code>. */
+	public static final URI INVERSE_PROPERTY_TAG = NAMESPACE.resolve("inverse");
+
 	/**
 	 * Utilities for working with URF names.
 	 * @author Garret Wilson

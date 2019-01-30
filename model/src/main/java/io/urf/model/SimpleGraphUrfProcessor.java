@@ -47,6 +47,41 @@ import io.urf.URF.Tag;
  */
 public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> {
 
+	/** The inference strategy installed for this processor. */
+	private final UrfInferencer inferencer;
+
+	private boolean recordRoots = true;
+
+	/**
+	 * @return Whether reported roots are recorded or ignored.
+	 * @see #reportRootResource(UrfReference)
+	 */
+	public boolean isRootsRecorded() {
+		return recordRoots;
+	}
+
+	/**
+	 * Sets whether reported roots should be recorded.
+	 * @param recordRoots <code>true</code> if reported roots should be recorded, or <code>false</code> if they should not be recorded as roots.
+	 * @see #reportRootResource(UrfReference)
+	 */
+	public void setRootsRecorded(final boolean recordRoots) {
+		this.recordRoots = recordRoots;
+	}
+
+	/** Constructor with a no inferencing. */
+	public SimpleGraphUrfProcessor() {
+		this(UrfInferencer.NOP);
+	}
+
+	/**
+	 * Inferencer constructor.
+	 * @param inferencer The strategy for performing inferences.
+	 */
+	public SimpleGraphUrfProcessor(@Nonnull final UrfInferencer inferencer) {
+		this.inferencer = requireNonNull(inferencer);
+	}
+
 	private Object inferredRoot = null;
 
 	/**
@@ -64,13 +99,15 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 
 	@Override
 	public void reportRootResource(final UrfReference root) {
-		final Object rootObject = ObjectUrfResource.findObject(root) //if we were given a wrapped value, its a value object
-				.orElseGet(() -> {
-					final URI rootTag = checkArgumentPresent(root.getTag());
-					final UrfResource rootResource = determineDeclaredResource(rootTag);
-					return ObjectUrfResource.unwrap(rootResource); //our actual resource may be wrapping a collection
-				});
-		reportedRoots.add(rootObject);
+		if(isRootsRecorded()) {
+			final Object rootObject = ObjectUrfResource.findObject(root) //if we were given a wrapped value, its a value object
+					.orElseGet(() -> {
+						final URI rootTag = checkArgumentPresent(root.getTag());
+						final UrfResource rootResource = determineDeclaredResource(rootTag);
+						return ObjectUrfResource.unwrap(rootResource); //our actual resource may be wrapping a collection
+					});
+			reportedRoots.add(rootObject);
+		}
 	}
 
 	/**
@@ -257,6 +294,8 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		if(inferredRoot == null || inferredRoot == propertyValue) {
 			inferredRoot = ObjectUrfResource.unwrap(subjectResource);
 		}
+
+		inferencer.processStatement(this, subject, property, object); //let the inferencer make inferences as appropriate
 	}
 
 	//TODO document; basically this says that we trust the source to provide value objects
