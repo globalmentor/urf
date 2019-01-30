@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-21</dd>
+			<dd>Draft 2019-01-30</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -218,7 +218,7 @@
 		<dd>The UUID is converted into a IRI with a scheme of <code>urn</code> and a URN namespace of <code>uuid</code> according to <a href="#ref-rfc4122" class="ref">RFC 4122</a>.</dd>
 	</dl>
 	<h4>Number</h4>
-	<aside class="note far third">Non-decimal SURF numbers are identical to those of JSON, except that SURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
+	<aside class="note far third">Non-decimal SURF numbers are compatible with JSON numbers, except that SURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
 	<aside class="note far third">Examples of decimal types SURF processors <span class="spec-may">may</span> use include:
 		<dl>
 			<dt>C#</dt>
@@ -229,9 +229,11 @@
 			<dd><a href="https://docs.python.org/3/library/decimal.html" class="external"><code>decimal</code></a></dd>
 		</dl>
 	</aside>
-	<p>A <dfn>number</dfn> represents a numerical value in base 10 that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. If the number begins with the <code class="name">NUMBER SIGN</code> character <code>$</code> (<code class="unicode">U+0023</code>), it is considered an <dfn>integer</dfn> and <span class="spec-must-not">must not</span> contain a fraction or exponent component. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<p>A <dfn>number</dfn> represents a numerical value in base 10 that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional. If the number begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it is considered a <dfn>decimal</dfn> regardless of the presence or absence of a fraction and/or decimal component, and a SURF parser <span class="spec-must">must</span> represent the value using a construct that exactly represents the fractional part without rounding within the supported range.</p>
+	<aside class="annotation far half">While JSON only has a single “number” type, its specification is sufficiently broad as to allow implementations to distinguish between integer and non-integer types based upon the presence of a decimal and/or exponent—and indeed some pure JSON implementations already make this distinction. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
+	<p>If the number does not begin with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>) and contains neither a fraction nor an exponent component, it is considered an <dfn>integer</dfn>. A SURF parser may represent non-decimal numbers using <a href="#ref-ieee754" class="ref">IEEE 754</a>, but it <span class="spec-must">must</span> maintain a distinction between general numbers and integers.</p>
 	<ul class="spec-production">
-		<li><code class="name">number</code> ⇒ ['#' | '$'] ['-'] <code class="name">whole</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
+		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">whole</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
 		<li><code class="name">whole</code> ⇒ <code class="name">digit</code>+</li>
 		<li><code class="name">fraction</code> ⇒ '.' <code class="name">digit</code>+</li>
 		<li><code class="name">exponent</code> ⇒ ('e' | 'E') ['-' | '+'] <code class="name">digit</code>+</li>
@@ -386,7 +388,7 @@
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
 		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">value</code></li>
-		<li><code class="name">key</code> ⇒ '\' <code class="name">described_resource</code> '\' | <code class="name">resource</code></li>
+		<li><code class="name">key</code> ⇒ '\' <code class="name">described_resource</code> '\' | <code class="name" id="ref-ieee754">resource</code></li>
 		<li><code class="name">value</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
 	<h4>Set</h4>
@@ -408,7 +410,9 @@
 	</ul>
 	<h2>References</h2>
 	<dl>
-		<dt id="ref-iso8601" class="ref-target">ISO 8601:2004</dt>
+		<dt id="ref-ieee754" class="ref-target">IEEE 754-2008</dt>
+		<dd><a href="https://ieeexplore.ieee.org/document/4610935"><cite>IEEE Standard for Floating-Point Arithmetic</cite></a>. IEEE.</dd>
+		<dt class="ref-target" id="ref-iso8601">ISO 8601:2004</dt>
 		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
 		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed (Innosoft), N. Borenstein. IETF.</dd>
