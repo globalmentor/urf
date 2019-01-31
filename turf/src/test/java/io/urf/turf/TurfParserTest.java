@@ -217,14 +217,14 @@ public class TurfParserTest {
 			assertThat(object2.findPropertyValueByHandle("info"), isPresentAndIs("second"));
 			final UrfObject object2Stuff = object2.findPropertyValueByHandle("extra").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
 			assertThat(object2Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
-			assertThat(object2Stuff.findPropertyValueByHandle("test"), isPresentAndIs(222));
+			assertThat(object2Stuff.findPropertyValueByHandle("test"), isPresentAndIs(222L));
 
 			final UrfObject object3 = (UrfObject)roots.get(2);
 			assertThat(object3.getTag(), isPresentAndIs(URI.create("https://example.com/object3")));
 			assertThat(object3.findPropertyValueByHandle("info"), isPresentAndIs("third"));
 			final UrfObject object3Stuff = object3.findPropertyValueByHandle("extra").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
 			assertThat(object3Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
-			assertThat(object3Stuff.findPropertyValueByHandle("test"), isPresentAndIs(333));
+			assertThat(object3Stuff.findPropertyValueByHandle("test"), isPresentAndIs(333L));
 
 			final UrfObject object4 = (UrfObject)roots.get(3);
 			assertThat(object4.getTag(), isEmpty());

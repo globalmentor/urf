@@ -1370,7 +1370,6 @@ public class TurfSerializer {
 	 * </p>
 	 * <ul>
 	 * <li>{@link BigDecimal}</li>
-	 * <li>{@link BigInteger}</li>
 	 * </ul>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param number The information to be serialized as a number.
@@ -1380,7 +1379,7 @@ public class TurfSerializer {
 	 * @see TURF#NUMBER_DECIMAL_BEGIN
 	 */
 	public static Appendable serializeNumber(@Nonnull final Appendable appendable, @Nonnull final Number number) throws IOException {
-		final boolean isDecimal = (number instanceof BigDecimal) || (number instanceof BigInteger);
+		final boolean isDecimal = number instanceof BigDecimal;
 		if(isDecimal) {
 			appendable.append(NUMBER_DECIMAL_BEGIN);
 		}

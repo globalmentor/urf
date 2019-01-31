@@ -332,13 +332,16 @@ public class SurfSerializerTest implements Clogged {
 	@Test
 	public void testOkNumbers() throws IOException {
 		final SurfObject surfObject = new SurfObject();
-		surfObject.setPropertyValue("zero", Integer.valueOf(0));
+		surfObject.setPropertyValue("zero", Long.valueOf(0));
 		surfObject.setPropertyValue("zeroFraction", Double.valueOf(0));
-		surfObject.setPropertyValue("one", Integer.valueOf(1));
+		surfObject.setPropertyValue("one", Long.valueOf(1));
 		surfObject.setPropertyValue("oneFraction", Double.valueOf(1));
-		surfObject.setPropertyValue("integer", Integer.valueOf(123));
-		surfObject.setPropertyValue("negative", Integer.valueOf(-123));
+		surfObject.setPropertyValue("integer", Long.valueOf(123));
+		surfObject.setPropertyValue("negative", Long.valueOf(-123));
 		surfObject.setPropertyValue("long", Long.valueOf(3456789123L));
+		surfObject.setPropertyValue("maxLong", Long.valueOf(Long.MAX_VALUE));
+		surfObject.setPropertyValue("big", new BigInteger(Long.toString(Long.MAX_VALUE)).add(BigInteger.ONE));
+		surfObject.setPropertyValue("bigger", new BigInteger("100000000000000000000")); //10^20
 		surfObject.setPropertyValue("fraction", Double.valueOf(12345.6789));
 		surfObject.setPropertyValue("scientific1", Double.valueOf(1.23e+4));
 		surfObject.setPropertyValue("scientific2", Double.valueOf(12.3e-4));
@@ -348,13 +351,13 @@ public class SurfSerializerTest implements Clogged {
 		//These BigDecimal tests require identical scale, which is why "$0.0" isn't compared to BigDecimal.ZERO.
 		surfObject.setPropertyValue("decimal", new BigDecimal("0.3"));
 		surfObject.setPropertyValue("money", new BigDecimal("1.23"));
-		surfObject.setPropertyValue("decimalZero", BigInteger.ZERO);
+		surfObject.setPropertyValue("decimalZero", BigDecimal.ZERO);
 		surfObject.setPropertyValue("decimalZeroFraction", new BigDecimal("0.0"));
-		surfObject.setPropertyValue("decimalOne", BigInteger.ONE);
+		surfObject.setPropertyValue("decimalOne", BigDecimal.ONE);
 		surfObject.setPropertyValue("decimalOneFraction", new BigDecimal("1.0"));
-		surfObject.setPropertyValue("decimalInteger", new BigInteger("123"));
-		surfObject.setPropertyValue("decimalNegative", new BigInteger("-123"));
-		surfObject.setPropertyValue("decimalLong", new BigInteger("3456789123"));
+		surfObject.setPropertyValue("decimalInteger", new BigDecimal("123"));
+		surfObject.setPropertyValue("decimalNegative", new BigDecimal("-123"));
+		surfObject.setPropertyValue("decimalLong", new BigDecimal("3456789123"));
 		surfObject.setPropertyValue("decimalFraction", new BigDecimal("12345.6789"));
 		surfObject.setPropertyValue("decimalScientific1", new BigDecimal("1.23e+4"));
 		surfObject.setPropertyValue("decimalScientific2", new BigDecimal("12.3e-4"));
@@ -522,18 +525,18 @@ public class SurfSerializerTest implements Clogged {
 	public void testOkMaps() throws IOException {
 		final Map<Object, Object> map = new HashMap<>();
 		map.put("foo", "bar");
-		map.put(123, "number");
+		map.put(123L, "number");
 		map.put(false, "Boolean");
 		map.put(true, "Boolean");
-		map.put(Arrays.asList(1, 2, 3), new BigDecimal("1.23"));
+		map.put(Arrays.asList(1L, 2L, 3L), new BigDecimal("1.23"));
 		final Map<Object, Object> pingPong = new HashMap<>();
 		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		map.put("map", pingPong);
 		map.put(new HashSet<Object>(Arrays.asList("foo", false)), true);
 		map.put(new SurfObject("Game", "pingpong"), "ping pong");
 		final SurfObject bullsEye = new SurfObject("Point");
-		bullsEye.setPropertyValue("x", 0);
-		bullsEye.setPropertyValue("y", 0);
+		bullsEye.setPropertyValue("x", 0L);
+		bullsEye.setPropertyValue("y", 0L);
 		map.put(bullsEye, "Bull's Eye");
 		final Map<String, String> abbrMap = new HashMap<>();
 		abbrMap.put("ITTF", "International Table Tennis Federation");
@@ -642,28 +645,28 @@ public class SurfSerializerTest implements Clogged {
 	@Test
 	public void testOkLabels() throws IOException {
 		final SurfObject root = new SurfObject();
-		root.setPropertyValue("foo", 123);
+		root.setPropertyValue("foo", 123L);
 		//TODO circular references: root.setPropertyValue("self", root);
 		root.setPropertyValue("value", false);
 		final SurfObject object = new SurfObject("example-Type");
 		final SurfObject exampleThing = new SurfObject(URI.create("http://example.com/thing"), "example-Thing");
 		exampleThing.setPropertyValue("name", "Example Thing");
-		object.setPropertyValue("stuff", asList("one", 123, "three", exampleThing));
+		object.setPropertyValue("stuff", asList("one", 123L, "three", exampleThing));
 		root.setPropertyValue("thing", object);
 		final SurfObject fooBar = new SurfObject("Bar", "foo");
 		fooBar.setPropertyValue("prop", "val");
 		//TODO circular references: fooBar.setPropertyValue("self", fooBar);
 		root.setPropertyValue("foobar", fooBar);
-		final Map<Integer, Object> me = new HashMap<>();
+		final Map<Long, Object> me = new HashMap<>();
 		//TODO circular references: me.put(0, me);
-		me.put(1, "one");
-		me.put(2, 123);
-		me.put(4, fooBar);
-		me.put(99, exampleThing);
-		me.put(100, object);
+		me.put(1L, "one");
+		me.put(2L, 123L);
+		me.put(4L, fooBar);
+		me.put(99L, exampleThing);
+		me.put(100L, object);
 		root.setPropertyValue("map", me);
 		final Set<Object> these = new HashSet<>();
-		these.add(123);
+		these.add(123L);
 		these.add(false);
 		these.add(object);
 		//TODO circular references: these.add(root);

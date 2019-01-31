@@ -52,7 +52,7 @@ public class TurfConfigurationFileFormatTest {
 			configuration = format.load(inputStream);
 		}
 		assertThat(configuration.getString("foo"), is("bar"));
-		assertThat(configuration.getInt("test"), is(123));
+		assertThat(configuration.getLong("test"), is(123L)); //TODO add test for retrieving int after converters are added in CONFOUND-15
 		assertThat(configuration.getBoolean("flag"), is(true));
 	}
 

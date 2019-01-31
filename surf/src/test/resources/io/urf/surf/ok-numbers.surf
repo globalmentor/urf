@@ -6,6 +6,9 @@
 	integer = 123
 	negative = -123
 	long = 3456789123
+	maxLong = 9223372036854775807
+	big = 9223372036854775808
+	bigger = 100000000000000000000 !10^20
 	fraction = 12345.6789
 	scientific1 = 1.23e+4
 	scientific2 = 12.3E-4

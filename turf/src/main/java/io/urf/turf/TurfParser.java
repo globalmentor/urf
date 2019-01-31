@@ -938,22 +938,58 @@ public class TurfParser<R> {
 	}
 
 	/**
+	 * Parses a number resource. The current position must be that of the first character of the number. The new position will be that immediately after the
+	 * number, or at the end of the reader.
+	 * <p>
+	 * This method will return an instance of {@link DefaultValueUrfResource} containing the following types:
+	 * </p>
+	 * <dl>
+	 * <dt>{@link Long}</dt>
+	 * <dd>{@link URF#INTEGER_TYPE_TAG} - All non-decimal, non-fractional, non-exponent numbers that fall within the range of <code>long</code>.</dd>
+	 * <dt>{@link BigInteger}</dt>
+	 * <dd>{@link URF#INTEGER_TYPE_TAG} - All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>long</code>.</dd>
+	 * <dt>{@link Double}</dt>
+	 * <dd>{@link URF#REAL_TYPE_TAG} - All non-decimal, fractional and/or exponent numbers.</dd>
+	 * <dt>{@link BigDecimal}</dt>
+	 * <dd>{@link URF#DECIMAL_TYPE_TAG} - All decimal numbers.</dd>
+	 * </dl>
+	 * @implSpec This implementation delegates to {@link #parseNumber(Reader)}.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A value resource containing the number parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
+	 */
+	public static ValueUrfResource<? extends Number> parseNumberResource(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final Number number = parseNumber(reader);
+		final URI typeTag;
+		if(number instanceof Double) {
+			typeTag = REAL_TYPE_TAG;
+		} else if(number instanceof Long || number instanceof BigInteger) {
+			typeTag = INTEGER_TYPE_TAG;
+		} else if(number instanceof BigDecimal) {
+			typeTag = DECIMAL_TYPE_TAG;
+		} else {
+			throw new IllegalStateException("Number parsing logic returned unexpected number type.");
+		}
+		return new DefaultValueUrfResource<Number>(typeTag, number);
+	}
+
+	/**
 	 * Parses a number. The current position must be that of the first character of the number. The new position will be that immediately after the number, or at
 	 * the end of the reader.
 	 * <p>
-	 * This implementation will return one of the following types:
+	 * This method will return one of the following types:
 	 * </p>
 	 * <dl>
-	 * <dt>{@link Integer}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent non-decimal numbers that fall within the range of <code>int</code>.</dd>
 	 * <dt>{@link Long}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>int</code> but within the range of <code>long</code>.</dd>
-	 * <dt>{@link Double}</dt>
-	 * <dd>All non-decimal fractional numbers that fall within the range of <code>double</code>.</dd>
+	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall within the range of <code>long</code>.</dd>
 	 * <dt>{@link BigInteger}</dt>
-	 * <dd>All non-fractional decimal numbers.</dd>
+	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>long</code>.</dd>
+	 * <dt>{@link Double}</dt>
+	 * <dd>All non-decimal, fractional and/or exponent numbers.</dd>
 	 * <dt>{@link BigDecimal}</dt>
-	 * <dd>All fractional decimal numbers.</dd>
+	 * <dd>All decimal numbers.</dd>
 	 * </dl>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return A Java {@link Number} containing the number parsed from the reader.
@@ -962,34 +998,6 @@ public class TurfParser<R> {
 	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
 	 */
 	public static Number parseNumber(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		return parseNumberResource(reader).getValue();
-	}
-
-	/**
-	 * Parses a number resource. The current position must be that of the first character of the number. The new position will be that immediately after the
-	 * number, or at the end of the reader.
-	 * <p>
-	 * This implementation will return one of the following types:
-	 * </p>
-	 * <dl>
-	 * <dt>{@link Integer}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent non-decimal numbers that fall within the range of <code>int</code>.</dd>
-	 * <dt>{@link Long}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>int</code> but within the range of <code>long</code>.</dd>
-	 * <dt>{@link Double}</dt>
-	 * <dd>All non-decimal fractional numbers that fall within the range of <code>double</code>.</dd>
-	 * <dt>{@link BigInteger}</dt>
-	 * <dd>All non-fractional decimal numbers.</dd>
-	 * <dt>{@link BigDecimal}</dt>
-	 * <dd>All fractional decimal numbers.</dd>
-	 * </dl>
-	 * @param reader The reader the contents of which to be parsed.
-	 * @return A Java {@link Number} containing the number parsed from the reader.
-	 * @throws NullPointerException if the given reader is <code>null</code>.
-	 * @throws IOException if there is an error reading from the reader.
-	 * @throws ParseIOException if the number is not in the correct format, or if the number is outside the range that can be represented by this parser.
-	 */
-	public static ValueUrfResource<? extends Number> parseNumberResource(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		int c = peekRequired(reader); //there must be at least one number character
 		//check for decimal: $
 		final boolean isDecimal;
@@ -1030,31 +1038,20 @@ public class TurfParser<R> {
 		}
 		final String numberString = stringBuilder.toString(); //convert the number to a string
 		try {
-			final URI typeTag;
-			final Number value;
 			if(isDecimal) {
-				if(hasFraction || hasExponent) { //if there was a fraction or exponent
-					typeTag = REAL_TYPE_TAG;
-					value = new BigDecimal(numberString);
-				} else { //if there is no fraction or exponent
-					typeTag = INTEGER_TYPE_TAG;
-					value = new BigInteger(numberString);
-				}
+				return new BigDecimal(numberString);
 			} else {
 				if(hasFraction || hasExponent) { //if there was a fraction or exponent
-					typeTag = REAL_TYPE_TAG;
-					value = Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it TODO this can be changed to simply Double.valueOf(numberString)
+					return Double.valueOf(numberString); //parse a double and return it
 				} else { //if there is no fraction or exponent
-					typeTag = INTEGER_TYPE_TAG;
-					final long longValue = Long.parseLong(numberString);
-					if(longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) { //return an Integer if we can
-						value = Integer.valueOf((int)longValue);
-					} else { //otherwise return a Long
-						value = Long.valueOf(longValue);
+					try {
+						return Long.valueOf(numberString);
+					} catch(final NumberFormatException numberFormatException) {
+						//in case the number was too big, see if we can parse it as a big integer TODO make the check more efficient than catching an exception 
+						return new BigInteger(numberString);
 					}
 				}
 			}
-			return new DefaultValueUrfResource<Number>(typeTag, value);
 		} catch(final NumberFormatException numberFormatException) { //if the number was not syntactically correct
 			throw new ParseIOException(reader, "Invalid number format: " + numberString, numberFormatException);
 		}
