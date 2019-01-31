@@ -949,7 +949,7 @@ public class TurfParser<R> {
 	 * <dt>{@link BigInteger}</dt>
 	 * <dd>{@link URF#INTEGER_TYPE_TAG} - All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>long</code>.</dd>
 	 * <dt>{@link Double}</dt>
-	 * <dd>{@link URF#REAL_TYPE_TAG} - All non-decimal, fractional and/or exponent numbers.</dd>
+	 * <dd>{@link URF#NUMBER_TYPE_TAG} - All non-decimal, fractional and/or exponent numbers.</dd>
 	 * <dt>{@link BigDecimal}</dt>
 	 * <dd>{@link URF#DECIMAL_TYPE_TAG} - All decimal numbers.</dd>
 	 * </dl>
@@ -964,7 +964,7 @@ public class TurfParser<R> {
 		final Number number = parseNumber(reader);
 		final URI typeTag;
 		if(number instanceof Double) {
-			typeTag = REAL_TYPE_TAG;
+			typeTag = NUMBER_TYPE_TAG;
 		} else if(number instanceof Long || number instanceof BigInteger) {
 			typeTag = INTEGER_TYPE_TAG;
 		} else if(number instanceof BigDecimal) {

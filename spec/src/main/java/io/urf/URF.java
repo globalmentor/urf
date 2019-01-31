@@ -77,14 +77,14 @@ public class URF {
 	public static final URI MAP_ENTRY_TYPE_TAG = NAMESPACE.resolve("MapEntry");
 	/** The tag of the <code>urf-MonthDay</code> type. */
 	public static final URI MONTH_DAY_TYPE_TAG = NAMESPACE.resolve("MonthDay");
+	/** The tag of the <code>urf-Real</code> type. */
+	public static final URI NUMBER_TYPE_TAG = NAMESPACE.resolve("Number");
 	/** The tag of the <code>urf-OffsetDate</code> type. */
 	public static final URI OFFSET_DATE_TYPE_TAG = NAMESPACE.resolve("OffsetDate");
 	/** The tag of the <code>urf-OffsetDateTime</code> type. */
 	public static final URI OFFSET_DATE_TIME_TYPE_TAG = NAMESPACE.resolve("OffsetDateTime");
 	/** The tag of the <code>urf-OffsetTime</code> type. */
 	public static final URI OFFSET_TIME_TYPE_TAG = NAMESPACE.resolve("OffsetTime");
-	/** The tag of the <code>urf-Real</code> type. */
-	public static final URI REAL_TYPE_TAG = NAMESPACE.resolve("Real"); //TODO rename to simply "Number"
 	/** The tag of the <code>urf-RegularExpression</code> type. */
 	public static final URI REGULAR_EXPRESSION_TYPE_TAG = NAMESPACE.resolve("RegularExpression");
 	/** The tag of the <code>urf-Resource</code> type. */

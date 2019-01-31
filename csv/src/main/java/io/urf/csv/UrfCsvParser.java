@@ -296,7 +296,7 @@ public class UrfCsvParser<R> implements Clogged {
 						}
 						return new DefaultValueUrfResource<>(typeTag, localTime);
 					};
-				} else if(REAL_TYPE_TAG.equals(typeTag)) {
+				} else if(NUMBER_TYPE_TAG.equals(typeTag)) {
 					parseStrategy = field -> {
 						final Double number;
 						try {
