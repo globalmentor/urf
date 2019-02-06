@@ -290,7 +290,7 @@ public class TurfParser<R> {
 		}
 		do {
 			stringBuilder.append((char)c); //append the character
-			reader.mark(1); //mark our current position
+			reader.mark(MINIMUM_MARK); //mark our current position
 			c = reader.read(); //read another character
 		} while(Name.isTokenCharacter(c)); //keep reading and appending until we reach a non-name token character
 		if(c >= 0) { //if we didn't reach the end of the stream
@@ -320,7 +320,7 @@ public class TurfParser<R> {
 		}
 		do {
 			stringBuilder.append((char)c); //append the character
-			reader.mark(1); //mark our current position
+			reader.mark(MINIMUM_MARK); //mark our current position
 			c = reader.read(); //read another character
 		} while(Name.isTokenCharacter(c)); //keep reading and appending until we reach a non-name token character
 		if(c >= 0) { //if we didn't reach the end of the stream
