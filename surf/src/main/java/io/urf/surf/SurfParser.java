@@ -745,16 +745,14 @@ public class SurfParser {
 	 * This implementation will return one of the following types:
 	 * </p>
 	 * <dl>
-	 * <dt>{@link Integer}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent non-decimal numbers that fall within the range of <code>int</code>.</dd>
 	 * <dt>{@link Long}</dt>
-	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>int</code> but within the range of <code>long</code>.</dd>
-	 * <dt>{@link Double}</dt>
-	 * <dd>All non-decimal fractional numbers that fall within the range of <code>double</code>.</dd>
+	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall within the range of <code>long</code>.</dd>
 	 * <dt>{@link BigInteger}</dt>
-	 * <dd>All non-fractional decimal numbers.</dd>
+	 * <dd>All non-decimal, non-fractional, non-exponent numbers that fall outside the range of <code>long</code>.</dd>
+	 * <dt>{@link Double}</dt>
+	 * <dd>All non-decimal, fractional and/or exponent numbers.</dd>
 	 * <dt>{@link BigDecimal}</dt>
-	 * <dd>All fractional decimal numbers.</dd>
+	 * <dd>All decimal numbers.</dd>
 	 * </dl>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return A Java {@link Number} containing the number parsed from the reader.
@@ -804,20 +802,16 @@ public class SurfParser {
 		final String numberString = stringBuilder.toString(); //convert the number to a string
 		try {
 			if(isDecimal) {
-				if(hasFraction || hasExponent) { //if there was a fraction or exponent
-					return new BigDecimal(numberString);
-				} else { //if there is no fraction or exponent
-					return new BigInteger(numberString);
-				}
+				return new BigDecimal(numberString);
 			} else {
 				if(hasFraction || hasExponent) { //if there was a fraction or exponent
-					return Double.valueOf(Double.parseDouble(numberString)); //parse a double and return it
+					return Double.valueOf(numberString); //parse a double and return it
 				} else { //if there is no fraction or exponent
-					final long longValue = Long.parseLong(numberString);
-					if(longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) { //return an Integer if we can
-						return Integer.valueOf((int)longValue);
-					} else { //otherwise return a Long
-						return Long.valueOf(longValue);
+					try {
+						return Long.valueOf(numberString);
+					} catch(final NumberFormatException numberFormatException) {
+						//in case the number was too big, see if we can parse it as a big integer TODO make the check more efficient than catching an exception 
+						return new BigInteger(numberString);
 					}
 				}
 			}

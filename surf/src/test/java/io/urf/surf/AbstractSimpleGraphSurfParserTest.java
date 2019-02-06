@@ -310,13 +310,16 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 	public void testOkNumbers() throws IOException {
 		@SuppressWarnings("unchecked")
 		final SO resource = (SO)parseTestResource(OK_NUMBERS_RESOURCE_NAME).get();
-		assertThat(getPropertyValue(resource, "zero"), isPresentAndIs(Integer.valueOf(0)));
+		assertThat(getPropertyValue(resource, "zero"), isPresentAndIs(Long.valueOf(0)));
 		assertThat(getPropertyValue(resource, "zeroFraction"), isPresentAndIs(Double.valueOf(0)));
-		assertThat(getPropertyValue(resource, "one"), isPresentAndIs(Integer.valueOf(1)));
+		assertThat(getPropertyValue(resource, "one"), isPresentAndIs(Long.valueOf(1)));
 		assertThat(getPropertyValue(resource, "oneFraction"), isPresentAndIs(Double.valueOf(1)));
-		assertThat(getPropertyValue(resource, "integer"), isPresentAndIs(Integer.valueOf(123)));
-		assertThat(getPropertyValue(resource, "negative"), isPresentAndIs(Integer.valueOf(-123)));
+		assertThat(getPropertyValue(resource, "integer"), isPresentAndIs(Long.valueOf(123)));
+		assertThat(getPropertyValue(resource, "negative"), isPresentAndIs(Long.valueOf(-123)));
 		assertThat(getPropertyValue(resource, "long"), isPresentAndIs(Long.valueOf(3456789123L)));
+		assertThat(getPropertyValue(resource, "maxLong"), isPresentAndIs(Long.valueOf(Long.MAX_VALUE)));
+		assertThat(getPropertyValue(resource, "big"), isPresentAndIs(new BigInteger(Long.toString(Long.MAX_VALUE)).add(BigInteger.ONE)));
+		assertThat(getPropertyValue(resource, "bigger"), isPresentAndIs(new BigInteger("100000000000000000000"))); //10^20
 		assertThat(getPropertyValue(resource, "fraction"), isPresentAndIs(Double.valueOf(12345.6789)));
 		assertThat(getPropertyValue(resource, "scientific1"), isPresentAndIs(Double.valueOf(1.23e+4)));
 		assertThat(getPropertyValue(resource, "scientific2"), isPresentAndIs(Double.valueOf(12.3e-4)));
@@ -327,13 +330,13 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 		//If value equivalence regardless of scale is desired, use BigDecimal.compare().
 		assertThat(getPropertyValue(resource, "decimal"), isPresentAndIs(new BigDecimal("0.3")));
 		assertThat(getPropertyValue(resource, "money"), isPresentAndIs(new BigDecimal("1.23")));
-		assertThat(getPropertyValue(resource, "decimalZero"), isPresentAndIs(BigInteger.ZERO));
+		assertThat(getPropertyValue(resource, "decimalZero"), isPresentAndIs(BigDecimal.ZERO));
 		assertThat(getPropertyValue(resource, "decimalZeroFraction"), isPresentAndIs(new BigDecimal("0.0")));
-		assertThat(getPropertyValue(resource, "decimalOne"), isPresentAndIs(BigInteger.ONE));
+		assertThat(getPropertyValue(resource, "decimalOne"), isPresentAndIs(BigDecimal.ONE));
 		assertThat(getPropertyValue(resource, "decimalOneFraction"), isPresentAndIs(new BigDecimal("1.0")));
-		assertThat(getPropertyValue(resource, "decimalInteger"), isPresentAndIs(new BigInteger("123")));
-		assertThat(getPropertyValue(resource, "decimalNegative"), isPresentAndIs(new BigInteger("-123")));
-		assertThat(getPropertyValue(resource, "decimalLong"), isPresentAndIs(new BigInteger("3456789123")));
+		assertThat(getPropertyValue(resource, "decimalInteger"), isPresentAndIs(new BigDecimal("123")));
+		assertThat(getPropertyValue(resource, "decimalNegative"), isPresentAndIs(new BigDecimal("-123")));
+		assertThat(getPropertyValue(resource, "decimalLong"), isPresentAndIs(new BigDecimal("3456789123")));
 		assertThat(getPropertyValue(resource, "decimalFraction"), isPresentAndIs(new BigDecimal("12345.6789")));
 		assertThat(getPropertyValue(resource, "decimalScientific1"), isPresentAndIs(new BigDecimal("1.23e+4")));
 		assertThat(getPropertyValue(resource, "decimalScientific2"), isPresentAndIs(new BigDecimal("12.3e-4")));
@@ -492,10 +495,10 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 		final Map<?, ?> map = (Map<?, ?>)object.get();
 		assertThat(map.size(), is(10));
 		assertThat(map.get("foo"), is("bar"));
-		assertThat(map.get(123), is("number"));
+		assertThat(map.get(123L), is("number"));
 		assertThat(map.get(false), is("Boolean"));
 		assertThat(map.get(true), is("Boolean"));
-		assertThat(map.get(Arrays.asList(1, 2, 3)), is(new BigDecimal("1.23")));
+		assertThat(map.get(Arrays.asList(1L, 2L, 3L)), is(new BigDecimal("1.23")));
 		final Map<Object, Object> pingPong = new HashMap<>();
 		pingPong.put("ping", Arrays.asList(CodePointCharacter.of('p'), CodePointCharacter.of('o'), CodePointCharacter.of('n'), CodePointCharacter.of('g')));
 		assertThat(map.get("map"), is(pingPong));
