@@ -181,6 +181,30 @@ public class URF {
 		}
 
 		/**
+		 * Determines whether the given string conforms to the rules for an URF name ID token.
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid URF name ID token.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @see #ID_TOKEN_PATTERN
+		 */
+		public static boolean isValidIdToken(final String string) {
+			return ID_TOKEN_PATTERN.matcher(requireNonNull(string)).matches();
+		}
+
+		/**
+		 * Confirms that the given string conforms to the rules for an URF name ID token.
+		 * @param string The string to check.
+		 * @return The given string.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 * @throws IllegalArgumentException if the given string does not conform to the rules for an URF name ID token.
+		 * @see #ID_TOKEN_PATTERN
+		 */
+		public static String checkArgumentValidIdToken(final String string) {
+			checkArgument(isValidToken(string), "Invalid URF name ID token \"%s\".", string);
+			return string;
+		}
+
+		/**
 		 * Determines if the given character is a SURF token name begin character. A name token begin character is a Unicode letter.
 		 * @param c The character to check.
 		 * @return <code>true</code> if the character is a SURF name begin character.

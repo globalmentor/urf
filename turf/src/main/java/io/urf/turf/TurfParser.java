@@ -327,7 +327,7 @@ public class TurfParser<R> {
 			reader.reset(); //reset to the last mark, which was set right before the non-name character we found
 		}
 		final String nameToken = stringBuilder.toString();
-		checkParseIO(reader, Name.isValidToken(nameToken), "Invalid name ID token %s.", nameToken);
+		checkParseIO(reader, Name.isValidIdToken(nameToken), "Invalid name ID token %s.", nameToken);
 		return nameToken;
 	}
 
