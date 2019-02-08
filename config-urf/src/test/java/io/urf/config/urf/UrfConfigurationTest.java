@@ -56,7 +56,7 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
 		assertThat(urfConfiguration.getBoolean("flag"), is(true));
 		assertThat(urfConfiguration.hasConfigurationValue("none"), is(false));
-		assertThat(urfConfiguration.getOptionalObject("none"), isEmpty());
+		assertThat(urfConfiguration.findObject("none"), isEmpty());
 
 		assertThat(urfConfiguration.getString("organization.name"), is("Acme Company"));
 		assertThat(urfConfiguration.getInt("organization.size"), is(123));
@@ -76,7 +76,7 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
 		assertThat(urfConfiguration.getBoolean("flag"), is(true));
 		assertThat(urfConfiguration.hasConfigurationValue("none"), is(false));
-		assertThat(urfConfiguration.getOptionalObject("none"), isEmpty());
+		assertThat(urfConfiguration.findObject("none"), isEmpty());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
