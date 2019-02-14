@@ -275,4 +275,50 @@ public class URFTest {
 		URF.Handle.toTag("fake/foo-bar-Example#123");
 	}
 
+	/**
+	 * Ensures that the tag generation method from a handle is caching {@link URI}s when appropriate.
+	 * @see URF.Handle#toTag(String)
+	 */
+	@Test
+	public void testHandleToTagCaching() {
+		final Map<String, URI> namespaces = new HashMap<>();
+		namespaces.put("fake", URI.create("https://example.com/fake/"));
+
+		final URI fooTag = URF.Handle.toTag("foo", namespaces);
+		assertThat(URF.Handle.toTag("foo", namespaces), is(sameInstance(fooTag)));
+		assertThat(URF.Handle.toTag("foo", namespaces), is(sameInstance(fooTag)));
+
+		final URI barTag = URF.Handle.toTag("bar");
+		assertThat(barTag, is(not(fooTag)));
+		assertThat(URF.Handle.toTag("bar", namespaces), is(sameInstance(barTag)));
+		assertThat(URF.Handle.toTag("foo", namespaces), is(sameInstance(fooTag)));
+
+		final URI fooBarExampleTag = URF.Handle.toTag("foo-bar-Example");
+		assertThat(fooBarExampleTag, is(not(fooTag)));
+		assertThat(fooBarExampleTag, is(not(barTag)));
+		assertThat(URF.Handle.toTag("foo-bar-Example", namespaces), is(sameInstance(fooBarExampleTag)));
+		assertThat(URF.Handle.toTag("bar", namespaces), is(sameInstance(barTag)));
+		assertThat(URF.Handle.toTag("foo", namespaces), is(sameInstance(fooTag)));
+		assertThat(URF.Handle.toTag("foo-bar-Example", namespaces), is(sameInstance(fooBarExampleTag)));
+
+		//custom namespaces aren't cached
+		final URI fakeTestTag = URF.Handle.toTag("fake/test", namespaces);
+		assertThat(fakeTestTag, is(not(fooTag)));
+		assertThat(fakeTestTag, is(not(barTag)));
+		assertThat(fakeTestTag, is(not(fooBarExampleTag)));
+		final URI fakeTestTag2 = URF.Handle.toTag("fake/test", namespaces);
+		assertThat(fakeTestTag2, is(equalTo(fakeTestTag)));
+		assertThat(fakeTestTag2, is(not(sameInstance(fakeTestTag))));
+
+		//ID tags aren't cached
+		final URI exampleFooIdTag = URF.Handle.toTag("Example#foo", namespaces);
+		assertThat(exampleFooIdTag, is(not(fooTag)));
+		assertThat(exampleFooIdTag, is(not(barTag)));
+		assertThat(exampleFooIdTag, is(not(fooBarExampleTag)));
+		assertThat(exampleFooIdTag, is(not(fakeTestTag)));
+		final URI exampleFooIdTag2 = URF.Handle.toTag("Example#foo", namespaces);
+		assertThat(exampleFooIdTag2, is(equalTo(exampleFooIdTag)));
+		assertThat(exampleFooIdTag2, is(not(sameInstance(exampleFooIdTag))));
+	}
+
 }
