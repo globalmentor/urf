@@ -27,6 +27,7 @@ import java.util.regex.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.collections.*;
 import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Characters;
 import com.globalmentor.net.URIs;
@@ -700,24 +701,50 @@ public class URF {
 			return toTag(handle, emptyMap());
 		}
 
+		/** A cache of tags in the ad hoc namespace, keyed to handles. */
+		private static final Map<String, URI> AD_HOC_TAGS_BY_HANDLE_CACHE = new DecoratorReadWriteLockMap<>(new PurgeOnWriteSoftValueHashMap<>());
+
 		/**
 		 * Produces the tag that a handle represents.
+		 * @implSpec This implementation saves memory by saving commonly used tags in a cache. Only tags in the ad hoc namespace with no ID are saved. Tags are
+		 *           actually constructed when needed by delegating to {@link #toTag(Matcher, URI)}.
+		 * @implNote Caching handles in custom namespaces would be more complicated, as namespace prefixes are arbitrary. Similarly caching handles with IDs might
+		 *           be counter-productive, as each each would represent an instance of some type, so they might not be duplicated anyway.
 		 * @param handle The handle for which a tag should be determined.
 		 * @param namespaces The registered namespaces, associated with their aliases.
 		 * @return The tag that the given handle represents.
 		 * @throws NullPointerException if the given handle and/or namespaces map is <code>null</code>.
 		 * @throws IllegalArgumentException if the given string is not a valid handle.
 		 * @throws IllegalArgumentException if the given handle refers to an unregistered namespace alias.
+		 * @throws IllegalArgumentException if the handle contains multiple segments in any namespace other than the ad-hoc namespace.
 		 * @see #PATTERN
 		 */
 		public static URI toTag(@Nonnull final String handle, @Nonnull final Map<String, URI> namespaces) {
 			final Matcher matcher = checkArgumentMatchesValid(handle);
 			final String namespaceAlias = matcher.group(PATTERN_NAMESPACE_ALIAS_GROUP);
 			final URI namespace = namespaceAlias == null ? AD_HOC_NAMESPACE : namespaces.get(namespaceAlias);
-			checkArgument(namespace != null, "Unregistered namespace alias %s in handle %s.", namespaceAlias, handle);
+			checkArgument(namespace != null, "Handle %s namespace alias %s is not associated with a namespace.", handle, namespaceAlias);
+			if(namespaceAlias == null && matcher.group(PATTERN_ID_GROUP) == null) { //cache all ad hoc tags by handle
+				return AD_HOC_TAGS_BY_HANDLE_CACHE.computeIfAbsent(handle, h -> toTag(matcher, namespace));
+			}
+			return toTag(matcher, namespace);
+		}
+
+		/**
+		 * Creates the tag that a handle represents.
+		 * @param matcher The matcher that has already verified the validity of a handle.
+		 * @param namespace The determined namespace of the handle.
+		 * @return The tag that the given matched handle represents.
+		 * @throws NullPointerException if the given matcher and/or namespace is <code>null</code>.
+		 * @throws IllegalArgumentException if the handle contains multiple segments in any namespace other than the ad-hoc namespace.
+		 * @see #PATTERN
+		 */
+		private static URI toTag(@Nonnull final Matcher matcher, @Nonnull final URI namespace) {
+			requireNonNull(namespace);
 			final String[] handleSegments = matcher.group(PATTERN_SEGEMENTS_GROUP).split(String.valueOf(SEGMENT_DELIMITER));
 			assert handleSegments.length > 0; //a valid handle always has at least one segment
-			checkArgument(handleSegments.length == 1 || namespaceAlias == null, "Handles with multiple segments %s only allowed in the ad-hoc namespace.", handle);
+			checkArgument(handleSegments.length == 1 || namespace.equals(AD_HOC_NAMESPACE), "Handles with multiple segments %s only allowed in the ad-hoc namespace.",
+					matcher.group(0));
 			final StringBuilder adHocRelativePathBuilder = new StringBuilder();
 			for(final String handleSegment : handleSegments) {
 				if(adHocRelativePathBuilder.length() > 0) {

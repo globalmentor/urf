@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.*;
 
@@ -33,8 +34,10 @@ import com.globalmentor.io.Filenames;
 
 import io.clogr.*;
 import io.confound.config.file.ResourcesConfigurationManager;
+import io.urf.URF;
 import io.urf.csv.UrfCsvParser;
 import io.urf.model.*;
+import io.urf.turf.TURF;
 import io.urf.turf.TurfParser;
 import io.urf.turf.TurfSerializer;
 import picocli.CommandLine;
@@ -117,7 +120,19 @@ public class UrfCli implements Runnable, Clogged {
 				urfInferencer = UrfInferencer.NOP;
 			}
 
+			//TODO add a way to have feedback final AtomicLong rootCount = new AtomicLong(0);
 			final SimpleGraphUrfProcessor urfProcessor = new SimpleGraphUrfProcessor(urfInferencer);
+			//TODO add a way to have feedback
+			//			{
+			//				@Override
+			//				public void reportRootResource(final UrfReference root) {
+			//					super.reportRootResource(root);
+			//					final long newRootCount = rootCount.incrementAndGet();
+			//					if(newRootCount % 1000 == 0) {
+			//						System.out.println(newRootCount);
+			//					}
+			//				};
+			//			};
 
 			//process files		
 			for(final Path path : paths) { //parse each file using the same processor
@@ -126,15 +141,30 @@ public class UrfCli implements Runnable, Clogged {
 				final String typeHandle = Filenames.getBaseFilename(path.getFileName().toString());
 				final URI typeTag = Handle.toTag(typeHandle);
 
-				final UrfCsvParser<List<Object>> urfCsvParser = new UrfCsvParser<>(urfProcessor);
 				try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {
-					//TODO provide updates to the user during parsing and when writing
-					urfCsvParser.parseDocument(inputStream, typeTag);
+
+					if(Filenames.getExtension(path.getFileName().toString()).equals(TURF.FILENAME_EXTENSION)) {
+						final TurfParser<List<Object>> turfParser = new TurfParser<>(urfProcessor);
+						//TODO provide updates to the user during parsing and when writing
+						turfParser.parseDocument(inputStream);
+					} else { //assume URF CSV
+						final UrfCsvParser<List<Object>> urfCsvParser = new UrfCsvParser<>(urfProcessor);
+						//TODO provide updates to the user during parsing and when writing
+						urfCsvParser.parseDocument(inputStream, typeTag);
+					}
+
 				}
 
 				//only record root resources for the first file, to prevent forcing references to be serialized as roots from other aggregated files
 				urfProcessor.setRootsRecorded(false);
 			}
+
+			//TODO add some sort of summary
+			//System.out.println("number of declared resources: " + urfProcessor.getDeclaredResources().count());
+			//System.out.println("number of cached URIs: " + URF.Handle.AD_HOC_TAGS_BY_HANDLE_CACHE.size());
+			//URF.Handle.AD_HOC_TAGS_BY_HANDLE_CACHE.entrySet().stream().limit(100)
+			//		.forEach(entry -> System.out.println(String.format("%s : %s", entry.getKey(), entry.getValue())));
+
 			final TurfSerializer turfSerializer = new TurfSerializer();
 			turfSerializer.setFormatted(true);
 			if(outputPath != null) {
