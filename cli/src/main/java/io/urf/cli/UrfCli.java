@@ -27,56 +27,29 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.*;
 
-import org.fusesource.jansi.AnsiConsole;
-import org.slf4j.event.Level;
-
+import com.globalmentor.application.*;
 import com.globalmentor.io.Filenames;
 
-import io.clogr.*;
-import io.confound.config.file.ResourcesConfigurationManager;
-import io.urf.URF;
 import io.urf.csv.UrfCsvParser;
 import io.urf.model.*;
 import io.urf.turf.TURF;
 import io.urf.turf.TurfParser;
 import io.urf.turf.TurfSerializer;
-import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 /**
  * Command-line interface for working with URF data.
  * @author Garret Wilson
  */
-@Command(name = "urf", description = "Command-line interface for working with URF data.", versionProvider = UrfCli.VersionProvider.class, mixinStandardHelpOptions = true)
-public class UrfCli implements Runnable, Clogged {
-
-	private boolean debug;
+@Command(name = "urf", description = "Command-line interface for working with URF data.", versionProvider = UrfCli.MetadataProvider.class, mixinStandardHelpOptions = true)
+public class UrfCli extends BaseCliApplication {
 
 	/**
-	 * Enables or disables debug mode, which is disabled by default.
-	 * @param debug The new state of debug mode.
+	 * Constructor.
+	 * @param args The command line arguments.
 	 */
-	@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.")
-	protected void setDebug(final boolean debug) {
-		this.debug = debug;
-		updateLogLevel();
-	}
-
-	/**
-	 * Returns whether debug mode is enabled.
-	 * <p>
-	 * Debug mode enables debug level logging and may also enable other debug functionality.
-	 * </p>
-	 * @return The state of debug mode.
-	 */
-	protected boolean isDebug() {
-		return debug;
-	}
-
-	/** Updates the log level based upon the current debug setting. The current debug setting remains unchanged. */
-	protected void updateLogLevel() {
-		final Level logLevel = debug ? Level.DEBUG : Level.WARN; //TODO default to INFO level when we provide a log output (e.g. to file) option
-		Clogr.getLoggingConcern().setLogLevel(logLevel);
+	public UrfCli(@Nonnull final String[] args) {
+		super(args);
 	}
 
 	/**
@@ -84,19 +57,7 @@ public class UrfCli implements Runnable, Clogged {
 	 * @param args Program arguments.
 	 */
 	public static void main(@Nonnull final String[] args) {
-		AnsiConsole.systemInstall();
-		CommandLine.run(new UrfCli(), args);
-		AnsiConsole.systemUninstall();
-	}
-
-	/** Constructor. */
-	public UrfCli() {
-		updateLogLevel(); //update the log level based upon the debug setting
-	}
-
-	@Override
-	public void run() {
-		CommandLine.usage(this, System.out);
+		Application.start(new UrfCli(args));
 	}
 
 	@Command(description = "Converts one or more files to some URF file format.")
@@ -182,20 +143,10 @@ public class UrfCli implements Runnable, Clogged {
 		}
 	}
 
-	/**
-	 * Strategy for retrieving a version from the configuration.
-	 * @author Garret Wilson
-	 */
-	static class VersionProvider implements IVersionProvider {
-
-		/** The configuration key containing the version of the program. */
-		public static final String CONFIG_KEY_VERSION = "version";
-
-		@Override
-		public String[] getVersion() throws Exception {
-			return new String[] {ResourcesConfigurationManager.loadConfigurationForClass(UrfCli.class)
-					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException).getString(CONFIG_KEY_VERSION)};
+	/** Strategy for providing version and other information from the configuration. */
+	static class MetadataProvider extends AbstractMetadataProvider {
+		public MetadataProvider() {
+			super(UrfCli.class);
 		}
-
 	}
 }

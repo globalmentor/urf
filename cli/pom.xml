@@ -15,9 +15,16 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
+		<exe.main.class>io.urf.cli.UrfCli</exe.main.class>
+		<exe.filename>urf.exe</exe.filename>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-application</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
@@ -71,56 +78,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<shadedArtifactAttached>true</shadedArtifactAttached>
-					<shadedClassifierName>exe</shadedClassifierName>
-					<transformers>
-						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>io.urf.cli.UrfCli</mainClass>
-						</transformer>
-						<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-					</transformers>
-				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
 				<artifactId>launch4j-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>launch4j</goal>
-						</goals>
-						<configuration>
-							<headerType>console</headerType>
-							<outfile>${project.build.directory}/urf.exe</outfile>
-							<jar>${project.build.directory}/${project.artifactId}-${project.version}-exe.jar</jar>
-							<errTitle>${project.name}</errTitle>
-							<jre>
-								<minVersion>11</minVersion>
-							</jre>
-							<versionInfo>
-								<fileVersion>${project.releaseVersion}.0</fileVersion>
-								<txtFileVersion>${project.version}</txtFileVersion>
-								<fileDescription>${project.description}</fileDescription>
-								<copyright>Copyright © ${project.inceptionYear}-${build.year} ${project.organization.name}. All rights reserved.</copyright>
-								<productName>${project.name}</productName>
-								<internalName>${project.artifactId}</internalName>
-								<productVersion>${project.releaseVersion}.0</productVersion>
-								<txtProductVersion>${project.version}</txtProductVersion>
-								<originalFilename>urf.exe</originalFilename>
-							</versionInfo>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
