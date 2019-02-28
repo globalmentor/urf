@@ -42,7 +42,7 @@ public class URF {
 	public static final URI AD_HOC_NAMESPACE = URI.create("https://urf.name/");
 
 	/** The URF ontology namespace. */
-	public static final URI NAMESPACE = URI.create("https://urf.name/urf/");
+	public static final URI NAMESPACE = AD_HOC_NAMESPACE.resolve("urf/");
 
 	//#types
 
@@ -453,7 +453,7 @@ public class URF {
 		}
 
 		/**
-		 * Creates a tag for an instance of a type by its namespace and name.
+		 * Creates an ID tag for an instance of a type by its namespace and name.
 		 * @param typeNamespace The type namespace.
 		 * @param typeName The type name.
 		 * @param id The ID identifying the instance of the type.
@@ -464,7 +464,7 @@ public class URF {
 		}
 
 		/**
-		 * Creates a tag for an instance of a type by its tag.
+		 * Creates an ID tag for an instance of a type by its tag.
 		 * @param typeTag The type tag.
 		 * @param id The ID identifying the instance of the type.
 		 * @return A tag with the given type and ID.
