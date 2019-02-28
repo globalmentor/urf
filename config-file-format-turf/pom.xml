@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-core</artifactId>
+			<artifactId>globalmentor-base</artifactId>
 		</dependency>
 
 		<dependency>
