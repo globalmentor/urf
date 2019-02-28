@@ -83,7 +83,7 @@ public class Content {
 		}
 
 		/**
-		 * Creates an ID tag for an instance of {@link MediaType}.
+		 * Creates an ID tag for an instance of {@link ContentType}.
 		 * @param mediaType The Internet media type to represent.
 		 * @return A tag for the given media type.
 		 * @see Content#MEDIA_TYPE_CLASS_TAG
