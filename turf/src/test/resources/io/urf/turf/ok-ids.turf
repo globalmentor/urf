@@ -1,8 +1,6 @@
-\URF\:
-  namespaces = {
-    "count": <https://example.com/one/two/>
-  }
-;
+\
+  space-count = <https://example.com/one/two/>
+\
 
 *:
 

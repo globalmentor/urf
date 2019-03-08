@@ -44,6 +44,9 @@ public class URF {
 	/** The URF ontology namespace. */
 	public static final URI NAMESPACE = AD_HOC_NAMESPACE.resolve("urf/");
 
+	/** The namespace for declaring namespace aliases in serializations. */
+	public static final URI SPACE_NAMESPACE = AD_HOC_NAMESPACE.resolve("space/");
+
 	//#types
 
 	/** The tag of the <code>urf-Binary</code> type. */
