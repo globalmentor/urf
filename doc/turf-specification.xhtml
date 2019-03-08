@@ -118,7 +118,7 @@
 	<ul class="spec-production">
 		<li><code class="name">signature</code> ⇒ "/URF/"</li>
 	</ul>
-	<h4><span style="color: #222222;">Directives</span></h4>
+	<h4>Directives</h4>
 	<h5>Namespace Declaration</h5>
 	<p>For every directive corresponding to a tag in the <code>https://urf.name/space/</code> namespace, the tag name declares a namespace alias prefix to be used with handles within the document body, and the value, which <span class="spec-must">must</span> be an <code>urf-Iri</code> literal, designates the namespace with which the alias is associated. A TURF serializer <span class="spec-must">must</span> generate a header containing appropriate namespace declarations for all custom namespaces used in the document.</p>
 	<p>For example a directive handle <code>space-dc</code> indicates that <code>dc</code> is to be used as a namespace alias prefix. The example TURF document header in the figure above associates that prefix with the <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> namespace. Thus if <code>dc/creator</code> were to be used within the body of the example document above, it would indicate the tag <code>&lt;http://purl.org/dc/elements/1.1/creator&gt;</code>.</p>
