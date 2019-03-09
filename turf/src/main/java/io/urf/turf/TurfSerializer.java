@@ -26,7 +26,6 @@ import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
-import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -38,6 +37,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -720,9 +720,7 @@ public class TurfSerializer {
 			}
 			if(rootCount > 0) {
 				if(includeHeader) { //separate the header from the roots with a blank line
-					if(!formatNewLine(appendable, 2) || isSequenceSeparatorRequired()) {
-						appendable.append(SEQUENCE_DELIMITER);
-					}
+					formatNewLine(appendable, 2);
 				}
 				serializeRoots(appendable, roots);
 			}
@@ -733,18 +731,24 @@ public class TurfSerializer {
 	}
 
 	/**
-	 * Serializes a TURF document header to a writer, including the TURF signature and namespace declarations, if present.
+	 * Serializes a TURF document header to a writer, including the namespace declarations, if present.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeHeader(@Nonnull final Appendable appendable) throws IOException {
-		appendable.append(SIGNATURE); //\SURF\
-		final UrfObject directives = new UrfObject();
-		final Map<String, URI> namespaces = namespaceAliases.entrySet().stream().collect(toMap(Map.Entry::getValue, Map.Entry::getKey)); //TODO improve ReverseMap to supply its reverse view
-		directives.setPropertyValueByHandle(DIRECTIVE_NAMESPACES_HANDLE, namespaces);
-		return serializeDescription(appendable, directives);
+		appendable.append(DIVISION_DELIMITER); //\
+		//TODO serialize signature, when finalized, based on configuration
+		formatNewLine(appendable);
+		//map the namespaces to space-alias/namespaceIri properties
+		final Stream<Map.Entry<URI, Object>> namespaceProperties = namespaceAliases.entrySet().stream()
+				.map(namespaceAliasEntry -> new AbstractMap.SimpleEntry<>(Tag.forType(SPACE_NAMESPACE, namespaceAliasEntry.getValue()), namespaceAliasEntry.getKey()));
+		try (final Closeable indention = increaseIndentLevel()) {
+			serializeSequence(appendable, namespaceProperties::iterator, this::serializeProperty);
+		}
+		formatIndent(appendable);
+		return appendable.append(DIVISION_DELIMITER); //\
 	}
 
 	long serializedRootCount = 0;

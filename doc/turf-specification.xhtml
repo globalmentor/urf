@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-30</dd>
+			<dd>Draft 2019-03-07</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -90,39 +90,64 @@
 		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
 	<h2>Structure</h2>
-	<p>A TURF document is divided into two sections: a <dfn>header</dfn> and a <dfn>body</dfn>, both of which are optional. If a header is included, it <span class="spec-must">must</span> appear starting at the first character of the document.</p>
+	<p>A TURF document is divided into four sections: a <dfn>header</dfn> with optional <dfn>signature</dfn>, a <dfn>document description</dfn>, a <dfn>body</dfn>, and a <dfn>footer</dfn>, each of which is optional. If a footer is included, a header <span class="spec-must">must</span> be included as well..</p>
 	<ul class="spec-production">
-		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">body</code>?</li>
+		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">line_break</code>* <code class="name">document_description</code>? <code class="name">line_break</code>* <code class="name">body</code>? <code class="name">line_break</code>* <code class="name">footer</code>? <code class="name">line_break</code>*</li>
 	</ul>
-	<p>TODO document footer/terminator <code>\.</code></p>
+	<ul class="spec-production">
+	</ul>
 	<h3>Header</h3>
 	<figure class="far half">
-		<figcaption>Example TURF document header.</figcaption>
-		<pre class="line-numbers"><code class="language-turf">\URF
-! Example TURF document.
-\:
+		<figcaption>Example TURF document with optional header, signature, and footer.</figcaption>
+		<pre class="line-numbers"><code class="language-turf">\/URF/
   space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
   space-foaf = &lt;http://xmlns.com/foaf/0.1/&gt;
-:
+\
+
+! body of document …
+
+\/./\</code></pre>
+	</figure>
+	<p>The optional document header begins and ends with a backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>). If a header is included it <span class="spec-must">must</span> appear at the first character of the document. The header <span class="spec-may">may</span> contain <dfn>directives</dfn>, a sequence of name-value pairs that provide serialization details essential for parsing. A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but may provide a way to access them separately. <span class="note">The production rules for literals appear later in this specification.</span></p>
+	<ul class="spec-production">
+		<li><code class="name">header</code> ⇒ '\' <code class="name">signature</code>? <code class="name">directive-sequence</code> '\'</li>
+		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
+	</ul>
+	<h4 id="signature">Signature</h4>
+	<p><em>This section is experimental.</em> If a signature is present, it <span class="spec-must">must</span> appear starting at the first character header. A TURF parser <span class="spec-must">must</span> use the bytes of the signature, or the absence of a signature, to determine the charset and byte order of the document. A TURF parser <span class="spec-may">may</span> use the signature as a heuristic to reasonably determine that some file in fact contains a TURF document.</p>
+	<ul class="spec-production">
+		<li><code class="name">signature</code> ⇒ "/URF/"</li>
+	</ul>
+	<h4>Directives</h4>
+	<h5>Namespace Declaration</h5>
+	<p>For every directive corresponding to a tag in the <code>https://urf.name/space/</code> namespace, the tag name declares a namespace alias prefix to be used with handles within the document body, and the value, which <span class="spec-must">must</span> be an <code>urf-Iri</code> literal, designates the namespace with which the alias is associated. A TURF serializer <span class="spec-must">must</span> generate a header containing appropriate namespace declarations for all custom namespaces used in the document.</p>
+	<p>For example a directive handle <code>space-dc</code> indicates that <code>dc</code> is to be used as a namespace alias prefix. The example TURF document header in the figure above associates that prefix with the <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> namespace. Thus if <code>dc/creator</code> were to be used within the body of the example document above, it would indicate the tag <code>&lt;http://purl.org/dc/elements/1.1/creator&gt;</code>.</p>
+	<h3>Document Description</h3>
+	<figure class="far half">
+		<figcaption>Example TURF document with a document description.</figcaption>
+		<pre class="line-numbers"><code class="language-turf">\
+  space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
+\
+#
+  dc/title = "Example Document"
+  dc/creator = "Jane Doe"
+#
 
 ! body of document …</code></pre>
 	</figure>
-	<h4 id="signature">Signature</h4>
-	<p>The header of a document, if present, <span class="spec-must">must</span> begin with a TURF <dfn>signature</dfn>, the character sequence <code>\URF</code> at the beginning of the document. It <span class="spec-may">may</span> optionally be followed, on the same or different line, with a <dfn>directives</dfn> declaration.</p>
-	<h4>Directives</h4>
-	<p>The directives are a sequence of name-value pairs, with each name an URF handle and a value a TURF literal. <span class="note">The production rules for the description contents are described later in this specification.</span></p>
+	<p><em>This section is experimental.</em> The optional document description provides a description of the document contents, separate from its serialization and independent of the represented URF graph. The document description begins and ends with the <code class="name">NUMBER SIGN</code> <code>#</code> (<code class="unicode">U+0023</code>), and contains a sequence of name-value pairs. A TURF parser <span class="spec-must-not">must not</span> return the document description as part of the URF instance graph, but <span class="spec-should">should</span> provide some means for it to be retrieved after parsing is finished.</p>
 	<ul class="spec-production">
-		<li><code class="name">header</code> ⇒ <code class="name">signature</code> <code class="name">line_break</code>* <code class="name">directives</code>?</li>
-		<li><code class="name">signature</code> ⇒ "\URF"</li>
-		<li><code class="name">directives</code> ⇒ ':' <code class="name">directive-sequence</code> ';'</li>
-		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
+		<li><code class="name">document_description</code> ⇒ '#' <code class="name">document_property-sequence</code> '#'</li>
+		<li><code class="name">document_property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
 	</ul>
-	<p>A directory handle <span class="spec-must-not">must not</span> use a namespace alias prefix. For example a fictional directive <code>foo/bar</code> is not allowed.</p>
-	<h5>Namespace Declaration</h5>
-	<p>For every directive corresponding a tag in the <code>https://urf.name/space/</code> namespace, the tag name declares a namespace alias prefix to be used with handles within the document body, and the value, which <span class="spec-must">must</span> be an <code>urf-Iri</code> literal, designates the namespace with which the alias is associated.</p>
-	<p>For example a directive handle <code>space-dc</code> indicates that <code>dc</code> is to be used as a namespace alias prefix. The example TURF document header in the figure above associates that prefix with the <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> namespace. Thus if <code>dc/creator</code> were to be used within the body of the example document above, it would indicate the tag <code>&lt;http://purl.org/dc/elements/1.1/creator&gt;</code>.</p>
 	<h3>Body</h3>
 	<p>The document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
+	<h3>Footer</h3>
+	<aside class="annotation far third">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>\/.../\</code> separator, forming the basis of a message stream, for example.</aside>
+	<p><em>This section is experimental.</em> The document footer, if present, explicitly indicates the end of the TURF document.</p>
+	<ul class="spec-production">
+		<li><code class="name">footer</code> ⇒ "\/./\"</li>
+	</ul>
 	<h2>Resources</h2>
 	<p>A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">

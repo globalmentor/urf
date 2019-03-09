@@ -171,41 +171,75 @@ public class TurfParser<R> {
 	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
 		boolean nextItemProhibited = false;
-		int c;
-		if((c = skipLineBreaks(reader)) >= 0) {
-			if(c == DIRECTIVE_DELIMITER) {
-				//TODO consider allowing line breaks inside "\ URF \"
-				check(reader, SIGNATURE); //\URF\
-				c = skipFiller(reader);
-				if(c == DESCRIPTION_BEGIN) { //\URF\:;
-					final SimpleGraphUrfProcessor directivesProcessor = new SimpleGraphUrfProcessor();
-					final URI directivesTag = Tag.generateBlank();
-					directivesProcessor.declareResource(directivesTag, null);
-					final TurfParser<List<Object>> directivesParser = new TurfParser<>(directivesProcessor);
-					//TODO maybe turn on SURF compliance for directives
-					directivesParser.parseDescription(reader, new SimpleUrfResource(directivesTag));
-					directivesProcessor.reportRootResource(new SimpleUrfResource(directivesTag));
-					final UrfObject directives = directivesProcessor.getResult().stream().findAny().map(UrfObject.class::cast).orElseThrow(IllegalStateException::new); //TODO clean up all these gymnastics
-					final Object namespaces = directives.findPropertyValueByHandle(DIRECTIVE_NAMESPACES_HANDLE).orElse(null);
-					if(namespaces != null) {
-						checkParseIO(reader, namespaces instanceof Map, "Directive %s value is not a map.", DIRECTIVE_NAMESPACES_HANDLE);
-						@SuppressWarnings("unchecked")
-						final Map<String, URI> namespacesByAlias = (Map<String, URI>)namespaces;
-						this.namepaces = namespacesByAlias;
-					}
-				}
-				final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
-				if(requireItem.isPresent()) {
-					nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
-					nextItemProhibited = false;
-				} else {
-					nextItemRequired = false;
-					nextItemProhibited = true;
-				}
-				c = peek(reader);
+
+		//header
+		int c = peek(reader); //the header has to come a the first of the document, if at all
+		final boolean hasHeader = c == DIVISION_DELIMITER;
+		if(hasHeader) {
+			check(reader, DIVISION_DELIMITER); //\
+			c = peek(reader); //the signature has to come a the first of the header, if at all
+			if(c == SIGNATURE_BEGIN) {
+				check(reader, SIGNATURE); ///URF/
 			}
+			c = skipLineBreaks(reader);
+			final Map<String, URI> namespaces = new HashMap<>();
+			parseSequence(reader, DIVISION_DELIMITER, r -> { //directives
+				final String propertyHandle = parseHandle(reader);
+				final URI propertyTag;
+				try {
+					propertyTag = Handle.toTag(propertyHandle, namespaces);
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
+				}
+				skipLineBreaks(reader);
+				check(reader, PROPERTY_VALUE_DELIMITER); //=
+				skipLineBreaks(reader);
+				final UrfReference value = parseResource(reader, false);
+				//TODO make sure the resource is a literal
+				//TODO store the document property somewhere for later retrieval
+				if(Tag.getNamespace(propertyTag).filter(SPACE_NAMESPACE::equals).isPresent()) {
+					final String namespaceAlias = Tag.getName(propertyTag)
+							.orElseThrow(() -> new ParseIOException("Document property " + propertyHandle + " missing namespace alias."));
+					final URI namespace = ObjectUrfResource.findObject(value).filter(URI.class::isInstance).map(URI.class::cast)
+							.orElseThrow(() -> new ParseIOException("Namespace alias " + namespaceAlias + " must be mapped to an IRI."));
+					//TODO add method to check that a URI is a potential namespace
+					namespaces.put(namespaceAlias, namespace); //TODO do we allow multiple definitions for the same namespace?
+				}
+				//TODO log warning for ignored directives
+			});
+			this.namepaces = namespaces; //save the gathered namespaces
+			check(reader, DIVISION_DELIMITER); //\
 		}
-		//parse root resources
+
+		//Because we checked for the header at the beginning of the document, we now need to skip vertical filler,
+		//whether or not there was a header.
+		c = skipLineBreaks(reader);
+
+		//document description
+		if(c == DOCUMENT_DESCRIPTION_DELIMITER) {
+			check(reader, DOCUMENT_DESCRIPTION_DELIMITER); //#
+			c = skipLineBreaks(reader);
+			final Map<String, URI> namespaces = new HashMap<>();
+			parseSequence(reader, DOCUMENT_DESCRIPTION_DELIMITER, r -> {
+				final String propertyHandle = parseHandle(reader);
+				final URI propertyTag;
+				try {
+					propertyTag = Handle.toTag(propertyHandle, namespaces);
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
+				}
+				skipLineBreaks(reader);
+				check(reader, PROPERTY_VALUE_DELIMITER); //=
+				skipLineBreaks(reader);
+				final UrfReference value = parseResource(reader, false);
+				//TODO make sure the resource is a literal
+				//TODO process document description
+			});
+			check(reader, DOCUMENT_DESCRIPTION_DELIMITER); //#
+			c = skipLineBreaks(reader);
+		}
+
+		//body (root resources)
 		while(c >= 0 || nextItemRequired) {
 			if(c >= 0 && nextItemProhibited) {
 				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
@@ -223,6 +257,8 @@ public class TurfParser<R> {
 			}
 			c = peek(reader);
 		}
+
+		//TODO footer
 		return getProcessor().getResult();
 	}
 
