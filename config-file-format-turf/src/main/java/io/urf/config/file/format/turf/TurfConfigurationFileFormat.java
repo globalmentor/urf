@@ -37,7 +37,7 @@ import io.urf.turf.*;
 public class TurfConfigurationFileFormat implements ConfigurationFileFormat {
 
 	@Override
-	public Set<String> getFilenameExtensionSuffixes() {
+	public Set<String> getFilenameExtensions() {
 		return singleton(TURF.FILENAME_EXTENSION);
 	}
 
