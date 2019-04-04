@@ -1144,18 +1144,18 @@ public class TurfSerializer {
 	 * All references to the resources in the graph must have already been discovered if aliases need to be generated.
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
-	 * @param urfObject The URF object with the description to be serialized.
+	 * @param description The description to be serialized.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#DESCRIPTION_BEGIN
 	 * @see TURF#DESCRIPTION_END
 	 */
-	public Appendable serializeDescription(@Nonnull final Appendable appendable, @Nonnull final UrfObject urfObject) throws IOException {
+	public Appendable serializeDescription(@Nonnull final Appendable appendable, @Nonnull final UrfResourceDescription description) throws IOException {
 		appendable.append(DESCRIPTION_BEGIN); //:
 		formatNewLine(appendable);
 		try (final Closeable indention = increaseIndentLevel()) {
-			serializeSequence(appendable, urfObject.getProperties(), this::serializeProperty);
+			serializeSequence(appendable, description.getProperties(), this::serializeProperty);
 		}
 		formatIndent(appendable);
 		appendable.append(DESCRIPTION_END); //;

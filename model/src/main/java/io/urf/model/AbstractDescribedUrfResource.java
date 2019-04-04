@@ -115,7 +115,7 @@ public abstract class AbstractDescribedUrfResource extends BaseUrfResource imple
 		}
 	}
 
-	/** @return An iterable to the object's properties by tags and their associated values. */
+	@Override
 	public Iterable<Map.Entry<URI, Object>> getProperties() {
 		final int propertyCount = propertyValuesByTag.size();
 		final int initialPropertyValueCapacity = max(min(propertyCount * 5, 100), propertyCount); //guess the capacity at 5 times the properties, unless over 100, but at least PropertyCount

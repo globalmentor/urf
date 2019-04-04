@@ -30,6 +30,9 @@ import io.urf.URF.Tag;
  */
 public interface UrfResourceDescription {
 
+	/** A shared immutable, empty description. */
+	public static final UrfResourceDescription EMPTY = new EmptyUrfResourceDescription();
+
 	/** @return The number of unique properties the resource has. */
 	public int getPropertyCount();
 
@@ -66,14 +69,41 @@ public interface UrfResourceDescription {
 	}
 
 	/**
+	 * Determines if a value exists for a property by the property tag.
+	 * @implSpec The default implementation delegates to {@link #findPropertyValue(URI)}.
+	 * @param propertyTag The tag of the property.
+	 * @return <code>true</code> if there is a value for the identified property.
+	 * @throws NullPointerException if the given property tag is <code>null</code>.
+	 * @throws IllegalArgumentException if the given URI is not a valid tag.
+	 * @see #findPropertyValue(URI)
+	 */
+	public default boolean hasPropertyValue(@Nonnull URI propertyTag) {
+		return findPropertyValue(propertyTag).isPresent();
+	}
+
+	/**
 	 * Retrieves the value of a property by the property tag. If the property is an n-ary property, there it is undefined which of the property values will be
 	 * returned.
 	 * @param propertyTag The tag of the property.
 	 * @return The value of the property, if any.
 	 * @throws NullPointerException if the given property tag is <code>null</code>.
 	 * @throws IllegalArgumentException if the given URI is not a valid tag.
+	 * @see #hasPropertyValue(URI)
 	 */
 	public Optional<Object> findPropertyValue(@Nonnull URI propertyTag);
+
+	/**
+	 * Determines if a value exists for a property by the property handle.
+	 * @implSpec The default implementation delegates to {@link #findPropertyValueByHandle(String)}.
+	 * @param propertyHandle The handle of the property.
+	 * @return <code>true</code> if there is a value for the identified property.
+	 * @throws NullPointerException if the given property handle is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #findPropertyValueByHandle(String)
+	 */
+	public default boolean hasPropertyValueByHandle(@Nonnull String propertyHandle) {
+		return findPropertyValueByHandle(propertyHandle).isPresent();
+	}
 
 	/**
 	 * Retrieves the value of a property by the property handle.
@@ -83,6 +113,7 @@ public interface UrfResourceDescription {
 	 * @throws NullPointerException if the given property handle is <code>null</code>.
 	 * @throws IllegalArgumentException if the given string is not a valid handle.
 	 * @see #findPropertyValue(URI)
+	 * @see #hasPropertyValueByHandle(String)
 	 */
 	public default Optional<Object> findPropertyValueByHandle(@Nonnull String propertyHandle) {
 		return findPropertyValue(Handle.toTag(propertyHandle));
@@ -178,8 +209,8 @@ public interface UrfResourceDescription {
 		return mergePropertyValue(Handle.toTag(propertyHandle), propertyValue);
 	}
 
-	/** @return An iterable to the resource's tagged properties and their values. */
-	//TODO add, but use name that won't be confused with URF property "name": public Iterable<NameValuePair<String, Object>> getPropertyNameValuePairs();
+	/** @return An iterable to the properties by tags and their associated values. */
+	public Iterable<Map.Entry<URI, Object>> getProperties();
 
 	/**
 	 * Sets property values from a map of property tags and values. Neither <code>null</code> property tags nor <code>null</code> property values are allowed.
