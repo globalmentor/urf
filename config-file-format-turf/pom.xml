@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.urf</groupId>
 		<artifactId>urf</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.3.0</version>
 	</parent>
 
 	<artifactId>config-file-format-turf</artifactId>
