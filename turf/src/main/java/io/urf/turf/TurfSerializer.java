@@ -1051,7 +1051,7 @@ public class TurfSerializer {
 			throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
 		final Optional<String> handle = Handle.fromTag(tag, namespaceAliases)
 				.filter(tagHandle -> !tagHandle.equals(BOOLEAN_FALSE_LEXICAL_FORM) && !tagHandle.equals(BOOLEAN_TRUE_LEXICAL_FORM));
-		ifPresentOrElse​(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
+		ifPresentOrElse(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 		return appendable;
 	}
 
