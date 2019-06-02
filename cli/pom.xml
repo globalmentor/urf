@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.urf</groupId>
 		<artifactId>urf</artifactId>
-		<version>0.3.1</version>
+		<version>0.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>urf-cli</artifactId>
