@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf;
+package io.urf.vocab.content;
 
 import static com.globalmentor.net.ContentType.*;
 import static com.globalmentor.text.Text.PLAIN_CONTENT_TYPE;
@@ -26,8 +26,13 @@ import org.junit.jupiter.api.*;
 
 import com.globalmentor.net.ContentType;
 
-import io.urf.Content;
+import io.urf.vocab.content.Content;
 
+/**
+ * Tests of the {@link Content} vocabulary.
+ * @author Garret Wilson
+ *
+ */
 public class ContentTest {
 
 	@Test

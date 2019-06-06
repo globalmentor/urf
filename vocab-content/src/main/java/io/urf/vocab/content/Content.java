@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.urf;
+package io.urf.vocab.content;
 
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
@@ -26,8 +26,10 @@ import javax.annotation.*;
 
 import com.globalmentor.net.ContentType;
 
+import io.urf.URF;
+
 /**
- * The URF content ontology.
+ * The URF content vocabulary.
  * @author Garret Wilson
  */
 public class Content {
