@@ -16,6 +16,9 @@
 
 package io.urf;
 
+import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.util.Optionals.*;
+
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -51,7 +54,7 @@ public class Content {
 	public static final URI CHARSET_PROPERTY_TAG = NAMESPACE.resolve("charset");
 	/** The instant when a resource was created. */
 	public static final URI CREATED_PROPERTY_TAG = NAMESPACE.resolve("createdAt");
-	/** The resource that created this resource atthe indicated created instant. */
+	/** The resource that created this resource at the indicated created instant. */
 	public static final URI CREATOR_PROPERTY_TAG = NAMESPACE.resolve("creator");
 	/** The actual content, such as bytes or a string, of a resource. */
 	public static final URI CONTENT_PROPERTY_TAG = NAMESPACE.resolve("content");
@@ -78,8 +81,21 @@ public class Content {
 		 * @see Content#CHARSET_CLASS_TAG
 		 * @see Charset#name()
 		 */
-		public static URI forCharset(@Nonnull final Charset charset) {
+		public static URI fromCharset(@Nonnull final Charset charset) {
 			return URF.Tag.forTypeId(CHARSET_CLASS_TAG, charset.name());
+		}
+
+		/**
+		 * Determines the charset represented by the tag.
+		 * @param tag The tag to convert to a charset.
+		 * @return The tag indicated charset.
+		 * @throws IllegalArgumentException if the given tag does not represent a valid charset.
+		 * @see Content#CHARSET_CLASS_TAG
+		 */
+		public static Charset toCharset(@Nonnull final URI tag) throws IllegalArgumentException {
+			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), CHARSET_CLASS_TAG), "Tag %s not a charset tag.", tag);
+			final String charsetName = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no charset indicated."));
+			return Charset.forName(charsetName);
 		}
 
 		/**
@@ -87,10 +103,22 @@ public class Content {
 		 * @param mediaType The Internet media type to represent.
 		 * @return A tag for the given media type.
 		 * @see Content#MEDIA_TYPE_CLASS_TAG
-		 * @see ContentType#getBaseContentType()
 		 */
-		public static URI forMediaType(@Nonnull final ContentType mediaType) {
-			return URF.Tag.forTypeId(MEDIA_TYPE_CLASS_TAG, mediaType.getBaseType());
+		public static URI fromMediaType(@Nonnull final ContentType mediaType) {
+			return URF.Tag.forTypeId(MEDIA_TYPE_CLASS_TAG, mediaType.toString());
+		}
+
+		/**
+		 * Determines the media type represented by the tag.
+		 * @param tag The tag to convert to a media type.
+		 * @return The tag indicated media type.
+		 * @throws IllegalArgumentException if the given tag does not represent a valid media type.
+		 * @see Content#MEDIA_TYPE_CLASS_TAG
+		 */
+		public static ContentType toMediaType(@Nonnull final URI tag) throws IllegalArgumentException {
+			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), MEDIA_TYPE_CLASS_TAG), "Tag %s not a media type tag.", tag);
+			final String contentType = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no media type indicated."));
+			return ContentType.of(contentType);
 		}
 	}
 
