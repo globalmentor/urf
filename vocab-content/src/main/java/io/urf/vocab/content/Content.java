@@ -21,12 +21,14 @@ import static com.globalmentor.util.Optionals.*;
 
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import javax.annotation.*;
 
 import com.globalmentor.net.ContentType;
 
 import io.urf.URF;
+import io.urf.model.*;
 
 /**
  * The URF content vocabulary.
@@ -52,14 +54,17 @@ public class Content {
 
 	/** The instant when a resource was last accessed. */
 	public static final URI ACCESSED_PROPERTY_TAG = NAMESPACE.resolve("accessedAt");
-	/** The charset of a resource. */
+	/**
+	 * The charset of a resource.
+	 * @deprecated This property is experimental; as the charset is now normally part of the {@link #TYPE_PROPERTY_TAG} property, it is unclear whether a separate
+	 *             property adds any value.
+	 */
+	@Deprecated
 	public static final URI CHARSET_PROPERTY_TAG = NAMESPACE.resolve("charset");
 	/** The instant when a resource was created. */
 	public static final URI CREATED_PROPERTY_TAG = NAMESPACE.resolve("createdAt");
 	/** The resource that created this resource at the indicated created instant. */
 	public static final URI CREATOR_PROPERTY_TAG = NAMESPACE.resolve("creator");
-	/** The actual content, such as bytes or a string, of a resource. */
-	public static final URI CONTENT_PROPERTY_TAG = NAMESPACE.resolve("content");
 	/** The instant a resource was last modified. */
 	public static final URI MODIFIED_PROPERTY_TAG = NAMESPACE.resolve("modifiedAt");
 	/**
@@ -69,6 +74,33 @@ public class Content {
 	public static final URI LENGTH_PROPERTY_TAG = NAMESPACE.resolve("length");
 	/** The Internet media type of a resource. */
 	public static final URI TYPE_PROPERTY_TAG = NAMESPACE.resolve("type");
+
+	/**
+	 * Retrieves the content type value as a {@link ContentType} instance. The value of the {@link #TYPE_PROPERTY_TAG} property is expected to be a resource of
+	 * type {@value #MEDIA_TYPE_CLASS_TAG}.
+	 * @param description The description from which to get the property.
+	 * @return The value of the property, if any.
+	 * @throws NullPointerException if the given property tag is <code>null</code>.
+	 * @throws IllegalArgumentException if the value of the content property is not a valid resource of the media type.
+	 * @see UrfResourceDescription#findPropertyValue(URI)
+	 * @see #TYPE_PROPERTY_TAG
+	 * @see Content#MEDIA_TYPE_CLASS_TAG
+	 */
+	public static Optional<ContentType> findContentType(@Nonnull final UrfResourceDescription description) {
+		return description.findPropertyValue(TYPE_PROPERTY_TAG).map(value -> checkArgumentIsInstance(value, UrfObject.class)).flatMap(UrfObject::getTag)
+				.map(Tag::toMediaType);
+	}
+
+	/**
+	 * Sets the content type, using a value as a resource of type {@value #MEDIA_TYPE_CLASS_TAG}.
+	 * @param description The description on which to set the property.
+	 * @param contentType The media type to set.
+	 * @throws NullPointerException if the given description and/or content type is <code>null</code>.
+	 */
+	public static void setContentType(@Nonnull final UrfResourceDescription description, @Nonnull final ContentType contentType) {
+		final UrfObject mediaTypeResource = new UrfObject(Tag.fromMediaType(contentType));
+		description.setPropertyValue(TYPE_PROPERTY_TAG, mediaTypeResource);
+	}
 
 	/**
 	 * Utilities for working with TURF tags related to content.
