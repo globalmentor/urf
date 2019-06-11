@@ -436,6 +436,9 @@ public class TurfSerializerTest {
 				new TurfSerializer()
 						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://urf.name/SomeType"), true).toString(),
 				is("|<https://example.com/Test>|*SomeType"));
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test#foo"), URI.create("https://urf.name/SomeType"), true).toString(),
+				is("|<https://example.com/Test#foo>|*SomeType"));
 		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake")
 				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/fake/SomeType"), true)
 				.toString(), is("|<https://example.com/Test>|*fake/SomeType"));

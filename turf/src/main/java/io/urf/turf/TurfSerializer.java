@@ -1083,12 +1083,10 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The identifying tag of the object.
-	 * @param typeTag The tag identifying object type, or <code>null</code> if the object has no declared type; if the tag is an ID tag and a type is given, the
-	 *          type must match the type implied by the tag.
+	 * @param typeTag The tag identifying object type, or <code>null</code> if the object has no declared type.
 	 * @param declaration Whether the object declaration form <code>…*Type</code> should be included if there is a type.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
-	 * @throws IllegalArgumentException if a type tag was provided that does not match the implied type of an ID tag.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see #serializeObject(Appendable, URI)
 	 */
@@ -1105,8 +1103,8 @@ public class TurfSerializer {
 					serializeString(appendable, id);
 					appendable.append(LABEL_DELIMITER);
 					serializeObject(appendable, typeTag);
+					return appendable;
 				}
-				return appendable;
 			} else { //Type#id
 				final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
 				if(idHandle != null) { //Type#id
