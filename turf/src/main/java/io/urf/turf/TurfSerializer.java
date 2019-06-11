@@ -1117,7 +1117,7 @@ public class TurfSerializer {
 		//|<tag>|*Type
 		//TODO prevent both an alias and tag label from being serialized
 		serializeTagReference(appendable, tag);
-		if(declaration) { //if we should force the full declaration
+		if(declaration && typeTag != null) { //if we should force the full declaration and a type is explicitly indicated
 			serializeObject(appendable, typeTag);
 		}
 		return appendable;
