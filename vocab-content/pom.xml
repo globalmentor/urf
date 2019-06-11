@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.urf</groupId>
+		<artifactId>urf</artifactId>
+		<version>0.3.2-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>urf-vocab-content</artifactId>
+
+	<name>URF Content Vocabulary</name>
+	<description>URF vocabulary for describing resource content.</description>
+	<url>https://urf.io/</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-model</artifactId>
+		</dependency>
+	</dependencies>
+</project>
