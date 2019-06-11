@@ -48,6 +48,7 @@ import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
+import com.globalmentor.util.Optionals;
 
 import io.urf.model.*;
 
@@ -1062,17 +1063,18 @@ public class TurfSerializer {
 	 * <code>Type</code>:
 	 * <dl>
 	 * <dt>{@code Type#id}</dt>
-	 * <dd>If the object has an ID tag that can be expressed as a handle.</dd>
+	 * <dd>If the object has an ID tag but no type tag; the ID will be encoded as needed.</dd>
 	 * <dt>{@code |"id"|*Type}</dt>
-	 * <dd>If the object has an ID tag that cannot be expressed as a handle.</dd>
+	 * <dd>If the object has an ID tag with a type tag that matches its ID tag type, and the type tag cannot be expressed as a handle.</dd>
 	 * <dt>{@code |"id"|*|<typeTag>|}</dt>
-	 * <dd>If the object has an ID tag that cannot be expressed as a handle, and the type tag cannot be expressed as a handle.</dd>
+	 * <dd>If the object has an ID tag with a type tag that matches its ID tag type, and the type tag cannot be expressed as a handle.</dd>
 	 * <dt>{@code handle*Type}</dt>
-	 * <dd>If the object has tag that has no ID, but the tag can be expressed as a handle.</dd>
+	 * <dd>If the object has tag that has no ID, or the type tag is of a different type than the ID tag, but the tag can be expressed as a handle.</dd>
 	 * <dt>{@code handle*|<typeTag>|}</dt>
-	 * <dd>If the object has tag that has no ID, but the tag can be expressed as a handle; however the type tag cannot be expressed as a handle.</dd>
+	 * <dd>If the object has tag that has no ID, or the type tag is of a different type than the ID tag, but the tag can be expressed as a handle; however the
+	 * type tag cannot be expressed as a handle.</dd>
 	 * <dt>{@code |<tag>|*Type}</dt>
-	 * <dd>If the object has tag that has no ID and the tag cannot be expressed as a handle.</dd>
+	 * <dd>If the object has tag that has no ID, or the type tag is of a different type than the ID tag and the tag cannot be expressed as a handle.</dd>
 	 * <dt>{@code |<tag>|*|<typeTag>|}</dt>
 	 * <dd>If the object has tag that has no ID, and neither the tag nor the type tag can be expressed as a handle.</dd>
 	 * </dl>
@@ -1092,28 +1094,33 @@ public class TurfSerializer {
 	 */
 	public Appendable serializeObjectReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nullable final URI typeTag,
 			final boolean declaration) throws IOException {
+		//ID tags _may_ get special serialization; if so, these short-circuit and skip the rest of the logic
 		final String id = Tag.getId(tag).orElse(null);
 		if(id != null) {
-			if(typeTag != null) { //if a type was given, make sure it matches the implied type
-				final URI idTypeTag = Tag.getIdTypeTag(tag).orElseThrow(() -> new AssertionError("If an tag has an ID, it is assumed to have an implied type."));
-				checkArgument(idTypeTag.equals(typeTag), "Object reference with ID tag %s cannot have its implicit type given as %s to %s.", tag, idTypeTag, typeTag);
+			if(typeTag != null) { //|"id"|*Type
+				//only serialize IDs as labels if the tag is an ID type with a type tag that matches the ID tag type
+				if(Optionals.isPresentAndEquals(Tag.getIdTypeTag(tag), typeTag)) {
+					//TODO prevent both an alias and ID label from being serialized
+					appendable.append(LABEL_DELIMITER);
+					serializeString(appendable, id);
+					appendable.append(LABEL_DELIMITER);
+					serializeObject(appendable, typeTag);
+				}
+				return appendable;
+			} else { //Type#id
+				final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
+				if(idHandle != null) { //Type#id
+					appendable.append(idHandle);
+					return appendable;
+				}
 			}
-			final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
-			if(idHandle != null) { //Type#id
-				appendable.append(idHandle);
-			} else { //|"id"|*Type
-				//TODO prevent both an alias and ID label from being serialized
-				appendable.append(LABEL_DELIMITER);
-				serializeString(appendable, id);
-				appendable.append(LABEL_DELIMITER);
-				serializeObject(appendable, typeTag);
-			}
-		} else { //|<tag>|*Type
-			//TODO prevent both an alias and tag label from being serialized
-			serializeTagReference(appendable, tag);
-			if(declaration) { //if we should force the full declaration
-				serializeObject(appendable, typeTag);
-			}
+		}
+
+		//|<tag>|*Type
+		//TODO prevent both an alias and tag label from being serialized
+		serializeTagReference(appendable, tag);
+		if(declaration) { //if we should force the full declaration
+			serializeObject(appendable, typeTag);
 		}
 		return appendable;
 	}

@@ -134,43 +134,45 @@ public class TurfParserTest {
 
 		final UrfObject asTag = (UrfObject)urfObject.findPropertyValueByHandle("asTag").orElseThrow(AssertionError::new);
 		assertThat(asTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar1")));
-		assertThat(asTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
 		assertThat(asTag.findPropertyValueByHandle("test"), isPresentAndIs("first"));
 
+		final UrfObject asBareTag = (UrfObject)urfObject.findPropertyValueByHandle("asBareTag").orElseThrow(AssertionError::new);
+		assertThat(asBareTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar2")));
+		assertThat(asBareTag.findPropertyValueByHandle("test"), isEmpty());
+
 		final UrfObject asWithTypeTag = (UrfObject)urfObject.findPropertyValueByHandle("asTagWithTypeTag").orElseThrow(AssertionError::new);
-		assertThat(asWithTypeTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar2")));
+		assertThat(asWithTypeTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar3")));
 		assertThat(asWithTypeTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
-		assertThat(asWithTypeTag.findPropertyValueByHandle("test"), isPresentAndIs("second"));
+		assertThat(asWithTypeTag.findPropertyValueByHandle("test"), isPresentAndIs("third"));
 
 		final UrfObject asLabelAndTag = (UrfObject)urfObject.findPropertyValueByHandle("asLabelAndTag").orElseThrow(AssertionError::new);
-		assertThat(asLabelAndTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar3")));
+		assertThat(asLabelAndTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar4")));
 		assertThat(asLabelAndTag.getTypeTag(), isPresentAndIs(URI.create("https://example.com/Foo")));
-		assertThat(asLabelAndTag.findPropertyValueByHandle("test"), isPresentAndIs("third"));
+		assertThat(asLabelAndTag.findPropertyValueByHandle("test"), isPresentAndIs("fourth"));
 
 		final UrfObject asLabelAndHandle = (UrfObject)urfObject.findPropertyValueByHandle("asLabelAndHandle").orElseThrow(AssertionError::new);
-		assertThat(asLabelAndHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar4")));
+		assertThat(asLabelAndHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar5")));
 		assertThat(asLabelAndHandle.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Foo")));
-		assertThat(asLabelAndHandle.findPropertyValueByHandle("test"), isPresentAndIs("fourth"));
+		assertThat(asLabelAndHandle.findPropertyValueByHandle("test"), isPresentAndIs("fifth"));
 
 		final UrfObject asLabelAndNamespaceHandle = (UrfObject)urfObject.findPropertyValueByHandle("asLabelAndNamespaceHandle").orElseThrow(AssertionError::new);
-		assertThat(asLabelAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar5")));
+		assertThat(asLabelAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar6")));
 		assertThat(asLabelAndNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
-		assertThat(asLabelAndNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("fifth"));
+		assertThat(asLabelAndNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("sixth"));
 
 		final UrfObject asTagAndNamespaceHandle = (UrfObject)urfObject.findPropertyValueByHandle("asTagAndNamespaceHandle").orElseThrow(AssertionError::new);
-		assertThat(asTagAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar6")));
+		assertThat(asTagAndNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar7")));
 		assertThat(asTagAndNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
-		assertThat(asTagAndNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("sixth"));
+		assertThat(asTagAndNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("seventh"));
 
 		final UrfObject asHandle = (UrfObject)urfObject.findPropertyValueByHandle("asHandle").orElseThrow(AssertionError::new);
-		assertThat(asHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar7")));
-		assertThat(asHandle.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Foo")));
-		assertThat(asHandle.findPropertyValueByHandle("test"), isPresentAndIs("seventh"));
+		assertThat(asHandle.getTag(), isPresentAndIs(URI.create("https://urf.name/Foo#bar8")));
+		assertThat(asHandle.findPropertyValueByHandle("test"), isPresentAndIs("eighth"));
 
 		final UrfObject asNamespaceHandle = (UrfObject)urfObject.findPropertyValueByHandle("asNamespaceHandle").orElseThrow(AssertionError::new);
-		assertThat(asNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar8")));
-		assertThat(asNamespaceHandle.getTypeTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo")));
-		assertThat(asNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("eighth"));
+		assertThat(asNamespaceHandle.getTag(), isPresentAndIs(URI.create("https://example.com/one/two/Foo#bar9")));
+		assertThat(asNamespaceHandle.findPropertyValueByHandle("test"), isPresentAndIs("ninth"));
+
 	}
 
 	//TODO add bad ID test with conflicting type, e.g. 	|<https://example.com/Foo#test>|*|<https://example.com/Bar>|

@@ -609,22 +609,11 @@ public class TurfParser<R> {
 			assert findResourceByAlias(label.toString()).isPresent();
 		}
 
-		//if there was some object reference, process the object, inferring the type if needed
+		//if there was some object reference, process the object
 		if(instanceReference != null) { //TODO there may be a better way to check; maybe just see if the resource is an instance of SimpleUrfResource, or not an object resource
 			final URI tag = instanceReference.getTag().orElseThrow(() -> new AssertionError("Parsed object missing tag.")); //TODO don't we have a utility method for this supplier?
 			final URI declaredTypeTag = instanceReference.getTypeTag().orElse(null); //TODO switch to Java 9 Optional.or()
-			final URI idTypeTag = Tag.getIdTypeTag(tag).orElse(null);
-			final URI typeTag;
-			if(idTypeTag != null) { //use the implied type, if any, making sure it doesn't conflict with any declared type
-				if(declaredTypeTag != null) {
-					checkParseIO(reader, declaredTypeTag.equals(idTypeTag), "Resource with ID tag %s cannot have its implicit type redefined from %s to %s.", tag,
-							idTypeTag, declaredTypeTag);
-				}
-				typeTag = idTypeTag;
-			} else {
-				typeTag = declaredTypeTag;
-			}
-			getProcessor().declareResource(tag, typeTag);
+			getProcessor().declareResource(tag, declaredTypeTag);
 		}
 
 		//description (optional)
