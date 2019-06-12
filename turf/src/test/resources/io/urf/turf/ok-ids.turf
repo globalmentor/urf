@@ -8,32 +8,34 @@
 	  test = "first"
 	;
 
-	asTagWithTypeTag = |<https://example.com/Foo#bar2>|*|<https://example.com/Foo>|:
-	  test = "second"
-	;
+	asBareTag = |<https://example.com/Foo#bar2>|
 
-	asLabelAndTag = |"bar3"|*|<https://example.com/Foo>|:
+	asTagWithTypeTag = |<https://example.com/Foo#bar3>|*|<https://example.com/Foo>|:
 	  test = "third"
 	;
 
-	asLabelAndHandle = |"bar4"|*Foo:
+	asLabelAndTag = |"bar4"|*|<https://example.com/Foo>|:
 	  test = "fourth"
 	;
 
-	asLabelAndNamespaceHandle = |"bar5"|*count/Foo:
+	asLabelAndHandle = |"bar5"|*Foo:
 	  test = "fifth"
 	;
 
-	asTagAndNamespaceHandle = |<https://example.com/one/two/Foo#bar6>|*count/Foo:
+	asLabelAndNamespaceHandle = |"bar6"|*count/Foo:
 	  test = "sixth"
 	;
 
-	asHandle = Foo#bar7:
+	asTagAndNamespaceHandle = |<https://example.com/one/two/Foo#bar7>|*count/Foo:
 	  test = "seventh"
 	;
 
-	asNamespaceHandle = count/Foo#bar8:
+	asHandle = Foo#bar8:
 	  test = "eighth"
+	;
+
+	asNamespaceHandle = count/Foo#bar9:
+	  test = "ninth"
 	;
 
 ;

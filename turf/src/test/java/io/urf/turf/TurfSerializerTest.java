@@ -369,16 +369,25 @@ public class TurfSerializerTest {
 	public void TestSerializeObjectReference() throws IOException {
 
 		//Type#id
-		assertThat(new TurfSerializer()
-				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo"), URI.create("https://urf.name/Example"), false).toString(),
+		assertThat(new TurfSerializer().serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo"), null, false).toString(),
 				is("Example#foo"));
-		assertThat(new TurfSerializer()
-				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#123"), URI.create("https://urf.name/Example"), false).toString(),
+		assertThat(new TurfSerializer().serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#123"), null, false).toString(),
 				is("Example#123"));
-		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake").serializeObjectReference(new StringBuilder(),
-				URI.create("https://example.com/fake/Example#foo"), URI.create("https://example.com/fake/Example"), false).toString(), is("fake/Example#foo"));
+		//TODO add test for an ID that might be a valid name yet still need encoding
+		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake")
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/fake/Example#foo"), null, false).toString(), is("fake/Example#foo"));
 
 		//|"id"|*Type
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo"), URI.create("https://urf.name/Example"), false).toString(),
+				is("|\"foo\"|*Example"));
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#123"), URI.create("https://urf.name/Example"), false).toString(),
+				is("|\"123\"|*Example"));
+		assertThat(
+				new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake").serializeObjectReference(new StringBuilder(),
+						URI.create("https://example.com/fake/Example#foo"), URI.create("https://example.com/fake/Example"), false).toString(),
+				is("|\"foo\"|*fake/Example"));
 		assertThat(new TurfSerializer()
 				.serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo:bar"), URI.create("https://urf.name/Example"), false)
 				.toString(), is("|\"foo:bar\"|*Example"));
@@ -417,6 +426,8 @@ public class TurfSerializerTest {
 				.toString(), is("fake/Example*|<https://example.com/SomeType>|"));
 
 		//|<tag>|*Type
+		assertThat(new TurfSerializer().serializeObjectReference(new StringBuilder(), URI.create("https://urf.name/Example#foo:bar"), null, false).toString(),
+				is("|<https://urf.name/Example#foo:bar>|")); //ID prevents a valid name, therefore there can be no handle
 		assertThat(
 				new TurfSerializer()
 						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://urf.name/SomeType"), false).toString(),
@@ -425,6 +436,9 @@ public class TurfSerializerTest {
 				new TurfSerializer()
 						.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://urf.name/SomeType"), true).toString(),
 				is("|<https://example.com/Test>|*SomeType"));
+		assertThat(new TurfSerializer()
+				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test#foo"), URI.create("https://urf.name/SomeType"), true).toString(),
+				is("|<https://example.com/Test#foo>|*SomeType"));
 		assertThat(new TurfSerializer().registerNamespace(URI.create("https://example.com/fake/"), "fake")
 				.serializeObjectReference(new StringBuilder(), URI.create("https://example.com/Test"), URI.create("https://example.com/fake/SomeType"), true)
 				.toString(), is("|<https://example.com/Test>|*fake/SomeType"));
