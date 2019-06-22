@@ -77,7 +77,7 @@ public class Content {
 
 	/**
 	 * Retrieves the content type value as a {@link ContentType} instance. The value of the {@link #TYPE_PROPERTY_TAG} property is expected to be a resource with
-	 * an ID tag with an ID tag type of {@value #MEDIA_TYPE_CLASS_TAG}.
+	 * an ID tag with an ID tag type of <code>content-MediaType</code>.
 	 * @param description The description from which to get the property.
 	 * @return The value of the property, if any.
 	 * @throws NullPointerException if the given property tag is <code>null</code>.
@@ -92,8 +92,8 @@ public class Content {
 	}
 
 	/**
-	 * Sets the content type, using a value as a resource with the appropriate ID tag of type {@value #MEDIA_TYPE_CLASS_TAG} and an explicit type of
-	 * {@value #MEDIA_TYPE_CLASS_TAG}.
+	 * Sets the content type, using a value as a resource with the appropriate ID tag of type <code>content-MediaType</code> and an explicit type of
+	 * <code>content-MediaType</code>.
 	 * @param description The description on which to set the property.
 	 * @param contentType The media type to set.
 	 * @throws NullPointerException if the given description and/or content type is <code>null</code>.
