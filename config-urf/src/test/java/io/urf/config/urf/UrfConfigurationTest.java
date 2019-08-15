@@ -18,9 +18,11 @@ package io.urf.config.urf;
 
 import static org.junit.Assert.*;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static com.globalmentor.java.OperatingSystem.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.*;
 
@@ -85,6 +87,18 @@ public class UrfConfigurationTest {
 		map.put("foo", "bar");
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(map);
 		urfConfiguration.getString("foo..bar");
+	}
+
+	/** Test that strings are correctly converted to path objects. */
+	@Test
+	public void testFindPath() {
+		final String tempDirectorySystemProperty = System.getProperty(JAVA_IO_TMPDIR_PROPERTY);
+		final UrfObject urfObject = new UrfObject("Configuration");
+		urfObject.setPropertyValueByHandle("tempDir", tempDirectorySystemProperty);
+
+		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.hasConfigurationValue("tempDir"), is(true));
+		assertThat(urfConfiguration.getPath("tempDir"), is(Paths.get(tempDirectorySystemProperty)));
 	}
 
 }
