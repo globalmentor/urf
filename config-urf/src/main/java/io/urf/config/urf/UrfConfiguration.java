@@ -19,6 +19,7 @@ package io.urf.config.urf;
 import static com.globalmentor.java.Conditions.*;
 import static java.util.Objects.*;
 
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -76,4 +77,18 @@ public class UrfConfiguration extends AbstractObjectConfiguration {
 		return Optional.ofNullable(object);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version adds the ability to convert a {@link String} value from the URF model to a {@link Path} using {@link Paths#get(String, String...)}.
+	 */
+	@Override
+	protected <O> Optional<O> convertValue(final Optional<Object> value, final Class<O> convertClass) throws ConfigurationException {
+		if(value.isPresent()) { //TODO convert to Java 9 or()
+			final Object object = value.get();
+			if(convertClass.equals(Path.class) && object instanceof String) {
+				return Optional.of(convertClass.cast(Paths.get((String)object)));
+			}
+		}
+		return super.convertValue(value, convertClass); //if we don't recognize it, perform the default conversion
+	}
 }
