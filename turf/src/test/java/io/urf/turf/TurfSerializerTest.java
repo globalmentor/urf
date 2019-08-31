@@ -452,6 +452,32 @@ public class TurfSerializerTest {
 				is("|<https://example.com/Test>|*|<https://example.com/SomeType>|"));
 	}
 
+	//#short-hand property object descriptions
+
+	/** @see TurfTestResources#OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES */
+	@Test
+	public void testPropertyObjectDescriptions() throws IOException {
+		for(final String okPropertyObjectDescriptionsResourceName : OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES) {
+			final UrfObject urfObject = new UrfObject();
+			final UrfObject exampleObject = new UrfObject();
+			exampleObject.setPropertyValueByHandle("foo", "bar");
+			exampleObject.setPropertyValueByHandle("test", 123L);
+			urfObject.setPropertyValueByHandle("example", exampleObject);
+			final UrfObject otherObject = new UrfObject();
+			otherObject.setPropertyValueByHandle("one", true);
+			urfObject.setPropertyValueByHandle("other", otherObject);
+			for(final boolean shortPropertyObjectDescriptions : asList(false, true)) {
+				for(final boolean formatted : asList(false, true)) {
+					final TurfSerializer serializer = new TurfSerializer();
+					serializer.setShortPropertyObjectDescriptions(shortPropertyObjectDescriptions);
+					serializer.setFormatted(formatted);
+					final String serialization = serializer.serializeDocument(urfObject);
+					assertGraphsEqual(okPropertyObjectDescriptionsResourceName, parse(serialization), parseTestResource(okPropertyObjectDescriptionsResourceName));
+				}
+			}
+		}
+	}
+
 	//#n-ary properties
 
 	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME */

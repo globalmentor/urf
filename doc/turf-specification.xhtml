@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-03-07</dd>
+			<dd>Draft 2019-08-31</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -183,8 +183,9 @@
 	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error. (TODO lift restriction here and in SURF for JSON compatibility) A TURF parser must preserve all distinct values of each n-ary property.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">tag_reference</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">tag_reference</code> <code class="name">line_break</code>* ('=' <code class="name">line_break</code>* <code class="name">resource</code>) | <code class="name">description</code></li>
 	</ul>
+	<p>A TURF parser <span class="spec-must">must</span> interpret a description appearing immediately after the property tag reference as if an object with no type appeared as the resource in the property production. For example the property <code>foo:…;</code> is the short-hand equivalent of <code>foo=*:…;</code>.</p>
 	<h3>Literals</h3>
 	<p>TURF <dfn>literals</dfn> are lexical representations of tagged resources with lexical ID types. <span class="note">Any TURF literal can also be represented by indicating the resource's lexical representation in an ID label as     explained above. The literal <code>1.23</code> can also be represented as <code>|"1.23"|*urf-Number</code>, for example. If the resource canonical lexical representation is also an URF name, it may even be represented as a handle. For example the literal "<code>foo"</code> can be represented as <code>urf-String#foo</code>.</span></p>
 	<p>The following definitions in many cases delegate to the respective URF definitions of the canonical lexical representations for the respective types. The summaries of the URF canonical lexical representations when given are for informational purposes only. In addition a production rule may refer to the canonical lexical representation of an URF type. For example <code class="name">urf-EmailAddress_lex</code> refers the canonical lexical representation of the <code>urf-EmailAddress</code> type.</p>
