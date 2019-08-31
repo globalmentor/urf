@@ -714,9 +714,18 @@ public class TurfParser<R> {
 			//TODO fix; do we want to declare properties? if not, what if they are described? final UrfResource property = getProcessor().declareResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			final UrfResource property = new SimpleUrfResource(propertyTag); //TODO decide whether to declare properties
 			skipLineBreaks(reader);
-			check(reader, PROPERTY_VALUE_DELIMITER); //=
-			skipLineBreaks(reader);
-			final UrfReference value = parseResource(reader);
+			final UrfReference value;
+			if(peek(reader) == DESCRIPTION_BEGIN) { //: (short-hand property object description) 
+				final URI blankTag = Tag.generateBlank();
+				final UrfResource object = new SimpleUrfResource(blankTag, (URI)null);
+				getProcessor().declareResource(blankTag);
+				parseDescription(reader, object);
+				value = object;
+			} else { //normal property-value association
+				check(reader, PROPERTY_VALUE_DELIMITER); //=
+				skipLineBreaks(reader);
+				value = parseResource(reader);
+			}
 			getProcessor().processStatement(subject, property, value);
 			/*TODO transfer to TurfGraphProcessor
 						final Optional<Object> oldValue = subject.setPropertyValue(propertyHandle, value);

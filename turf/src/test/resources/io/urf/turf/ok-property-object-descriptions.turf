@@ -1,0 +1,10 @@
+*:
+  example = *:
+    foo = "bar"
+    test = 123
+  ;
+
+  other = *:
+    one = true
+  ;
+;

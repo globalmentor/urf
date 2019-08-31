@@ -208,44 +208,62 @@ public class TurfParserTest {
 	public void testOkRoots() throws IOException {
 		for(final String okRootResourceName : asList(OK_ROOTS_WHITESPACE_RESOURCE_NAME)) { //TODO add non-whitespace variation
 			final List<Object> roots = parseTestResource(okRootResourceName);
-			assertThat(roots, hasSize(8)); //TODO fix when references are brought back
+			assertThat(okRootResourceName, roots, hasSize(8)); //TODO fix when references are brought back
 
 			final UrfObject object1 = (UrfObject)roots.get(0);
-			assertThat(object1.getTag(), isPresentAndIs(URI.create("https://example.com/object1")));
-			assertThat(object1.findPropertyValueByHandle("info"), isPresentAndIs("first"));
+			assertThat(okRootResourceName, object1.getTag(), isPresentAndIs(URI.create("https://example.com/object1")));
+			assertThat(okRootResourceName, object1.findPropertyValueByHandle("info"), isPresentAndIs("first"));
 
 			final UrfObject object2 = (UrfObject)roots.get(1);
-			assertThat(object2.getTag(), isPresentAndIs(URI.create("https://example.com/object2")));
-			assertThat(object2.findPropertyValueByHandle("info"), isPresentAndIs("second"));
+			assertThat(okRootResourceName, object2.getTag(), isPresentAndIs(URI.create("https://example.com/object2")));
+			assertThat(okRootResourceName, object2.findPropertyValueByHandle("info"), isPresentAndIs("second"));
 			final UrfObject object2Stuff = object2.findPropertyValueByHandle("extra").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
-			assertThat(object2Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
-			assertThat(object2Stuff.findPropertyValueByHandle("test"), isPresentAndIs(222L));
+			assertThat(okRootResourceName, object2Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
+			assertThat(okRootResourceName, object2Stuff.findPropertyValueByHandle("test"), isPresentAndIs(222L));
 
 			final UrfObject object3 = (UrfObject)roots.get(2);
-			assertThat(object3.getTag(), isPresentAndIs(URI.create("https://example.com/object3")));
-			assertThat(object3.findPropertyValueByHandle("info"), isPresentAndIs("third"));
+			assertThat(okRootResourceName, object3.getTag(), isPresentAndIs(URI.create("https://example.com/object3")));
+			assertThat(okRootResourceName, object3.findPropertyValueByHandle("info"), isPresentAndIs("third"));
 			final UrfObject object3Stuff = object3.findPropertyValueByHandle("extra").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
-			assertThat(object3Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
-			assertThat(object3Stuff.findPropertyValueByHandle("test"), isPresentAndIs(333L));
+			assertThat(okRootResourceName, object3Stuff.getTypeTag(), isPresentAndIs(URF.Handle.toTag("Stuff")));
+			assertThat(okRootResourceName, object3Stuff.findPropertyValueByHandle("test"), isPresentAndIs(333L));
 
 			final UrfObject object4 = (UrfObject)roots.get(3);
-			assertThat(object4.getTag(), isEmpty());
-			assertThat(object4.findPropertyValueByHandle("info"), isPresentAndIs("fourth"));
+			assertThat(okRootResourceName, object4.getTag(), isEmpty());
+			assertThat(okRootResourceName, object4.findPropertyValueByHandle("info"), isPresentAndIs("fourth"));
 
 			final UrfObject object5 = (UrfObject)roots.get(4);
-			assertThat(object5.getTag(), isPresentAndIs(URI.create("https://example.com/object5")));
-			assertThat(object5.getTypeTag(), isPresentAndIs(URF.Handle.toTag("foo-Bar")));
-			assertThat(object5.findPropertyValueByHandle("info"), isPresentAndIs("fifth"));
+			assertThat(okRootResourceName, object5.getTag(), isPresentAndIs(URI.create("https://example.com/object5")));
+			assertThat(okRootResourceName, object5.getTypeTag(), isPresentAndIs(URF.Handle.toTag("foo-Bar")));
+			assertThat(okRootResourceName, object5.findPropertyValueByHandle("info"), isPresentAndIs("fifth"));
 
 			final UrfObject object6 = (UrfObject)roots.get(5);
-			assertThat(object6.getTag(), isEmpty());
-			assertThat(object6.findPropertyValueByHandle("info"), isPresentAndIs("fourth"));
+			assertThat(okRootResourceName, object6.getTag(), isEmpty());
+			assertThat(okRootResourceName, object6.findPropertyValueByHandle("info"), isPresentAndIs("fourth"));
 
-			assertThat(roots.get(6), is("foobar"));
+			assertThat(okRootResourceName, roots.get(6), is("foobar"));
 
 			final UrfObject object7 = (UrfObject)roots.get(7);
-			assertThat(object7.getTag(), isEmpty());
-			assertThat(object7.findPropertyValueByHandle("info"), isPresentAndIs("eighth"));
+			assertThat(okRootResourceName, object7.getTag(), isEmpty());
+			assertThat(okRootResourceName, object7.findPropertyValueByHandle("info"), isPresentAndIs("eighth"));
+		}
+	}
+
+	//#short-hand property object descriptions
+
+	/** @see TurfTestResources#OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES */
+	@Test
+	public void testPropertyObjectDescriptions() throws IOException {
+		for(final String okPropertyObjectDescriptionsResourceName : OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES) {
+			final UrfObject urfObject = (UrfObject)parseTestResource(okPropertyObjectDescriptionsResourceName).stream().findAny().orElseThrow(AssertionError::new);
+			assertThat(okPropertyObjectDescriptionsResourceName, urfObject.getPropertyCount(), is(2));
+			assertThat(okPropertyObjectDescriptionsResourceName, urfObject.findPropertyValueByHandle("example"), isPresentAnd(instanceOf(UrfObject.class)));
+			final UrfObject exampleObject = urfObject.findPropertyValueByHandle("example").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
+			assertThat(okPropertyObjectDescriptionsResourceName, exampleObject.findPropertyValueByHandle("foo"), isPresentAndIs("bar"));
+			assertThat(okPropertyObjectDescriptionsResourceName, exampleObject.findPropertyValueByHandle("test"), isPresentAndIs(123L));
+			assertThat(okPropertyObjectDescriptionsResourceName, urfObject.findPropertyValueByHandle("other"), isPresentAnd(instanceOf(UrfObject.class)));
+			final UrfObject otherObject = urfObject.findPropertyValueByHandle("other").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
+			assertThat(okPropertyObjectDescriptionsResourceName, otherObject.findPropertyValueByHandle("one"), isPresentAndIs(true));
 		}
 	}
 

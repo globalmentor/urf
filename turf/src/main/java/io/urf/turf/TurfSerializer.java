@@ -134,9 +134,7 @@ import io.urf.model.*;
  * <p>
  * The serializer should be released after use so as not to leak memory of parsed resources when resources are present with tags/IDs and/or generate aliases.
  * </p>
- * <p>
- * This implementation is not thread safe.
- * </p>
+ * @implSpec This implementation is not thread safe.
  * @author Garret Wilson
  */
 public class TurfSerializer {
@@ -199,9 +197,7 @@ public class TurfSerializer {
 
 	/**
 	 * Returns whether this serializer will format the document with additional whitespace and newlines.
-	 * <p>
-	 * This implementation defaults to no formatting.
-	 * </p>
+	 * @implSpec This implementation defaults to no formatting.
 	 * @return Whether serialization output should be formatted.
 	 */
 	public boolean isFormatted() {
@@ -238,9 +234,7 @@ public class TurfSerializer {
 
 	/**
 	 * Returns the sequence of characters used for each indention level.
-	 * <p>
-	 * This implementation defaults to the horizontal tab character.
-	 * </p>
+	 * @implSpec This implementation defaults to the horizontal tab character.
 	 * @return The character(s) used for indention.
 	 */
 	public CharSequence getIndentSequence() {
@@ -297,9 +291,7 @@ public class TurfSerializer {
 
 	/**
 	 * Returns the sequence of characters used to separate lines.
-	 * <p>
-	 * This implementation defaults to the platform-dependent line separator for the current system.
-	 * </p>
+	 * @implSpec This implementation defaults to the platform-dependent line separator for the current system.
 	 * @return The character(s) used for line endings.
 	 * @see System#lineSeparator()
 	 */
@@ -357,9 +349,7 @@ public class TurfSerializer {
 
 	/**
 	 * Whether separators will always be added between sequence items even if newlines are present.
-	 * <p>
-	 * This implementation defaults to not adding sequence separators if not needed.
-	 * </p>
+	 * @implSpec This implementation defaults to not adding sequence separators if not needed.
 	 * @return Whether sequence separators will always be added even when options.
 	 */
 	public boolean isSequenceSeparatorRequired() {
@@ -372,6 +362,25 @@ public class TurfSerializer {
 	 */
 	public void setSequenceSeparatorRequired(final boolean sequenceSeparatorRequired) {
 		this.sequenceSeparatorRequired = sequenceSeparatorRequired;
+	}
+
+	private boolean shortPropertyObjectDescriptions = true;
+
+	/**
+	 * Returns whether this serializer will use the short-hand form for serializing property values that are merely object descriptions.
+	 * @implSpec This implementation defaults to using short-hand property object descriptions.
+	 * @return Whether anonymous object description property values should be represented in short-hand form.
+	 */
+	public boolean isShortPropertyObjectDescriptions() {
+		return shortPropertyObjectDescriptions;
+	}
+
+	/**
+	 * Sets whether this serializer will use the short-hand form for serializing property values that are merely object descriptions.
+	 * @param shortPropertyObjectDescriptions If anonymous object description property values should be represented in short-hand form.
+	 */
+	public void setShortPropertyObjectDescriptions(final boolean shortPropertyObjectDescriptions) {
+		this.shortPropertyObjectDescriptions = shortPropertyObjectDescriptions;
 	}
 
 	/**
@@ -994,7 +1003,7 @@ public class TurfSerializer {
 		//serialize description if appropriate
 		if(resource instanceof UrfObject) {
 			final UrfObject urfObject = (UrfObject)resource;
-			if(urfObject.getPropertyCount() > 0) { //if there are properties (otherwise skip the {} altogether)
+			if(urfObject.hasProperties()) { //if there are properties (otherwise skip the :; altogether)
 				serializeDescription(appendable, urfObject);
 			}
 		}
@@ -1180,14 +1189,31 @@ public class TurfSerializer {
 	 */
 	public Appendable serializeProperty(@Nonnull final Appendable appendable, @Nonnull final Map.Entry<URI, Object> property) throws IOException {
 		serializeTagReference(appendable, property.getKey());
-		if(formatted) {
-			appendable.append(SPACE_CHAR);
+		final Object propertyValue = property.getValue();
+		final boolean shortObjectDescription;
+		if(propertyValue instanceof UrfObject && isShortPropertyObjectDescriptions()) {
+			final UrfObject propertyValueObject = (UrfObject)propertyValue;
+			shortObjectDescription = //in order to use the short form, the object... 
+					!propertyValueObject.getTag().isPresent() ///...must not have a tag...
+							&& !propertyValueObject.getTypeTag().isPresent() //..must not have type...
+							&& propertyValueObject.hasProperties() //...have at least one property (otherwise the empty object form is prettier)...
+							&& determineAliasForResource(propertyValue) == null; //...and not have any aliases (because we would need to serialize a label)
+		} else {
+			shortObjectDescription = false;
 		}
-		appendable.append(PROPERTY_VALUE_DELIMITER); //=
-		if(formatted) {
-			appendable.append(SPACE_CHAR);
+		if(shortObjectDescription) {
+			serializeDescription(appendable, (UrfObject)propertyValue);
+		} else {
+			if(formatted) {
+				appendable.append(SPACE_CHAR);
+			}
+			appendable.append(PROPERTY_VALUE_DELIMITER); //=
+			if(formatted) {
+				appendable.append(SPACE_CHAR);
+			}
+			serializeResource(appendable, property.getValue());
 		}
-		return serializeResource(appendable, property.getValue());
+		return appendable;
 	}
 
 	//literals
@@ -1261,9 +1287,7 @@ public class TurfSerializer {
 
 	/**
 	 * Serializes a character as content, without any delimiters.
-	 * <p>
-	 * This implementation does not escape the solidus (slash) character <code>'/'</code>, which is not required to be escaped.
-	 * </p>
+	 * @implNote This implementation does not escape the solidus (slash) character <code>'/'</code>, which is not required to be escaped.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param delimiter The delimiter that surrounds the character and which should be escaped.
 	 * @param codePoint The code point to serialize.
@@ -1334,9 +1358,7 @@ public class TurfSerializer {
 
 	/**
 	 * Serializes an IRI along with its delimiters.
-	 * <p>
-	 * This implementation serializes an IRI using an IRI short form if possible.
-	 * </p>
+	 * @implNote This implementation serializes an IRI using an IRI short form if possible.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param iri The information to be serialized as an IRI.
 	 * @return The given appendable.
@@ -1374,12 +1396,10 @@ public class TurfSerializer {
 
 	/**
 	 * Serializes a number along with its delimiter if should be represented as a decimal.
-	 * <p>
-	 * This implementation represents the following types as decimal:
-	 * </p>
-	 * <ul>
-	 * <li>{@link BigDecimal}</li>
-	 * </ul>
+	 * @implSpec This implementation represents the following types as decimal:
+	 *           <ul>
+	 *           <li>{@link BigDecimal}</li>
+	 *           </ul>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param number The information to be serialized as a number.
 	 * @return The given appendable.

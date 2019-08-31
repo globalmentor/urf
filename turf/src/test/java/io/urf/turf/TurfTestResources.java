@@ -54,6 +54,15 @@ public class TurfTestResources {
 	//#roots
 	public static final String OK_ROOTS_WHITESPACE_RESOURCE_NAME = "ok-roots-whitespace.turf";
 
+	//#short-hand property object descriptions
+	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME = "ok-property-object-descriptions.turf";
+	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_RESOURCE_NAME = "ok-property-object-descriptions-short.turf";
+	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_NO_WHITESPACE_RESOURCE_NAME = "ok-property-object-descriptions-short-no-whitespace.turf";
+
+	/** Names of TURF document resources semantically equivalent to {@value #OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME}. */
+	public static Set<String> OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES = immutableSetOf(OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME,
+			OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_RESOURCE_NAME, OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_NO_WHITESPACE_RESOURCE_NAME);
+
 	//#n-ary properties
 
 	//##one n-ary property
