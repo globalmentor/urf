@@ -25,6 +25,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import io.confound.config.*;
+import io.urf.URF;
 import io.urf.model.UrfObject;
 
 /**
@@ -32,7 +33,7 @@ import io.urf.model.UrfObject;
  * @author Garret Wilson
  * @see <a href="https://urf.io/">Uniform Resource Framework (URF)</a>
  */
-public class UrfConfiguration extends AbstractObjectConfiguration {
+public class UrfConfiguration extends AbstractObjectConfiguration implements Section {
 
 	private final Object root;
 
@@ -43,6 +44,16 @@ public class UrfConfiguration extends AbstractObjectConfiguration {
 	 */
 	public UrfConfiguration(@Nonnull final Object root) {
 		this.root = requireNonNull(root);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the handle of the root object, if the root object is an {@link UrfObject} and has a type that can be represented as a
+	 *           handle. If the root object has a type that cannot be represented as a handle, it is returned as the string form of its tag.
+	 */
+	@Override
+	public Optional<String> getSectionType() {
+		return root instanceof UrfObject ? ((UrfObject)root).getTypeTag().map(tag -> URF.Handle.fromTag(tag).orElse(tag.toString())) : Optional.empty();
 	}
 
 	//TODO override hasConfigurationKeyImpl() if can be made more efficient

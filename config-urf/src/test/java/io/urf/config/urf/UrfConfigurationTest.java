@@ -18,6 +18,7 @@ package io.urf.config.urf;
 
 import static org.junit.Assert.*;
 
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -53,6 +54,7 @@ public class UrfConfigurationTest {
 		urfObject.setPropertyValueByHandle("organization", org);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.getSectionType(), isPresentAndIs("Configuration"));
 		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));
 		assertThat(urfConfiguration.getString("foo"), is("bar"));
 		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
@@ -65,6 +67,14 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.getString("organization.address.state"), is("NY"));
 		assertThat(urfConfiguration.hasConfigurationValue("organization.address.country"), is(true));
 		assertThat(urfConfiguration.getString("organization.address.country"), is("USA"));
+	}
+
+	/** @see UrfConfiguration#getSectionType() */
+	@Test
+	public void testRootUrfObjectTypeTag() {
+		final UrfObject urfObject = new UrfObject(null, URI.create("https://example.com/foo/Bar"));
+		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.getSectionType(), isPresentAndIs("https://example.com/foo/Bar"));
 	}
 
 	@Test
