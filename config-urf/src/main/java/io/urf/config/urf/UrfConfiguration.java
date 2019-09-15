@@ -21,7 +21,6 @@ import static java.util.Objects.*;
 
 import java.nio.file.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
@@ -31,7 +30,7 @@ import io.urf.model.UrfObject;
 /**
  * Configuration implementation backed by an URF object graph.
  * @author Garret Wilson
- * @see <a href="https://io.urf/">Uniform Resource Framework (URF)</a>
+ * @see <a href="https://urf.io/">Uniform Resource Framework (URF)</a>
  */
 public class UrfConfiguration extends AbstractObjectConfiguration {
 
@@ -48,12 +47,6 @@ public class UrfConfiguration extends AbstractObjectConfiguration {
 
 	//TODO override hasConfigurationKeyImpl() if can be made more efficient
 
-	/** The delimiter for hierarchical keys. */
-	private static final char KEY_HIERARCHY_DELIMITER = '.'; //TODO consolidate; provide more Confound infrastructure for hierarchical configurations
-
-	/** The pattern for splitting out the segments of a potentially hierarchical key. */
-	private static final Pattern KEY_HIERARCHY_DELIMITER_PATTERN = Pattern.compile(Pattern.quote(String.valueOf(KEY_HIERARCHY_DELIMITER)));
-
 	/**
 	 * {@inheritDoc}
 	 * @throws IllegalArgumentException if the given key has subsequent delimiters, such as <code>"foo..bar"</code>.
@@ -61,7 +54,7 @@ public class UrfConfiguration extends AbstractObjectConfiguration {
 	@Override
 	protected Optional<Object> findConfigurationValueImpl(final String key) throws ConfigurationException {
 		Object object = root;
-		for(final String keySegment : KEY_HIERARCHY_DELIMITER_PATTERN.split(key, -1)) { //use -1 to subsequent delimiters by not discarding empty strings
+		for(final String keySegment : KEY_SEGMENTS_PATTERN.split(key, -1)) { //use -1 to subsequent delimiters by not discarding empty strings
 			checkArgument(!keySegment.isEmpty(), "Configuration key %s cannot have an empty hiararchy segment.", key);
 			if(object == null) { //if we can't go down further, continue validating the rest of the key before returning the value
 				continue;
