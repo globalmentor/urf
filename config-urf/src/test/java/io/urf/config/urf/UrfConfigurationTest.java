@@ -27,6 +27,10 @@ import static com.globalmentor.java.OperatingSystem.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.*;
 
+import com.globalmentor.net.EmailAddress;
+
+import io.confound.config.Configuration;
+import io.confound.config.Section;
 import io.urf.config.urf.UrfConfiguration;
 import io.urf.model.UrfObject;
 
@@ -38,6 +42,7 @@ public class UrfConfigurationTest {
 
 	/**
 	 * @see UrfConfiguration#getSectionRoot()
+	 * @see UrfConfiguration#getSectionName()
 	 * @see UrfConfiguration#getSectionType()
 	 */
 	@Test
@@ -94,6 +99,67 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.getBoolean("flag"), is(true));
 		assertThat(urfConfiguration.hasConfigurationValue("none"), is(false));
 		assertThat(urfConfiguration.findObject("none"), isEmpty());
+	}
+
+	/**
+	 * @see Configuration#findSection(String)
+	 * @see Configuration#getSection(String)
+	 */
+	@Test
+	public void testGetSectionObject() {
+		final UrfObject root = new UrfObject();
+		root.setPropertyValueByHandle("foo", "bar");
+
+		//simulate the INI-like section of `.gitconfig`
+		//```ini
+		//[user]
+		//  name = J. Doe
+		//  email = jdoe@example.com
+		//```
+		//```turf
+		//  user:
+		//    name = "J. Doe"
+		//    email = <jdoe@example.com>
+		//  ;
+		//```
+		final UrfObject user = new UrfObject();
+		user.setPropertyValueByHandle("name", "J. Doe");
+		user.setPropertyValueByHandle("email", EmailAddress.fromString("jdoe@example.com"));
+		root.setPropertyValueByHandle("user", user);
+
+		root.setPropertyValueByHandle("flag", Boolean.TRUE);
+
+		//add a typed section
+		final UrfObject org = new UrfObject(null, "Company");
+		org.setPropertyValueByHandle("name", "Acme Company");
+		org.setPropertyValueByHandle("size", 123);
+		root.setPropertyValueByHandle("org", org);
+
+		final UrfConfiguration urfConfiguration = new UrfConfiguration(root);
+		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));
+		assertThat(urfConfiguration.getString("foo"), is("bar"));
+		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
+		assertThat(urfConfiguration.getBoolean("flag"), is(true));
+		assertThat(urfConfiguration.hasConfigurationValue("none"), is(false));
+		assertThat(urfConfiguration.findObject("none"), isEmpty());
+
+		assertThat(urfConfiguration.hasConfigurationValue("user"), is(true));
+		assertThat(urfConfiguration.findSection("user"), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("user", Section.class), isPresentAnd(instanceOf(Section.class)));
+		final Section userSection = urfConfiguration.getSection("user");
+		assertThat(userSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
+		assertThat(userSection.getSectionType(), isEmpty());
+		assertThat(userSection.getString("name"), is("J. Doe"));
+		assertThat(userSection.getObject("email", EmailAddress.class), is(EmailAddress.fromString("jdoe@example.com")));
+
+		assertThat(urfConfiguration.hasConfigurationValue("org"), is(true));
+		assertThat(urfConfiguration.findSection("org"), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("org", Section.class), isPresentAnd(instanceOf(Section.class)));
+		final Section orgSection = urfConfiguration.getSection("org");
+		assertThat(orgSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
+		assertThat(orgSection.getSectionType(), isPresentAndIs("Company"));
+		assertThat(orgSection.getString("name"), is("Acme Company"));
+		assertThat(orgSection.getInt("size"), is(123));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

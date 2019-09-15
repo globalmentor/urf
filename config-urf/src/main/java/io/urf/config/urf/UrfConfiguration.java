@@ -37,18 +37,18 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 
 	private final Object root;
 
-	/** A reference to the root configuration, or <code>null</code> if this configuration is the root configuration. */
-	private final Configuration rootConfiguration;
+	/** A reference to the root configuration for the section, or <code>null</code> if this configuration is the section root. */
+	private final Configuration sectionRoot;
 
 	@Override
 	public Configuration getSectionRoot() {
-		return rootConfiguration != null ? rootConfiguration : this;
+		return sectionRoot != null ? sectionRoot : this;
 	}
 
 	/**
 	 * URF object graph root constructor.
 	 * @param root The root object of the URF object graph.
-	 * @throws NullPointerException if the given object is <code>null</code>.
+	 * @throws NullPointerException if the given root object is <code>null</code>.
 	 */
 	public UrfConfiguration(@Nonnull final Object root) {
 		this(null, root);
@@ -56,12 +56,12 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 
 	/**
 	 * Root configuration and URF object graph root constructor.
-	 * @param rootConfiguration A reference to the root configuration, or <code>null</code> if this configuration is the root configuration.
+	 * @param sectionRoot A reference to the root configuration for the section, or <code>null</code> if this configuration is the section root.
 	 * @param root The root object of the URF object graph.
-	 * @throws NullPointerException if the given object is <code>null</code>.
+	 * @throws NullPointerException if the given root object is <code>null</code>.
 	 */
-	protected UrfConfiguration(@Nullable Configuration rootConfiguration, @Nonnull final Object root) {
-		this.rootConfiguration = rootConfiguration;
+	protected UrfConfiguration(@Nullable Configuration sectionRoot, @Nonnull final Object root) {
+		this.sectionRoot = sectionRoot;
 		this.root = requireNonNull(root);
 	}
 
@@ -102,16 +102,26 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version adds the ability to convert a {@link String} value from the URF model to a {@link Path} using {@link Paths#get(String, String...)}.
+	 * @implSpec This version adds the ability to do the following conversions:
+	 *           <ul>
+	 *           <li>Converts {@link String} value from the URF model to a {@link Path} using {@link Paths#get(String, String...)}.</li>
+	 *           <li>Converts an {@link UrfObject} to a {@link Section}.</li>
+	 *           </ul>
 	 */
 	@Override
 	protected <O> Optional<O> convertValue(final Optional<Object> value, final Class<O> convertClass) throws ConfigurationException {
 		if(value.isPresent()) { //TODO convert to Java 9 or()
 			final Object object = value.get();
-			if(convertClass.equals(Path.class) && object instanceof String) {
+			if(convertClass.equals(Section.class) && object instanceof UrfObject) {
+				final UrfObject urfObject = (UrfObject)object;
+				//pass our section root, because this URF configuration could itself be a section of a root configuration
+				final Section section = new UrfConfiguration(getSectionRoot(), urfObject);
+				return Optional.of(convertClass.cast(section));
+			} else if(convertClass.equals(Path.class) && object instanceof String) {
 				return Optional.of(convertClass.cast(Paths.get((String)object)));
 			}
 		}
 		return super.convertValue(value, convertClass); //if we don't recognize it, perform the default conversion
 	}
+
 }
