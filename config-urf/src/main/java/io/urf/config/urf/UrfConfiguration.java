@@ -37,12 +37,31 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 
 	private final Object root;
 
+	/** A reference to the root configuration, or <code>null</code> if this configuration is the root configuration. */
+	private final Configuration rootConfiguration;
+
+	@Override
+	public Configuration getSectionRoot() {
+		return rootConfiguration != null ? rootConfiguration : this;
+	}
+
 	/**
 	 * URF object graph root constructor.
 	 * @param root The root object of the URF object graph.
 	 * @throws NullPointerException if the given object is <code>null</code>.
 	 */
 	public UrfConfiguration(@Nonnull final Object root) {
+		this(null, root);
+	}
+
+	/**
+	 * Root configuration and URF object graph root constructor.
+	 * @param rootConfiguration A reference to the root configuration, or <code>null</code> if this configuration is the root configuration.
+	 * @param root The root object of the URF object graph.
+	 * @throws NullPointerException if the given object is <code>null</code>.
+	 */
+	protected UrfConfiguration(@Nullable Configuration rootConfiguration, @Nonnull final Object root) {
+		this.rootConfiguration = rootConfiguration;
 		this.root = requireNonNull(root);
 	}
 

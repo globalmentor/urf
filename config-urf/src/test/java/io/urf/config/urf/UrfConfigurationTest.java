@@ -36,6 +36,10 @@ import io.urf.model.UrfObject;
  */
 public class UrfConfigurationTest {
 
+	/**
+	 * @see UrfConfiguration#getSectionRoot()
+	 * @see UrfConfiguration#getSectionType()
+	 */
 	@Test
 	public void testRootUrfObject() {
 		final UrfObject urfObject = new UrfObject(null, "Configuration");
@@ -54,6 +58,7 @@ public class UrfConfigurationTest {
 		urfObject.setPropertyValueByHandle("organization", org);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.getSectionRoot(), is(sameInstance(urfConfiguration)));
 		assertThat(urfConfiguration.getSectionType(), isPresentAndIs("Configuration"));
 		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));
 		assertThat(urfConfiguration.getString("foo"), is("bar"));
