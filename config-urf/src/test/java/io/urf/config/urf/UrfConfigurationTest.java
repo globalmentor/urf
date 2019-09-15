@@ -37,11 +37,11 @@ public class UrfConfigurationTest {
 
 	@Test
 	public void testRootUrfObject() {
-		final UrfObject urfObject = new UrfObject("Configuration");
+		final UrfObject urfObject = new UrfObject(null, "Configuration");
 		urfObject.setPropertyValueByHandle("foo", "bar");
 		urfObject.setPropertyValueByHandle("flag", Boolean.TRUE);
 
-		final UrfObject org = new UrfObject("Company");
+		final UrfObject org = new UrfObject(null, "Company");
 		org.setPropertyValueByHandle("name", "Acme Company");
 		org.setPropertyValueByHandle("size", 123);
 
@@ -93,7 +93,7 @@ public class UrfConfigurationTest {
 	@Test
 	public void testFindPath() {
 		final String tempDirectorySystemProperty = System.getProperty(JAVA_IO_TMPDIR_PROPERTY);
-		final UrfObject urfObject = new UrfObject("Configuration");
+		final UrfObject urfObject = new UrfObject(null, "Configuration");
 		urfObject.setPropertyValueByHandle("tempDir", tempDirectorySystemProperty);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
