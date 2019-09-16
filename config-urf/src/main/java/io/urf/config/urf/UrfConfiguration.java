@@ -104,15 +104,18 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 	 * {@inheritDoc}
 	 * @implSpec This version adds the ability to do the following conversions:
 	 *           <ul>
-	 *           <li>Converts {@link String} value from the URF model to a {@link Path} using {@link Paths#get(String, String...)}.</li>
-	 *           <li>Converts an {@link UrfObject} to a {@link Section}.</li>
+	 *           <li>Converts {@link String} value from the URF model to a {@link Path} using {@link Paths#get(String, String...)} with a {@link Path} is
+	 *           requested.</li>
+	 *           <li>Converts an {@link UrfObject} to a {@link Section} when an {@link UrfConfiguration} or any super class is requested. This means, for example,
+	 *           that merely requesting <code>Object.class</code> will convert an {@link UrfObject} to a {@link Section}. The only way to retrieve an
+	 *           {@link UrfObject} node would be to request <code>UrfObject.class</code> explicitly.</li>
 	 *           </ul>
 	 */
 	@Override
 	protected <O> Optional<O> convertValue(final Optional<Object> value, final Class<O> convertClass) throws ConfigurationException {
 		if(value.isPresent()) { //TODO convert to Java 9 or()
 			final Object object = value.get();
-			if(convertClass.equals(Section.class) && object instanceof UrfObject) {
+			if(convertClass.isAssignableFrom(UrfConfiguration.class) && object instanceof UrfObject) {
 				final UrfObject urfObject = (UrfObject)object;
 				//pass our section root, because this URF configuration could itself be a section of a root configuration
 				final Section section = new UrfConfiguration(getSectionRoot(), urfObject);

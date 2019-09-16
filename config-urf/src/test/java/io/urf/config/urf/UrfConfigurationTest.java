@@ -146,6 +146,7 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.hasConfigurationValue("user"), is(true));
 		assertThat(urfConfiguration.findSection("user"), isPresentAnd(instanceOf(Section.class)));
 		assertThat(urfConfiguration.findObject("user", Section.class), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("user", Object.class), isPresentAnd(instanceOf(Section.class)));
 		final Section userSection = urfConfiguration.getSection("user");
 		assertThat(userSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
 		assertThat(userSection.getSectionType(), isEmpty());
@@ -155,6 +156,7 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.hasConfigurationValue("org"), is(true));
 		assertThat(urfConfiguration.findSection("org"), isPresentAnd(instanceOf(Section.class)));
 		assertThat(urfConfiguration.findObject("org", Section.class), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("org", Object.class), isPresentAnd(instanceOf(Section.class)));
 		final Section orgSection = urfConfiguration.getSection("org");
 		assertThat(orgSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
 		assertThat(orgSection.getSectionType(), isPresentAndIs("Company"));
