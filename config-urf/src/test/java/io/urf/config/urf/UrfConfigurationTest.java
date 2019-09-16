@@ -18,6 +18,7 @@ package io.urf.config.urf;
 
 import static org.junit.Assert.*;
 
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -26,6 +27,10 @@ import static com.globalmentor.java.OperatingSystem.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.*;
 
+import com.globalmentor.net.EmailAddress;
+
+import io.confound.config.Configuration;
+import io.confound.config.Section;
 import io.urf.config.urf.UrfConfiguration;
 import io.urf.model.UrfObject;
 
@@ -35,13 +40,18 @@ import io.urf.model.UrfObject;
  */
 public class UrfConfigurationTest {
 
+	/**
+	 * @see UrfConfiguration#getSectionRoot()
+	 * @see UrfConfiguration#getSectionName()
+	 * @see UrfConfiguration#getSectionType()
+	 */
 	@Test
 	public void testRootUrfObject() {
-		final UrfObject urfObject = new UrfObject("Configuration");
+		final UrfObject urfObject = new UrfObject(null, "Configuration");
 		urfObject.setPropertyValueByHandle("foo", "bar");
 		urfObject.setPropertyValueByHandle("flag", Boolean.TRUE);
 
-		final UrfObject org = new UrfObject("Company");
+		final UrfObject org = new UrfObject(null, "Company");
 		org.setPropertyValueByHandle("name", "Acme Company");
 		org.setPropertyValueByHandle("size", 123);
 
@@ -53,6 +63,8 @@ public class UrfConfigurationTest {
 		urfObject.setPropertyValueByHandle("organization", org);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.getSectionRoot(), is(sameInstance(urfConfiguration)));
+		assertThat(urfConfiguration.getSectionType(), isPresentAndIs("Configuration"));
 		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));
 		assertThat(urfConfiguration.getString("foo"), is("bar"));
 		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
@@ -65,6 +77,14 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.getString("organization.address.state"), is("NY"));
 		assertThat(urfConfiguration.hasConfigurationValue("organization.address.country"), is(true));
 		assertThat(urfConfiguration.getString("organization.address.country"), is("USA"));
+	}
+
+	/** @see UrfConfiguration#getSectionType() */
+	@Test
+	public void testRootUrfObjectTypeTag() {
+		final UrfObject urfObject = new UrfObject(null, URI.create("https://example.com/foo/Bar"));
+		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
+		assertThat(urfConfiguration.getSectionType(), isPresentAndIs("https://example.com/foo/Bar"));
 	}
 
 	@Test
@@ -81,6 +101,69 @@ public class UrfConfigurationTest {
 		assertThat(urfConfiguration.findObject("none"), isEmpty());
 	}
 
+	/**
+	 * @see Configuration#findSection(String)
+	 * @see Configuration#getSection(String)
+	 */
+	@Test
+	public void testGetSectionObject() {
+		final UrfObject root = new UrfObject();
+		root.setPropertyValueByHandle("foo", "bar");
+
+		//simulate the INI-like section of `.gitconfig`
+		//```ini
+		//[user]
+		//  name = J. Doe
+		//  email = jdoe@example.com
+		//```
+		//```turf
+		//  user:
+		//    name = "J. Doe"
+		//    email = <jdoe@example.com>
+		//  ;
+		//```
+		final UrfObject user = new UrfObject();
+		user.setPropertyValueByHandle("name", "J. Doe");
+		user.setPropertyValueByHandle("email", EmailAddress.fromString("jdoe@example.com"));
+		root.setPropertyValueByHandle("user", user);
+
+		root.setPropertyValueByHandle("flag", Boolean.TRUE);
+
+		//add a typed section
+		final UrfObject org = new UrfObject(null, "Company");
+		org.setPropertyValueByHandle("name", "Acme Company");
+		org.setPropertyValueByHandle("size", 123);
+		root.setPropertyValueByHandle("org", org);
+
+		final UrfConfiguration urfConfiguration = new UrfConfiguration(root);
+		assertThat(urfConfiguration.hasConfigurationValue("foo"), is(true));
+		assertThat(urfConfiguration.getString("foo"), is("bar"));
+		assertThat(urfConfiguration.hasConfigurationValue("flag"), is(true));
+		assertThat(urfConfiguration.getBoolean("flag"), is(true));
+		assertThat(urfConfiguration.hasConfigurationValue("none"), is(false));
+		assertThat(urfConfiguration.findObject("none"), isEmpty());
+
+		assertThat(urfConfiguration.hasConfigurationValue("user"), is(true));
+		assertThat(urfConfiguration.findSection("user"), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("user", Section.class), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("user", Object.class), isPresentAnd(instanceOf(Section.class)));
+		final Section userSection = urfConfiguration.getSection("user");
+		assertThat(userSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
+		assertThat(userSection.getSectionType(), isEmpty());
+		assertThat(userSection.getString("name"), is("J. Doe"));
+		assertThat(userSection.getObject("email", EmailAddress.class), is(EmailAddress.fromString("jdoe@example.com")));
+
+		assertThat(urfConfiguration.hasConfigurationValue("org"), is(true));
+		assertThat(urfConfiguration.findSection("org"), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("org", Section.class), isPresentAnd(instanceOf(Section.class)));
+		assertThat(urfConfiguration.findObject("org", Object.class), isPresentAnd(instanceOf(Section.class)));
+		final Section orgSection = urfConfiguration.getSection("org");
+		assertThat(orgSection.getSectionRoot(), is(sameInstance(urfConfiguration)));
+		assertThat(orgSection.getSectionType(), isPresentAndIs("Company"));
+		assertThat(orgSection.getString("name"), is("Acme Company"));
+		assertThat(orgSection.getInt("size"), is(123));
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testEmptyKeySegmentError() {
 		final Map<String, Object> map = new HashMap<>();
@@ -93,7 +176,7 @@ public class UrfConfigurationTest {
 	@Test
 	public void testFindPath() {
 		final String tempDirectorySystemProperty = System.getProperty(JAVA_IO_TMPDIR_PROPERTY);
-		final UrfObject urfObject = new UrfObject("Configuration");
+		final UrfObject urfObject = new UrfObject(null, "Configuration");
 		urfObject.setPropertyValueByHandle("tempDir", tempDirectorySystemProperty);
 
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(urfObject);
