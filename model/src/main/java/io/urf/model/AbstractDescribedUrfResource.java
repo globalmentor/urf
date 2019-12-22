@@ -146,4 +146,14 @@ public abstract class AbstractDescribedUrfResource extends BaseUrfResource imple
 		super(tag, typeTag);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version includes the resource property tags and their associated values if there are any properties.
+	 */
+	@Override
+	public String toString() {
+		final String defaultString = super.toString();
+		return !propertyValuesByTag.isEmpty() ? defaultString + " " + propertyValuesByTag.toString() : defaultString;
+	}
+
 }
