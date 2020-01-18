@@ -155,7 +155,7 @@ public class Content {
 		public static ContentType toMediaType(@Nonnull final URI tag) throws IllegalArgumentException {
 			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), MEDIA_TYPE_CLASS_TAG), "Tag %s not a media type tag.", tag);
 			final String contentType = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no media type indicated."));
-			return ContentType.of(contentType);
+			return ContentType.parse(contentType);
 		}
 	}
 
