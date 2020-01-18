@@ -12,7 +12,7 @@
 <body>
 	<header>
 		<h1>Text URF (TURF) Specification</h1>
-		<aside class="important far side">Draft version.</aside>
+		<aside class="important float-end max-size-subordinate">Draft version.</aside>
 		<dl>
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
@@ -31,7 +31,7 @@
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
-	<aside class="note far third">The charset of a TURF document may therefore be deduced by examining the bytes of the document. If those bytes match the TURF signature in some charset, that is the charset of the document; otherwise, the charset is UTF-8.</aside>
+	<aside class="note float-end max-size-significant">The charset of a TURF document may therefore be deduced by examining the bytes of the document. If those bytes match the TURF signature in some charset, that is the charset of the document; otherwise, the charset is UTF-8.</aside>
 	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a TURF document <span class="spec-must">shall</span> be <code>text/urf</code> and <span class="spec-must">must</span> be encoded in UTF-8, UTF-16, or UTF-32. A TURF document <span class="spec-must-not">must not</span> begin with a byte order mark (<abbr>BOM</abbr>) or UTF-8 signature. If encoded in any encoding other than UTF-8, a TURF document <span class="spec-must">must</span> begin with a TURF <a href="#signature">signature</a>.</p>
 	<p>TURF differs from general <a href="#ref-rfc2046" class="ref">RFC 2046</a> text media types in the following: </p>
 	<ul>
@@ -44,7 +44,7 @@
 	<h2>Syntax</h2>
 	<p>The production rules in this specification reference and build upon those already defined in <a href="#ref-urf" class="ref">URF</a></p>
 	<h3>Whitespace</h3>
-	<aside class="note far third">TURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
+	<aside class="note float-end max-size-significant">TURF follows the <cite>ECMAScript® 2016</cite> definition of “WhiteSpace”. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-white-space"><cite>ECMA-262 7<sup>th</sup> Edition: 11.2 White Space</cite></a>.</span></aside>
 	<p>TURF consider the following characters as <dfn>whitespace</dfn>, including characters in the Unicode <code class="name">Space_Separator</code> (<code>Zs</code>) category.</p>
 	<ul class="spec-production">
 		<li><code class="name">whitespace</code> ⇒ <code class="name">tab</code> | <code class="name">vtab</code> | <code class="name">ff</code> | <code class="name">sp</code> | <code class="name">nbsp</code> | <code class="name">zwnbspr</code> | <code class="name">Space_Separator</code></li>
@@ -69,20 +69,20 @@
 		<li><code class="name">line_comment</code> ⇒ '!' [^<code class="name">eol</code>]*</li>
 	</ul>
 	<h3>Filler</h3>
-	<aside class="note far third">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
+	<aside class="note float-end max-size-significant">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
 	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
 	<ul class="spec-production">
 		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
 	</ul>
 	<h3>Line Breaks</h3>
-	<aside class="tip far third">A parser <span class="spec-may">may</span> simply discard line comments and parse the TURF document as if they were not present.</aside>
+	<aside class="tip float-end max-size-significant">A parser <span class="spec-may">may</span> simply discard line comments and parse the TURF document as if they were not present.</aside>
 	<p>A <dfn>line break</dfn> is any end of line surrounded on either side by filler.</p>
 	<ul class="spec-production">
 		<li><code class="name">line_break</code> ⇒ · <code class="name">eol</code> ·</li>
 	</ul>
 	<h3 id="sequence">Sequences</h3>
 	<p>Several TURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
-	<aside class="note far third">The sequence separator is a TURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
+	<aside class="note float-end max-size-significant">The sequence separator is a TURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
 	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
 	<ul class="spec-production">
 		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
@@ -97,7 +97,7 @@
 	<ul class="spec-production">
 	</ul>
 	<h3>Header</h3>
-	<figure class="far half">
+	<figure class="float-end max-size-partial">
 		<figcaption>Example TURF document with optional header, signature, and footer.</figcaption>
 		<pre class="line-numbers"><code class="language-turf">\/URF/
   space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
@@ -123,7 +123,7 @@
 	<p>For every directive corresponding to a tag in the <code>https://urf.name/space/</code> namespace, the tag name declares a namespace alias prefix to be used with handles within the document body, and the value, which <span class="spec-must">must</span> be an <code>urf-Iri</code> literal, designates the namespace with which the alias is associated. A TURF serializer <span class="spec-must">must</span> generate a header containing appropriate namespace declarations for all custom namespaces used in the document.</p>
 	<p>For example a directive handle <code>space-dc</code> indicates that <code>dc</code> is to be used as a namespace alias prefix. The example TURF document header in the figure above associates that prefix with the <code>&lt;http://purl.org/dc/elements/1.1/&gt;</code> namespace. Thus if <code>dc/creator</code> were to be used within the body of the example document above, it would indicate the tag <code>&lt;http://purl.org/dc/elements/1.1/creator&gt;</code>.</p>
 	<h3>Document Description</h3>
-	<figure class="far half">
+	<figure class="float-end max-size-partial">
 		<figcaption>Example TURF document with a document description.</figcaption>
 		<pre class="line-numbers"><code class="language-turf">\
   space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
@@ -143,7 +143,7 @@
 	<h3>Body</h3>
 	<p>The document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
 	<h3>Footer</h3>
-	<aside class="annotation far third">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>\/.../\</code> separator, forming the basis of a message stream, for example.</aside>
+	<aside class="annotation float-end max-size-significant">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>\/.../\</code> separator, forming the basis of a message stream, for example.</aside>
 	<p><em>This section is experimental.</em> The document footer, if present, explicitly indicates the end of the TURF document.</p>
 	<ul class="spec-production">
 		<li><code class="name">footer</code> ⇒ "\/./\"</li>
@@ -179,7 +179,7 @@
 	</ul>
 	<p>If a type is indicated, it represents an URF statement with the object as the subject and the identified type as the value of the <code>urf-type</code> property. If preceded by a tag reference (that is, a tag label or a equivalently a handle introduces the object), the indicated tag serves as the tag of the object.</p>
 	<h3>Descriptions</h3>
-	<aside class="annotation far third">The representation of n-ary property handles combined with syntax of TURF property assignment conveniently results in the form <code class="langauge-turf">foo+="bar"</code> which reflects the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
+	<aside class="annotation float-end max-size-significant">The representation of n-ary property handles combined with syntax of TURF property assignment conveniently results in the form <code class="langauge-turf">foo+="bar"</code> which reflects the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
 	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error. (TODO lift restriction here and in SURF for JSON compatibility) A TURF parser must preserve all distinct values of each n-ary property.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
@@ -190,7 +190,7 @@
 	<p>TURF <dfn>literals</dfn> are lexical representations of tagged resources with lexical ID types. <span class="note">Any TURF literal can also be represented by indicating the resource's lexical representation in an ID label as     explained above. The literal <code>1.23</code> can also be represented as <code>|"1.23"|*urf-Number</code>, for example. If the resource canonical lexical representation is also an URF name, it may even be represented as a handle. For example the literal "<code>foo"</code> can be represented as <code>urf-String#foo</code>.</span></p>
 	<p>The following definitions in many cases delegate to the respective URF definitions of the canonical lexical representations for the respective types. The summaries of the URF canonical lexical representations when given are for informational purposes only. In addition a production rule may refer to the canonical lexical representation of an URF type. For example <code class="name">urf-EmailAddress_lex</code> refers the canonical lexical representation of the <code>urf-EmailAddress</code> type.</p>
 	<h4>Binary</h4>
-	<aside class="annotation far side">TURF uses the binary delimiter <code>%</code> because it resembles <code>0</code> and <code>1</code>.</aside>
+	<aside class="annotation float-end max-size-subordinate">TURF uses the binary delimiter <code>%</code> because it resembles <code>0</code> and <code>1</code>.</aside>
 	<p>The TURF binary literal representation for resources with the <code>urf-Binary</code> type begins with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>) and is followed by the canonical lexical representation. <span class="info">As defined by URF, the canonical lexical representation for <code>urf-Binary</code> is zero or more bytes be encoded using the “Base 64 Encoding” defined in <a href="#ref-rfc4648" class="ref">RFC 4648</a>, beginning with the <code class="name">PERCENT SIGN</code> character <code>%</code> (<code class="unicode">U+0025</code>), using “base64url” alphabet with no Base 64 padding.</span></p>
 	<ul class="spec-production">
 		<li><code class="name">binary</code> ⇒ '%' <code class="name">urf-Binary_lex</code></li>
@@ -229,13 +229,13 @@
 	<ul class="spec-production">
 	</ul>
 	<h4>Email Address</h4>
-	<aside class="annotation far side">The caret delimiter indicating an email address resembles the paper airplane symbol representing “send email” in many user interfaces.</aside>
+	<aside class="annotation float-end max-size-subordinate">The caret delimiter indicating an email address resembles the paper airplane symbol representing “send email” in many user interfaces.</aside>
 	<p>An email address literal for the <code>urf-EmailAddress</code> type begins with the <code class="name">CIRCUMFLEX ACCENT</code> character <code>^</code> (<code class="unicode">U+005E</code>) <span class="note">commonly known as a “caret”</span>, followed by the URF canonical lexical representation: <span class="info">the “addr-spec” format specified in <a href="#ref-rfc5322" class="ref">RFC 5322</a>, without any obsolete elements, comments or folding white space</span>.</p>
 	<ul class="spec-production">
 		<li><code class="name">email</code> ⇒ '^' <code class="name">urf-EmailAddress_lex</code></li>
 	</ul>
 	<h4>IRI</h4>
-	<aside class="annotation far third"><a href="#ref-rfc3986" class="ref">RFC 3986</a> mentions that angle brackets are a common way to delimit URIs.</aside>
+	<aside class="annotation float-end max-size-significant"><a href="#ref-rfc3986" class="ref">RFC 3986</a> mentions that angle brackets are a common way to delimit URIs.</aside>
 	<p>The literal representation of <code>urf-Iri</code> is the canonical lexical representation for that type (<span class="info">from <a href="#ref-rfc3987" class="ref">RFC 3987</a></span>) placed between a <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>) and a <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>).</p>
 	<ul class="spec-production">
 		<ul>
@@ -252,10 +252,10 @@
 		<dd>The UUID is converted into a IRI with a scheme of <code>urn</code> and a URN namespace of <code>uuid</code> according to <a href="#ref-rfc4122" class="ref">RFC 4122</a>.</dd>
 	</dl>
 	<h4>Number</h4>
-	<aside class="note far third">Non-decimal TURF numbers are compatible with JSON numbers, except that TURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
+	<aside class="note float-end max-size-significant">Non-decimal TURF numbers are compatible with JSON numbers, except that TURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
 	<p>There are several related literal representations for the <code>urf-Number</code> type and its subclasses. The TURF literal production rules are more lenient than the corresponding URF canonical representations, and <span class="spec-must">must</span> be normalized. The general production rule for the <code>urf-Number</code> types is a base 10 representation that <span class="spec-may">may</span> be negative and <span class="spec-may">may</span> be fractional.</p>
 	<p>If the literal begins with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>), it represents an <code>urf-Decimal</code> instance. A TURF parser <span class="spec-must">must</span> represent a decimal instance exactly without rounding within the supported range. Specifically a TURF parser <span class="spec-must-not">must not</span> represent decimal numbers using <a href="#ref-ieee754" class="ref">IEEE 754</a>.</p>
-	<aside class="annotation far third">While JSON only has a single “number” type, its specification is sufficiently broad as to allow implementations to distinguish between integer and non-integer types based upon the presence of a decimal and/or exponent—and indeed some pure JSON implementations already make this distinction. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
+	<aside class="annotation float-end max-size-significant">While JSON only has a single “number” type, its specification is sufficiently broad as to allow implementations to distinguish between integer and non-integer types based upon the presence of a decimal and/or exponent—and indeed some pure JSON implementations already make this distinction. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
 	<p>If the literal does not begin with the <code class="name">DOLLAR SIGN</code> character <code>$</code> (<code class="unicode">U+0024</code>) it represents an instance of <code>urf-Number</code> unless it contains neither a fraction nor an exponent component, in which case it represents an instance of <code>urf-Integer</code>.</p>
 	<ul class="spec-production">
 		<li><code class="name">number</code> ⇒ ['$'] ['-'] <code class="name">whole</code> [<code class="name">fraction</code>] [<code class="name">exponent</code>]</li>
@@ -273,14 +273,14 @@
 	</ul>
 	<p>Nevertheless the presence of any leading zero(s) in the <code class="name">whole</code> component <span class="spec-must-not">shall not</span> be interpreted as indicating any other number base other than base 10.</p>
 	<h4>Regular Expression</h4>
-	<aside class="note far third">TURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that TURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
+	<aside class="note float-end max-size-significant">TURF regular expressions are syntactically identical to those defined in <cite>ECMAScript® 2016</cite>, except that TURF allows empty regular expressions. <span class="see">See <a href="http://www.ecma-international.org/ecma-262/7.0/#sec-literals-regular-expression-literals"><cite>ECMA-262 7<sup>th</sup> Edition: 11.8.5 Regular Expression Literals</cite></a>.</span></aside>
 	<p>The TURF literal representation for an <code>urf-RegularExpression</code> is its URF canonical lexical representation surrounded by slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is interpreted as as an escape character only if followed by a slash character <code>/</code>.</p>
 	<p>TODO decide on whether and how to allow flags</p>
 	<ul class="spec-production">
 		<li><code class="name">regex</code> ⇒ '/' <code class="name">urf-RegularExpression_lex</code> '/'</li>
 	</ul>
 	<h4>String</h4>
-	<aside class="note far third">Compare to <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</aside>
+	<aside class="note float-end max-size-significant">Compare to <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</aside>
 	<p>An <code>urf-String</code> literal is its URF canonical lexical representation, escaped as necessary, and delimited on both sides by the <code class="name">QUOTATION MARK</code> character <code>"</code> (<code class="unicode">U+0022</code>). The sequence of Unicode code points in a string <span class="spec-should">should</span> follow <code class="name">Normalization Form C</code> (<code>NFC</code>) as per <a href="#ref-uax15" class="ref">UAX #15</a>. The backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>) is used as as an escape character. The <code class="name">QUOTATION MARK</code> , <code class="name">REVERSE SOLIDUS</code>, and control characters <span class="spec-must-not">must not</span> appear in a string unless they are escaped. The following escape sequences are allowed:</p>
 	<dl>
 		<dt><code>\\</code></dt>
@@ -306,9 +306,9 @@
 	</dl>
 	<p> TODO production</p>
 	<h4>Telephone</h4>
-	<aside class="annotation far half"><cite>RFC 3966</cite> allows visual separators as an aid to remembering URIs. TURF's focus is representing information and thus forgoes separators in the interest of simplicity.</aside>
+	<aside class="annotation float-end max-size-partial"><cite>RFC 3966</cite> allows visual separators as an aid to remembering URIs. TURF's focus is representing information and thus forgoes separators in the interest of simplicity.</aside>
 	<p>The literal representation of <code>urf-TelephoneNumber</code> is exactly its URF canonical lexical form: <span class="info">the format prescribed by <a href="#ref-rfc3966" class="ref">RFC 3966</a>, which is a <code class="name">PLUS SIGN</code> <code>+</code> (<code class="unicode">U+002B</code>), followed by at least one digit, with no visual separators</span>. The presence of the beginning <code class="name">PLUS SIGN</code> provides a built-in TURF delimiter.</p>
-	<figure class="far half">
+	<figure class="float-end max-size-partial">
 		<figcaption>Example TURF telephone number.</figcaption>
 		<ul>
 			<li><code class="language-turf">+12015550123</code></li>
@@ -318,7 +318,7 @@
 		<li><code class="name">telephone</code> ⇒ <code class="name">urf-TelephoneNumber_lex</code></li>
 	</ul>
 	<h4>Temporal</h4>
-	<figure class="far half">
+	<figure class="float-end max-size-partial">
 		<figcaption>Example TURF temporal literals.</figcaption>
 		<ul>
 			<li><code class="language-turf">@2017-02-12T23:29:18.829Z</code></li>
@@ -336,9 +336,9 @@
 	</figure>
 	<p>The TURF literal representations for the <code>urf-Temporal</code> types are each identical to the URF canonical lexical representation for the respective type, with a prefix of the <code class="name">COMMERCIAL AT</code> character <code>@</code> (<code class="unicode">U+0040</code>). <span class="info">The URF canonical lexical representations for the most part comply with <a href="#ref-iso8601" class="ref">ISO 8601</a>, with time zones from the IANA <a href="#ref-iso8601" class="ref">TZ</a> database represented following <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="external"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</span></p>
 	<h4>UUID</h4>
-	<aside class="annotation far side">The ampersand character &amp; was chosen for UUIDs because it recalls the address-of operator of C/C++.</aside>
+	<aside class="annotation float-end max-size-subordinate">The ampersand character &amp; was chosen for UUIDs because it recalls the address-of operator of C/C++.</aside>
 	<p>A TURF literal for the <code>urf-Uuid</code> type is the <code class="name">AMPERSAND</code> character <code>&amp;</code> (<code class="unicode">U+0026</code>) followed by its URF canonical lexical representation: <span class="info">the “UUID” production of <a href="#ref-rfc4122" class="ref">RFC 4122</a></span>.</p>
-	<figure class="far third">
+	<figure class="float-end max-size-significant">
 		<figcaption>Example SURF UUID.</figcaption>
 		<ul>
 			<li><code class="language-turf">&amp;f81d4fae-7dec-11d0-a765-00a0c91e6bf6</code></li>
