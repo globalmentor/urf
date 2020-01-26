@@ -32,7 +32,7 @@ import com.globalmentor.net.ContentType;
 public class TURF {
 
 	/** The content type for TURF: <code>text/urf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(TEXT_PRIMARY_TYPE, "urf");
+	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf");
 
 	/** An extension for TURF filenames. */
 	public static final String FILENAME_EXTENSION = "turf";

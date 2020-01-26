@@ -18,6 +18,7 @@ package io.urf;
 
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.text.RegularExpressions.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
@@ -613,17 +614,15 @@ public class URF {
 		}
 
 		/**
-		 * Confirms that the given string conforms to the rules for an URF handle, returning a matcher
-		 * @param string The string to check.
-		 * @return A matcher that has successfully matched the given string.
-		 * @throws NullPointerException if the given string is <code>null</code>.
-		 * @throws IllegalArgumentException if the given string does not conform to the rules for an URF handle.
+		 * Confirms that the given input conforms to the rules for an URF handle, returning a matcher.
+		 * @param input The character sequence to check.
+		 * @return A matcher that has successfully matched the given input.
+		 * @throws NullPointerException if the given input is <code>null</code>.
+		 * @throws IllegalArgumentException if the given input does not conform to the rules for an URF handle.
 		 * @see #PATTERN
 		 */
-		public static Matcher checkArgumentMatchesValid(final String string) {
-			final Matcher matcher = PATTERN.matcher(requireNonNull(string));
-			checkArgument(matcher.matches(), "Invalid URF handle \"%s\".", string);
-			return matcher;
+		public static Matcher checkArgumentMatchesValid(final CharSequence input) {
+			return checkArgumentMatches(input, PATTERN, "Invalid URF handle \"%s\".", input);
 		}
 
 		//TODO decide whether encoding/decoding is needed, as IRIs are used

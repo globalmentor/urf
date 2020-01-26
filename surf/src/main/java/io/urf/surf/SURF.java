@@ -39,7 +39,7 @@ import com.globalmentor.net.ContentType;
 public class SURF {
 
 	/** The content type for SURF: <code>text/surf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(TEXT_PRIMARY_TYPE, "surf");
+	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "surf");
 
 	/** An extension for SURF filenames. */
 	public static final String FILENAME_EXTENSION = "surf";
