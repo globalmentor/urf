@@ -301,6 +301,16 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 
 	//TODO add tests for extended characters; bad IRIs (such as a non-absolute IRI); a test containing U+202E, as described in RFC 3987 3.2.1
 
+	/** @see SurfTestResources#OK_MEDIA_TYPES_RESOURCE_NAME */
+	@Test
+	public void testOkMediaType() throws IOException {
+		@SuppressWarnings("unchecked")
+		final SO resource = (SO)parseTestResource(OK_MEDIA_TYPES_RESOURCE_NAME).get();
+		//TODO complete test of parsed media types
+	}
+
+	//TODO add bad tests with illegal type, subtype, and parameter names
+
 	//##number
 
 	//TODO create several single-number documents to test various number components ending the document, e.g. 123 and 123.456
