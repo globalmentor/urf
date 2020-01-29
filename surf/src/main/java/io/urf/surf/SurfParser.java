@@ -797,7 +797,7 @@ public class SurfParser {
 					}
 					parameterValue = parameterValueBuilder.toString();
 				} else {
-					//Note that with the current ContentType implementation this will include control characters;
+					//Note that with the current ContentType implementation this will include any control characters;
 					//nevertheless this will be checked when the object is constructed. 
 					parameterValue = readUntil(reader, ContentType.ILLEGAL_TOKEN_CHARACTERS);
 				}

@@ -124,6 +124,11 @@ public class TURF {
 	/** The delimiter that ends IRI literal representations. */
 	public static final char IRI_END = '>';
 
+	/** The delimiter that begins media type literal representations. */
+	public static final char MEDIA_TYPE_BEGIN = '>';
+	/** The delimiter that ends media type literal representations. */
+	public static final char MEDIA_TYPE_END = '<';
+
 	/** The delimiter that begins a decimal number. */
 	public static final char NUMBER_DECIMAL_BEGIN = '$';
 	/** The symbol that delimits the fractional part of a number. */

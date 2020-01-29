@@ -82,6 +82,8 @@ public class URF {
 	public static final URI MAP_ENTRY_TYPE_TAG = NAMESPACE.resolve("MapEntry");
 	/** The tag of the <code>urf-MonthDay</code> type. */
 	public static final URI MONTH_DAY_TYPE_TAG = NAMESPACE.resolve("MonthDay");
+	/** The tag of the <code>urf-MediaType</code> type. */
+	public static final URI MEDIA_TYPE_TYPE_TAG = NAMESPACE.resolve("MediaType");
 	/** The tag of the <code>urf-Real</code> type. */
 	public static final URI NUMBER_TYPE_TAG = NAMESPACE.resolve("Number");
 	/** The tag of the <code>urf-OffsetDate</code> type. */
