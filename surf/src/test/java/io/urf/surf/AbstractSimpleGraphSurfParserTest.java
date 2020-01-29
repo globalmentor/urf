@@ -294,7 +294,6 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 		assertThat(getPropertyValue(resource, "example"), isPresentAndIs(URI.create("http://www.example.com/")));
 		assertThat(getPropertyValue(resource, "iso_8859_1"), isPresentAndIs(URI.create("http://www.example.org/Dürst")));
 		assertThat(getPropertyValue(resource, "encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
-		assertThat(getPropertyValue(resource, "encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
 		assertThat(getPropertyValue(resource, "mailto"), isPresentAndIs(URI.create("mailto:jdoe@example.com")));
 		assertThat(getPropertyValue(resource, "tel"), isPresentAndIs(URI.create("tel:+12015550123")));
 		assertThat(getPropertyValue(resource, "urn_uuid"), isPresentAndIs(URI.create("urn:uuid:5623962b-22b1-4680-ae1c-7174a46144fc")));
