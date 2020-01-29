@@ -42,6 +42,7 @@ import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
@@ -77,6 +78,10 @@ import com.globalmentor.text.ASCII;
  * <ul>
  * <li>{@link URI}</li>
  * <li>{@link URL}</li>
+ * </ul>
+ * <h3>media type</h3>
+ * <ul>
+ * <li>{@link ContentType}</li>
  * </ul>
  * <h3>number</h3>
  * <ul>
@@ -145,6 +150,7 @@ public class SurfSerializer {
 	private final static String BYTE_ARRAY_CLASS_NAME = "[B";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
+	private final static String CONTENT_TYPE_CLASS_NAME = "com.globalmentor.net.ContentType";
 	private final static String DATE_CLASS_NAME = "java.util.Date";
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
@@ -601,6 +607,10 @@ public class SurfSerializer {
 					throw new IllegalArgumentException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
 				}
 				break;
+			//##email address
+			case CONTENT_TYPE_CLASS_NAME:
+				serializeMediaType(appendable, (ContentType)resource);
+				break;
 			//##number
 			case BIG_DECIMAL_CLASS_NAME:
 			case BIG_INTEGER_CLASS_NAME:
@@ -953,6 +963,20 @@ public class SurfSerializer {
 				break;
 		}
 		return appendable.append(IRI_END);
+	}
+
+	/**
+	 * Serializes a media type along with its delimiters.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param contentType The information to be serialized as a media type.
+	 * @return The given appendable.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#MEDIA_TYPE_BEGIN
+	 * @see SURF#MEDIA_TYPE_END
+	 */
+	public static Appendable serializeMediaType(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType) throws IOException {
+		return appendable.append(MEDIA_TYPE_BEGIN).append(contentType.toString()).append(MEDIA_TYPE_END);
 	}
 
 	/**
