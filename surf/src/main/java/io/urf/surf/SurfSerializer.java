@@ -617,7 +617,7 @@ public class SurfSerializer {
 					throw new IllegalArgumentException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
 				}
 				break;
-			//##email address
+			//##media type
 			case CONTENT_TYPE_CLASS_NAME:
 				serializeMediaType(appendable, (ContentType)resource);
 				break;
