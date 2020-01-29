@@ -25,7 +25,7 @@ import javax.annotation.*;
 /**
  * Utility methods for working with SURF resources.
  * @author Garret Wilson
- * @deprecated TODO move to SurfSerializer
+ * @deprecated Moved to {@link SurfSerializer}; this class will be removed in future versions.
  */
 @Deprecated
 public class SurfResources {

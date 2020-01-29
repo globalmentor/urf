@@ -20,7 +20,6 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
 import static io.urf.surf.SURF.*;
-import static io.urf.surf.SurfResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -182,6 +181,17 @@ public class SurfSerializer {
 	private final static String YEAR__CLASS_NAME = "java.time.Year";
 	private final static String YEAR_MONTH_CLASS_NAME = "java.time.YearMonth";
 	private final static String ZONED_DATE_TIME_CLASS_NAME = "java.time.ZonedDateTime";
+
+	/**
+	 * Determines whether the given resource is a compound resource, that is, one that can contain other resources. This method returns <code>true</code> for
+	 * {@link SurfObject}, any {@link Collection}, and any {@link Map}.
+	 * @param resource The resource which may or may not be a compound resource.
+	 * @return <code>true</code> if the given resource may hold other resources.
+	 */
+	public static boolean isCompoundResource(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		return resource instanceof SurfObject || resource instanceof Collection || resource instanceof Map;
+	}
 
 	private boolean formatted = false;
 
