@@ -60,9 +60,10 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 		return urfObject.getPropertyCount();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<Object> getPropertyValue(final UrfObject urfObject, final String propertyHandle) {
-		return urfObject.findPropertyValueByHandle(propertyHandle);
+	public <T> Optional<T> getPropertyValue(final UrfObject urfObject, final String propertyHandle) {
+		return (Optional<T>)urfObject.findPropertyValueByHandle(propertyHandle);
 	}
 
 	//#labels

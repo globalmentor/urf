@@ -61,9 +61,10 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 		return surfObject.getPropertyCount();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<Object> getPropertyValue(final SurfObject surfObject, final String propertyHandle) {
-		return surfObject.getPropertyValue(propertyHandle);
+	public <T> Optional<T> getPropertyValue(final SurfObject surfObject, final String propertyHandle) {
+		return (Optional<T>)surfObject.getPropertyValue(propertyHandle);
 	}
 
 	//#labels
