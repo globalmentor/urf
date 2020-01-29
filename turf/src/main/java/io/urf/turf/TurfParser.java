@@ -68,7 +68,7 @@ import io.urf.model.*;
 public class TurfParser<R> {
 
 	/**
-	 * Represents an alias label parsed in a SURF document.
+	 * Represents an alias label parsed in a TURF document.
 	 * @author Garret Wilson
 	 */
 	private final static class Alias {
@@ -132,15 +132,15 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a SURF document from a string.
+	 * Parses a TURF document from a string.
 	 * <p>
 	 * This is a convenience method that delegates to {@link #parseDocument(Reader)}.
 	 * </p>
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @param string The string containing SURF data.
+	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
-	 * @throws IOException If there was an error reading the SURF data.
-	 * @throws ParseIOException if the SURF data was invalid.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
 		try (final Reader stringReader = new StringReader(string)) {
@@ -149,24 +149,24 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a SURF resource from an input stream.
+	 * Parses a TURF resource from an input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @param inputStream The input stream containing SURF data.
+	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
-	 * @throws IOException If there was an error reading the SURF data.
-	 * @throws ParseIOException if the SURF data was invalid.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
 		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)));
 	}
 
 	/**
-	 * Parses SURF resources from a reader.
+	 * Parses TURF resources from a reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
-	 * @throws IOException If there was an error reading the SURF data.
-	 * @throws ParseIOException if the SURF data was invalid.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
@@ -447,10 +447,10 @@ public class TurfParser<R> {
 
 	/**
 	 * Parses a resource; either a tag or a resource representation with an optional description. The next character read must be the start of the resource.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return A reference to the resource read and parsed from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
-	 * @throws ParseIOException if the SURF data was invalid.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public UrfReference parseResource(@Nonnull final Reader reader) throws IOException {
 		return parseResource(reader, true);
@@ -458,12 +458,12 @@ public class TurfParser<R> {
 
 	/**
 	 * Parses a resource; either a tag or a resource representation. The next character read must be the start of the resource.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @param allowDescription Whether a description is allowed; if <code>false</code>, any following description delimiter will not be considered part of the
 	 *          resource.
 	 * @return A reference to the resource read and parsed from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
-	 * @throws ParseIOException if the SURF data was invalid.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public UrfReference parseResource(@Nonnull final Reader reader, final boolean allowDescription) throws IOException {
 		Object label = null;
@@ -634,9 +634,9 @@ public class TurfParser<R> {
 	 * Parses an object, a described resource instance indicated by {@value TURF#OBJECT_BEGIN}. The next character read is expected to be
 	 * {@value TURF#OBJECT_BEGIN}.
 	 * @param tag The object resource's globally identifying tag, or <code>null</code> if the object has no tag.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The resource read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 * @see TURF#OBJECT_BEGIN
 	 */
 	public UrfResource parseObject(@Nullable URI tag, @Nonnull final Reader reader) throws IOException {
@@ -654,9 +654,9 @@ public class TurfParser<R> {
 	 * </p>
 	 * @param label The object label (or tag from a handle); either an {@link Alias}, a {@link URI} representing a tag IRI, or a {@link String} representing an
 	 *          ID.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The resource read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 * @see TURF#OBJECT_BEGIN
 	 */
 	protected UrfResource parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
@@ -701,9 +701,9 @@ public class TurfParser<R> {
 
 	/**
 	 * Parses the description properties of a resource. The next character read is expected to be the start of the description {@value TURF#DESCRIPTION_BEGIN}.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @param subject The resource to which properties should be added.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 * @see TURF#DESCRIPTION_BEGIN
 	 */
 	protected void parseDescription(@Nonnull final Reader reader, @Nonnull final UrfResource subject) throws IOException {
@@ -753,16 +753,16 @@ public class TurfParser<R> {
 		try {
 			return Base64.getUrlDecoder().decode(base64String);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader, "Invalid SURF binary Base64 (base64url) encoding: " + base64String, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid TURF binary Base64 (base64url) encoding: " + base64String, illegalArgumentException);
 		}
 	}
 
 	/**
 	 * Parses a Boolean value. The next character read is expected to be the start of {@link TURF#BOOLEAN_FALSE_LEXICAL_FORM} or
 	 * {@link TURF#BOOLEAN_TRUE_LEXICAL_FORM}.
-	 * @param reader The reader containing SURF data.
-	 * @return A {@link Boolean} representing the SURF boolean literal read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @param reader The reader containing TURF data.
+	 * @return A {@link Boolean} representing the TURF boolean literal read from the reader.
+	 * @throws IOException If there was an error reading the TURF data.
 	 */
 	public static Boolean parseBoolean(@Nonnull final Reader reader) throws IOException {
 		int c = peekRequired(reader); //peek the next character
@@ -893,7 +893,7 @@ public class TurfParser<R> {
 	 * Parses an email address. The current position must be that of the beginning email delimiter character. The new position will be that immediately after the
 	 * last character in the email address.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return An instance of {@link EmailAddress} representing the SURF email addresses parsed from the reader.
+	 * @return An instance of {@link EmailAddress} representing the TURF email addresses parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the email address is not in the correct format.
@@ -925,7 +925,7 @@ public class TurfParser<R> {
 		try {
 			return EmailAddress.of(localPart, domain);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader, "Invalid SURF email address format: " + localPart + EmailAddress.LOCAL_PART_DOMAIN_DELIMITER + domain,
+			throw new ParseIOException(reader, "Invalid TURF email address format: " + localPart + EmailAddress.LOCAL_PART_DOMAIN_DELIMITER + domain,
 					illegalArgumentException);
 		}
 	}
@@ -934,7 +934,7 @@ public class TurfParser<R> {
 	 * Parses an IRI. The current position must be that of the beginning IRI delimiter character. The new position will be that immediately after the ending IRI
 	 * delimiter character.
 	 * <p>
-	 * SURF IRI short forms are accepted.
+	 * TURF IRI short forms are accepted.
 	 * </p>
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return A Java {@link URI} containing the IRI parsed from the reader.
@@ -1048,7 +1048,7 @@ public class TurfParser<R> {
 		if(c == NUMBER_NEGATIVE_SYMBOL) { //-
 			stringBuilder.append(check(reader, NUMBER_NEGATIVE_SYMBOL));
 		}
-		//TODO check for beginning zero and follow final SURF octal rules
+		//TODO check for beginning zero and follow final TURF octal rules
 		readRequiredMinimumCount(reader, ASCII.DIGIT_CHARACTERS, 1, stringBuilder); //read all integer digits; there must be at least one
 		c = peek(reader); //peek the next character
 		if(c >= 0) { //if we're not at the end of the reader
@@ -1150,7 +1150,7 @@ public class TurfParser<R> {
 	 * Parses a telephone number. The current position must be that of the beginning telephone number delimiter character. The new position will be that
 	 * immediately after the last character in the telephone number.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return An instance of {@link TelephoneNumber} representing the SURF telephone number parsed from the reader.
+	 * @return An instance of {@link TelephoneNumber} representing the TURF telephone number parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the telephone number is not in the correct format.
@@ -1163,7 +1163,7 @@ public class TurfParser<R> {
 		try {
 			return TelephoneNumber.parse(telephoneNumberDigits);
 		} catch(final IllegalArgumentException illegalArgumentException) { //this should never happen with the manual parsing logic above
-			throw new ParseIOException(reader, "Invalid SURF telephone number digits: " + telephoneNumberDigits, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid TURF telephone number digits: " + telephoneNumberDigits, illegalArgumentException);
 		}
 	}
 
@@ -1323,7 +1323,7 @@ public class TurfParser<R> {
 	 * Parses a UUID. The current position must be that of the beginning UUID delimiter character. The new position will be that immediately after the last
 	 * character in the UUID.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return An instance of {@link UUID} representing the SURF UUID parsed from the reader.
+	 * @return An instance of {@link UUID} representing the TURF UUID parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the UUID is not in the correct format.
@@ -1344,7 +1344,7 @@ public class TurfParser<R> {
 		try {
 			return UUID.fromString(stringBuilder.toString());
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader, "Invalid SURF UUID contents: " + stringBuilder, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid TURF UUID contents: " + stringBuilder, illegalArgumentException);
 		}
 	}
 
@@ -1357,9 +1357,9 @@ public class TurfParser<R> {
 	 * Once the list is created, it will be associated with the given alias if any.
 	 * </p>
 	 * @param alias The resource alias, or <code>null</code> if the resource has no alias.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The list read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 */
 	public UrfResource parseListResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
 		final URI blankTag = Tag.generateBlank();
@@ -1387,9 +1387,9 @@ public class TurfParser<R> {
 	 * Once the map is created, it will be associated with the given alias if any.
 	 * </p>
 	 * @param alias The resource alias, or <code>null</code> if the resource has no alias.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The map read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 */
 	public UrfResource parseMapResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
 		final URI blankMapTag = Tag.generateBlank();
@@ -1433,9 +1433,9 @@ public class TurfParser<R> {
 	 * Once the set is created, it will be associated with the given alias if any.
 	 * </p>
 	 * @param alias The resource alias, or <code>null</code> if the resource has no alias.
-	 * @param reader The reader containing SURF data.
+	 * @param reader The reader containing TURF data.
 	 * @return The set read from the reader.
-	 * @throws IOException If there was an error reading the SURF data.
+	 * @throws IOException If there was an error reading the TURF data.
 	 */
 	public UrfResource parseSetResource(@Nullable final Alias alias, @Nonnull final Reader reader) throws IOException {
 		final URI blankTag = Tag.generateBlank();
@@ -1458,7 +1458,7 @@ public class TurfParser<R> {
 	//parsing
 
 	/**
-	 * Parses a general SURF sequence (such as a list). This method skips whitespace, comments, and sequence delimiters. For each sequence item,
+	 * Parses a general TURF sequence (such as a list). This method skips whitespace, comments, and sequence delimiters. For each sequence item,
 	 * {@link IOConsumer#accept(Object)} is called, passing the {@link Reader}, for the item to be parsed.
 	 * @param reader The reader containing the sequence to parse.
 	 * @param sequenceEnd The character expected to end the sequence.
@@ -1484,7 +1484,7 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Skips over SURF sequence delimiters in a reader. Whitespace and comments. The new position will either be the that of the first non-whitespace and non-EOL
+	 * Skips over TURF sequence delimiters in a reader. Whitespace and comments. The new position will either be the that of the first non-whitespace and non-EOL
 	 * character; or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return {@link Boolean#TRUE} if a line delimiter was encountered that requires a following item, {@link Boolean#FALSE} if a line delimiter was encountered
@@ -1509,7 +1509,7 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Skips over SURF filler in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace character
+	 * Skips over TURF filler in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace character
 	 * or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
@@ -1531,7 +1531,7 @@ public class TurfParser<R> {
 	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
 
 	/**
-	 * Skips over SURF line breaks in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace and
+	 * Skips over TURF line breaks in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace and
 	 * non-EOL character; or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
