@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-17</dd>
+			<dd>Draft 2020-01-31</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -266,8 +266,27 @@
 	<p>A resource containing associations between keys and values. Each association is represented by an instance of <a href="#urf-MapEntry"><code>urf-MapEntry</code></a>, which is a value of the <a href="#urf-member_"><code>urf-member+</code></a> property of the map resource.</p>
 	<h5 id="urf-MapEntry"><code>urf-MapEntry</code></h5>
 	<p>A resource representing a key-value mapping between the value of the <a href="#urf-key"><code>urf-key</code></a> property value <a href="#urf-value"><code>urf-value</code></a> property value.</p>
+	<h5><code>urf-MediaType</code></h5>
+	<p>A media type resource is an Internet media type described by <a href="#ref-rfc6838" class="ref">RFC 6838</a>. <em class="note">Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>.</em> Media types are lexical ID types with a canonical form that follows <a href="#ref-rfc6838" class="ref">RFC 6838</a> with the following normalizations:</p>
+	<ul>
+		<li>The type, the subtype, and each parameter name <span class="spec-must">must</span> be in lowercase.</li>
+		<li>If any value for any parameter is case-insensitive, it <span class="spec-must">must</span> be in lowercase. <span class="warning">This means that values of the <code>charset</code> parameter such as <code>UTF-8</code>, which is case insensitive and used in HTTP in both uppercase and lowercase, <span class="spec-must">must</span> be in lowercase canonical lexical form.</span></li>
+		<li>Parameters must be presented sorted primarily in lexical order of names and secondarily in lexical order of values, with no ABNF <code>WSP</code> around the parameters and their delimiters.</li>
+	</ul>
+	<p></p>
+	<p></p>
+	<aside class="note float-start max-width-partial">Media type tag examples:
+		<dl>
+			<dt><code>text/xml</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#text/xml</code></dd>
+			<dt><code>text/markdown;charset=UTF-8</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#text/markdown;charset%3Dutf-8</code></dd>
+			<dt><code>image/png</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#image%2Fpng</code></dd>
+		</dl>
+	</aside>
 	<h5 id="urf-MonthDay"><code>urf-MonthDay</code></h5>
-	<aside class="note float-end max-size-significant">The format for <code>month_day</code> conforms to an older version of <cite>ISO 8601</cite>; the most recent version does not mention a month+day format. </aside>
+	<aside class="annotation float-end max-size-significant">The format for <code>month_day</code> conforms to an older version of <cite>ISO 8601</cite>; the most recent version does not mention a month+day format. </aside>
 	<p>Represents a calendar month and day without respect to any time zone. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
 	<ul class="spec-production">
 		<li><code class="name">month_day</code> ⇒ '-' '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
@@ -393,8 +412,6 @@
 	<h4>Classes</h4>
 	<h5><code><span style="color: #222222;">content-Charset</span></code></h5>
 	<p>TODO The name of the mapping of integer values to a set of characters. This is equivalent to the <dfn>charset</dfn> Internet media type parameter described by [<a href="#rfc2046">RFC 2046</a>] and further elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset encapsulates both the concept of a <dfn>coded character set</dfn> and a <dfn>character encoding scheme</dfn>, as specified in [<a href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA Charset Registry</a>], such as <code>UTF-16BE</code>.</p>
-	<h5><code>content-MediaType</code></h5>
-	<p>TODO A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use inline namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</p>
 	<h2>References</h2>
 	<dl>
 		<dt>DCMI Namespace</dt>
@@ -407,8 +424,6 @@
 		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
 		<dt>RDF/XML</dt>
 		<dd>Dave Beckett. <a href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax Specification (Revised)</cite></a>. World Wide Web Consortium, 2006-02-10.</dd>
-		<dt>RFC 2046</dt>
-		<dd>N. Freed and N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>. Internet Engineering Task Force, 1996.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt>RFC 2130</dt>
@@ -435,6 +450,8 @@
 		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson (SJD). IETF.</dd>
 		<dt id="ref-rfc5322" class="ref-target">RFC 5322</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc5322"><cite>Internet Message Format</cite></a>, P. Resnick, Ed. (Qualcomm Incorporated). IETF.</dd>
+		<dt id="ref-rfc6838" class="ref-target">RFC 6838</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc6838"><cite>Media Type Specifications and Registration Procedures</cite></a>, N. Freed (Oracle), J. Klensin, T.Hansen (AT&amp;T Laboratories). IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
@@ -451,7 +468,7 @@
 		<li>Brad Neuberg encouraged the creation of an alternate RDF serialization.</li>
 		<li>Frank Manola made convincing arguments for using ordinals instead of integers as list element properties.</li>
 	</ul>
-	<footer><small>Copyright © 2007–2019 <a href="https://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
+	<footer><small>Copyright © 2007–2020 <a href="https://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 

@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-30</dd>
+			<dd>Draft 2020-01-31</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -45,7 +45,7 @@
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
 	<aside class="note float-end max-size-significant">The separate TURF format allows other encodings such as UTF-16 and UTF-32.</aside>
-	<p>The Internet media type (<a href="#ref-rfc2046" class="ref">RFC 2046</a>, <a href="#ref-rfc6657" class="ref">RFC 6657</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
+	<p>The Internet media type (<a href="#ref-rfc6838" class="ref">RFC 6838</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
@@ -130,7 +130,7 @@
 		<li><code class="name">resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> | <code class="name">label</code></li>
 		<li><code class="name">described_resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> · <code class="name">description</code>? | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
-		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
+		<li><code class="name">literal</code> ⇒ <code class="name">binary</code> | <code class="name">boolean</code> | <code class="name">character</code> | <code class="name">email</code> | <code class="name">iri</code> | <code class="name">media_type</code> | <code class="name">number</code> | <code class="name">regex</code> | <code class="name">string</code> | <code class="name">telephone</code> | <code class="name">temporal</code> | <code class="name">uuid</code></li>
 		<li><code class="name">collection</code> ⇒ <code class="name">list</code> | <code class="name">map</code> | <code class="name">set</code></li>
 	</ul>
 	<p> A label consists of an identifier; which is either a SURF name, a string, or an IRI; surrounded by matching <code class="name">VERTICAL LINE</code> characters <code>|</code> (<code class="unicode">U+007C</code>). The first occurrence of a label with a particular identifier <span class="spec-may">may</span> include a resource representation; if no resource representation is present at the first appearance of a label with some identifier, an object with no type and no description is implied. Subsequent appearances of a label with the same identifier <span class="spec-must-not">must not</span> include a resource representation. A nested resource representation <span class="spec-may">may</span> refer to the label of an outer resource in the graph.</p>
@@ -217,6 +217,33 @@
 		<dt><code class="name">uuid</code></dt>
 		<dd>The UUID is converted into a IRI with a scheme of <code>urn</code> and a URN namespace of <code>uuid</code> according to <a href="#ref-rfc4122" class="ref">RFC 4122</a>.</dd>
 	</dl>
+	<h4>Media Type</h4>
+	<p>A <dfn>media type</dfn>, sometimes referred to as a “content type”, indicates the type of content contained in a resource and is essential for navigating the World Wide Web. It consists of a type and subtype, optionally followed by one or more parameters.</p>
+	<aside class="note float-end max-size-partial">One of the most common media types is <code>text/html;charset=UTF-8</code> indicating an HTML document using the UTF-8 charset. In SURF this can be represented using <code>&gt;html;charset=utf-8&lt;</code>.</aside>
+	<p>SURF places the media type between the <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>) and the <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>), in that order. <em class="warning">This representation is not to be confused with that of an IRI, which uses the same delimiters but in a different order.</em></p>
+	<ul class="spec-production">
+		<li><code class="name">media_type</code> ⇒ '&gt;' <code class="name">rfc_6838_media_type</code> '&lt;'</li>
+	</ul>
+	<figure class="float-end max-size-partial">
+		<figcaption>Example SURF media types with meanings.</figcaption>
+		<dl>
+			<dt><code class="language-surf">&gt;xml&lt;</code></dt>
+			<dd><code>text/xml</code></dd>
+			<dt><code class="language-surf">&gt;markdown;charset=utf-8&lt;</code></dt>
+			<dd><code>text/markdown;charset=UTF-8</code></dd>
+			<dt><code class="language-surf">&gt;text/markdown;charset=UTF-8&lt;</code></dt>
+			<dd><code>text/markdown;charset=UTF-8</code></dd>
+			<dt><code class="language-surf">&gt;image/png&lt;</code></dt>
+			<dd><code>image/png</code></dd>
+		</dl>
+	</figure>
+	<p>The syntax of the media type is that prescribed by <a href="#ref-rfc6838" class="ref">RFC 6838</a> with the following additional restrictions and recommendations:</p>
+	<ul>
+		<li>The type, subtype, and parameter name(s) <span class="spec-should">should</span> be in lowercase.</li>
+		<li>The If the top-level type is <code>text</code>, the top-level type and its following <code class="name">SOLIDUS</code> (<code class="unicode">U+002F</code>) delimiter <span class="spec-may">may</span> be left out. For example, the media type <code>text/plain</code> <span class="spec-may">may</span> be indicated as simply <code class="language-surf">&gt;plain&lt;</code> in SURF.</li>
+		<li>The value of the <code>charset</code> parameter <span class="spec-should">should</span> be in lowercase.</li>
+		<li>If any value for any parameter other than <code>charset</code> is case-insensitive, it <span class="spec-must">must</span> be in lowercase.</li>
+	</ul>
 	<h4>Number</h4>
 	<aside class="note float-end max-size-significant">Non-decimal SURF numbers are compatible with JSON numbers, except that SURF allows leading zeros. <span class="see">See <a href="#ref-rfc7159" class="ref">RFC 7159</a>.</span></aside>
 	<aside class="note float-end max-size-significant">Examples of decimal types SURF processors <span class="spec-may">may</span> use include:
@@ -414,8 +441,6 @@
 		<dd><a href="https://ieeexplore.ieee.org/document/4610935"><cite>IEEE Standard for Floating-Point Arithmetic</cite></a>. IEEE.</dd>
 		<dt class="ref-target" id="ref-iso8601">ISO 8601:2004</dt>
 		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
-		<dt id="ref-rfc2046" class="ref-target">RFC 2046</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc2046"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>, N. Freed (Innosoft), N. Borenstein. IETF.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt id="ref-rfc3966" class="ref-target">RFC 3966</dt>
@@ -432,8 +457,8 @@
 		<dd><a href="https://tools.ietf.org/html/rfc5322"><cite>Internet Message Format</cite></a>, P. Resnick, Ed. (Qualcomm Incorporated). IETF.</dd>
 		<dt id="ref-rfc6068" class="ref-target">RFC 6068</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc6068"><cite>The 'mailto' URI Scheme</cite></a>, M. Duerst (Aoyama Gakuin University), L. Masinter (Adobe Systems Incorporated), J. Zawinski (DNA Lounge). IETF.</dd>
-		<dt id="ref-rfc6657" class="ref-target">RFC 6657</dt>
-		<dd><a href="https://tools.ietf.org/html/rfc6657"><cite>Update to MIME regarding "charset" Parameter Handling in Textual Media Types</cite></a>, A. Melnikov (Isode Limited), J. Reschke (greenbytes). IETF.</dd>
+		<dt id="ref-rfc6838" class="ref-target">RFC 6838</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc6838"><cite>Media Type Specifications and Registration Procedures</cite></a>, N. Freed (Oracle), J. Klensin, T.Hansen (AT&amp;T Laboratories). IETF.</dd>
 		<dt id="ref-rfc7159" class="ref-target">RFC 7159</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc7159"><cite id="ref-rfc7159">The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>, T. Bray (Google, Inc.). IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
@@ -441,7 +466,7 @@
 		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
 		<dd><a href="http://unicode.org/reports/tr15/"><cite>Unicode® Standard Annex #15: Unicode Normalization Forms</cite></a>, Mark Davis, Ken Whistler. The Unicode Consortium.</dd>
 	</dl>
-	<footer><small>Copyright © 2016–2019 <a href="https://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
+	<footer><small>Copyright © 2016–2020 <a href="https://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 
