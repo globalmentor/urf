@@ -31,11 +31,11 @@ import io.urf.URF.Tag;
 /**
  * Abstract base class for an URF resource that has lexical ID type. The tag and type tag are dynamically generated based upon the type and ID representation.
  * <p>
- * All implementations of this class must return an ID in {@link #getIdImpl()}.
+ * All implementations of this class must return an ID in {@link #getLexicalId()}.
  * </p>
  * @author Garret Wilson
  */
-public abstract class AbstractIdTypedUrfResource extends AbstractUrfResource {
+public abstract class AbstractLexicalIdTypeUrfResource extends AbstractUrfResource {
 
 	private final URI typeNamespace;
 
@@ -43,22 +43,21 @@ public abstract class AbstractIdTypedUrfResource extends AbstractUrfResource {
 
 	@Override
 	public Optional<URI> getTag() {
-		return Optional.of(URF.Tag.forTypeId(typeNamespace, typeName, getIdImpl()));
+		return Optional.of(URF.Tag.forTypeId(typeNamespace, typeName, getLexicalId()));
 	}
 
-	/** {@inheritDoc} This implementation calls {@link #getIdImpl()}. */
+	/** {@inheritDoc} This implementation calls {@link #getLexicalId()}. */
 	@Override
 	public Optional<String> getName() {
-		return Optional.of(Name.forTypeId(typeName, getIdImpl()));
+		return Optional.of(Name.forTypeId(typeName, getLexicalId()));
 	}
 
-	/** {@inheritDoc} This implementation calls {@link #getIdImpl()}. */
+	/** {@inheritDoc} This implementation calls {@link #getLexicalId()}. */
 	@Override
 	public final Optional<String> getId() {
-		return Optional.of(getIdImpl());
+		return Optional.of(getLexicalId());
 	}
 
-	/** {@inheritDoc} This implementation calls {@link #getIdImpl()}. */
 	@Override
 	public Optional<URI> getTypeTag() {
 		return Optional.of(URF.Tag.forType(typeNamespace, typeName));
@@ -69,7 +68,7 @@ public abstract class AbstractIdTypedUrfResource extends AbstractUrfResource {
 	 * @param typeTag The resource type tag.
 	 * @throws IllegalArgumentException if the given type tag has no namespace and/or name, or has an ID.
 	 */
-	public AbstractIdTypedUrfResource(@Nonnull final URI typeTag) {
+	public AbstractLexicalIdTypeUrfResource(@Nonnull final URI typeTag) {
 		this(Tag.getNamespace(typeTag).orElseThrow(IllegalArgumentException::new), Tag.getName(typeTag).orElseThrow(IllegalArgumentException::new));
 		checkArgument(!Tag.getId(typeTag).isPresent(), "Type tag may not contain ID.");
 	}
@@ -80,15 +79,16 @@ public abstract class AbstractIdTypedUrfResource extends AbstractUrfResource {
 	 * @param typeNamespace The resource type namespace.
 	 * @param typeName The resource type name.
 	 */
-	public AbstractIdTypedUrfResource(@Nonnull final URI typeNamespace, @Nonnull final String typeName) {
+	public AbstractLexicalIdTypeUrfResource(@Nonnull final URI typeNamespace, @Nonnull final String typeName) {
 		this.typeNamespace = requireNonNull(typeNamespace);
 		this.typeName = requireNonNull(typeName);
 	}
 
 	/**
-	 * Returns the ID of this resource for its type.
-	 * @return The ID of the resource.
+	 * Returns the lexical form of this resource for its type.
+	 * @apiNote The lexical form is equivalent to the non-optional ID of a lexical ID type resource.
+	 * @return The lexical form of the resource.
 	 */
-	protected abstract String getIdImpl();
+	public abstract String getLexicalId();
 
 }

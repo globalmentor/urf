@@ -42,7 +42,7 @@ public class UrfBinaryResource extends AbstractValueUrfResource<byte[]> {
 
 	/** {@inheritDoc} This implementation delegates to {@link #getLexicalId(byte[])}. */
 	@Override
-	protected String getIdImpl() {
+	public String getLexicalId() {
 		return getLexicalId(getValue());
 	}
 

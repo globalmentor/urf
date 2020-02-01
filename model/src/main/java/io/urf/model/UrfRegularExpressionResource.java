@@ -38,7 +38,7 @@ public class UrfRegularExpressionResource extends AbstractValueUrfResource<Patte
 
 	/** {@inheritDoc} This implementation delegates to {@link #getLexicalId(Pattern)}. */
 	@Override
-	protected String getIdImpl() {
+	public String getLexicalId() {
 		return getLexicalId(getValue());
 	}
 
