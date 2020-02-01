@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import javax.annotation.*;
 
 /**
- * An ID tagged resource for a regular expression.
+ * A lexical ID type resource for a regular expression.
  * @author Garret Wilson
  */
 public class UrfRegularExpressionResource extends AbstractValueUrfResource<Pattern> {
@@ -44,7 +44,6 @@ public class UrfRegularExpressionResource extends AbstractValueUrfResource<Patte
 
 	/**
 	 * Determines the URF lexical ID of an URF regular expression value.
-	 * 
 	 * @param value The regular expression value.
 	 * @return The lexical ID of the regular expression.
 	 */

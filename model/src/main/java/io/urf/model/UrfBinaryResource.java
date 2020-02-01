@@ -23,10 +23,10 @@ import java.util.Base64;
 import javax.annotation.*;
 
 /**
- * An ID tagged resource containing binary data.
+ * A lexical ID type resource containing binary data.
  * <p>
- * <strong>Warning:</strong> The binary value contained in this class is mutable, may be changed by any code that has access to it. It is recommended to use
- * instances of this class only temporarily in order to perform some task.
+ * <strong>Warning:</strong> The binary value contained in this class is mutable, and therefore may be changed by any code that has access to it. It is
+ * recommended to use instances of this class only temporarily in order to perform some task.
  * </p>
  * @author Garret Wilson
  */
@@ -48,7 +48,6 @@ public class UrfBinaryResource extends AbstractValueUrfResource<byte[]> {
 
 	/**
 	 * Determines the URF lexical ID of an URF binary value.
-	 * 
 	 * @param value The binary value.
 	 * @return The lexical ID of the binary value.
 	 */

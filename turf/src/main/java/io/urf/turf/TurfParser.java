@@ -509,7 +509,7 @@ public class TurfParser<R> {
 				resource = new DefaultValueUrfResource<>(IRI_TYPE_TAG, parseIRI(reader));
 				break;
 			case MEDIA_TYPE_BEGIN:
-				resource = new DefaultValueUrfResource<>(MEDIA_TYPE_TYPE_TAG, parseMediaType(reader));
+				resource = new UrfMediaTypeResource(parseMediaType(reader));
 				break;
 			case NUMBER_DECIMAL_BEGIN:
 			case NUMBER_NEGATIVE_SYMBOL:

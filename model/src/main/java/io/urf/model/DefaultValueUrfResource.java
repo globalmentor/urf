@@ -43,7 +43,6 @@ public class DefaultValueUrfResource<T> extends AbstractValueUrfResource<T> {
 
 	/**
 	 * Type namespace and type name constructor.
-	 * 
 	 * @param typeNamespace The resource type namespace.
 	 * @param typeName The resource type name.
 	 * @param value The value object encapsulated by this resource.
