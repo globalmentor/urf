@@ -47,7 +47,7 @@ public class ContentTest {
 	public void testFindContentType() {
 		final UrfObject urfObject = new UrfObject();
 		assertThat(Content.findContentType(urfObject), isEmpty());
-		urfObject.setPropertyValue(Content.TYPE_PROPERTY_TAG, new UrfObject(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3DUTF-8")));
+		urfObject.setPropertyValue(Content.TYPE_PROPERTY_TAG, new UrfObject(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3Dutf-8")));
 		assertThat(Content.findContentType(urfObject), isPresentAndIs(ContentType.parse("text/html; charset=UTF-8")));
 	}
 
@@ -57,7 +57,7 @@ public class ContentTest {
 		final UrfObject urfObject = new UrfObject();
 		Content.setContentType(urfObject, ContentType.parse("text/html; charset=UTF-8"));
 		assertThat(urfObject.findPropertyValue(Content.TYPE_PROPERTY_TAG).map(UrfObject.class::cast).flatMap(UrfObject::getTag),
-				isPresentAndIs(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3DUTF-8")));
+				isPresentAndIs(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3Dutf-8")));
 	}
 
 	//content-Charset
@@ -90,7 +90,7 @@ public class ContentTest {
 				is(Content.NAMESPACE.resolve("MediaType#application%2Fvnd.openxmlformats-officedocument.wordprocessingml.document")));
 		assertThat(Content.Tag.fromMediaType(ContentType.parse("text/html")), is(Content.NAMESPACE.resolve("MediaType#text%2Fhtml")));
 		assertThat(Content.Tag.fromMediaType(ContentType.parse("text/html;charset=UTF-8")),
-				is(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3DUTF-8")));
+				is(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3Dutf-8")));
 	}
 
 	/** @see Content.Tag#toMediaType(URI) */
@@ -102,7 +102,7 @@ public class ContentTest {
 		assertThat(Content.Tag.toMediaType(Content.NAMESPACE.resolve("MediaType#application%2Fvnd.openxmlformats-officedocument.wordprocessingml.document")),
 				is(ContentType.parse("application/vnd.openxmlformats-officedocument.wordprocessingml.document")));
 		assertThat(Content.Tag.toMediaType(Content.NAMESPACE.resolve("MediaType#text%2Fhtml")), is(ContentType.parse("text/html")));
-		assertThat(Content.Tag.toMediaType(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3DUTF-8")), is(ContentType.parse("text/html;charset=UTF-8")));
+		assertThat(Content.Tag.toMediaType(Content.NAMESPACE.resolve("MediaType#text%2Fhtml%3Bcharset%3Dutf-8")), is(ContentType.parse("text/html;charset=UTF-8")));
 	}
 
 }
