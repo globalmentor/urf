@@ -51,10 +51,10 @@ public class UrfMediaTypeResource extends AbstractValueUrfResource<ContentType> 
 		super(MEDIA_TYPE_TYPE_TAG, value);
 	}
 
-	/** {@inheritDoc} This implementation delegates to {@link #getLexicalId(ContentType)}. */
+	/** {@inheritDoc} This implementation delegates to {@link #toLexicalId(ContentType)}. */
 	@Override
 	public String getLexicalId() {
-		return getLexicalId(getValue());
+		return toLexicalId(getValue());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class UrfMediaTypeResource extends AbstractValueUrfResource<ContentType> 
 	 * @param value The regular expression value.
 	 * @return The lexical ID of the regular expression.
 	 */
-	public static String getLexicalId(@Nonnull final ContentType value) {
+	public static String toLexicalId(@Nonnull final ContentType value) {
 		final Set<ContentType.Parameter> parameters = value.getParameters();
 		final int parameterSize = parameters.size();
 		final Iterable<ContentType.Parameter> sortedParameters;

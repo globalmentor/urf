@@ -36,10 +36,10 @@ public class UrfRegularExpressionResource extends AbstractValueUrfResource<Patte
 		super(REGULAR_EXPRESSION_TYPE_TAG, value);
 	}
 
-	/** {@inheritDoc} This implementation delegates to {@link #getLexicalId(Pattern)}. */
+	/** {@inheritDoc} This implementation delegates to {@link #toLexicalId(Pattern)}. */
 	@Override
 	public String getLexicalId() {
-		return getLexicalId(getValue());
+		return toLexicalId(getValue());
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class UrfRegularExpressionResource extends AbstractValueUrfResource<Patte
 	 * @param value The regular expression value.
 	 * @return The lexical ID of the regular expression.
 	 */
-	public static String getLexicalId(@Nonnull final Pattern value) {
+	public static String toLexicalId(@Nonnull final Pattern value) {
 		//TODO add support for flags
 		return value.toString();
 	}

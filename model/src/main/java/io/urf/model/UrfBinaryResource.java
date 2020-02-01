@@ -40,10 +40,10 @@ public class UrfBinaryResource extends AbstractValueUrfResource<byte[]> {
 		super(BINARY_TYPE_TAG, value);
 	}
 
-	/** {@inheritDoc} This implementation delegates to {@link #getLexicalId(byte[])}. */
+	/** {@inheritDoc} This implementation delegates to {@link #toLexicalId(byte[])}. */
 	@Override
 	public String getLexicalId() {
-		return getLexicalId(getValue());
+		return toLexicalId(getValue());
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class UrfBinaryResource extends AbstractValueUrfResource<byte[]> {
 	 * @param value The binary value.
 	 * @return The lexical ID of the binary value.
 	 */
-	public static String getLexicalId(@Nonnull final byte[] value) {
+	public static String toLexicalId(@Nonnull final byte[] value) {
 		return Base64.getUrlEncoder().withoutPadding().encodeToString(value);
 	}
 
