@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
  * @param <T> The type of value the resource contains.
  * @author Garret Wilson
  */
-public abstract class AbstractValueUrfResource<T> extends AbstractIdTypedUrfResource implements ValueUrfResource<T> {
+public abstract class AbstractValueUrfResource<T> extends AbstractLexicalIdTypeUrfResource implements ValueUrfResource<T> {
 
 	private final T value;
 

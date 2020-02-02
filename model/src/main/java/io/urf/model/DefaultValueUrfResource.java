@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
 /**
  * The default implementation of a value URF resource.
  * <p>
- * <strong>Important:</strong> This implementation uses the value object's {@link Object#toString()} value as the resource ID. If this is not appropriate,
- * extend {@link AbstractValueUrfResource} and override {@link AbstractValueUrfResource#getIdImpl()}.
+ * <strong>Important:</strong> This implementation uses the value object's {@link Object#toString()} value as the lexical ID. If this is not appropriate, extend
+ * {@link AbstractValueUrfResource} and override {@link AbstractValueUrfResource#getLexicalId()}.
  * </p>
  * @param <T> The type of value the resource contains.
  * @author Garret Wilson
@@ -43,7 +43,6 @@ public class DefaultValueUrfResource<T> extends AbstractValueUrfResource<T> {
 
 	/**
 	 * Type namespace and type name constructor.
-	 * 
 	 * @param typeNamespace The resource type namespace.
 	 * @param typeName The resource type name.
 	 * @param value The value object encapsulated by this resource.
@@ -57,7 +56,7 @@ public class DefaultValueUrfResource<T> extends AbstractValueUrfResource<T> {
 	 * @see #getValue()
 	 */
 	@Override
-	protected final String getIdImpl() {
+	public final String getLexicalId() {
 		return getValue().toString();
 	}
 

@@ -1,0 +1,26 @@
+*:
+	xml = >xml<
+	textXml = >text/xml<
+	markdowns = [
+		>markdown;charset=utf-8<
+		>text/markdown;charset=utf-8<
+		>markdown;charset=UTF-8<
+		>text/markdown;charset=UTF-8<
+		>text/markdown; charset=utf-8<
+		>text/markdown; charset=UTF-8<
+		>TEXT/MARKDOWN; CHARSET=UTF-8<
+	]
+	json = >application/json<
+	png = >image/png<
+	threeParams = >text/plain; charset=us-ascii; foo=bar; test=example<
+	duplicateNames = >text/plain; test=foo; charset=us-ascii; test=bar<
+	!special test parameter value: `(foo)<bar>@",;:\/[foobar]?=`
+	special = >text/plain; charset=us-ascii; test="(foo)<bar>@\",;:\\/[foobar]?="<
+	!escaped test parameter value: `foo"bar	andxmore\stuff` (note horizontal tab)
+	escaped = >text/plain; charset=us-ascii; test="foo\"bar	andxmore\\stuff"<
+	webForm = >application/x-www-form-urlencoded<
+	docx = >application/vnd.openxmlformats-officedocument.wordprocessingml.document<
+	odt = >application/vnd.oasis.opendocument.text<
+	multipartForm = >multipart/form-data; charset=utf-8; boundary="q1w2e3r4ty:9-5xyz"<
+	jsonApi = >application/vnd.api+json<
+;

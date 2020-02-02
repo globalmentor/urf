@@ -39,7 +39,7 @@ import com.globalmentor.net.ContentType;
 public class SURF {
 
 	/** The content type for SURF: <code>text/surf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(TEXT_PRIMARY_TYPE, "surf");
+	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "surf");
 
 	/** An extension for SURF filenames. */
 	public static final String FILENAME_EXTENSION = "surf";
@@ -116,6 +116,11 @@ public class SURF {
 	public static final char IRI_BEGIN = '<';
 	/** The delimiter that ends IRI literal representations. */
 	public static final char IRI_END = '>';
+
+	/** The delimiter that begins media type literal representations. */
+	public static final char MEDIA_TYPE_BEGIN = '>';
+	/** The delimiter that ends media type literal representations. */
+	public static final char MEDIA_TYPE_END = '<';
 
 	/** The delimiter that begins a decimal number. */
 	public static final char NUMBER_DECIMAL_BEGIN = '$';

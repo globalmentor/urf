@@ -21,14 +21,10 @@ import static com.globalmentor.util.Optionals.*;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.Optional;
 
 import javax.annotation.*;
 
-import com.globalmentor.net.ContentType;
-
 import io.urf.URF;
-import io.urf.model.*;
 
 /**
  * The URF content vocabulary.
@@ -45,8 +41,6 @@ public class Content {
 	public static final URI CHARSET_CLASS_TAG = NAMESPACE.resolve("Charset");
 	/** The URI of the <code>content-ContentResource</code> class. */
 	public static final URI CONTENT_RESOURCE_CLASS_TAG = NAMESPACE.resolve("ContentResource");
-	/** The URI of the <code>content-MediaType</code> class. */
-	public static final URI MEDIA_TYPE_CLASS_TAG = NAMESPACE.resolve("MediaType");
 	/** The URI of the <code>content-Text</code> class. */
 	public static final URI TEXT_CLASS_TAG = NAMESPACE.resolve("Text");
 
@@ -76,36 +70,6 @@ public class Content {
 	public static final URI TYPE_PROPERTY_TAG = NAMESPACE.resolve("type");
 
 	/**
-	 * Retrieves the content type value as a {@link ContentType} instance. The value of the {@link #TYPE_PROPERTY_TAG} property is expected to be a resource with
-	 * an ID tag with an ID tag type of <code>content-MediaType</code>.
-	 * @param description The description from which to get the property.
-	 * @return The value of the property, if any.
-	 * @throws NullPointerException if the given property tag is <code>null</code>.
-	 * @throws IllegalArgumentException if the value of the content property is not a valid resource of the media type.
-	 * @see UrfResourceDescription#findPropertyValue(URI)
-	 * @see #TYPE_PROPERTY_TAG
-	 * @see Content#MEDIA_TYPE_CLASS_TAG
-	 */
-	public static Optional<ContentType> findContentType(@Nonnull final UrfResourceDescription description) {
-		return description.findPropertyValue(TYPE_PROPERTY_TAG).map(value -> checkArgumentIsInstance(value, UrfObject.class)).flatMap(UrfObject::getTag)
-				.map(Tag::toMediaType);
-	}
-
-	/**
-	 * Sets the content type, using a value as a resource with the appropriate ID tag of type <code>content-MediaType</code> and an explicit type of
-	 * <code>content-MediaType</code>.
-	 * @param description The description on which to set the property.
-	 * @param contentType The media type to set.
-	 * @throws NullPointerException if the given description and/or content type is <code>null</code>.
-	 * @see #TYPE_PROPERTY_TAG
-	 * @see Content#MEDIA_TYPE_CLASS_TAG
-	 */
-	public static void setContentType(@Nonnull final UrfResourceDescription description, @Nonnull final ContentType contentType) {
-		final UrfObject mediaTypeResource = new UrfObject(Tag.fromMediaType(contentType), MEDIA_TYPE_CLASS_TAG);
-		description.setPropertyValue(TYPE_PROPERTY_TAG, mediaTypeResource);
-	}
-
-	/**
 	 * Utilities for working with TURF tags related to content.
 	 * @author Garret Wilson
 	 */
@@ -118,6 +82,7 @@ public class Content {
 		 * @see Content#CHARSET_CLASS_TAG
 		 * @see Charset#name()
 		 */
+		@Deprecated
 		public static URI fromCharset(@Nonnull final Charset charset) {
 			return URF.Tag.forTypeId(CHARSET_CLASS_TAG, charset.name());
 		}
@@ -129,34 +94,13 @@ public class Content {
 		 * @throws IllegalArgumentException if the given tag does not represent a valid charset.
 		 * @see Content#CHARSET_CLASS_TAG
 		 */
+		@Deprecated
 		public static Charset toCharset(@Nonnull final URI tag) throws IllegalArgumentException {
 			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), CHARSET_CLASS_TAG), "Tag %s not a charset tag.", tag);
 			final String charsetName = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no charset indicated."));
 			return Charset.forName(charsetName);
 		}
 
-		/**
-		 * Creates an ID tag for an instance of {@link ContentType}.
-		 * @param mediaType The Internet media type to represent.
-		 * @return A tag for the given media type.
-		 * @see Content#MEDIA_TYPE_CLASS_TAG
-		 */
-		public static URI fromMediaType(@Nonnull final ContentType mediaType) {
-			return URF.Tag.forTypeId(MEDIA_TYPE_CLASS_TAG, mediaType.toString());
-		}
-
-		/**
-		 * Determines the media type represented by the tag.
-		 * @param tag The tag to convert to a media type.
-		 * @return The tag indicated media type.
-		 * @throws IllegalArgumentException if the given tag does not represent a valid media type.
-		 * @see Content#MEDIA_TYPE_CLASS_TAG
-		 */
-		public static ContentType toMediaType(@Nonnull final URI tag) throws IllegalArgumentException {
-			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), MEDIA_TYPE_CLASS_TAG), "Tag %s not a media type tag.", tag);
-			final String contentType = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no media type indicated."));
-			return ContentType.of(contentType);
-		}
 	}
 
 }

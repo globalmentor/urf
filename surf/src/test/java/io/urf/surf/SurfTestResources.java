@@ -92,6 +92,9 @@ public class SurfTestResources {
 	//##IRI
 	public static final String OK_IRIS_RESOURCE_NAME = "ok-iris.surf";
 
+	//##media type
+	public static final String OK_MEDIA_TYPES_RESOURCE_NAME = "ok-media-types.surf";
+
 	//##number
 	public static final String OK_NUMBERS_RESOURCE_NAME = "ok-numbers.surf";
 

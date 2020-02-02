@@ -12,12 +12,12 @@
 <body>
 	<header>
 		<h1>Uniform Resource Framework (URF) Specification</h1>
-		<aside class="important far side">Draft version.</aside>
+		<aside class="important float-end max-size-subordinate">Draft version.</aside>
 		<dl>
 			<dt>Author</dt>
-			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="http://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
+			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2019-01-17</dd>
+			<dd>Draft 2020-02-01</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -41,7 +41,7 @@
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Model</h2>
-	<aside class="note far half">Examples of resources:
+	<aside class="note float-end max-size-partial">Examples of resources:
 		<ul>
 			<li>The web page at <code>https://www.example.com/trees.html</code>.</li>
 			<li>The book <cite>A Tale of Trees</cite>.</li>
@@ -56,7 +56,7 @@
 		<figcaption>A resource.</figcaption> <img src="images/resource-diagram.svg" alt="URF resource." />
 	</figure>
 	<h3>Statements </h3>
-	<figure class="far third">
+	<figure class="float-end max-size-significant">
 		<figcaption>Statements assert that resources have property values.</figcaption> <img src="images/resource-property-value-diagram.svg" alt="URF resource, property, and value." />
 	</figure>
 	<p>Resources are described by a set of <dfn>statements</dfn>, each claiming that some resource <dfn>subject</dfn> has a <dfn>property</dfn> with some <dfn>property value</dfn>.</p>
@@ -70,7 +70,7 @@
 		</ul>
 	</aside>
 	<h3>Tags</h3>
-	<aside class="note far half">Examples of tags:
+	<aside class="note float-end max-size-partial">Examples of tags:
 		<dl>
 			<dt><code>https://www.example.com/trees.html</code></dt>
 			<dd>A web page about trees.</dd>
@@ -103,7 +103,7 @@
 	<h4>IDs</h4>
 	<p>A tag that contains a fragment identifier is referred to as an <dfn>ID tag</dfn>, and the decoded fragment part of the name is considered the <dfn>ID</dfn> of the resource, whether or the resource has a name. Thus  the resource with the tag <code>https://urf.name/Tree#456</code> has the ID <code>456</code>, the the resource <code>https://urf.name/urf/String#foo:bar</code> has the ID <code>foo:bar</code>, even though the latter resource has no name.</p>
 	<h4>Namespaces</h4>
-	<aside class="annotation far half">The URF definition of a namespace implies that a namespace must end in the slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). <span class="error">This disallows namespaces ending in the <code class="name">NUMBER SIGN</code> character <code>#</code> (<code class="unicode">U+0023</code>) such as <code>http://www.w3.org/2001/XMLSchema#</code>, which appears in other specifications such as XML and RDF.</span></aside>
+	<aside class="annotation float-end max-size-partial">The URF definition of a namespace implies that a namespace must end in the slash or <code class="name">SOLIDUS</code> character <code>/</code> (<code class="unicode">U+002F</code>). <span class="error">This disallows namespaces ending in the <code class="name">NUMBER SIGN</code> character <code>#</code> (<code class="unicode">U+0023</code>) such as <code>http://www.w3.org/2001/XMLSchema#</code>, which appears in other specifications such as XML and RDF.</span></aside>
 	<p>For those resources with names, the remaining part of the tag path (the part before the last path component) is considered the <dfn>namespace</dfn> of the resource. Namespaces <span class="spec-should">should</span> be used to group resources with related semantics.</p>
 	<p>Each additional path component of a tag path indicates a <dfn>subnamespace</dfn> inside the previous namespace. Thus the namespace identified by the IRI <code>https://urf.name/bio/</code> is a subnamespace of that identified by <code>https://urf.name/</code>. Each subnamespace path component <span class="spec-should">should</span> follow the syntax rules of a base name.</p>
 	<h5>Ad Hoc Namespace</h5>
@@ -123,9 +123,9 @@
 	<h5>Formal Namespaces</h5>
 	<p>All other namespaces constitute <dfn>formal namespaces</dfn> defined by third parties. For example, the <a href="http://dublincore.org/" class="external">Dublin Core Metadata Initiative</a> defines the formal namespace <code>http://purl.org/dc/elements/1.1/</code> for information in the <a href="http://www.dublincore.org/documents/dces/" class="external"><cite>Dublin Core Metadata Element Set, Version 1.1</cite></a>.</p>
 	<h4>Handles</h4>
-	<aside class="annotation far half">The handle prefix delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes" class="external"><cite>HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="external"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The URF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="external"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
+	<aside class="annotation float-end max-size-partial">The handle prefix delimiter <code>-</code> is meant to parallel that used by <a href="https://www.w3.org/TR/html5/dom.html#embedding-custom-non-visible-data-with-the-data-*-attributes" class="external"><cite>HTML5 <code>data-*</code> attributes</cite></a>, that used by <a href="https://www.w3.org/TR/custom-elements/" class="external"><cite>HTML Custom Elements</cite></a>, as well as naming conventions such as used for npm packages and Maven artifacts. The URF informal namespace prefix mechanism attempts to strike a balance between the complex, draconian URL associations of <a href="https://www.w3.org/TR/REC-xml-names/" class="external"><cite>Namespaces in XML 1.0</cite></a> and a lackadaisical, free-for-all identifier situation such as in JSON.</aside>
 	<p>A <dfn>handle</dfn> represents a shorter yet unambiguous string representation of a resource tag. For tags in the <code>https://urf.name/urf/</code> namespace or one of its subnamespaces, the resource handle is the same as its name, with zero or more <dfn>segments</dfn> prepended, each separated by the <code class="name">HYPHEN-MINUS</code> character <code>-</code> (<code class="unicode">U+002D</code>). Each segment represents the decoded path statement of the <code>https://urf.name/urf/</code> (sub)namespace, provided each segment meets the <code class="name">name_token</code> production.</p>
-	<aside class="note far half">Examples of handles along with the IRIs they represent.
+	<aside class="note float-end max-size-partial">Examples of handles along with the IRIs they represent.
 		<dl>
 			<dt><code>color</code></dt>
 			<dd><code>https://urf.name/color</code></dd>
@@ -150,20 +150,20 @@
 		<li><code class="name">segment</code> ⇒ <code class="name">name_token</code></li>
 	</ul>
 	<h4>Blank Tags</h4>
-	<aside class="annotation far third">RDF has an analogous concept to a blank tag, which it calls a “<a href="https://www.w3.org/TR/rdf11-concepts/#section-skolemization" class="external">Skolem IRI</a>”.</aside>
+	<aside class="annotation float-end max-size-significant">RDF has an analogous concept to a blank tag, which it calls a “<a href="https://www.w3.org/TR/rdf11-concepts/#section-skolemization" class="external">Skolem IRI</a>”.</aside>
 	<p>If a resource has no tag, but a system has a need for some stronger identification in some context, a system may generate a <dfn>blank tag</dfn> to represent the resource. A blank tag is formed by resolving some IRI fragment identifier to the IRI <code>https://urf.name/urf/</code>. The fragment identifier <span class="spec-must">must</span> be unique for all blank tags within the context with which the blank tag will be shared. For example, a system might choose to generate a UUID according to <a href="#ref-rfc4122" class="ref">RFC 4122</a> as the fragment identifier, forming the blank tag <code>https://urf.name/urf/#330dca65-c7aa-49ab-b691-70af2b60ce03</code>. <span class="note">Although blank tags have IDs, they are not in the <code>https://urf.name/urf/</code> namespace—and indeed have no namespace—as blank tags have no names.</span></p>
 	<h3>Types</h3>
 	<p>Each URF resource is the instance of some type. If a resource is not an instance of any more specific type, it is of type <code>urf-Resource</code>.</p>
 	<h4>ID Tag Types</h4>
 	<p>An ID tag indicates both the unique tag and the type of the resource, with the type being the part of the tag with the fragment removed. For example, the resource identified by the tag <code>https://urf.name/Tree#456</code> (<code>Tree#456</code>) is of type <code>Tree</code> (itself a resource, identified by the tag <code>https://urf.name/Tree</code>). The resource ID <span class="spec-must">must</span> be globally unique across all resources of the same type. <span class="warning">A resource ID will likely not be globally unique for resources of other types.</span></p>
 	<h4>Lexical ID Types</h4>
-	<aside class="annotation far half">URF, unlike RDF, has no so-called “literal” type. All things described in URF are resources, plain and simple. The integer 5 is just as much a resource as the web page <code>https://www.example.com/trees.html</code>. The integer 5 does have a convenient tag <code>https://urf.name/urf/urf-Integer#5</code> which indicates both its type and lexical representation, but that does not make it a different “thing” in the URF model.</aside>
+	<aside class="annotation float-end max-size-partial">URF, unlike RDF, has no so-called “literal” type. All things described in URF are resources, plain and simple. The integer 5 is just as much a resource as the web page <code>https://www.example.com/trees.html</code>. The integer 5 does have a convenient tag <code>https://urf.name/urf/urf-Integer#5</code> which indicates both its type and lexical representation, but that does not make it a different “thing” in the URF model.</aside>
 	<p>The resources of some types are identified by ID tags that use the canonical lexical representation of the resource as the resource ID. For example, the <code>urf-Boolean</code> value <code>true</code> is identified by the tag <code>https://urf.name/urf/Boolean#true</code> (<code>urf-Boolean#true</code>). Similarly the integer <code>5</code>, which in URF is an instance of the <code>urf-Integer</code> type, is identified by the tag <code>https://urf.name/urf/urf-Integer#5</code> (<code>urf-Integer#5</code>).</p>
 	<h4>Classes</h4>
 	<p>Resources that define types are called <dfn>classes</dfn> and are instances of the resource <code>urf-Class</code>, which is itself instance of <code>urf-Class</code>. A class can be a specialization or <dfn>subclass</dfn> of another class. The class <code>urf-Integer</code>, for example, is a subclass of <code>urf-Number</code>. The class <code>urf-Class</code> is a subclass of <code>urf-Resource</code>.</p>
 	<h3>Properties</h3>
 	<p>Each resource has zero or more properties. Each property is a resource and must have a tag. Each property forms a statement by associating a subject resource with of a single property value, a resource which may be anonymous.</p>
-	<aside class="annotation far third">n-ary properties could be considered “additive” properties because of the way they are merged, and their representation with an ending <code class="name">PLUS SIGN</code> (e.g. <code>foo+</code>) reflects this. Conveniently the TURF syntax for assigning an n-ary property value by handle results in <code class="langauge-turf">foo+="bar"</code> which intuitively reflects the “additive” nature by recalling the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
+	<aside class="annotation float-end max-size-significant">n-ary properties could be considered “additive” properties because of the way they are merged, and their representation with an ending <code class="name">PLUS SIGN</code> (e.g. <code>foo+</code>) reflects this. Conveniently the TURF syntax for assigning an n-ary property value by handle results in <code class="langauge-turf">foo+="bar"</code> which intuitively reflects the “additive” nature by recalling the addition assignment operator <code>+=</code> in programming languages such as C/C++.</aside>
 	<p>If the base name of a property ends in the <code class="name">PLUS SIGN</code> <code>+</code> (<code class="unicode">U+002B</code>), it is considered an <dfn>n-ary property</dfn>, representing a one-to-many relationship between a subject and a property value. Otherwise the property is a <dfn>binary property</dfn>, representing a one-to-one relationship between a subject and a property value. An n-ary property <span class="spec-may">may</span> associate the same subject with more than one value in an URF instance, while a binary property <span class="spec-must">must</span> associate a subject with at most one value.</p>
 	<h4>Merging</h4>
 	<p>To <dfn>merge</dfn> two URF instances is to combine the contents of the source URF instance with the contents of the destination URF instance to produce a result URF instance. The presence of a binary property for the same subject in a source URF instance <span class="spec-should">should</span> replace the value for property of the same subject in the destination URF instance. The presence of an n-ary property for the same subject with an additional value should be added to the destination URF instance.</p>
@@ -186,7 +186,7 @@
 	<h5 id="urf-Collection"><code>urf-Collection</code></h5>
 	<p>The parent class for all <dfn>collection</dfn> resources <a href="#urf-List"><code>urf-List</code></a>, <a href="#urf-Map"><code>urf-Map</code></a>, and <a href="#urf-Set"><code>urf-Set</code></a>. Collection resources represent abstract data types that can hold other resources.</p>
 	<h5 id="urf-Decimal"><code>urf-Decimal</code></h5>
-	<aside class="annotation far third">Types analogous to <code>urf-Decimal</code> in programming languages include:
+	<aside class="annotation float-end max-size-significant">Types analogous to <code>urf-Decimal</code> in programming languages include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/364x0z75.aspx" class="external"><code>decimal</code></a></dd>
@@ -203,7 +203,7 @@
 	<h5 id="urf-EmailAddress"><code>urf-EmailAddress</code></h5>
 	<p>Represents an email address. This is a lexical ID type. The canonical lexical form is the “addr-spec” format specified in <a href="#ref-rfc5322" class="ref">RFC 5322</a>. The email <span class="spec-must-not">must not</span> include any obsolete elements (those starting with the prefix “obs-”) in <cite>RFC 5322</cite>. The lexical form <span class="spec-must-not">must not</span> include any “comments” or “folding white space” as defined by <cite>RFC 5322</cite>.</p>
 	<h5 id="urf-Instant"><code>urf-Instant</code></h5>
-	<aside class="annotation far third">The <code>urf-Instant</code> lexical representation is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="external"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
+	<aside class="annotation float-end max-size-significant">The <code>urf-Instant</code> lexical representation is compatible with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON" class="external"><code>JavaScript.Date.prototype.toJSON()</code></a>.</aside>
 	<p>An <dfn>instant</dfn> represents a normalized time of day on a particular calendar date. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
 	<ul class="spec-production">
 		<li><code class="name">instant</code> ⇒ <code class="name">date</code> 'T' <code class="name">time</code> 'Z'</li>
@@ -219,7 +219,7 @@
 	<h5><code>urf-Language</code></h5>
 	<p>TODO Language resources represent human langages and use inline namespace URIs. The lexical form of each is the corresponding <dfn>language tag</dfn> described in [<a href="#rfc4646">RFC 4646</a>].</p>
 	<h5><code>urf-List</code></h5>
-	<aside class="annotation far third">Types analogous to <code>urf-List</code> in programming languages  include:
+	<aside class="annotation float-end max-size-significant">Types analogous to <code>urf-List</code> in programming languages  include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/6sh2ey19.aspx" class="external"><code>System.Collections.Generic.List&lt;T&gt;</code></a></dd>
@@ -251,7 +251,7 @@
 	</ul>
 	<h4 id="urf-OffsetTime"><code></code></h4>
 	<h5><code>urf-Map</code></h5>
-	<aside class="annotation far third">Types analogous to <code>urf-Map</code> in programming languages include:
+	<aside class="annotation float-end max-size-significant">Types analogous to <code>urf-Map</code> in programming languages include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/xfhwa508.aspx" class="external"><code>System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;</code></a></dd>
@@ -266,8 +266,25 @@
 	<p>A resource containing associations between keys and values. Each association is represented by an instance of <a href="#urf-MapEntry"><code>urf-MapEntry</code></a>, which is a value of the <a href="#urf-member_"><code>urf-member+</code></a> property of the map resource.</p>
 	<h5 id="urf-MapEntry"><code>urf-MapEntry</code></h5>
 	<p>A resource representing a key-value mapping between the value of the <a href="#urf-key"><code>urf-key</code></a> property value <a href="#urf-value"><code>urf-value</code></a> property value.</p>
+	<h5><code>urf-MediaType</code></h5>
+	<p>A media type resource is an Internet media type described by <a href="#ref-rfc6838" class="ref">RFC 6838</a>. <em class="note">Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>.</em> Media types are lexical ID types with a canonical form that follows <a href="#ref-rfc6838" class="ref">RFC 6838</a> with the following normalizations:</p>
+	<ul>
+		<li>The type, the subtype, and each parameter name <span class="spec-must">must</span> be in lowercase.</li>
+		<li>If any value for any parameter is case-insensitive, it <span class="spec-must">must</span> be in lowercase. <span class="warning">This means that values of the <code>charset</code> parameter such as <code>UTF-8</code>, which is case insensitive and used in HTTP in both uppercase and lowercase, <span class="spec-must">must</span> be in lowercase canonical lexical form.</span></li>
+		<li>Parameters must be presented sorted primarily in lexicographic order of names and secondarily in lexicographic order of values, with no ABNF <code>WSP</code> around the parameters and their delimiters.</li>
+	</ul>
+	<aside class="note float-start max-width-partial">Media type tag examples:
+		<dl>
+			<dt><code>text/xml</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#text/xml</code></dd>
+			<dt><code>text/markdown;charset=UTF-8</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#text/markdown;charset%3Dutf-8</code></dd>
+			<dt><code>image/png</code></dt>
+			<dd><code>https://urf.name/urf/MediaType#image%2Fpng</code></dd>
+		</dl>
+	</aside>
 	<h5 id="urf-MonthDay"><code>urf-MonthDay</code></h5>
-	<aside class="note far third">The format for <code>month_day</code> conforms to an older version of <cite>ISO 8601</cite>; the most recent version does not mention a month+day format. </aside>
+	<aside class="annotation float-end max-size-significant">The format for <code>month_day</code> conforms to an older version of <cite>ISO 8601</cite>; the most recent version does not mention a month+day format. </aside>
 	<p>Represents a calendar month and day without respect to any time zone. This is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
 	<ul class="spec-production">
 		<li><code class="name">month_day</code> ⇒ '-' '-' <code class="name">MM</code> '-' <code class="name">DD</code></li>
@@ -322,7 +339,7 @@
 	<h5 id="urf-Resource"><code>urf-Resource</code></h5>
 	<p>Every resource is implicitly an instance of the class <code>urf-Resource</code> or one of its descendant classes.</p>
 	<h5><code>urf-Set</code></h5>
-	<aside class="annotation far third">Types analogous to <code>urf-Set</code> in programming languages include:
+	<aside class="annotation float-end max-size-significant">Types analogous to <code>urf-Set</code> in programming languages include:
 		<dl>
 			<dt>C#</dt>
 			<dd><a href="https://msdn.microsoft.com/en-us/library/bb359438.aspx" class="external"><code>System.Collections.Generic.HashSet&lt;T&gt;</code></a></dd>
@@ -371,7 +388,7 @@
 	</ul>
 	<h4 id="urf-OffsetTime"><code></code></h4>
 	<h5 id="urf-ZonedDateTime"><code>urf-ZonedDateTime</code></h5>
-	<aside class="annotation far half">The format for <code class="name">zoned_date_time</code> is an extension to the <cite>ISO 8601</cite> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="external"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
+	<aside class="annotation float-end max-size-partial">The format for <code class="name">zoned_date_time</code> is an extension to the <cite>ISO 8601</cite> specification, and follows Java <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_ZONED_DATE_TIME" class="external"><code>java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME</code></a>.</aside>
 	<p>Represents a date and time relative to a specific IANA <a href="#ref-iso8601" class="ref">TZ</a> time zoneThis is a subclass of <a href="#urf-Temporal"><code>urf-Temporal</code></a> and is a lexical ID type with the following production:</p>
 	<ul class="spec-production">
 		<li><code class="name">zoned_date_time</code> ⇒ <code class="name">offset_date_time</code> '[' <code class="name">tz</code> ']'</li>
@@ -391,10 +408,8 @@
 		<dd><code>https://urf.name/content/</code></dd>
 	</dl>
 	<h4>Classes</h4>
-	<h5><code><span style="color: #222222;">content-Charset</span></code></h5>
+	<h5><code>content-Charset</code></h5>
 	<p>TODO The name of the mapping of integer values to a set of characters. This is equivalent to the <dfn>charset</dfn> Internet media type parameter described by [<a href="#rfc2046">RFC 2046</a>] and further elaborated in [<a href="#rfc2278">RFC 2278</a>] Section 2.3. A charset encapsulates both the concept of a <dfn>coded character set</dfn> and a <dfn>character encoding scheme</dfn>, as specified in [<a href="#rfc2130">RFC 2130</a>] Section 3.2. The lexical form is the canonical charset name specified by [<a href="#ianaCharsetRegistry">IANA Charset Registry</a>], such as <code>UTF-16BE</code>.</p>
-	<h5><code>content-MediaType</code></h5>
-	<p>TODO A media type resource is an Internet media types described by [<a href="#rfc2046">RFC 2046</a>]. Internet media types are also known as <dfn>MIME types</dfn> and <dfn>content types</dfn>. Media type resources use inline namespace URIs, and each has a lexical form corresponding to its [<a href="#rfc2046">RFC 2046</a>] representation without any media type parameters.</p>
 	<h2>References</h2>
 	<dl>
 		<dt>DCMI Namespace</dt>
@@ -407,8 +422,6 @@
 		<dd><a href="https://www.iso.org/standard/40874.html"><cite>Data elements and interchange formats — Information interchange — Representation of dates and times, third edition, 2014-12-01</cite></a>. ISO.</dd>
 		<dt>RDF/XML</dt>
 		<dd>Dave Beckett. <a href="http://www.w3.org/TR/rdf-syntax-grammar/"><cite>RDF/XML Syntax Specification (Revised)</cite></a>. World Wide Web Consortium, 2006-02-10.</dd>
-		<dt>RFC 2046</dt>
-		<dd>N. Freed and N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</cite></a>. Internet Engineering Task Force, 1996.</dd>
 		<dt id="ref-rfc2119" class="ref-target">RFC 2119</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>, S. Bradner (Harvard University). IETF.</dd>
 		<dt>RFC 2130</dt>
@@ -435,6 +448,8 @@
 		<dd><a href="https://tools.ietf.org/html/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>, S. Josefsson (SJD). IETF.</dd>
 		<dt id="ref-rfc5322" class="ref-target">RFC 5322</dt>
 		<dd><a href="https://tools.ietf.org/html/rfc5322"><cite>Internet Message Format</cite></a>, P. Resnick, Ed. (Qualcomm Incorporated). IETF.</dd>
+		<dt id="ref-rfc6838" class="ref-target">RFC 6838</dt>
+		<dd><a href="https://tools.ietf.org/html/rfc6838"><cite>Media Type Specifications and Registration Procedures</cite></a>, N. Freed (Oracle), J. Klensin, T.Hansen (AT&amp;T Laboratories). IETF.</dd>
 		<dt id="ref-tz" class="ref-target">TZ</dt>
 		<dd><a href="https://www.iana.org/time-zones"><cite>Time Zone Database</cite></a>. IANA.</dd>
 		<dt id="ref-uax15" class="ref-target">UAX #15</dt>
@@ -451,7 +466,7 @@
 		<li>Brad Neuberg encouraged the creation of an alternate RDF serialization.</li>
 		<li>Frank Manola made convincing arguments for using ordinals instead of integers as list element properties.</li>
 	</ul>
-	<footer><small>Copyright © 2007–2019 <a href="http://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
+	<footer><small>Copyright © 2007–2020 <a href="https://www.globalmentor.com/">GlobalMentor, Inc.</a>. All Rights Reserved. Content may not be published or reproduced by any means for any purpose without permission. This specification may be freely used for its intended purpose but only in unmodified form.</small></footer>
 	<script src="../../pub/js/prism.js"></script>
 </body>
 

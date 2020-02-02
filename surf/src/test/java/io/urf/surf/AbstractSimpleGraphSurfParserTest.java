@@ -38,6 +38,7 @@ import org.junit.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 
 /**
@@ -85,12 +86,13 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 	protected abstract int getPropertyCount(@Nonnull final SO surfObject);
 
 	/**
-	 * Retrieves the value of a SURF object property by the property handle.
+	 * Retrieves the value of a SURF object property by the property handle. As a convenience, the property value is automatically cast to that expected.
+	 * @param <T> The type of object expected to be returned.
 	 * @param surfObject The parsed SURF object.
 	 * @param propertyHandle The handle of the property.
 	 * @return The value of the property, if any.
 	 */
-	public abstract Optional<Object> getPropertyValue(@Nonnull final SO surfObject, @Nonnull final String propertyHandle);
+	public abstract <T> Optional<T> getPropertyValue(@Nonnull final SO surfObject, @Nonnull final String propertyHandle);
 
 	//identifiers
 
@@ -292,7 +294,6 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 		assertThat(getPropertyValue(resource, "example"), isPresentAndIs(URI.create("http://www.example.com/")));
 		assertThat(getPropertyValue(resource, "iso_8859_1"), isPresentAndIs(URI.create("http://www.example.org/Dürst")));
 		assertThat(getPropertyValue(resource, "encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
-		assertThat(getPropertyValue(resource, "encodedForbidden"), isPresentAndIs(URI.create("http://xn--99zt52a.example.org/%E2%80%AE")));
 		assertThat(getPropertyValue(resource, "mailto"), isPresentAndIs(URI.create("mailto:jdoe@example.com")));
 		assertThat(getPropertyValue(resource, "tel"), isPresentAndIs(URI.create("tel:+12015550123")));
 		assertThat(getPropertyValue(resource, "urn_uuid"), isPresentAndIs(URI.create("urn:uuid:5623962b-22b1-4680-ae1c-7174a46144fc")));
@@ -300,6 +301,40 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 	}
 
 	//TODO add tests for extended characters; bad IRIs (such as a non-absolute IRI); a test containing U+202E, as described in RFC 3987 3.2.1
+
+	/** @see SurfTestResources#OK_MEDIA_TYPES_RESOURCE_NAME */
+	@Test
+	public void testOkMediaType() throws IOException {
+		@SuppressWarnings("unchecked")
+		final SO resource = (SO)parseTestResource(OK_MEDIA_TYPES_RESOURCE_NAME).get();
+		assertThat(getPropertyCount(resource), is(14)); //make sure we're up-to-date with the latest test
+		assertThat(getPropertyValue(resource, "xml"), isPresentAndIs(ContentType.of("text", "xml")));
+		assertThat(getPropertyValue(resource, "textXml"), isPresentAndIs(ContentType.of("text", "xml")));
+		assertThat(getPropertyValue(resource, "markdowns"), isPresentAnd(hasSize(7)));
+		final ContentType markdownUtf8 = ContentType.of("text", "markdown", ContentType.Parameter.CHARSET_UTF_8);
+		for(final ContentType contentType : this.<List<ContentType>>getPropertyValue(resource, "markdowns").get()) {
+			assertThat(contentType, is(markdownUtf8));
+		}
+		assertThat(getPropertyValue(resource, "json"), isPresentAndIs(ContentType.of("application", "json")));
+		assertThat(getPropertyValue(resource, "png"), isPresentAndIs(ContentType.of("image", "png")));
+		assertThat(getPropertyValue(resource, "threeParams"), isPresentAndIs(ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII,
+				ContentType.Parameter.of("foo", "bar"), ContentType.Parameter.of("test", "example"))));
+		assertThat(getPropertyValue(resource, "duplicateNames"), isPresentAndIs(ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII,
+				ContentType.Parameter.of("test", "foo"), ContentType.Parameter.of("test", "bar"))));
+		assertThat(getPropertyValue(resource, "special"), isPresentAndIs(
+				ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII, ContentType.Parameter.of("test", "(foo)<bar>@\",;:\\/[foobar]?="))));
+		assertThat(getPropertyValue(resource, "escaped"),
+				isPresentAndIs(ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII, ContentType.Parameter.of("test", "foo\"bar\tandxmore\\stuff"))));
+		assertThat(getPropertyValue(resource, "webForm"), isPresentAndIs(ContentType.of("application", "x-www-form-urlencoded")));
+		assertThat(getPropertyValue(resource, "docx"),
+				isPresentAndIs(ContentType.of("application", "vnd.openxmlformats-officedocument.wordprocessingml.document")));
+		assertThat(getPropertyValue(resource, "odt"), isPresentAndIs(ContentType.of("application", "vnd.oasis.opendocument.text")));
+		assertThat(getPropertyValue(resource, "multipartForm"), isPresentAndIs(
+				ContentType.of("multipart", "form-data", ContentType.Parameter.CHARSET_UTF_8, ContentType.Parameter.of("boundary", "q1w2e3r4ty:9-5xyz"))));
+		assertThat(getPropertyValue(resource, "jsonApi"), isPresentAndIs(ContentType.of("application", "vnd.api+json")));
+	}
+
+	//TODO add bad tests with illegal type, subtype, and parameter names
 
 	//##number
 

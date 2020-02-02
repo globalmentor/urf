@@ -20,7 +20,6 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
 import static io.urf.surf.SURF.*;
-import static io.urf.surf.SurfResources.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -42,6 +41,7 @@ import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
@@ -77,6 +77,10 @@ import com.globalmentor.text.ASCII;
  * <ul>
  * <li>{@link URI}</li>
  * <li>{@link URL}</li>
+ * </ul>
+ * <h3>media type</h3>
+ * <ul>
+ * <li>{@link ContentType}</li>
  * </ul>
  * <h3>number</h3>
  * <ul>
@@ -145,6 +149,7 @@ public class SurfSerializer {
 	private final static String BYTE_ARRAY_CLASS_NAME = "[B";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
+	private final static String CONTENT_TYPE_CLASS_NAME = "com.globalmentor.net.ContentType";
 	private final static String DATE_CLASS_NAME = "java.util.Date";
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
@@ -176,6 +181,17 @@ public class SurfSerializer {
 	private final static String YEAR__CLASS_NAME = "java.time.Year";
 	private final static String YEAR_MONTH_CLASS_NAME = "java.time.YearMonth";
 	private final static String ZONED_DATE_TIME_CLASS_NAME = "java.time.ZonedDateTime";
+
+	/**
+	 * Determines whether the given resource is a compound resource, that is, one that can contain other resources. This method returns <code>true</code> for
+	 * {@link SurfObject}, any {@link Collection}, and any {@link Map}.
+	 * @param resource The resource which may or may not be a compound resource.
+	 * @return <code>true</code> if the given resource may hold other resources.
+	 */
+	public static boolean isCompoundResource(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		return resource instanceof SurfObject || resource instanceof Collection || resource instanceof Map;
+	}
 
 	private boolean formatted = false;
 
@@ -601,6 +617,10 @@ public class SurfSerializer {
 					throw new IllegalArgumentException(String.format("URL %s is not a valid URI.", resource), uriURISyntaxException);
 				}
 				break;
+			//##media type
+			case CONTENT_TYPE_CLASS_NAME:
+				serializeMediaType(appendable, (ContentType)resource);
+				break;
 			//##number
 			case BIG_DECIMAL_CLASS_NAME:
 			case BIG_INTEGER_CLASS_NAME:
@@ -953,6 +973,20 @@ public class SurfSerializer {
 				break;
 		}
 		return appendable.append(IRI_END);
+	}
+
+	/**
+	 * Serializes a media type along with its delimiters.
+	 * @param appendable The appendable to which serialized data should be appended.
+	 * @param contentType The information to be serialized as a media type.
+	 * @return The given appendable.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error appending to the appendable.
+	 * @see SURF#MEDIA_TYPE_BEGIN
+	 * @see SURF#MEDIA_TYPE_END
+	 */
+	public static Appendable serializeMediaType(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType) throws IOException {
+		return appendable.append(MEDIA_TYPE_BEGIN).append(contentType.toString()).append(MEDIA_TYPE_END);
 	}
 
 	/**
