@@ -17,16 +17,16 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2020-01-31</dd>
+			<dd>Draft 2020-02-04</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
 	<p>TURF is the text interchange format for URF. TURF emphasizes terseness and consistency while maintaining human readability, with a preference for using symbols from existing interchange formats such as JSON and programming languages such as Java and C#. TURF has several useful properties, including:</p>
 	<ul>
-		<li>TURF has an optional signature character sequence, <code>\URF</code>, for easy recognition.</li>
-		<li>TURF has an optional unambiguous end delimiter sequence <code>\.</code>, allowing TURF to be embedded in existing text-based content.</li>
-		<li>Whitespace separators and comments may be removed with no loss of semantics, resulting in an extremely compact representation.</li>
-		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, <code>&lt;…&gt;</code> for IRIs, and <code>#…</code> for decimal numbers.</li>
+		<li>TURF has an optional signature character sequence, <code>===&gt;urf&lt;</code>, for easy recognition.</li>
+		<li>TURF has an optional unambiguous end delimiter sequence <code>===</code>, allowing TURF to be embedded in existing text-based content.</li>
+		<li>Whitespace separators and comments may be removed following certain rules with no loss of semantics, resulting in an extremely compact representation.</li>
+		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, and <code>&lt;…&gt;</code> for IRIs.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
@@ -90,7 +90,7 @@
 		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
 	</ul>
 	<h2>Structure</h2>
-	<p>A TURF document is divided into four sections: a <dfn>header</dfn> with optional <dfn>signature</dfn>, a <dfn>document description</dfn>, a <dfn>body</dfn>, and a <dfn>footer</dfn>, each of which is optional. If a footer is included, a header <span class="spec-must">must</span> be included as well..</p>
+	<p>A TURF document is divided into four sections: a <dfn>header</dfn>, a <dfn>document description</dfn>, a <dfn>body</dfn>, and a <dfn>footer</dfn>, each of which is optional. If a footer is included, a header <span class="spec-must">must</span> be included as well..</p>
 	<ul class="spec-production">
 		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">line_break</code>* <code class="name">document_description</code>? <code class="name">line_break</code>* <code class="name">body</code>? <code class="name">line_break</code>* <code class="name">footer</code>? <code class="name">line_break</code>*</li>
 	</ul>
@@ -98,25 +98,42 @@
 	</ul>
 	<h3>Header</h3>
 	<figure class="float-end max-size-partial">
-		<figcaption>Example TURF document with optional header, signature, and footer.</figcaption>
-		<pre class="line-numbers"><code class="language-turf">\/URF/
+		<figcaption>Example TURF document with optional header and footer.</figcaption>
+		<pre class="line-numbers"><code class="language-turf">===&gt;urf:
   space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
   space-foaf = &lt;http://xmlns.com/foaf/0.1/&gt;
-\
+;&lt;
 
 ! body of document …
 
-\/./\</code></pre>
+===</code></pre>
 	</figure>
-	<p>The optional document header begins and ends with a backslash or <code class="name">REVERSE SOLIDUS</code> <code>\</code> (<code class="unicode">U+005C</code>). If a header is included it <span class="spec-must">must</span> appear at the first character of the document. The header <span class="spec-may">may</span> contain <dfn>directives</dfn>, a sequence of name-value pairs that provide serialization details essential for parsing. A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but may provide a way to access them separately. <span class="note">The production rules for literals appear later in this specification.</span></p>
+	<p>The optional document header begins with three <code class="name">EQUALS SIGN</code> <code>=</code> characters (<code class="unicode">U+003D</code>) and is followed immediately by a document type, a modified media type representation between the <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>) and the <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>), in that order. If a header is included it <span class="spec-must">must</span> appear at the first character of the document.</p>
 	<ul class="spec-production">
-		<li><code class="name">header</code> ⇒ '\' <code class="name">signature</code>? <code class="name">directive-sequence</code> '\'</li>
+		<li><code class="name">header</code> ⇒ "===" <code class="name">document_type</code></li>
+		<li><code class="name">document_type</code> ⇒ '&gt;' <code class="name">rfc_6838_media_type</code> <code class="name">directives</code>? '&lt;'</li>
+	</ul>
+	<p>The document type uses the same production as a <a href="#media-type">media-type</a> literal, with the following modifications:</p>
+	<ul>
+		<li>The type, subtype, and parameter name(s) <span class="spec-should">should</span> be in lowercase.</li>
+		<li>The If the top-level type is <code>text</code>, the top-level type and its following <code class="name">SOLIDUS</code> (<code class="unicode">U+002F</code>) delimiter <span class="spec-should">should</span> be left out. Specifically the media type <code>text/urf</code> <span class="spec-should">should</span> be indicated as simply <code class="language-surf">&gt;urf&lt;</code>.</li>
+		<li>The <code>charset</code> parameter <span class="spec-must-not">must not</span> be present.</li>
+		<li>Immediately following the <a href="#ref-rfc6838" class="ref">RFC 6838</a> representation of the media type but before the ending media type delimiter, the document type header <span class="spec-may">may</span> contain <dfn>directives</dfn>, a sequence of name-value pairs that provide serialization details essential for parsing.</li>
+	</ul>
+	<p>A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but may provide a way to access them separately.</p>
+	<ul class="spec-production">
+		<li><code class="name">directives</code> ⇒ ':' <code class="name">directive-sequence</code> ';'</li>
 		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
 	</ul>
+	<p>A directive handle <span class="spec-must-not">must not</span> include a namespace alias. <span class="note">The production rules for literals appear later in this specification.</span></p>
+	<p>Currently only document types for the <code>text/urf</code> media type are supported.</p>
 	<h4 id="signature">Signature</h4>
-	<p><em>This section is experimental.</em> If a signature is present, it <span class="spec-must">must</span> appear starting at the first character header. A TURF parser <span class="spec-must">must</span> use the bytes of the signature, or the absence of a signature, to determine the charset and byte order of the document. A TURF parser <span class="spec-may">may</span> use the signature as a heuristic to reasonably determine that some file in fact contains a TURF document.</p>
+	<p><em>This section is experimental.</em> If a header is present it functions as a <dfn>signature</dfn> to identify the document type. A TURF parser <span class="spec-must">must</span> use the bytes of the signature, or the absence of a signature, to determine the charset and byte order of the document, but only if no other indication of charset and byte order is present. A TURF parser <span class="spec-may">may</span> use the signature as a heuristic to reasonably determine that some file in fact contains a TURF document.</p>
 	<ul class="spec-production">
-		<li><code class="name">signature</code> ⇒ "/URF/"</li>
+		<li><code class="name">signature</code> ⇒ "===&gt;urf" (';' | ':' | '&lt;')</li>
+	</ul>
+	<p>Note that detection of the signature currently requires that the document type follow all the recommendations in this specification. The signature presented here will not detect documents that do not follow all the recommendations here even though they are otherwise conforming TURF documents.</p>
+	<ul class="spec-production">
 	</ul>
 	<h4>Directives</h4>
 	<h5>Namespace Declaration</h5>
@@ -125,9 +142,9 @@
 	<h3>Document Description</h3>
 	<figure class="float-end max-size-partial">
 		<figcaption>Example TURF document with a document description.</figcaption>
-		<pre class="line-numbers"><code class="language-turf">\
+		<pre class="line-numbers"><code class="language-turf">===&gt;urf:
   space-dc = &lt;http://purl.org/dc/elements/1.1/&gt;
-\
+;&lt;
 #
   dc/title = "Example Document"
   dc/creator = "Jane Doe"
@@ -143,10 +160,10 @@
 	<h3>Body</h3>
 	<p>The document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
 	<h3>Footer</h3>
-	<aside class="annotation float-end max-size-significant">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>\/.../\</code> separator, forming the basis of a message stream, for example.</aside>
+	<aside class="annotation float-end max-size-significant">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>===&gt;...&lt;</code> separator, potentially each identifying a different type of document, forming the basis of a message stream, for example.</aside>
 	<p><em>This section is experimental.</em> The document footer, if present, explicitly indicates the end of the TURF document.</p>
 	<ul class="spec-production">
-		<li><code class="name">footer</code> ⇒ "\/./\"</li>
+		<li><code class="name">footer</code> ⇒ "==="</li>
 	</ul>
 	<h2>Resources</h2>
 	<p>A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
@@ -251,7 +268,7 @@
 		<dt><code class="name">uuid</code></dt>
 		<dd>The UUID is converted into a IRI with a scheme of <code>urn</code> and a URN namespace of <code>uuid</code> according to <a href="#ref-rfc4122" class="ref">RFC 4122</a>.</dd>
 	</dl>
-	<h4>Media Type</h4>
+	<h4 id="media-type">Media Type</h4>
 	<p>A <dfn>media type</dfn>, sometimes referred to as a “content type”, indicates the type of content contained in a resource and is essential for navigating the World Wide Web. It consists of a type and subtype, optionally followed by one or more parameters.</p>
 	<aside class="note float-end max-size-partial">One of the most common media types is <code>text/html;charset=UTF-8</code> indicating an HTML document using the UTF-8 charset. In TURF this can be represented as <code>&gt;html;charset=utf-8&lt;</code>.</aside>
 	<p>TURF places the media type between the <code class="name">GREATER-THAN SIGN</code> character <code>&gt;</code> (<code class="unicode">U+003E</code>) and the <code class="name">LESS-THAN SIGN</code> character <code>&lt;</code> (<code class="unicode">U+003C</code>), in that order. <em class="warning">This representation is not to be confused with that of an IRI, which uses the same delimiters but in a different order.</em></p>
