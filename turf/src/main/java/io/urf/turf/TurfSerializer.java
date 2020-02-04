@@ -752,10 +752,11 @@ public class TurfSerializer {
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
+	 * @see TURF#DIVISION
 	 */
 	public Appendable serializeHeader(@Nonnull final Appendable appendable) throws IOException {
-		appendable.append(DIVISION_DELIMITER); //\
-		//TODO serialize signature, when finalized, based on configuration
+		appendable.append(DIVISION); //===
+		appendable.append(MEDIA_TYPE_BEGIN).append(TURF.CONTENT_TYPE.getSubType()).append(DESCRIPTION_BEGIN); //>turf:
 		formatNewLine(appendable);
 		//map the namespaces to space-alias/namespaceIri properties
 		final Stream<Map.Entry<URI, Object>> namespaceProperties = namespaceAliases.entrySet().stream()
@@ -764,7 +765,7 @@ public class TurfSerializer {
 			serializeSequence(appendable, namespaceProperties::iterator, this::serializeProperty);
 		}
 		formatIndent(appendable);
-		return appendable.append(DIVISION_DELIMITER); //\
+		return appendable.append(DESCRIPTION_END).append(MEDIA_TYPE_END); //;<
 	}
 
 	long serializedRootCount = 0;

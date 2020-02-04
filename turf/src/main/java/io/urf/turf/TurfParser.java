@@ -24,6 +24,7 @@ import static io.urf.turf.TURF.*;
 import static io.urf.turf.TURF.WHITESPACE_CHARACTERS;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static org.zalando.fauxpas.FauxPas.throwingFunction;
 
 import java.io.*;
 import java.math.*;
@@ -34,6 +35,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.*;
 
@@ -47,6 +49,7 @@ import com.globalmentor.model.UUIDs;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
+import com.globalmentor.util.Optionals;
 
 import io.urf.URF;
 import io.urf.model.*;
@@ -175,41 +178,28 @@ public class TurfParser<R> {
 
 		//header
 		int c = peek(reader); //the header has to come a the first of the document, if at all
-		final boolean hasHeader = c == DIVISION_DELIMITER;
+		final boolean hasHeader = c == DIVISION_BEGIN;
 		if(hasHeader) {
-			check(reader, DIVISION_DELIMITER); //\
-			c = peek(reader); //the signature has to come a the first of the header, if at all
-			if(c == SIGNATURE_BEGIN) {
-				check(reader, SIGNATURE); ///URF/
-			}
-			c = skipLineBreaks(reader);
-			final Map<String, URI> namespaces = new HashMap<>();
-			parseSequence(reader, DIVISION_DELIMITER, r -> { //directives
-				final String propertyHandle = parseHandle(reader);
-				final URI propertyTag;
-				try {
-					propertyTag = Handle.toTag(propertyHandle, namespaces);
-				} catch(final IllegalArgumentException illegalArgumentException) {
-					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
-				}
-				skipLineBreaks(reader);
-				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipLineBreaks(reader);
-				final UrfReference value = parseResource(reader, false);
-				//TODO make sure the resource is a literal
-				//TODO store the document property somewhere for later retrieval
-				if(Tag.getNamespace(propertyTag).filter(SPACE_NAMESPACE::equals).isPresent()) {
-					final String namespaceAlias = Tag.getName(propertyTag)
-							.orElseThrow(() -> new ParseIOException("Document property " + propertyHandle + " missing namespace alias."));
-					final URI namespace = ObjectUrfResource.findObject(value).filter(URI.class::isInstance).map(URI.class::cast)
-							.orElseThrow(() -> new ParseIOException("Namespace alias " + namespaceAlias + " must be mapped to an IRI."));
-					//TODO add method to check that a URI is a potential namespace
-					namespaces.put(namespaceAlias, namespace); //TODO do we allow multiple definitions for the same namespace?
-				}
-				//TODO log warning for ignored directives
-			});
-			this.namepaces = namespaces; //save the gathered namespaces
-			check(reader, DIVISION_DELIMITER); //\
+			check(reader, DIVISION); //===
+			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> doctype = parseMediaType(reader, true);
+			checkParseIO(reader, doctype.getKey().hasBaseType(TURF.CONTENT_TYPE.getBaseContentType()), "Document type `%s` not supported; must be `%s`.",
+					doctype.getKey(), TURF.CONTENT_TYPE);
+			//TODO store the document type somewhere for later retrieval
+
+			//gather the namespace declarations from the embedded doctype description
+			namepaces = Optionals.stream(doctype.getValue().map(Map::entrySet)).flatMap(Set::stream)
+					//only look at namespace property
+					.filter(entry -> Tag.getNamespace(entry.getKey()).filter(SPACE_NAMESPACE::equals).isPresent())
+					//convert each namespace property to a namespace entry
+					.map(throwingFunction(entry -> {
+						final String namespaceAlias = Tag.getName(entry.getKey())
+								.orElseThrow(() -> new ParseIOException("Document property `<" + entry.getKey() + ">` missing namespace alias."));
+						final URI namespace = ObjectUrfResource.findObject(entry.getValue()).filter(URI.class::isInstance).map(URI.class::cast)
+								.orElseThrow(() -> new ParseIOException("Namespace alias " + namespaceAlias + " must be mapped to an IRI."));
+						//TODO add method to check that a URI is a potential namespace
+						return new AbstractMap.SimpleImmutableEntry<>(namespaceAlias, namespace);
+					})).collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue), Collections::unmodifiableMap));
+			//TODO log warning for ignored directives?
 		}
 
 		//Because we checked for the header at the beginning of the document, we now need to skip vertical filler,
@@ -975,13 +965,6 @@ public class TurfParser<R> {
 		return iri;
 	}
 
-	/** Possible delimiters indicating a media type subtype, a parameter, or the end of the media type literal. */
-	private static final Characters MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS = Characters.of(ContentType.TYPE_DIVIDER, ContentType.PARAMETER_DELIMITER_CHAR,
-			MEDIA_TYPE_END);
-
-	/** Possible delimiters indicating a media type a parameter or the end of the media type literal. */
-	private static final Characters MEDIA_TYPE_OPTIONAL_PARAMETER_CHARACTERS = MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS.remove(ContentType.TYPE_DIVIDER);
-
 	/**
 	 * Parses a media type. The current position must be that of the beginning media type delimiter character. The new position will be that immediately after the
 	 * ending media type delimiter character.
@@ -993,28 +976,46 @@ public class TurfParser<R> {
 	 * @see TURF#MEDIA_TYPE_BEGIN
 	 * @see TURF#MEDIA_TYPE_END
 	 */
-	public static ContentType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	public ContentType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		return parseMediaType(reader, false).getKey();
+	}
+
+	/**
+	 * Parses a media type, optionally allowing an embedded description. The current position must be that of the beginning media type delimiter character. The
+	 * new position will be that immediately after the ending media type delimiter character.
+	 * @implSpec This implementation only allows property handles and literal values in the description.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @param allowDescription Whether an embedded description is recognized and allowed in the media type literal.
+	 * @return An instance of {@link ContentType} representing the TURF media type parsed from the reader.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the media type is not in the correct format.
+	 * @see TURF#MEDIA_TYPE_BEGIN
+	 * @see TURF#MEDIA_TYPE_END
+	 */
+	public Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> parseMediaType(@Nonnull final Reader reader, final boolean allowDescription)
+			throws IOException, ParseIOException {
 		check(reader, MEDIA_TYPE_BEGIN); //`>`
 		final String primaryType;
 		final String subType;
-		final String firstToken = readUntilRequired(reader, MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS); //`/` or `;` or `<`
+		final String firstToken = parseMediaTypeRestrictedName(reader);
 		char c = peekRequired(reader);
 		if(c == ContentType.TYPE_DIVIDER) { //`/`
 			check(reader, ContentType.TYPE_DIVIDER);
 			primaryType = firstToken;
-			subType = readUntilRequired(reader, MEDIA_TYPE_OPTIONAL_PARAMETER_CHARACTERS); //`;` or `<`
+			subType = parseMediaTypeRestrictedName(reader);
 			c = peekRequired(reader);
 		} else { //default to the `text` type if no type divider was found
 			primaryType = ContentType.TEXT_PRIMARY_TYPE;
 			subType = firstToken;
 		}
 		final Set<ContentType.Parameter> parameters;
-		if(c == ContentType.PARAMETER_DELIMITER_CHAR) { //`;`
+		if(c == ContentType.PARAMETER_DELIMITER_CHAR) { //`;` parameters
 			parameters = new HashSet<>();
 			do {
 				check(reader, ContentType.PARAMETER_DELIMITER_CHAR);
 				skip(reader, ABNF.WSP_CHARACTERS);
-				final String parameterName = readUntilRequired(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR); //`=`
+				final String parameterName = parseMediaTypeRestrictedName(reader);
 				check(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR);
 				final String parameterValue;
 				c = peekRequired(reader);
@@ -1039,13 +1040,60 @@ public class TurfParser<R> {
 		} else {
 			parameters = emptySet();
 		}
+		final Map<URI, ValueUrfResource<?>> description;
+		if(c == DESCRIPTION_BEGIN) { //`:` description
+			check(reader, DESCRIPTION_BEGIN);
+			description = new HashMap<>();
+			parseSequence(reader, DESCRIPTION_END, r -> {
+				final String propertyHandle = parseHandle(reader);
+				final URI propertyTag;
+				try {
+					propertyTag = Handle.toTag(propertyHandle);
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
+				}
+				skipLineBreaks(reader);
+				check(reader, PROPERTY_VALUE_DELIMITER); //=
+				skipLineBreaks(reader);
+				final UrfReference value = parseResource(reader, false);
+				checkParseIO(reader, value instanceof ValueUrfResource, "Media type description value `%s` must be a supported literal.", value);
+				final boolean duplicate = description.putIfAbsent(propertyTag, (ValueUrfResource<?>)value) != null; //TODO do we allow multiple definitions?
+				checkParseIO(reader, !duplicate, "Duplicate media type description property handle `%s`.", propertyHandle);
+			});
+			check(reader, DESCRIPTION_END); //;
+		} else {
+			description = null;
+		}
 		check(reader, MEDIA_TYPE_END); //`<`
 		try {
-			return ContentType.of(primaryType, subType, parameters);
+			return new AbstractMap.SimpleImmutableEntry<>(ContentType.of(primaryType, subType, parameters), Optional.ofNullable(description));
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new ParseIOException(reader,
 					"Invalid TURF media type format and parameters: " + primaryType + ContentType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
 		}
+	}
+
+	/**
+	 * Parses a <dfn>restricted name</dfn> of an Internet media type. The current position must be that of the first character of the restricted name. The new
+	 * position will be that immediately after the restricted name, or at the end of the reader.
+	 * @apiNote The <code>restricted-name</code> production in <a href="https://tools.ietf.org/html/rfc6838">RFC 6838</a> is used for the primary type, the
+	 *          subtype, and each parameter name.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link ContentType#RESTRICTED_NAME_PATTERN} pattern.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the restricted name is not in the correct format.
+	 * @see ContentType#RESTRICTED_NAME_PATTERN
+	 */
+	protected static String parseMediaTypeRestrictedName(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final StringBuilder builder = new StringBuilder();
+		builder.append(check(reader, ContentType.RESTRICTED_NAME_FIRST_CHARACTERS));
+		readWhile(reader, ContentType.RESTRICTED_NAME_CHARACTERS, builder);
+		final int length = builder.length();
+		checkParseIO(reader, builder.length() <= ContentType.RESTRICTED_NAME_MAX_LENGTH,
+				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, ContentType.RESTRICTED_NAME_MAX_LENGTH);
+		assert ContentType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
+		return builder.toString();
 	}
 
 	/**
