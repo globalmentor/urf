@@ -64,8 +64,10 @@ public class TURF {
 
 	//divisions
 
-	/** The delimiter that begins and ends document divisions such as headers and footers. */
-	public static final char DIVISION_DELIMITER = '\\';
+	/** The string that indicates a document division such as a header or a footer. */
+	public static final String DIVISION = "===";
+	/** The delimiter that begins a devision. */
+	public static final char DIVISION_BEGIN = DIVISION.charAt(0);
 
 	/** The delimiter that begins and ends the document description. */
 	public static final char DOCUMENT_DESCRIPTION_DELIMITER = '#';
