@@ -743,13 +743,6 @@ public class SurfParser {
 		return iri;
 	}
 
-	/** Possible delimiters indicating a media type subtype, a parameter, or the end of the media type literal. */
-	private static final Characters MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS = Characters.of(ContentType.TYPE_DIVIDER, ContentType.PARAMETER_DELIMITER_CHAR,
-			MEDIA_TYPE_END);
-
-	/** Possible delimiters indicating a media type a parameter or the end of the media type literal. */
-	private static final Characters MEDIA_TYPE_OPTIONAL_PARAMETER_CHARACTERS = MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS.remove(ContentType.TYPE_DIVIDER);
-
 	/**
 	 * Parses a media type. The current position must be that of the beginning media type delimiter character. The new position will be that immediately after the
 	 * ending media type delimiter character.
@@ -765,12 +758,12 @@ public class SurfParser {
 		check(reader, MEDIA_TYPE_BEGIN); //`>`
 		final String primaryType;
 		final String subType;
-		final String firstToken = readUntilRequired(reader, MEDIA_TYPE_COMPONENT_DELIMITER_CHARACTERS); //`/` or `;` or `<`
+		final String firstToken = parseMediaTypeRestrictedName(reader);
 		char c = peekRequired(reader);
 		if(c == ContentType.TYPE_DIVIDER) { //`/`
 			check(reader, ContentType.TYPE_DIVIDER);
 			primaryType = firstToken;
-			subType = readUntilRequired(reader, MEDIA_TYPE_OPTIONAL_PARAMETER_CHARACTERS); //`;` or `<`
+			subType = parseMediaTypeRestrictedName(reader);
 			c = peekRequired(reader);
 		} else { //default to the `text` type if no type divider was found
 			primaryType = ContentType.TEXT_PRIMARY_TYPE;
@@ -782,7 +775,7 @@ public class SurfParser {
 			do {
 				check(reader, ContentType.PARAMETER_DELIMITER_CHAR);
 				skip(reader, ABNF.WSP_CHARACTERS);
-				final String parameterName = readUntilRequired(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR); //`=`
+				final String parameterName = parseMediaTypeRestrictedName(reader);
 				check(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR);
 				final String parameterValue;
 				c = peekRequired(reader);
@@ -814,6 +807,29 @@ public class SurfParser {
 			throw new ParseIOException(reader,
 					"Invalid SURF media type format and parameters: " + primaryType + ContentType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
 		}
+	}
+
+	/**
+	 * Parses a <dfn>restricted name</dfn> of an Internet media type. The current position must be that of the first character of the restricted name. The new
+	 * position will be that immediately after the restricted name, or at the end of the reader.
+	 * @apiNote The <code>restricted-name</code> production in <a href="https://tools.ietf.org/html/rfc6838">RFC 6838</a> is used for the primary type, the
+	 *          subtype, and each parameter name.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link ContentType#RESTRICTED_NAME_PATTERN} pattern.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 * @throws ParseIOException if the restricted name is not in the correct format.
+	 * @see ContentType#RESTRICTED_NAME_PATTERN
+	 */
+	protected static String parseMediaTypeRestrictedName(@Nonnull final Reader reader) throws IOException, ParseIOException {
+		final StringBuilder builder = new StringBuilder();
+		builder.append(check(reader, ContentType.RESTRICTED_NAME_FIRST_CHARACTERS));
+		readWhile(reader, ContentType.RESTRICTED_NAME_CHARACTERS, builder);
+		final int length = builder.length();
+		checkParseIO(reader, builder.length() <= ContentType.RESTRICTED_NAME_MAX_LENGTH,
+				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, ContentType.RESTRICTED_NAME_MAX_LENGTH);
+		assert ContentType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
+		return builder.toString();
 	}
 
 	/**
