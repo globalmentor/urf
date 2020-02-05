@@ -52,7 +52,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 
 	@Override
 	public Optional<String> getTypeHandle(final UrfObject urfObject) {
-		return urfObject.getTypeTag().flatMap(URF.Handle::fromTag);
+		return urfObject.getTypeTag().flatMap(URF.Handle::findFromTag);
 	}
 
 	@Override

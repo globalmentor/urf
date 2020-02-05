@@ -189,10 +189,10 @@ public class TurfParser<R> {
 			//gather the namespace declarations from the embedded doctype description
 			namepaces = Optionals.stream(doctype.getValue().map(Map::entrySet)).flatMap(Set::stream)
 					//only look at namespace property
-					.filter(entry -> Tag.getNamespace(entry.getKey()).filter(SPACE_NAMESPACE::equals).isPresent())
+					.filter(entry -> Tag.findNamespace(entry.getKey()).filter(SPACE_NAMESPACE::equals).isPresent())
 					//convert each namespace property to a namespace entry
 					.map(throwingFunction(entry -> {
-						final String namespaceAlias = Tag.getName(entry.getKey())
+						final String namespaceAlias = Tag.findName(entry.getKey())
 								.orElseThrow(() -> new ParseIOException("Document property `<" + entry.getKey() + ">` missing namespace alias."));
 						final URI namespace = ObjectUrfResource.findObject(entry.getValue()).filter(URI.class::isInstance).map(URI.class::cast)
 								.orElseThrow(() -> new ParseIOException("Namespace alias " + namespaceAlias + " must be mapped to an IRI."));

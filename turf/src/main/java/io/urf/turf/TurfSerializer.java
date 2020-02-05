@@ -1070,7 +1070,7 @@ public class TurfSerializer {
 	 */
 	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases)
 			throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		final Optional<String> handle = Handle.fromTag(tag, namespaceAliases)
+		final Optional<String> handle = Handle.findFromTag(tag, namespaceAliases)
 				.filter(tagHandle -> !tagHandle.equals(BOOLEAN_FALSE_LEXICAL_FORM) && !tagHandle.equals(BOOLEAN_TRUE_LEXICAL_FORM));
 		ifPresentOrElse(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 		return appendable;
@@ -1113,11 +1113,11 @@ public class TurfSerializer {
 	public Appendable serializeObjectReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nullable final URI typeTag,
 			final boolean declaration) throws IOException {
 		//ID tags _may_ get special serialization; if so, these short-circuit and skip the rest of the logic
-		final String id = Tag.getId(tag).orElse(null);
+		final String id = Tag.findId(tag).orElse(null);
 		if(id != null) {
 			if(typeTag != null) { //|"id"|*Type
 				//only serialize IDs as labels if the tag is an ID type with a type tag that matches the ID tag type
-				if(Optionals.isPresentAndEquals(Tag.getIdTypeTag(tag), typeTag)) {
+				if(Optionals.isPresentAndEquals(Tag.findIdTypeTag(tag), typeTag)) {
 					//TODO prevent both an alias and ID label from being serialized
 					appendable.append(LABEL_DELIMITER);
 					serializeString(appendable, id);
@@ -1126,7 +1126,7 @@ public class TurfSerializer {
 					return appendable;
 				}
 			} else { //Type#id
-				final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
+				final String idHandle = Handle.findFromTag(tag, getNamespaceAliases()).orElse(null);
 				if(idHandle != null) { //Type#id
 					appendable.append(idHandle);
 					return appendable;

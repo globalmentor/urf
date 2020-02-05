@@ -37,10 +37,10 @@ public interface UrfResource extends UrfReference {
 	 * </p>
 	 * @return The name, if any, of the resource.
 	 * @see #getTag()
-	 * @see URF.Tag#getName(URI)
+	 * @see URF.Tag#findName(URI)
 	 */
 	public default Optional<String> getName() {
-		return getTag().flatMap(URF.Tag::getName);
+		return getTag().flatMap(URF.Tag::findName);
 	}
 
 	/**
@@ -50,10 +50,10 @@ public interface UrfResource extends UrfReference {
 	 * </p>
 	 * @return The ID, if any, of the resource.
 	 * @see #getTag()
-	 * @see URF.Tag#getId(URI)
+	 * @see URF.Tag#findId(URI)
 	 */
 	public default Optional<String> getId() {
-		return getTag().flatMap(URF.Tag::getId);
+		return getTag().flatMap(URF.Tag::findId);
 	}
 
 	/** @return The tag of the resource type, if known. */
