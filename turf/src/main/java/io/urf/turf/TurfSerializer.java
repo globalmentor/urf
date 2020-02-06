@@ -50,7 +50,9 @@ import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 import com.globalmentor.util.Optionals;
+import com.globalmentor.vocab.*;
 
+import io.urf.UrfVocabularySpecification;
 import io.urf.model.*;
 
 /**
@@ -218,7 +220,12 @@ public class TurfSerializer {
 		this.formatted = formatted;
 	}
 
-	private final Map<URI, String> namespaceAliases = new HashMap<>();
+	final VocabularyRegistrar vocabularyRegistrar = new VocabularyManager(UrfVocabularySpecification.INSTANCE);
+
+	/** @return The registrar keeping track of namespaces aliases associated with their namespaces. */
+	protected VocabularyRegistrar getVocabularyRegistrar() {
+		return vocabularyRegistrar;
+	}
 
 	/**
 	 * Registers a namespace with the given namespace alias. If the namespace was already registered
@@ -227,13 +234,8 @@ public class TurfSerializer {
 	 * @return This serializer.
 	 */
 	public TurfSerializer registerNamespace(@Nonnull final URI namespace, @Nonnull final String alias) {
-		namespaceAliases.put(requireNonNull(namespace), requireNonNull(alias));
+		vocabularyRegistrar.registerVocabulary(namespace, requireNonNull(alias));
 		return this;
-	}
-
-	/** @return The map of namespaces aliases associated with their namespaces. */
-	protected Map<URI, String> getNamespaceAliases() {
-		return namespaceAliases;
 	}
 
 	private CharSequence indentSequence = String.valueOf(CHARACTER_TABULATION_CHAR);
@@ -722,7 +724,7 @@ public class TurfSerializer {
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
 		//header
-		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
+		final boolean includeHeader = !getVocabularyRegistrar().isEmpty(); //TODO add option(s) to force a header
 		if(includeHeader) {
 			serializeHeader(appendable);
 		}
@@ -759,7 +761,7 @@ public class TurfSerializer {
 		appendable.append(MEDIA_TYPE_BEGIN).append(TURF.CONTENT_TYPE.getSubType()).append(DESCRIPTION_BEGIN); //>turf:
 		formatNewLine(appendable);
 		//map the namespaces to space-alias/namespaceIri properties
-		final Stream<Map.Entry<URI, Object>> namespaceProperties = namespaceAliases.entrySet().stream()
+		final Stream<Map.Entry<URI, Object>> namespaceProperties = getVocabularyRegistrar().getRegisteredPrefixesByVocabulary().stream()
 				.map(namespaceAliasEntry -> new AbstractMap.SimpleEntry<>(Tag.forType(SPACE_NAMESPACE, namespaceAliasEntry.getValue()), namespaceAliasEntry.getKey()));
 		try (final Closeable indention = increaseIndentLevel()) {
 			serializeSequence(appendable, namespaceProperties::iterator, this::serializeProperty);
@@ -1051,7 +1053,7 @@ public class TurfSerializer {
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
 	public Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		return serializeTagReference(appendable, tag, getNamespaceAliases());
+		return serializeTagReference(appendable, tag, getVocabularyRegistrar());
 	}
 
 	/**
@@ -1062,15 +1064,15 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The tag to be serialized.
-	 * @param namespaceAliases The map of namespaces aliases associated with their namespaces.
+	 * @param vocabularyRegistry The namespaces aliases associated with their namespaces.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader and/or namespace aliases map is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
-	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases)
+	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull VocabularyRegistry vocabularyRegistry)
 			throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		final Optional<String> handle = Handle.findFromTag(tag, namespaceAliases)
+		final Optional<String> handle = Handle.findFromTag(tag, vocabularyRegistry)
 				.filter(tagHandle -> !tagHandle.equals(BOOLEAN_FALSE_LEXICAL_FORM) && !tagHandle.equals(BOOLEAN_TRUE_LEXICAL_FORM));
 		ifPresentOrElse(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 		return appendable;
@@ -1126,7 +1128,7 @@ public class TurfSerializer {
 					return appendable;
 				}
 			} else { //Type#id
-				final String idHandle = Handle.findFromTag(tag, getNamespaceAliases()).orElse(null);
+				final String idHandle = Handle.findFromTag(tag, getVocabularyRegistrar()).orElse(null);
 				if(idHandle != null) { //Type#id
 					appendable.append(idHandle);
 					return appendable;

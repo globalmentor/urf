@@ -25,6 +25,8 @@ import java.util.*;
 
 import org.junit.*;
 
+import com.globalmentor.vocab.VocabularyManager;
+
 /**
  * Tests of URF definitions and utilities.
  * 
@@ -179,8 +181,8 @@ public class URFTest {
 	/** @see URF.Handle#findFromTag(URI) */
 	@Test
 	public void testHandleFindFromTag() {
-		final Map<URI, String> aliases = new HashMap<>();
-		aliases.put(URI.create("https://example.com/fake/"), "fake");
+		final VocabularyManager aliases = new VocabularyManager();
+		aliases.registerVocabulary(URI.create("https://example.com/fake/"), "fake");
 		assertThat(URF.Handle.findFromTag(URI.create("https://urf.name/"), aliases), isEmpty());
 		assertThat(URF.Handle.findFromTag(URI.create("https://urf.name/Example"), aliases), isPresentAndIs("Example"));
 		assertThat(URF.Handle.findFromTag(URI.create("https://urf.name/Example+"), aliases), isPresentAndIs("Example+"));

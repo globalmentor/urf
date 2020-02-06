@@ -32,6 +32,7 @@ import com.globalmentor.collections.*;
 import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Characters;
 import com.globalmentor.net.URIs;
+import com.globalmentor.vocab.VocabularyRegistry;
 
 /**
  * Definitions for the Uniform Resource Framework (URF).
@@ -624,6 +625,17 @@ public class URF {
 			return checkArgumentMatches(input, PATTERN, "Invalid URF handle \"%s\".", input);
 		}
 
+		/**
+		 * Determines whether the given string conforms to the rules for an URF handle namespace alias.
+		 * @implSpec This implementation delegates to {@link Name#isValidToken(String)}
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid URF handle namespace alias.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 */
+		public static boolean isValidAlias(final String string) {
+			return Name.isValidIdToken(string);
+		}
+
 		//TODO decide whether encoding/decoding is needed, as IRIs are used
 
 		/**
@@ -635,19 +647,19 @@ public class URF {
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
 		public static Optional<String> findFromTag(@Nonnull final URI tag) {
-			return findFromTag(tag, emptyMap());
+			return findFromTag(tag, VocabularyRegistry.EMPTY);
 		}
 
 		/**
 		 * Determines the URF handle to represent the given resource tag.
 		 * @apiNote Not every tag has a handle. A tag with no namespace or no name, or for which no namespace alias is registered, has no handle.
 		 * @param tag The tag for which a handle should be determined.
-		 * @param namespaceAliases The registered namespace aliases, associated with their namespaces.
+		 * @param vocabularyRegistry The registered namespace aliases, associated with their namespaces.
 		 * @return The URF handle representing the given tag.
 		 * @throws NullPointerException if the given tag and/or namespace alias is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<String> findFromTag(@Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases) {
+		public static Optional<String> findFromTag(@Nonnull final URI tag, @Nonnull final VocabularyRegistry vocabularyRegistry) {
 			Tag.checkArgumentValid(tag);
 			final Optional<String> optionalName = Tag.findName(tag);
 			//if there is a name, convert it to a handle based on the namespace
@@ -656,11 +668,7 @@ public class URF {
 				return Tag.findNamespace(tag).flatMap(namespace -> {
 					final URI adHocNamespaceRelativeURI = AD_HOC_NAMESPACE.relativize(namespace);
 					if(adHocNamespaceRelativeURI.equals(namespace)) { //if the namespace is not relative to the ad-hoc namespace
-						final String alias = namespaceAliases.get(namespace);
-						if(alias == null) {
-							return Optional.empty(); //there is no handle
-						}
-						return Optional.of(alias + NAMESPACE_ALIAS_DELIMITER + name);
+						return vocabularyRegistry.findPrefixForVocabulary(namespace).map(alias -> alias + NAMESPACE_ALIAS_DELIMITER + name);
 					}
 					assert !adHocNamespaceRelativeURI.isAbsolute();
 					assert !URIs.hasAbsolutePath(adHocNamespaceRelativeURI);

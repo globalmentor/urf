@@ -31,6 +31,8 @@ import javax.annotation.*;
 
 import org.junit.Test;
 
+import com.globalmentor.vocab.VocabularyManager;
+
 import io.urf.URF;
 import io.urf.URF.Tag;
 import io.urf.model.*;
@@ -142,8 +144,8 @@ public class TurfSerializerTest {
 	/** @see TurfSerializer#serializeTagReference(Appendable, URI) */
 	@Test
 	public void testSerializeTagReference() throws IOException {
-		final Map<URI, String> aliases = new HashMap<>();
-		aliases.put(URI.create("https://example.com/fake/"), "fake");
+		final VocabularyManager aliases = new VocabularyManager();
+		aliases.registerVocabulary(URI.create("https://example.com/fake/"), "fake");
 		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/"), aliases).toString(), is("|<https://urf.name/>|"));
 		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example"), aliases).toString(), is("Example"));
 		assertThat(TurfSerializer.serializeTagReference(new StringBuilder(), URI.create("https://urf.name/Example+"), aliases).toString(), is("Example+"));
