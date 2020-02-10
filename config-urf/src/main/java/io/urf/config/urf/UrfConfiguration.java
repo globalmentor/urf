@@ -72,7 +72,7 @@ public class UrfConfiguration extends AbstractObjectConfiguration implements Sec
 	 */
 	@Override
 	public Optional<String> getSectionType() {
-		return root instanceof UrfObject ? ((UrfObject)root).getTypeTag().map(tag -> URF.Handle.fromTag(tag).orElse(tag.toString())) : Optional.empty();
+		return root instanceof UrfObject ? ((UrfObject)root).getTypeTag().map(tag -> URF.Handle.findFromTag(tag).orElse(tag.toString())) : Optional.empty();
 	}
 
 	//TODO override hasConfigurationKeyImpl() if can be made more efficient

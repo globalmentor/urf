@@ -17,14 +17,15 @@
 package io.urf.model;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 import java.time.*;
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import io.urf.URF.Handle;
 
@@ -128,11 +129,10 @@ public class UrfObjectTest {
 	 * Tests that trying to add two binary property values will throw an exception.
 	 * @see UrfObject#addPropertyValue(URI, Object)
 	 */
-	@Test(expected = IllegalStateException.class)
 	public void testAddTwoBinaryPropertyValues() {
 		final UrfObject urfObject = new UrfObject();
 		urfObject.addPropertyValue(TEST_PROPERTY_TAG, "foo");
-		urfObject.addPropertyValue(TEST_PROPERTY_TAG, "bar");
+		assertThrows(IllegalStateException.class, () -> urfObject.addPropertyValue(TEST_PROPERTY_TAG, "bar"));
 	}
 
 	/**

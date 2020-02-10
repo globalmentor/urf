@@ -96,8 +96,8 @@ public class Content {
 		 */
 		@Deprecated
 		public static Charset toCharset(@Nonnull final URI tag) throws IllegalArgumentException {
-			checkArgument(isPresentAndEquals(URF.Tag.getIdTypeTag(tag), CHARSET_CLASS_TAG), "Tag %s not a charset tag.", tag);
-			final String charsetName = URF.Tag.getId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no charset indicated."));
+			checkArgument(isPresentAndEquals(URF.Tag.findIdTypeTag(tag), CHARSET_CLASS_TAG), "Tag %s not a charset tag.", tag);
+			final String charsetName = URF.Tag.findId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no charset indicated."));
 			return Charset.forName(charsetName);
 		}
 

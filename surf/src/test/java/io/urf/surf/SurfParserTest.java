@@ -18,8 +18,8 @@ package io.urf.surf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static io.urf.surf.SurfTestResources.OK_LABELS_RESOURCE_NAME;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.URI;
@@ -27,9 +27,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.junit.Test;
-
-import junit.framework.AssertionFailedError;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests of {@link SurfParser}.
@@ -80,22 +78,22 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 			assertThat(rootAliased, isPresentAnd(sameInstance(root)));
 			//TODO circular references: assertThat(root.getPropertyValue("self"), isPresentAnd(sameInstance(root)));
 			//|number|
-			final Object foo = root.getPropertyValue("foo").orElseThrow(AssertionFailedError::new);
+			final Object foo = root.getPropertyValue("foo").orElseThrow(AssertionError::new);
 			assertThat(foo, is(123L));
 			final Optional<Object> numberAliased = surfParser.findResourceByAlias("number");
 			assertThat(numberAliased, isPresentAnd(sameInstance(foo)));
 			//|test|
-			final Object value = root.getPropertyValue("value").orElseThrow(AssertionFailedError::new);
+			final Object value = root.getPropertyValue("value").orElseThrow(AssertionError::new);
 			assertThat(value, is(false));
 			final Optional<Object> testAliased = surfParser.findResourceByAlias("test");
 			assertThat(testAliased, isPresentAnd(sameInstance(value)));
 			//|object|
-			final SurfObject thing = (SurfObject)root.getPropertyValue("thing").orElseThrow(AssertionFailedError::new);
+			final SurfObject thing = (SurfObject)root.getPropertyValue("thing").orElseThrow(AssertionError::new);
 			assertThat(thing.getTypeHandle(), isPresentAndIs("example-Type"));
 			final Optional<Object> objectAliased = surfParser.findResourceByAlias("object");
 			assertThat(objectAliased, isPresentAnd(sameInstance(thing)));
 			//|"foo"|*Bar
-			final SurfObject foobar = (SurfObject)root.getPropertyValue("foobar").orElseThrow(AssertionFailedError::new);
+			final SurfObject foobar = (SurfObject)root.getPropertyValue("foobar").orElseThrow(AssertionError::new);
 			assertThat(foobar.getTypeHandle(), isPresentAndIs("Bar"));
 			assertThat(foobar.getId(), isPresentAndIs("foo"));
 			assertThat(foobar.getPropertyValue("prop"), isPresentAndIs("val"));
@@ -103,7 +101,7 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 			final Optional<SurfObject> foobarIded = surfParser.findObjectById("Bar", "foo");
 			assertThat(foobarIded, isPresentAnd(sameInstance(foobar)));
 			//list elements
-			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionFailedError::new);
+			final List<?> stuff = (List<?>)thing.getPropertyValue("stuff").orElseThrow(AssertionError::new);
 			assertThat(stuff, hasSize(4));
 			assertThat(stuff.get(0), is("one"));
 			assertThat(stuff.get(1), is(123L));
@@ -118,7 +116,7 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 			final Optional<SurfObject> exampleThingTagged = surfParser.findObjectByTag(URI.create("http://example.com/thing"));
 			assertThat(exampleThingTagged, isPresentAnd(sameInstance(exampleThing)));
 			//map values
-			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionFailedError::new);
+			final Map<?, ?> map = (Map<?, ?>)root.getPropertyValue("map").orElseThrow(AssertionError::new);
 			//TODO circular references: assertThat(map.get(0), is(sameInstance(map))); //the map has itself for a value
 			assertThat(map.get(1L), is("one"));
 			assertThat(map.get(2L), is(sameInstance(numberAliased.get())));
@@ -127,16 +125,16 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 			assertThat(map.get(100L), is(sameInstance(objectAliased.get())));
 			//set members
 			@SuppressWarnings("unchecked")
-			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionFailedError::new);
+			final Set<Object> set = (Set<Object>)root.getPropertyValue("set").orElseThrow(AssertionError::new);
 			assertThat(set, hasSize(5));
 			assertThat(set, hasItem(123L));
 			assertThat(set, hasItem(false));
 			final Optional<Object> newAliased = surfParser.findResourceByAlias("newThing");
-			final SurfObject newAliasedResource = (SurfObject)newAliased.orElseThrow(AssertionFailedError::new);
+			final SurfObject newAliasedResource = (SurfObject)newAliased.orElseThrow(AssertionError::new);
 			assertThat(getTypeHandle(newAliasedResource), isPresentAndIs("example-Thing"));
 			assertThat(getPropertyValue(newAliasedResource, "description"), isPresentAndIs("a new thing"));
 			final Optional<Object> anotherAliased = surfParser.findResourceByAlias("another");
-			final SurfObject anotherAliasedResource = (SurfObject)anotherAliased.orElseThrow(AssertionFailedError::new);
+			final SurfObject anotherAliasedResource = (SurfObject)anotherAliased.orElseThrow(AssertionError::new);
 			assertThat(getPropertyValue(anotherAliasedResource, "description"), isPresentAndIs("yet another thing"));
 			assertThat(set, hasItem(sameInstance(numberAliased.get())));
 			assertThat(set, hasItem(sameInstance(testAliased.get())));

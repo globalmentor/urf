@@ -69,8 +69,8 @@ public abstract class AbstractLexicalIdTypeUrfResource extends AbstractUrfResour
 	 * @throws IllegalArgumentException if the given type tag has no namespace and/or name, or has an ID.
 	 */
 	public AbstractLexicalIdTypeUrfResource(@Nonnull final URI typeTag) {
-		this(Tag.getNamespace(typeTag).orElseThrow(IllegalArgumentException::new), Tag.getName(typeTag).orElseThrow(IllegalArgumentException::new));
-		checkArgument(!Tag.getId(typeTag).isPresent(), "Type tag may not contain ID.");
+		this(Tag.findNamespace(typeTag).orElseThrow(IllegalArgumentException::new), Tag.findName(typeTag).orElseThrow(IllegalArgumentException::new));
+		checkArgument(!Tag.findId(typeTag).isPresent(), "Type tag may not contain ID.");
 	}
 
 	/**

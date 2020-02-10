@@ -46,6 +46,10 @@
 		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
 
+	<properties>
+		<globalmentor-web.version>0.6.4-SNAPSHOT</globalmentor-web.version>
+	</properties>
+
 	<modules>
 		<module>cli</module>
 		<module>config-file-format-turf</module>
@@ -71,6 +75,12 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-itu</artifactId>
 				<version>0.6.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-vocab</artifactId>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>

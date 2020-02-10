@@ -16,16 +16,16 @@
 
 package io.urf.config.urf;
 
-import static org.junit.Assert.*;
-
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.OperatingSystem.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import org.junit.*;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
 import com.globalmentor.net.EmailAddress;
 
@@ -164,12 +164,11 @@ public class UrfConfigurationTest {
 		assertThat(orgSection.getInt("size"), is(123));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
 	public void testEmptyKeySegmentError() {
 		final Map<String, Object> map = new HashMap<>();
 		map.put("foo", "bar");
 		final UrfConfiguration urfConfiguration = new UrfConfiguration(map);
-		urfConfiguration.getString("foo..bar");
+		assertThrows(IllegalArgumentException.class, () -> urfConfiguration.getString("foo..bar"));
 	}
 
 	/** Test that strings are correctly converted to path objects. */

@@ -19,8 +19,8 @@ package io.urf.turf;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static io.urf.turf.TurfTestResources.*;
 import static java.util.Arrays.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.URI;
@@ -29,7 +29,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import io.urf.URF;
 import io.urf.model.*;

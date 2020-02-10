@@ -32,6 +32,7 @@ import com.globalmentor.collections.*;
 import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Characters;
 import com.globalmentor.net.URIs;
+import com.globalmentor.vocab.VocabularyRegistry;
 
 /**
  * Definitions for the Uniform Resource Framework (URF).
@@ -310,7 +311,7 @@ public class URF {
 	}
 
 	/**
-	 * Utilities for working with TURF tags.
+	 * Utilities for working with URF tags.
 	 * @author Garret Wilson
 	 */
 	public static final class Tag {
@@ -330,15 +331,14 @@ public class URF {
 
 		/**
 		 * Retrieves the namespace of the given tag. The namespace is the parent collection URI of the tag.
-		 * <p>
-		 * Not every tag is in a namespace. For example, a tag URI without a path is not in any namespace. A tag URI with the root path is not in any namespace
-		 * </p>
+		 * @apiNote Not every tag is in a namespace. For example, a tag URI without a path is not in any namespace. A tag URI with the root path is not in any
+		 *          namespace.
 		 * @param tag The tag URI from which a namespace should be retrieved.
 		 * @return The namespace of the tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<URI> getNamespace(@Nonnull final URI tag) {
+		public static Optional<URI> findNamespace(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			if(hasPath(tag)) {
 				return Optional.ofNullable(getParentURI(tag));
@@ -349,17 +349,15 @@ public class URF {
 		/**
 		 * Retrieves the resource name from the given tag. The name is the decoded last non-collection path segment of the URI, if any, including the URI fragment,
 		 * if any.
-		 * <p>
-		 * Not every tag has a name. For example, a tag URI without a path has no name. A tag URI that is a collection has no name. A tag URI with a fragment but no
-		 * last path segment has no name. A name must be valid or no name will be returned.
-		 * </p>
+		 * @apiNote Not every tag has a name. For example, a tag URI without a path has no name. A tag URI that is a collection has no name. A tag URI with a
+		 *          fragment but no last path segment has no name. A name must be valid or no name will be returned.
 		 * @param tag The tag URI from which a name should be retrieved.
 		 * @return The resource name, if any, from its tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
-		 * @see #getId(URI)
+		 * @see #findId(URI)
 		 */
-		public static Optional<String> getName(@Nonnull final URI tag) {
+		public static Optional<String> findName(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
 			if(rawPath != null && !rawPath.isEmpty() && !isCollectionPath(rawPath)) { //if there is a raw path that isn't a collection
@@ -385,7 +383,7 @@ public class URF {
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<URI> getIdTypeTag(@Nonnull final URI tag) {
+		public static Optional<URI> findIdTypeTag(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
 			final String rawFragment = tag.getRawFragment();
@@ -404,13 +402,13 @@ public class URF {
 		 * @return Whether this tag is considered an n-arity tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
-		 * @see #getName(URI)
+		 * @see #findName(URI)
 		 */
 		public static boolean isNary(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
 			final boolean maybeNary = rawPath != null && CharSequences.endsWith(rawPath, Name.NARY_DELIMITER);
-			return maybeNary && getName(tag).isPresent(); //if we find the n-ary delimiter, make sure this is a valid name
+			return maybeNary && findName(tag).isPresent(); //if we find the n-ary delimiter, make sure this is a valid name
 		}
 
 		/**
@@ -422,10 +420,10 @@ public class URF {
 		 * @return Whether the given tag URI has ID.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
-		 * @see #getId(URI)
+		 * @see #findId(URI)
 		 */
 		public static boolean hasId(@Nonnull final URI tag) {
-			return getId(tag).isPresent(); //TODO make more efficient, with tests
+			return findId(tag).isPresent(); //TODO make more efficient, with tests
 		}
 
 		/**
@@ -438,7 +436,7 @@ public class URF {
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<String> getId(@Nonnull final URI tag) {
+		public static Optional<String> findId(@Nonnull final URI tag) {
 			checkArgumentValid(tag);
 			final String rawPath = tag.getRawPath();
 			final String rawFragment = tag.getRawFragment();
@@ -512,7 +510,7 @@ public class URF {
 		 * @param tag The tag, which may be blank.
 		 * @return The ID of the blank tag, which may be empty if the tag is not a blank tag.
 		 */
-		public static Optional<String> getBlankId(@Nonnull final URI tag) {
+		public static Optional<String> findBlankId(@Nonnull final URI tag) {
 			if(!isBlank(tag)) {
 				return Optional.empty();
 			}
@@ -523,18 +521,18 @@ public class URF {
 	}
 
 	/**
-	 * Utilities for working with TURF handles.
+	 * Utilities for working with URF handles.
 	 * @author Garret Wilson
 	 */
 	public static final class Handle {
 
-		/** The delimiter used to separate a namespace alias prefix from the rest of a TURF handle. */
+		/** The delimiter used to separate a namespace alias prefix from the rest of a URF handle. */
 		public static final char NAMESPACE_ALIAS_DELIMITER = '/';
 
-		/** The delimiter used to separate ad-hoc namespaces in a TURF handle. */
+		/** The delimiter used to separate ad-hoc namespaces in a URF handle. */
 		public static final char SEGMENT_DELIMITER = '-';
 
-		/** All the possible delimiters used by a TURF handle. */
+		/** All the possible delimiters used by a URF handle. */
 		public static final Characters DELIMITERS = Characters.of(NAMESPACE_ALIAS_DELIMITER, SEGMENT_DELIMITER, Name.ID_DELIMITER);
 
 		/**
@@ -627,47 +625,50 @@ public class URF {
 			return checkArgumentMatches(input, PATTERN, "Invalid URF handle \"%s\".", input);
 		}
 
+		/**
+		 * Determines whether the given string conforms to the rules for an URF handle namespace alias.
+		 * @implSpec This implementation delegates to {@link Name#isValidToken(String)}
+		 * @param string The string to test.
+		 * @return <code>true</code> if the string is a valid URF handle namespace alias.
+		 * @throws NullPointerException if the given string is <code>null</code>.
+		 */
+		public static boolean isValidAlias(final String string) {
+			return Name.isValidIdToken(string);
+		}
+
 		//TODO decide whether encoding/decoding is needed, as IRIs are used
 
 		/**
-		 * Determines the TURF handle to represent the given resource tag.
-		 * <p>
-		 * Not every tag has a handle. A tag with no namespace or no name has no handle.
-		 * </p>
+		 * Determines the URF handle to represent the given resource tag.
+		 * @apiNote Not every tag has a handle. A tag with no namespace or no name has no handle.
 		 * @param tag The tag for which a handle should be determined.
-		 * @return The TURF handle representing the given tag.
+		 * @return The URF handle representing the given tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<String> fromTag(@Nonnull final URI tag) {
-			return fromTag(tag, emptyMap());
+		public static Optional<String> findFromTag(@Nonnull final URI tag) {
+			return findFromTag(tag, VocabularyRegistry.EMPTY);
 		}
 
 		/**
-		 * Determines the TURF handle to represent the given resource tag.
-		 * <p>
-		 * Not every tag has a handle. A tag with no namespace or no name, or for which no namespace alias is registered, has no handle.
-		 * </p>
+		 * Determines the URF handle to represent the given resource tag.
+		 * @apiNote Not every tag has a handle. A tag with no namespace or no name, or for which no namespace alias is registered, has no handle.
 		 * @param tag The tag for which a handle should be determined.
-		 * @param namespaceAliases The registered namespace aliases, associated with their namespaces.
-		 * @return The TURF handle representing the given tag.
+		 * @param vocabularyRegistry The registered namespace aliases, associated with their namespaces.
+		 * @return The URF handle representing the given tag.
 		 * @throws NullPointerException if the given tag and/or namespace alias is <code>null</code>.
 		 * @throws IllegalArgumentException if the given URI is not a valid tag.
 		 */
-		public static Optional<String> fromTag(@Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases) {
+		public static Optional<String> findFromTag(@Nonnull final URI tag, @Nonnull final VocabularyRegistry vocabularyRegistry) {
 			Tag.checkArgumentValid(tag);
-			final Optional<String> optionalName = Tag.getName(tag);
+			final Optional<String> optionalName = Tag.findName(tag);
 			//if there is a name, convert it to a handle based on the namespace
 			return optionalName.flatMap(name -> {
 				//if there is a namespace, use it to convert the name to a handle
-				return Tag.getNamespace(tag).flatMap(namespace -> {
+				return Tag.findNamespace(tag).flatMap(namespace -> {
 					final URI adHocNamespaceRelativeURI = AD_HOC_NAMESPACE.relativize(namespace);
 					if(adHocNamespaceRelativeURI.equals(namespace)) { //if the namespace is not relative to the ad-hoc namespace
-						final String alias = namespaceAliases.get(namespace);
-						if(alias == null) {
-							return Optional.empty(); //there is no handle
-						}
-						return Optional.of(alias + NAMESPACE_ALIAS_DELIMITER + name);
+						return vocabularyRegistry.findPrefixForVocabulary(namespace).map(alias -> alias + NAMESPACE_ALIAS_DELIMITER + name);
 					}
 					assert !adHocNamespaceRelativeURI.isAbsolute();
 					assert !URIs.hasAbsolutePath(adHocNamespaceRelativeURI);

@@ -16,7 +16,7 @@
 
 package io.urf.surf;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
 
 import java.io.*;
 import java.math.*;
@@ -34,7 +34,7 @@ import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.Bytes.*;
 import static io.urf.surf.SurfTestResources.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;

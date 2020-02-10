@@ -50,7 +50,10 @@ import com.globalmentor.net.ContentType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 import com.globalmentor.util.Optionals;
+import com.globalmentor.vocab.*;
 
+import io.urf.URF;
+import io.urf.UrfVocabularySpecification;
 import io.urf.model.*;
 
 /**
@@ -218,7 +221,12 @@ public class TurfSerializer {
 		this.formatted = formatted;
 	}
 
-	private final Map<URI, String> namespaceAliases = new HashMap<>();
+	final VocabularyRegistrar vocabularyRegistrar;
+
+	/** @return The registrar keeping track of namespaces aliases associated with their namespaces. */
+	VocabularyRegistrar getVocabularyRegistrar() {
+		return vocabularyRegistrar;
+	}
 
 	/**
 	 * Registers a namespace with the given namespace alias. If the namespace was already registered
@@ -227,13 +235,23 @@ public class TurfSerializer {
 	 * @return This serializer.
 	 */
 	public TurfSerializer registerNamespace(@Nonnull final URI namespace, @Nonnull final String alias) {
-		namespaceAliases.put(requireNonNull(namespace), requireNonNull(alias));
+		vocabularyRegistrar.registerVocabulary(namespace, requireNonNull(alias));
 		return this;
 	}
 
-	/** @return The map of namespaces aliases associated with their namespaces. */
-	protected Map<URI, String> getNamespaceAliases() {
-		return namespaceAliases;
+	private boolean discoverVocabularies = true;
+
+	/** @return Whether vocabulary namespaces are automatically discovered and registered with aliases before serializing a document. */
+	public boolean isDiscoverVocabularies() {
+		return discoverVocabularies;
+	}
+
+	/**
+	 * Sets whether vocabulary namespaces are automatically discovered and registered with aliases before serializing a document.
+	 * @param discoverVocabularies true if, before serializing a document, namespaces should be discovered and registered.
+	 */
+	public void setDiscoverVocabularies(final boolean discoverVocabularies) {
+		this.discoverVocabularies = discoverVocabularies;
 	}
 
 	private CharSequence indentSequence = String.valueOf(CHARACTER_TABULATION_CHAR);
@@ -444,6 +462,53 @@ public class TurfSerializer {
 		}
 	}
 
+	/**
+	 * Discovers and registers a namespace if found and as appropriate for the given tag. Namespaces relative to the ad-hoc namespace will not be registered.
+	 * @param tag The tag for which a namespace is to be discovered.
+	 * @see #getVocabularyRegistrar()
+	 * @see URF#AD_HOC_NAMESPACE
+	 */
+	void discoverVocabulary(@Nonnull final URI tag) {
+		URF.Tag.findNamespace(tag).flatMap(namespace -> {
+			final URI adHocNamespaceRelativeURI = AD_HOC_NAMESPACE.relativize(namespace);
+			if(!adHocNamespaceRelativeURI.equals(namespace)) { //if the namespace is relative to the ad-hoc namespace
+				return Optional.empty(); //don't register ad-hoc namespaces
+			}
+			return Optional.of(namespace);
+		}).ifPresent(getVocabularyRegistrar()::determinePrefixForVocabulary);
+	}
+
+	/**
+	 * Recursively discovers vocabulary namespaces used in the document as vocabularies and registers them with the vocabulary registry. Namespaces will be found
+	 * in:
+	 * <ul>
+	 * <li>Resource types.</li>
+	 * <li>Property tags.</li>
+	 * </ul>
+	 * @apiNote This implementation does not currently discover namespaces for arbitrary resource tags, as it is thought that tag formats can vary widely and may
+	 *          coincide without being in a vocabulary. Nevertheless if a resource tag is truly in a vocabulary namespace, it is likely that a type or a property
+	 *          will be in the same namespace and result in vocabulary discovery.
+	 * @param resource The resource graph for which namespaces should be discovered.
+	 * @see #discoverVocabulary(URI)
+	 */
+	void discoverVocabularies(@Nonnull final Object resource) {
+		requireNonNull(resource);
+		if(resource instanceof UrfObject) {
+			((UrfObject)resource).getTypeTag().ifPresent(this::discoverVocabulary); //resource type tag
+			((UrfObject)resource).getProperties().forEach(propertyEntry -> {
+				discoverVocabulary(propertyEntry.getKey()); //property tag
+				discoverVocabularies(propertyEntry.getValue());
+			});
+		} else if(resource instanceof Collection) {
+			((Collection<?>)resource).forEach(this::discoverVocabularies);
+		} else if(resource instanceof Map) { //discover references to map keys and values
+			((Map<?, ?>)resource).forEach((key, value) -> {
+				discoverVocabularies(key);
+				discoverVocabularies(value);
+			});
+		}
+	}
+
 	/** The map of aliases for objects and collections, with identity keys. */
 	private final Map<Object, String> aliasesByCompoundResource = new IdentityHashMap<>();
 
@@ -548,6 +613,19 @@ public class TurfSerializer {
 	 */
 	protected boolean setSerialized(@Nonnull final Object resource) {
 		return !(isCompoundResource(resource) ? serializedCompoundResources : serializedValues).add(resource);
+	}
+
+	/** No-args constructor. */
+	public TurfSerializer() {
+		this(VocabularyRegistry.EMPTY);
+	}
+
+	/**
+	 * Known vocabularies constructor.
+	 * @param knownVocabularies The vocabularies that are already recognized outside of any registrations; these will be used for determining prefixes.
+	 */
+	public TurfSerializer(@Nonnull final VocabularyRegistry knownVocabularies) {
+		vocabularyRegistrar = new VocabularyManager(UrfVocabularySpecification.INSTANCE, knownVocabularies);
 	}
 
 	/**
@@ -721,8 +799,12 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
+		if(isDiscoverVocabularies()) {
+			roots.forEach(this::discoverVocabularies);
+		}
+
 		//header
-		final boolean includeHeader = !namespaceAliases.isEmpty(); //TODO add option(s) to force a header
+		final boolean includeHeader = !getVocabularyRegistrar().isEmpty(); //TODO add option(s) to force a header
 		if(includeHeader) {
 			serializeHeader(appendable);
 		}
@@ -759,7 +841,7 @@ public class TurfSerializer {
 		appendable.append(MEDIA_TYPE_BEGIN).append(TURF.CONTENT_TYPE.getSubType()).append(DESCRIPTION_BEGIN); //>turf:
 		formatNewLine(appendable);
 		//map the namespaces to space-alias/namespaceIri properties
-		final Stream<Map.Entry<URI, Object>> namespaceProperties = namespaceAliases.entrySet().stream()
+		final Stream<Map.Entry<URI, Object>> namespaceProperties = getVocabularyRegistrar().getRegisteredPrefixesByVocabulary().stream()
 				.map(namespaceAliasEntry -> new AbstractMap.SimpleEntry<>(Tag.forType(SPACE_NAMESPACE, namespaceAliasEntry.getValue()), namespaceAliasEntry.getKey()));
 		try (final Closeable indention = increaseIndentLevel()) {
 			serializeSequence(appendable, namespaceProperties::iterator, this::serializeProperty);
@@ -1051,7 +1133,7 @@ public class TurfSerializer {
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
 	public Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag) throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		return serializeTagReference(appendable, tag, getNamespaceAliases());
+		return serializeTagReference(appendable, tag, getVocabularyRegistrar());
 	}
 
 	/**
@@ -1062,15 +1144,15 @@ public class TurfSerializer {
 	 * </p>
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param tag The tag to be serialized.
-	 * @param namespaceAliases The map of namespaces aliases associated with their namespaces.
+	 * @param vocabularyRegistry The namespaces aliases associated with their namespaces.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader and/or namespace aliases map is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see #serializeTagLabel(Appendable, URI)
 	 */
-	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull final Map<URI, String> namespaceAliases)
+	public static Appendable serializeTagReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nonnull VocabularyRegistry vocabularyRegistry)
 			throws IOException { //TODO rename to "reference" or "resource reference" instead of "tag reference"?
-		final Optional<String> handle = Handle.fromTag(tag, namespaceAliases)
+		final Optional<String> handle = Handle.findFromTag(tag, vocabularyRegistry)
 				.filter(tagHandle -> !tagHandle.equals(BOOLEAN_FALSE_LEXICAL_FORM) && !tagHandle.equals(BOOLEAN_TRUE_LEXICAL_FORM));
 		ifPresentOrElse(handle, throwingConsumer(appendable::append), throwingRunnable(() -> serializeTagLabel(appendable, tag)));
 		return appendable;
@@ -1113,11 +1195,11 @@ public class TurfSerializer {
 	public Appendable serializeObjectReference(@Nonnull final Appendable appendable, @Nonnull final URI tag, @Nullable final URI typeTag,
 			final boolean declaration) throws IOException {
 		//ID tags _may_ get special serialization; if so, these short-circuit and skip the rest of the logic
-		final String id = Tag.getId(tag).orElse(null);
+		final String id = Tag.findId(tag).orElse(null);
 		if(id != null) {
 			if(typeTag != null) { //|"id"|*Type
 				//only serialize IDs as labels if the tag is an ID type with a type tag that matches the ID tag type
-				if(Optionals.isPresentAndEquals(Tag.getIdTypeTag(tag), typeTag)) {
+				if(Optionals.isPresentAndEquals(Tag.findIdTypeTag(tag), typeTag)) {
 					//TODO prevent both an alias and ID label from being serialized
 					appendable.append(LABEL_DELIMITER);
 					serializeString(appendable, id);
@@ -1126,7 +1208,7 @@ public class TurfSerializer {
 					return appendable;
 				}
 			} else { //Type#id
-				final String idHandle = Handle.fromTag(tag, getNamespaceAliases()).orElse(null);
+				final String idHandle = Handle.findFromTag(tag, getVocabularyRegistrar()).orElse(null);
 				if(idHandle != null) { //Type#id
 					appendable.append(idHandle);
 					return appendable;
