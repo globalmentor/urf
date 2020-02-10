@@ -18,20 +18,19 @@ package io.urf.turf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static io.urf.surf.SurfTestResources.OK_LABELS_RESOURCE_NAME;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.URI;
 import java.util.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 import io.urf.URF;
 import io.urf.model.*;
 import io.urf.surf.AbstractSimpleGraphSurfParserTest;
 import io.urf.surf.SurfTestResources;
-import junit.framework.AssertionFailedError;
 
 /**
  * Test of parsing SURF documents with {@link TurfParser} into a simple graph using {@link SimpleGraphUrfProcessor}.
@@ -81,24 +80,24 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 			assertThat(rootAliased, isPresentAnd(sameInstance(root)));
 			//TODO circular references: assertThat(root.getPropertyValue("self"), isPresentAnd(sameInstance(root)));
 			//|number|
-			final Object foo = root.findPropertyValueByHandle("foo").orElseThrow(AssertionFailedError::new);
+			final Object foo = root.findPropertyValueByHandle("foo").orElseThrow(AssertionError::new);
 			assertThat(foo, is(123L));
 
 			final Optional<Object> numberAliased = parser.findResourceByAlias("number").map(ObjectUrfResource::unwrap);
 			assertThat(numberAliased, isPresentAnd(sameInstance(foo)));
 			//|test|
-			final Object value = root.findPropertyValueByHandle("value").orElseThrow(AssertionFailedError::new);
+			final Object value = root.findPropertyValueByHandle("value").orElseThrow(AssertionError::new);
 			assertThat(value, is(false));
 			final Optional<Object> testAliased = parser.findResourceByAlias("test").map(ObjectUrfResource::unwrap);
 			assertThat(testAliased, isPresentAnd(sameInstance(value)));
 			//|object|
-			final UrfObject thing = (UrfObject)root.findPropertyValueByHandle("thing").orElseThrow(AssertionFailedError::new);
+			final UrfObject thing = (UrfObject)root.findPropertyValueByHandle("thing").orElseThrow(AssertionError::new);
 			assertThat(thing.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/example/Type")));
 			final Optional<Object> objectAliased = processor
 					.findDeclaredObject(parser.findResourceByAlias("object").map(UrfReference.class::cast).flatMap(UrfReference::getTag).get());
 			assertThat(objectAliased, isPresentAnd(sameInstance(thing)));
 			//|"foo"|*Bar
-			final UrfObject foobar = (UrfObject)root.findPropertyValueByHandle("foobar").orElseThrow(AssertionFailedError::new);
+			final UrfObject foobar = (UrfObject)root.findPropertyValueByHandle("foobar").orElseThrow(AssertionError::new);
 			assertThat(foobar.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 			assertThat(foobar.getId(), isPresentAndIs("foo"));
 			assertThat(foobar.findPropertyValueByHandle("prop"), isPresentAndIs("val"));
@@ -106,7 +105,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 			final Optional<Object> foobarIded = processor.findDeclaredObjectByTypeId("Bar", "foo");
 			assertThat(foobarIded, isPresentAnd(sameInstance(foobar)));
 			//list elements
-			final List<?> stuff = (List<?>)thing.findPropertyValueByHandle("stuff").orElseThrow(AssertionFailedError::new);
+			final List<?> stuff = (List<?>)thing.findPropertyValueByHandle("stuff").orElseThrow(AssertionError::new);
 			assertThat(stuff, hasSize(4));
 			assertThat(stuff.get(0), is("one"));
 			assertThat(stuff.get(1), is(123L));
@@ -121,7 +120,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 			final Optional<Object> exampleThingTagged = processor.findDeclaredObject(URI.create("http://example.com/thing"));
 			assertThat(exampleThingTagged, isPresentAnd(sameInstance(exampleThing)));
 			//map values
-			final Map<?, ?> map = (Map<?, ?>)root.findPropertyValueByHandle("map").orElseThrow(AssertionFailedError::new);
+			final Map<?, ?> map = (Map<?, ?>)root.findPropertyValueByHandle("map").orElseThrow(AssertionError::new);
 			//TODO circular references: assertThat(map.get(0), is(sameInstance(map))); //the map has itself for a value
 			assertThat(map.get(1L), is("one"));
 			assertThat(map.get(2L), is(sameInstance(numberAliased.get())));
@@ -130,18 +129,18 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 			assertThat(map.get(100L), is(sameInstance(objectAliased.get())));
 			//set members
 			@SuppressWarnings("unchecked")
-			final Set<Object> set = (Set<Object>)root.findPropertyValueByHandle("set").orElseThrow(AssertionFailedError::new);
+			final Set<Object> set = (Set<Object>)root.findPropertyValueByHandle("set").orElseThrow(AssertionError::new);
 			assertThat(set, hasSize(5));
 			assertThat(set, hasItem(123L));
 			assertThat(set, hasItem(false));
 			final Optional<Object> newAliased = processor
 					.findDeclaredObject(parser.findResourceByAlias("newThing").map(UrfReference.class::cast).flatMap(UrfReference::getTag).get());
-			final UrfObject newAliasedResource = (UrfObject)newAliased.orElseThrow(AssertionFailedError::new);
+			final UrfObject newAliasedResource = (UrfObject)newAliased.orElseThrow(AssertionError::new);
 			assertThat(getTypeHandle(newAliasedResource), isPresentAndIs("example-Thing"));
 			assertThat(getPropertyValue(newAliasedResource, "description"), isPresentAndIs("a new thing"));
 			final Optional<Object> anotherAliased = processor
 					.findDeclaredObject(parser.findResourceByAlias("another").map(UrfReference.class::cast).flatMap(UrfReference::getTag).get());
-			final UrfObject anotherAliasedResource = (UrfObject)anotherAliased.orElseThrow(AssertionFailedError::new);
+			final UrfObject anotherAliasedResource = (UrfObject)anotherAliased.orElseThrow(AssertionError::new);
 			assertThat(getPropertyValue(anotherAliasedResource, "description"), isPresentAndIs("yet another thing"));
 			assertThat(set, hasItem(sameInstance(numberAliased.get())));
 			assertThat(set, hasItem(sameInstance(testAliased.get())));

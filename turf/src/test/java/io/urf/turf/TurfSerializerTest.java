@@ -20,8 +20,8 @@ import static io.urf.turf.TurfTestResources.*;
 import static java.util.AbstractMap.SimpleImmutableEntry;
 import static java.util.Arrays.*;
 import static java.util.stream.StreamSupport.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.URI;
@@ -30,7 +30,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 import com.globalmentor.vocab.*;
 

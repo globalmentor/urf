@@ -16,13 +16,13 @@
 
 package io.urf.config.file.format.turf;
 
-import static org.junit.Assert.*;
-
 import java.io.*;
 
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import io.confound.config.Configuration;
 import io.confound.config.MissingConfigurationKeyException;
@@ -62,14 +62,13 @@ public class TurfConfigurationFileFormatTest {
 	 * @see TurfConfigurationFileFormat#load(InputStream)
 	 * @throws IOException if there was an error preparing or loading the configuration.
 	 */
-	@Test(expected = MissingConfigurationKeyException.class)
 	public void testLoadNonExistingConfigurationKey() throws IOException {
 		final TurfConfigurationFileFormat format = new TurfConfigurationFileFormat();
 		final Configuration configuration;
 		try (final InputStream inputStream = new BufferedInputStream(getClass().getResourceAsStream(CONFIG_RESOURCE_NAME))) {
 			configuration = format.load(inputStream);
 		}
-		configuration.getString("foobar");
+		assertThrows(MissingConfigurationKeyException.class, () -> configuration.getString("foobar"));
 	}
 
 }

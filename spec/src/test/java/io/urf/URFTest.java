@@ -17,13 +17,14 @@
 package io.urf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import com.globalmentor.vocab.VocabularyManager;
 
@@ -248,33 +249,28 @@ public class URFTest {
 	}
 
 	/** @see URF.Handle#toTag(String) */
-	@Test(expected = IllegalArgumentException.class)
 	public void testHandleToTagInvalidHandleID() {
-		URF.Handle.toTag("Example#foo:bar");
+		assertThrows(IllegalArgumentException.class, () -> URF.Handle.toTag("Example#foo:bar"));
 	}
 
 	/** @see URF.Handle#toTag(String) */
-	@Test(expected = IllegalArgumentException.class)
 	public void testHandleToTagSegmentsInOtherNamespacesNotAllowed() {
-		URF.Handle.toTag("fake/foo-bar");
+		assertThrows(IllegalArgumentException.class, () -> URF.Handle.toTag("fake/foo-bar"));
 	}
 
 	/** @see URF.Handle#toTag(String) */
-	@Test(expected = IllegalArgumentException.class)
 	public void testHandleToTagSegmentsClassNameInOtherNamespacesNotAllowed() {
-		URF.Handle.toTag("fake/foo-bar-Example");
+		assertThrows(IllegalArgumentException.class, () -> URF.Handle.toTag("fake/foo-bar-Example"));
 	}
 
 	/** @see URF.Handle#toTag(String) */
-	@Test(expected = IllegalArgumentException.class)
 	public void testHandleToTagSegmentsIDInOtherNamespacesNotAllowed() {
-		URF.Handle.toTag("fake/foo-bar-Example#foo");
+		assertThrows(IllegalArgumentException.class, () -> URF.Handle.toTag("fake/foo-bar-Example#foo"));
 	}
 
 	/** @see URF.Handle#toTag(String) */
-	@Test(expected = IllegalArgumentException.class)
 	public void testHandleToTagSegmentsIDNumberInOtherNamespacesNotAllowed() {
-		URF.Handle.toTag("fake/foo-bar-Example#123");
+		assertThrows(IllegalArgumentException.class, () -> URF.Handle.toTag("fake/foo-bar-Example#123"));
 	}
 
 	/**

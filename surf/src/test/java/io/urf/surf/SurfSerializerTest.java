@@ -16,7 +16,7 @@
 
 package io.urf.surf;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
 
 import java.io.*;
 import java.math.*;
@@ -37,7 +37,7 @@ import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.Matchers.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
@@ -70,7 +70,7 @@ public class SurfSerializerTest implements Clogged {
 	}
 
 	/** General test currently for manual verification of formatted serialization. */
-	@Ignore
+	@Disabled
 	@Test
 	public void testSerialize() throws IOException {
 		final SurfObject surfObject = new SurfObject(URI.create("urn:uuid:bb8e7dbe-f0b4-4d94-a1cf-46ed0e920832"), "User");
@@ -415,7 +415,7 @@ public class SurfSerializerTest implements Clogged {
 	//##regular expression
 
 	/** @see SurfTestResources#OK_REGULAR_EXPRESSIONS_RESOURCE_NAME */
-	@Ignore //TODO enable when SurfObject support comparing pattern property values; see https://bugs.openjdk.java.net/browse/JDK-7163589
+	@Disabled //TODO enable when SurfObject support comparing pattern property values; see https://bugs.openjdk.java.net/browse/JDK-7163589
 	@Test
 	public void testOkRegularExpressions() throws IOException {
 		final SurfObject surfObject = new SurfObject();

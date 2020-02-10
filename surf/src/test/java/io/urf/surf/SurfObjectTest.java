@@ -16,13 +16,13 @@
 
 package io.urf.surf;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 
 import java.time.*;
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests of {@link SurfObject}.
