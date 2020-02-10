@@ -799,6 +799,10 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull Iterable<?> roots) throws IOException {
+		if(isDiscoverVocabularies()) {
+			roots.forEach(this::discoverVocabularies);
+		}
+
 		//header
 		final boolean includeHeader = !getVocabularyRegistrar().isEmpty(); //TODO add option(s) to force a header
 		if(includeHeader) {
