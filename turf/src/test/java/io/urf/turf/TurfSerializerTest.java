@@ -17,6 +17,7 @@
 package io.urf.turf;
 
 import static io.urf.turf.TurfTestResources.*;
+import static java.util.AbstractMap.SimpleImmutableEntry;
 import static java.util.Arrays.*;
 import static java.util.stream.StreamSupport.*;
 import static org.hamcrest.Matchers.*;
@@ -31,7 +32,7 @@ import javax.annotation.*;
 
 import org.junit.Test;
 
-import com.globalmentor.vocab.VocabularyManager;
+import com.globalmentor.vocab.*;
 
 import io.urf.URF;
 import io.urf.URF.Tag;
@@ -139,6 +140,116 @@ public class TurfSerializerTest {
 		stream(object1.getProperties().spliterator(), false).map(Map.Entry::getKey).filter(Tag::isNary).forEach(naryPropertyTag -> {
 			assertThat(reason + ", " + naryPropertyTag, object1.getPropertyValues(naryPropertyTag), is(object2.getPropertyValues(naryPropertyTag)));
 		});
+	}
+
+	private static final URI CC_NAMESPACE = URI.create("http://creativecommons.org/ns#");
+	private static final URI DC_NAMESPACE = URI.create("http://purl.org/dc/terms/");
+	private static final URI OG_NAMESPACE = URI.create("http://ogp.me/ns#");
+	private static final URI EG_NAMESPACE = URI.create("https://example.com/ns/");
+
+	/** @see TurfSerializer#discoverVocabulary(URI) */
+	@Test
+	public void testDiscoverVocabulary() {
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.setDiscoverVocabularies(true);
+		//The Creative Commons and Open Graph namespaces will be incorrectly detected by URF for now,
+		//because they don't follow the URF namespace convention.
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(CC_NAMESPACE, "permits").toURI()); //not an URF namespace
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(DC_NAMESPACE, "creator").toURI());
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(OG_NAMESPACE, "title").toURI()); //not an URF namespace
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(DC_NAMESPACE, "creator").toURI()); //duplicate
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(EG_NAMESPACE, "FooBar").toURI());
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("http://creativecommons.org/"), "ns1"), new SimpleImmutableEntry<>(DC_NAMESPACE, "terms"),
+						new SimpleImmutableEntry<>(URI.create("http://ogp.me/"), "ns2"), new SimpleImmutableEntry<>(EG_NAMESPACE, "ns")));
+	}
+
+	/** @see TurfSerializer#discoverVocabulary(URI) */
+	@Test
+	public void testDiscoverVocabularyWithKnownVocabularies() {
+		final VocabularyRegistry knownVocabularies = VocabularyRegistry.builder().registerPrefix("dc", DC_NAMESPACE).registerPrefix("eg", EG_NAMESPACE).build();
+		final TurfSerializer turfSerializer = new TurfSerializer(knownVocabularies);
+		//The Creative Commons and Open Graph namespaces will be incorrectly detected by URF for now,
+		//because they don't follow the URF namespace convention.
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(CC_NAMESPACE, "permits").toURI()); //not an URF namespace
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(DC_NAMESPACE, "creator").toURI());
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(OG_NAMESPACE, "title").toURI()); //not an URF namespace
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(DC_NAMESPACE, "creator").toURI()); //duplicate
+		turfSerializer.discoverVocabulary(VocabularyTerm.of(EG_NAMESPACE, "FooBar").toURI());
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("http://creativecommons.org/"), "ns1"), new SimpleImmutableEntry<>(DC_NAMESPACE, "dc"),
+						new SimpleImmutableEntry<>(URI.create("http://ogp.me/"), "ns2"), new SimpleImmutableEntry<>(EG_NAMESPACE, "eg")));
+	}
+
+	/** @see TurfSerializer#discoverVocabularies(Object) */
+	@Test
+	public void testDiscoverVocabulariesFromResourceType() {
+		final UrfObject urfObject = new UrfObject(URI.create("https://example.com/test1/tag"), URI.create("https://example.com/test2/Foo"));
+		urfObject.setPropertyValueByHandle("foo", "bar");
+		final UrfObject nestedUrfObject = new UrfObject(null, URI.create("https://example.com/test3/Bar"));
+		urfObject.setPropertyValueByHandle("nested", nestedUrfObject);
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.discoverVocabularies(urfObject);
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		//in the current implementation the tag is not discovered as a vocabulary
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("https://example.com/test2/"), "test2"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test3/"), "test3")));
+	}
+
+	/** @see TurfSerializer#discoverVocabularies(Object) */
+	@Test
+	public void testDiscoverVocabulariesFromPropertyTags() {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.setPropertyValue(URI.create("https://example.com/test1/prop1"), "value1");
+		final UrfObject nestedUrfObject = new UrfObject();
+		nestedUrfObject.setPropertyValue(URI.create("https://example.com/test2/prop2"), "value2");
+		urfObject.setPropertyValueByHandle("nested", nestedUrfObject);
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.discoverVocabularies(urfObject);
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("https://example.com/test1/"), "test1"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test2/"), "test2")));
+	}
+
+	/** @see TurfSerializer#discoverVocabularies(Object) */
+	@Test
+	public void testDiscoverVocabulariesInList() {
+		final UrfObject urfObject1 = new UrfObject(null, URI.create("https://example.com/test1/Foo"));
+		final UrfObject urfObject2 = new UrfObject(null, URI.create("https://example.com/test2/Bar"));
+		final UrfObject urfObject3 = new UrfObject(null, URI.create("https://example.com/test3/FooBar"));
+		urfObject1.setPropertyValueByHandle("prop", urfObject2);
+		urfObject1.setPropertyValueByHandle("more", asList(urfObject3)); //nested list
+		final List<Object> list = asList("foo", urfObject1, "bar");
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.discoverVocabularies(list);
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("https://example.com/test1/"), "test1"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test2/"), "test2"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test3/"), "test3")));
+	}
+
+	/** @see TurfSerializer#discoverVocabularies(Object) */
+	@Test
+	public void testDiscoverVocabulariesInMap() {
+		final UrfObject rootObject = new UrfObject(null, URI.create("https://example.com/test1/FooBar"));
+		final UrfObject fooObject = new UrfObject(null, URI.create("https://example.com/test2/Foo"));
+		final UrfObject barObject = new UrfObject(null, URI.create("https://example.com/test3/Bar"));
+		final Map<Object, Object> map = new HashMap<>();
+		map.put("foo", "bar");
+		map.put(fooObject, barObject);
+		rootObject.setPropertyValueByHandle("more", map);
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.discoverVocabularies(rootObject);
+		final VocabularyRegistrar vocabularyRegistrar = turfSerializer.getVocabularyRegistrar();
+		assertThat(vocabularyRegistrar.getRegisteredPrefixesByVocabulary(),
+				containsInAnyOrder(new SimpleImmutableEntry<>(URI.create("https://example.com/test1/"), "test1"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test2/"), "test2"),
+						new SimpleImmutableEntry<>(URI.create("https://example.com/test3/"), "test3")));
 	}
 
 	/** @see TurfSerializer#serializeTagReference(Appendable, URI) */

@@ -332,7 +332,7 @@ public class URF {
 		/**
 		 * Retrieves the namespace of the given tag. The namespace is the parent collection URI of the tag.
 		 * @apiNote Not every tag is in a namespace. For example, a tag URI without a path is not in any namespace. A tag URI with the root path is not in any
-		 *          namespace
+		 *          namespace.
 		 * @param tag The tag URI from which a namespace should be retrieved.
 		 * @return The namespace of the tag.
 		 * @throws NullPointerException if the given tag is <code>null</code>.
