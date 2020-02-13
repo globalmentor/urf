@@ -71,4 +71,15 @@ final class EmptyUrfResourceDescription implements UrfResourceDescription {
 	public Iterable<Map.Entry<URI, Object>> getProperties() {
 		return emptySet();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation throws an {@link UnsupportedOperationException}.
+	 * @throws UnsupportedOperationException because this implementation is read-only.
+	 */
+	@Override
+	public boolean removeProperty(final URI propertyTag) {
+		throw new UnsupportedOperationException("This empty description is immutable.");
+	}
+
 }
