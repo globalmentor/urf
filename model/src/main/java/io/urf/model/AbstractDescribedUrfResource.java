@@ -136,6 +136,13 @@ public abstract class AbstractDescribedUrfResource extends BaseUrfResource imple
 		return properties; //TODO improve implementation to use dynamic iterator by chaining sub-iterators
 	}
 
+	@Override
+	public boolean removeProperty(final URI propertyTag) {
+		final Object oldValue = propertyValuesByTag.remove(propertyTag);
+		assert !(oldValue instanceof Many) || !((Many)oldValue).isEmpty() : "This implementation should not allow an empty `Many`.";
+		return oldValue != null;
+	}
+
 	/**
 	 * Optional tag and optional type name constructor.
 	 * @param tag The identifying resource tag, or <code>null</code> if not known.

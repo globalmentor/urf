@@ -221,4 +221,26 @@ public interface UrfResourceDescription {
 		properties.forEach(this::setPropertyValue);
 	}
 
+	/**
+	 * Removes a property by the property tag. Any and all values of the property will be removed, even for n-arity properties.
+	 * @param propertyTag The name of the property to remove.
+	 * @return <code>true</code> if at least one property value was removed.
+	 * @throws NullPointerException if the given property tag is <code>null</code>.
+	 * @throws IllegalArgumentException if the given URI is not a valid tag.
+	 */
+	public boolean removeProperty(@Nonnull URI propertyTag);
+
+	/**
+	 * Removes a property by the property handle.
+	 * @implSpec The default implementation delegates to {@link #removeProperty(URI)}.
+	 * @param propertyHandle The handle of the property to remove.
+	 * @return <code>true</code> if at least one property value was removed.
+	 * @throws NullPointerException if the given property property tag is <code>null</code>.
+	 * @throws IllegalArgumentException if the given string is not a valid handle.
+	 * @see #removeProperty(URI)
+	 */
+	public default boolean removePropertyByHandle(@Nonnull String propertyHandle) {
+		return removeProperty(Handle.toTag(propertyHandle));
+	}
+
 }
