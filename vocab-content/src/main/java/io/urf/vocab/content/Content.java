@@ -47,7 +47,7 @@ public class Content {
 	//#properties
 
 	/** The instant when a resource was last accessed. */
-	public static final URI ACCESSED_PROPERTY_TAG = NAMESPACE.resolve("accessedAt");
+	public static final URI ACCESSED_AT_PROPERTY_TAG = NAMESPACE.resolve("accessedAt");
 	/**
 	 * The charset of a resource.
 	 * @deprecated This property is experimental; as the charset is now normally part of the {@link #TYPE_PROPERTY_TAG} property, it is unclear whether a separate
@@ -56,11 +56,15 @@ public class Content {
 	@Deprecated
 	public static final URI CHARSET_PROPERTY_TAG = NAMESPACE.resolve("charset");
 	/** The instant when a resource was created. */
-	public static final URI CREATED_PROPERTY_TAG = NAMESPACE.resolve("createdAt");
-	/** The resource that created this resource at the indicated created instant. */
+	public static final URI CREATED_AT_PROPERTY_TAG = NAMESPACE.resolve("createdAt");
+	/**
+	 * The resource that created this resource at the indicated created instant.
+	 * @deprecated To be removed; it is unclear how or why it was added.
+	 */
+	@Deprecated
 	public static final URI CREATOR_PROPERTY_TAG = NAMESPACE.resolve("creator");
 	/** The instant a resource was last modified. */
-	public static final URI MODIFIED_PROPERTY_TAG = NAMESPACE.resolve("modifiedAt");
+	public static final URI MODIFIED_AT_PROPERTY_TAG = NAMESPACE.resolve("modifiedAt");
 	/**
 	 * The size of the contents of the resource. For <code>urf-Binary</code> content, this indicates the number of bytes. For <code>urf-String</code> content,
 	 * this indicates the number of characters.
