@@ -63,6 +63,11 @@ public class Content {
 	 */
 	@Deprecated
 	public static final URI CREATOR_PROPERTY_TAG = NAMESPACE.resolve("creator");
+	/**
+	 * The bytes that identify the larger contents for modification detection.
+	 * @see <a href="https://en.wikipedia.org/wiki/Fingerprint_(computing)">Fingerprint (computing)</a>
+	 */
+	public static final URI FINGERPRINT_PROPERTY_TAG = NAMESPACE.resolve("fingerprint");
 	/** The instant a resource was last modified. */
 	public static final URI MODIFIED_AT_PROPERTY_TAG = NAMESPACE.resolve("modifiedAt");
 	/**
