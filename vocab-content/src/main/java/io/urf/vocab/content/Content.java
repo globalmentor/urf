@@ -35,7 +35,7 @@ public class Content {
 	/** The URI to the URF content namespace. */
 	public static final URI NAMESPACE = URF.AD_HOC_NAMESPACE.resolve("content/");
 
-	//#classes
+	//# classes
 
 	/** The URI of the <code>content-Charset</code> class. */
 	public static final URI CHARSET_CLASS_TAG = NAMESPACE.resolve("Charset");
@@ -44,7 +44,7 @@ public class Content {
 	/** The URI of the <code>content-Text</code> class. */
 	public static final URI TEXT_CLASS_TAG = NAMESPACE.resolve("Text");
 
-	//#properties
+	//# properties
 
 	/** The instant when a resource was last accessed. */
 	public static final URI ACCESSED_AT_PROPERTY_TAG = NAMESPACE.resolve("accessedAt");
@@ -104,6 +104,42 @@ public class Content {
 			final String charsetName = URF.Tag.findId(tag).orElseThrow(() -> new IllegalArgumentException("Tag " + tag + " has no charset indicated."));
 			return Charset.forName(charsetName);
 		}
+
+	}
+
+	/**
+	 * The URF content check vocabulary.
+	 * @author Garret Wilson
+	 */
+	public static class Check {
+
+		/** The URI to the URF content check namespace. */
+		public static final URI NAMESPACE = Content.NAMESPACE.resolve("check/");
+
+		//## properties
+
+		/** MD2 message digest. */
+		public static final URI MD2_PROPERTY_TAG = NAMESPACE.resolve("md2");
+		/** MD5 message digest. */
+		public static final URI MD5_PROPERTY_TAG = NAMESPACE.resolve("md5");
+		/** SHA1 message digest. */
+		public static final URI SHA1_PROPERTY_TAG = NAMESPACE.resolve("sha1");
+		/**
+		 * SHA2 message digest; differing size functions such as SHA-512/224 are not supported.
+		 * @see <a href="https://doi.org/10.6028/NIST.FIPS.180-4">NIST FIPS 180-4: Secure Hash Standard (SHS)</a>
+		 */
+		public static final URI SHA2_PROPERTY_TAG = NAMESPACE.resolve("sha2");
+		/**
+		 * SHA3 message digest.
+		 * @see <a href="https://doi.org/10.6028/NIST.FIPS.202">NIST FIPS 202: SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions</a>
+		 */
+		public static final URI SHA3_PROPERTY_TAG = NAMESPACE.resolve("sha3");
+		/**
+		 * A general checksum the result of using an unspecified algorithm.
+		 * @apiNote The algorithm is not specified. It is assumed that a consistent algorithm will be used by the consumer, and an algorithm change will result in
+		 *          the contents being considered modified.
+		 */
+		public static final URI SUM_PROPERTY_TAG = NAMESPACE.resolve("sum");
 
 	}
 
