@@ -40,12 +40,6 @@ public class TURF {
 	/** The default TURF charset. */
 	public static final Charset DEFAULT_CHARSET = UTF_8;
 
-	/** The optional signature for a TURF file. */
-	public static final String SIGNATURE = "/URF/";
-
-	/** The delimiter signaling the start of the TURF signature. */
-	public static final char SIGNATURE_BEGIN = SIGNATURE.charAt(0);
-
 	/** Characters recognized as whitespace. */
 	public static final Characters WHITESPACE_CHARACTERS = SPACE_SEPARATOR_CHARACTERS.add(CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR, FORM_FEED_CHAR,
 			SPACE_CHAR, NO_BREAK_SPACE_CHAR, ZERO_WIDTH_NO_BREAK_SPACE_CHAR);
