@@ -17,6 +17,7 @@
 package io.urf.turf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static com.globalmentor.util.stream.Streams.*;
 import static io.urf.turf.TurfTestResources.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.MatcherAssert.*;
@@ -99,7 +100,7 @@ public class TurfParserTest {
 	@Test
 	public void testObjectHandle() throws IOException {
 		for(final String okObjectHandleResourceName : OK_OBJECT_HANDLE_RESOURCE_NAMES) {
-			final UrfObject urfObject = (UrfObject)parseTestResource(okObjectHandleResourceName).stream().findAny()
+			final UrfObject urfObject = (UrfObject)parseTestResource(okObjectHandleResourceName).stream().reduce(toFindOnly())
 					.orElseThrow(() -> new AssertionError(okObjectHandleResourceName));
 			assertThat(okObjectHandleResourceName, urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 			assertThat(okObjectHandleResourceName, urfObject.getTypeTag(), not(isPresent()));
@@ -110,7 +111,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME */
 	@Test
 	public void testObjectHandleType() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
@@ -121,7 +123,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME */
 	@Test
 	public void testHandleAmbiguousProperty() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 		assertThat(urfObject.findPropertyValueByHandle("true"), isPresentAndIs("test"));
@@ -130,7 +133,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME */
 	@Test
 	public void testHandleAmbiguousTag() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/false")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
@@ -139,7 +143,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME */
 	@Test
 	public void testHandleAmbiguousType() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/true")));
 		assertThat(urfObject.findPropertyValueByHandle("example"), isPresentAndIs("test"));
@@ -148,7 +153,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME */
 	@Test
 	public void testHandleAmbiguousValue() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isPresentAndIs(URI.create("https://urf.name/foo")));
 		assertThat(urfObject.getTypeTag(), isPresentAndIs(URI.create("https://urf.name/Bar")));
 		final UrfObject value = urfObject.findPropertyValueByHandle("example").map(UrfObject.class::cast).orElseThrow(AssertionError::new);
@@ -162,7 +168,7 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_IDS_RESOURCE_NAME */
 	@Test
 	public void testIds() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_IDS_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_IDS_RESOURCE_NAME).stream().reduce(toFindOnly()).orElseThrow(AssertionError::new);
 
 		final UrfObject asTag = (UrfObject)urfObject.findPropertyValueByHandle("asTag").orElseThrow(AssertionError::new);
 		assertThat(asTag.getTag(), isPresentAndIs(URI.create("https://example.com/Foo#bar1")));
@@ -215,7 +221,7 @@ public class TurfParserTest {
 	@Test
 	public void testOkNamespaces() throws IOException {
 		for(final String okNamespacesResourceName : OK_NAMESPACES_RESOURCE_NAMES) {
-			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().findAny(); //TODO require no more than one resource
+			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().reduce(toFindOnly());
 			final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(() -> new AssertionError(okNamespacesResourceName));
 			assertThat(okNamespacesResourceName, urfObject.getPropertyCount(), is(5));
 			assertThat(okNamespacesResourceName, urfObject.getTag(), isPresentAndIs(URI.create("https://example.com/foo.bar")));
@@ -293,7 +299,7 @@ public class TurfParserTest {
 	@Test
 	public void testOkProperties() throws IOException {
 		for(final String okPropertiesResourceName : OK_PROPERTIES_RESOURCE_NAMES) {
-			final UrfObject urfObject = (UrfObject)parseTestResource(okPropertiesResourceName).stream().findAny()
+			final UrfObject urfObject = (UrfObject)parseTestResource(okPropertiesResourceName).stream().reduce(toFindOnly())
 					.orElseThrow(() -> new AssertionError(okPropertiesResourceName));
 			assertThat(urfObject.getTag(), isEmpty());
 			assertThat(urfObject.getTypeTag(), isEmpty());
@@ -313,7 +319,7 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME */
 	@Test
 	public void testOkPropertiesNamespacesAliases() throws IOException {
-		final Optional<Object> object = parseTestResource(OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME).stream().findAny();
+		final Optional<Object> object = parseTestResource(OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME).stream().reduce(toFindOnly());
 		final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(AssertionError::new);
 		assertThat(urfObject.getTag(), isEmpty());
 		assertThat(urfObject.getTypeTag(), isEmpty());
@@ -336,7 +342,7 @@ public class TurfParserTest {
 	@Test
 	public void testPropertyObjectDescriptions() throws IOException {
 		for(final String okPropertyObjectDescriptionsResourceName : OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES) {
-			final UrfObject urfObject = (UrfObject)parseTestResource(okPropertyObjectDescriptionsResourceName).stream().findAny()
+			final UrfObject urfObject = (UrfObject)parseTestResource(okPropertyObjectDescriptionsResourceName).stream().reduce(toFindOnly())
 					.orElseThrow(() -> new AssertionError(okPropertyObjectDescriptionsResourceName));
 			assertThat(okPropertyObjectDescriptionsResourceName, urfObject.getPropertyCount(), is(2));
 			assertThat(okPropertyObjectDescriptionsResourceName, urfObject.findPropertyValueByHandle("example"), isPresentAnd(instanceOf(UrfObject.class)));
@@ -356,7 +362,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME */
 	@Test
 	public void testOkNaryOnePropertyOneValue() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getPropertyCount(), is(1));
 		assertThat(urfObject.getPropertyValueCount(), is(1));
 		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example"));
@@ -365,7 +372,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME */
 	@Test
 	public void testOkNaryOnePropertyTwoValues() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getPropertyCount(), is(1));
 		assertThat(urfObject.getPropertyValueCount(), is(2));
 		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test"));
@@ -374,7 +382,7 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME */
 	@Test
 	public void testOkNaryOnePropertyThreeValues() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME).stream().findAny()
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME).stream().reduce(toFindOnly())
 				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getPropertyCount(), is(1));
 		assertThat(urfObject.getPropertyValueCount(), is(3));
@@ -384,7 +392,8 @@ public class TurfParserTest {
 	/** @see TurfTestResources#OK_NARY_TWO_PROPERTIES_RESOURCE_NAME */
 	@Test
 	public void testOkNaryTwoProperties() throws IOException {
-		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_TWO_PROPERTIES_RESOURCE_NAME).stream().findAny().orElseThrow(AssertionError::new);
+		final UrfObject urfObject = (UrfObject)parseTestResource(OK_NARY_TWO_PROPERTIES_RESOURCE_NAME).stream().reduce(toFindOnly())
+				.orElseThrow(AssertionError::new);
 		assertThat(urfObject.getPropertyCount(), is(2));
 		assertThat(urfObject.getPropertyValueCount(), is(7));
 		assertThat(urfObject.getPropertyValuesByHandle("many+"), containsInAnyOrder("example", "test", Year.of(1999)));
@@ -395,7 +404,7 @@ public class TurfParserTest {
 	@Test
 	public void testOkNaryMixedProperties() throws IOException {
 		for(final String okNamespacesResourceName : OK_NARY_MIXED_PROPERTIES_RESOURCE_NAMES) {
-			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().findAny(); //TODO require no more than one resource
+			final Optional<Object> object = parseTestResource(okNamespacesResourceName).stream().reduce(toFindOnly());
 			final UrfObject urfObject = object.map(UrfObject.class::cast).orElseThrow(() -> new AssertionError(okNamespacesResourceName));
 			assertThat(urfObject.getPropertyCount(), is(3));
 			assertThat(urfObject.getPropertyValueCount(), is(8));
