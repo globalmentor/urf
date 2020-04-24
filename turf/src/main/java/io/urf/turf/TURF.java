@@ -34,8 +34,14 @@ public class TURF {
 	/** The content type for TURF: <code>text/urf</code>. */
 	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf");
 
+	/** The content type for TURF Properties: <code>text/urf-properties</code>. */
+	public static final ContentType PROPERTIES_CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf-properties");
+
 	/** An extension for TURF filenames. */
 	public static final String FILENAME_EXTENSION = "turf";
+
+	/** An extension for TURF Properties filenames. */
+	public static final String PROPERTIES_FILENAME_EXTENSION = "turf-properties";
 
 	/** The default TURF charset. */
 	public static final Charset DEFAULT_CHARSET = UTF_8;

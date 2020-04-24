@@ -18,6 +18,7 @@ package io.urf.turf;
 
 import static com.globalmentor.io.ReaderParser.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.*;
 import static io.urf.URF.*;
 import static io.urf.turf.TURF.*;
@@ -136,58 +137,111 @@ public class TurfParser<R> {
 	}
 
 	/**
-	 * Parses a TURF document from a string.
-	 * <p>
-	 * This is a convenience method that delegates to {@link #parseDocument(Reader)}.
-	 * </p>
+	 * Parses a TURF document from a string, automatically detecting the TURF variant.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)}.
 	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
+		return parseDocument(string, null);
+	}
+
+	/**
+	 * Parses a TURF document from a string.
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @implSpec This is a convenience method that delegates to {@link #parseDocument(Reader, ContentType)}.
+	 * @param string The string containing TURF data.
+	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
+	 * @throws IllegalArgumentException if the given content type is not supported.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
+	 */
+	public R parseDocument(@Nonnull final String string, @Nullable final ContentType contentType) throws IOException, ParseIOException {
 		try (final Reader stringReader = new StringReader(string)) {
-			return parseDocument(stringReader);
+			return parseDocument(stringReader, contentType);
 		}
 	}
 
 	/**
-	 * Parses a TURF resource from an input stream.
+	 * Parses a TURF resource from an input stream, automatically detecting the TURF variant.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
-		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)));
+		return parseDocument(inputStream, null);
 	}
 
 	/**
-	 * Parses TURF resources from a reader.
+	 * Parses a TURF resource from an input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)}.
+	 * @param inputStream The input stream containing TURF data.
+	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
+	 * @throws IllegalArgumentException if the given content type is not supported.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
+	 */
+	public R parseDocument(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException, ParseIOException {
+		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)), contentType);
+	}
+
+	/**
+	 * Parses TURF resources from a reader, automatically detecting the TURF variant.
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)}.
 	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
-		boolean nextItemProhibited = false;
+		return parseDocument(reader, null);
+	}
+
+	/**
+	 * Parses TURF resources from a reader.
+	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
+	 * @param reader The reader containing TURF data.
+	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
+	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
+	 * @throws IllegalArgumentException if the given content type is not supported.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
+	 */
+	public R parseDocument(@Nonnull final Reader reader, @Nullable final ContentType contentType) throws IOException, ParseIOException {
+		//TODO add support for SURF
+		checkArgument(contentType == null || contentType.hasBaseType(TURF.CONTENT_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
+				"TURF parser does not support documents of type >%s<.", contentType);
 
 		//header
+		final Optional<ContentType> foundDoctype;
 		int c = peek(reader); //the header has to come a the first of the document, if at all
 		final boolean hasHeader = c == DIVISION_BEGIN;
 		if(hasHeader) {
 			check(reader, DIVISION); //===
-			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> doctype = parseMediaType(reader, true);
-			checkParseIO(reader, doctype.getKey().hasBaseType(TURF.CONTENT_TYPE.getBaseContentType()), "Document type `%s` not supported; must be `%s`.",
-					doctype.getKey(), TURF.CONTENT_TYPE);
+			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> namespaceMapForDoctype = parseMediaType(reader, true);
+			final ContentType doctype = namespaceMapForDoctype.getKey();
+			if(contentType != null) {
+				checkParseIO(reader, doctype.hasBaseType(contentType.getBaseContentType()), "Doctype >%s< does not has same base type as requested content type >%s<.",
+						doctype, contentType);
+			} else { //autodetect
+				checkArgument(doctype.hasBaseType(TURF.CONTENT_TYPE) || doctype.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
+						"Document type >%s< not supported; must be >%s< or >%s<.", doctype, TURF.CONTENT_TYPE, TURF.PROPERTIES_CONTENT_TYPE);
+			}
+			foundDoctype = Optional.of(doctype);
 			//TODO store the document type somewhere for later retrieval
 
 			//gather the namespace declarations from the embedded doctype description
-			namepaces = Optionals.stream(doctype.getValue().map(Map::entrySet)).flatMap(Set::stream)
+			namepaces = Optionals.stream(namespaceMapForDoctype.getValue().map(Map::entrySet)).flatMap(Set::stream)
 					//only look at namespace property
 					.filter(entry -> Tag.findNamespace(entry.getKey()).filter(SPACE_NAMESPACE::equals).isPresent())
 					//convert each namespace property to a namespace entry
@@ -200,6 +254,8 @@ public class TurfParser<R> {
 						return new AbstractMap.SimpleImmutableEntry<>(namespaceAlias, namespace);
 					})).collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue), Collections::unmodifiableMap));
 			//TODO log warning for ignored directives?
+		} else {
+			foundDoctype = Optional.empty();
 		}
 
 		//Because we checked for the header at the beginning of the document, we now need to skip vertical filler,
@@ -213,6 +269,7 @@ public class TurfParser<R> {
 			final Map<String, URI> namespaces = new HashMap<>();
 			parseSequence(reader, DOCUMENT_DESCRIPTION_DELIMITER, r -> {
 				final String propertyHandle = parseHandle(reader);
+				@SuppressWarnings("unused")
 				final URI propertyTag;
 				try {
 					propertyTag = Handle.toTag(propertyHandle, namespaces);
@@ -222,6 +279,7 @@ public class TurfParser<R> {
 				skipLineBreaks(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
 				skipLineBreaks(reader);
+				@SuppressWarnings("unused")
 				final UrfReference value = parseResource(reader, false);
 				//TODO make sure the resource is a literal
 				//TODO process document description
@@ -230,27 +288,58 @@ public class TurfParser<R> {
 			c = skipLineBreaks(reader);
 		}
 
-		//body (root resources)
-		while(c >= 0 || nextItemRequired) {
-			if(c >= 0 && nextItemProhibited) {
-				throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
-			}
-			final UrfReference rootResource = parseResource(reader);
-			getProcessor().reportRootResource(rootResource); //register the resource as a root
-			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
-			//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
-			if(requireItem.isPresent()) {
-				nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
-				nextItemProhibited = false;
-			} else {
-				nextItemRequired = false;
-				nextItemProhibited = true;
-			}
-			c = peek(reader);
+		try { //if neither a content type or a doctype was specified, assumed >text/urf< 
+			parsePartBody(reader, foundDoctype.orElseGet(() -> contentType != null ? contentType : TURF.CONTENT_TYPE));
+		} catch(final IllegalArgumentException illegalArgumentException) {
+			throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
 		}
 
 		//TODO footer
 		return getProcessor().getResult();
+	}
+
+	/**
+	 * Parses body of a TURF part. Resources are reported as root resources.
+	 * @apiNote Currently there is only one TURF part, the TURF document itself, so this method parses the document body, and the part type is the doctype.
+	 * @param reader The reader containing TURF data.
+	 * @param partType The type of this part; usually defined in the part header.
+	 * @throws IllegalArgumentException if the part type is not supported or has unsupported parameters.
+	 * @throws IOException If there was an error reading the TURF data.
+	 * @throws ParseIOException if the TURF data was invalid.
+	 */
+	protected void parsePartBody(@Nonnull final Reader reader, @Nonnull final ContentType partType) throws IOException, ParseIOException {
+		if(partType.hasBaseType(TURF.CONTENT_TYPE)) { //>text/urf<
+			checkArgument(partType.getParameters().isEmpty(), "Body with type >%s< does not support media type parameters.", partType);
+			boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
+			boolean nextItemProhibited = false;
+			int c;
+			while((c = peek(reader)) >= 0 || nextItemRequired) {
+				if(c >= 0 && nextItemProhibited) {
+					throw new ParseIOException(reader, "Unexpected data; perhaps a missing sequence delimiter.");
+				}
+				final UrfReference rootResource = parseResource(reader);
+				getProcessor().reportRootResource(rootResource); //register the resource as a root
+				final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
+				//TODO add check for SURF documents: checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
+				if(requireItem.isPresent()) {
+					nextItemRequired = requireItem.get().booleanValue(); //see if a new item is required
+					nextItemProhibited = false;
+				} else {
+					nextItemRequired = false;
+					nextItemProhibited = true;
+				}
+			}
+		} else if(partType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE)) { //>text/urf-properties<
+			final URI blankTag = Tag.generateBlank();
+			final UrfResource object = new SimpleUrfResource(blankTag, (URI)null);
+			getProcessor().declareResource(blankTag);
+			final int c = parseDescriptionBody(reader, DIVISION_BEGIN, object);
+			checkParseIO(reader, c != DIVISION_BEGIN, "Ending and inter-divisions not yet supported; character `%s` not allowed after body properties.", c);
+			assert c == -1 : "End of reader should have been found after body properties.";
+			getProcessor().reportRootResource(object); //register the object as a root
+		} else {
+			throw new IllegalArgumentException(); //TODO finish
+		}
 	}
 
 	/**
@@ -703,7 +792,24 @@ public class TurfParser<R> {
 	protected void parseDescription(@Nonnull final Reader reader, @Nonnull final UrfResource subject) throws IOException {
 		requireNonNull(subject);
 		check(reader, DESCRIPTION_BEGIN); //:
-		parseSequence(reader, DESCRIPTION_END, r -> {
+		parseDescriptionBody(reader, DESCRIPTION_END, subject);
+		check(reader, DESCRIPTION_END); //;
+	}
+
+	/**
+	 * Parses the body of the description properties of a resource, that is, inside the description delimiters.
+	 * @apiNote This method will return if it encounters the end of the reader, so if the sequence end is required the caller must check the return value.
+	 * @param reader The reader containing TURF data.
+	 * @param sequenceEnd The character expected to end the sequence.
+	 * @param subject The resource to which properties should be added.
+	 * @return The next character that will be returned by the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
+	 *         reached without encountering the end of the sequence.
+	 * @throws NullPointerException if the given reader and/or subject is <code>null</code>.
+	 * @throws IOException If there was an error reading the TURF data.
+	 */
+	protected int parseDescriptionBody(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final UrfResource subject) throws IOException {
+		requireNonNull(subject);
+		return parseSequence(reader, sequenceEnd, r -> {
 			final URI propertyTag = parseTagReference(reader);
 			//TODO fix; do we want to declare properties? if not, what if they are described? final UrfResource property = getProcessor().declareResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			final UrfResource property = new SimpleUrfResource(propertyTag); //TODO decide whether to declare properties
@@ -726,7 +832,6 @@ public class TurfParser<R> {
 						checkParseIO(reader, !oldValue.isPresent(), "Resource has duplicate definition for property %s.", propertyHandle);
 			*/
 		});
-		check(reader, DESCRIPTION_END); //;
 	}
 
 	//literals
@@ -1584,7 +1689,9 @@ public class TurfParser<R> {
 
 	/**
 	 * Parses a general TURF sequence (such as a list). This method skips whitespace, comments, and sequence delimiters. For each sequence item,
-	 * {@link IOConsumer#accept(Object)} is called, passing the {@link Reader}, for the item to be parsed.
+	 * {@link IOConsumer#accept(Object)} is called, passing the {@link Reader}, for the item to be parsed. The sequence ends when the sequence end delimiter or
+	 * the end of the reader is reached.
+	 * @apiNote This method will return if it encounters the end of the reader, so if the sequence end is required the caller must check the return value.
 	 * @param reader The reader containing the sequence to parse.
 	 * @param sequenceEnd The character expected to end the sequence.
 	 * @param itemParser The parser strategy, which is passed the {@link Reader} to use for parsing.
@@ -1599,7 +1706,7 @@ public class TurfParser<R> {
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
 			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
-			c = peekRequired(reader); //we'll need to know the next character whatever the case
+			c = peek(reader); //we'll need to know the next character whatever the case; don't fail for the end of the reader
 			if(!requireItem.isPresent()) { //if there was no item delimiter at all
 				break; //no possibility for a new item
 			}
@@ -1610,7 +1717,7 @@ public class TurfParser<R> {
 
 	/**
 	 * Skips over TURF sequence delimiters in a reader. Whitespace and comments. The new position will either be the that of the first non-whitespace and non-EOL
-	 * character; or the end of the input stream.
+	 * character; or the end of the reader.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return {@link Boolean#TRUE} if a line delimiter was encountered that requires a following item, {@link Boolean#FALSE} if a line delimiter was encountered
 	 *         for which a following item is optional, or {@link Optional#empty()} if no line ending was encountered.

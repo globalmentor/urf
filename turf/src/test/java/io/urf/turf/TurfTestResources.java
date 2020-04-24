@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class TurfTestResources {
 
-	//#handles
+	//# handles
 	public static final String OK_OBJECT_HANDLE_0_RESOURCE_NAME = "ok-object-handle-0.turf";
 	public static final String OK_OBJECT_HANDLE_1_RESOURCE_NAME = "ok-object-handle-1.turf";
 
@@ -35,26 +35,38 @@ public class TurfTestResources {
 
 	public static final String OK_OBJECT_HANDLE_TYPE_RESOURCE_NAME = "ok-object-handle-type.turf";
 
-	//##potentially ambiguous handles
+	//## potentially ambiguous handles
 	public static final String OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME = "ok-handle-ambiguous-property.turf";
 	public static final String OK_HANDLE_AMBIGUOUS_TAG_RESOURCE_NAME = "ok-handle-ambiguous-tag.turf";
 	public static final String OK_HANDLE_AMBIGUOUS_TYPE_RESOURCE_NAME = "ok-handle-ambiguous-type.turf";
 	public static final String OK_HANDLE_AMBIGUOUS_VALUE_RESOURCE_NAME = "ok-handle-ambiguous-value.turf";
 
-	//#IDs
+	//# IDs
 	public static final String OK_IDS_RESOURCE_NAME = "ok-ids.turf";
 
-	//#namespaces
+	//# namespaces
 	public static final String OK_NAMESPACES_RESOURCE_NAME = "ok-namespaces.turf";
 	public static final String OK_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-namespaces-aliases.turf";
 
 	/** Names of TURF document resources semantically equivalent to {@value #OK_NAMESPACES_RESOURCE_NAME}. */
 	public static Set<String> OK_NAMESPACES_RESOURCE_NAMES = immutableSetOf(OK_NAMESPACES_RESOURCE_NAME, OK_NAMESPACES_ALIASES_RESOURCE_NAME);
 
-	//#roots
+	//# roots
 	public static final String OK_ROOTS_WHITESPACE_RESOURCE_NAME = "ok-roots-whitespace.turf";
 
-	//#short-hand property object descriptions
+	//# properties files
+	public static final String OK_PROPERTIES_RESOURCE_NAME = "ok-properties.turf";
+	public static final String OK_PROPERTIES_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties.turf-properties";
+	public static final String OK_PROPERTIES_WITH_HEADER_RESOURCE_NAME = "ok-properties-with-header.turf";
+	public static final String OK_PROPERTIES_WITH_HEADER_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties-with-header.turf-properties";
+
+	/** Names of TURF and TURF Properties document resources semantically equivalent to {@value #OK_PROPERTIES_RESOURCE_NAME}. */
+	public static Set<String> OK_PROPERTIES_RESOURCE_NAMES = immutableSetOf(OK_PROPERTIES_RESOURCE_NAME, OK_PROPERTIES_TURF_PROPERTIES_RESOURCE_NAME,
+			OK_PROPERTIES_WITH_HEADER_RESOURCE_NAME, OK_PROPERTIES_WITH_HEADER_TURF_PROPERTIES_RESOURCE_NAME);
+
+	public static final String OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-properties-namespaces-aliases.turf-properties";
+
+	//# short-hand property object descriptions
 	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME = "ok-property-object-descriptions.turf";
 	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_RESOURCE_NAME = "ok-property-object-descriptions-short.turf";
 	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_NO_WHITESPACE_RESOURCE_NAME = "ok-property-object-descriptions-short-no-whitespace.turf";
@@ -63,17 +75,17 @@ public class TurfTestResources {
 	public static Set<String> OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES = immutableSetOf(OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME,
 			OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_RESOURCE_NAME, OK_PROPERTY_OBJECT_DESCRIPTIONS_SHORT_NO_WHITESPACE_RESOURCE_NAME);
 
-	//#n-ary properties
+	//# n-ary properties
 
-	//##one n-ary property
+	//## one n-ary property
 	public static final String OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME = "ok-nary-one-property-one-value.turf";
 	public static final String OK_NARY_ONE_PROPERTY_TWO_VALUES_RESOURCE_NAME = "ok-nary-one-property-two-values.turf";
 	public static final String OK_NARY_ONE_PROPERTY_THREE_VALUES_RESOURCE_NAME = "ok-nary-one-property-three-values.turf";
 
-	//##two n-ary properties
+	//## two n-ary properties
 	public static final String OK_NARY_TWO_PROPERTIES_RESOURCE_NAME = "ok-nary-two-properties.turf";
 
-	//##mixed n-ary and binary properties
+	//## mixed n-ary and binary properties
 	public static final String OK_NARY_MIXED_PROPERTIES_0_RESOURCE_NAME = "ok-nary-mixed-properties-0.turf";
 	public static final String OK_NARY_MIXED_PROPERTIES_1_RESOURCE_NAME = "ok-nary-mixed-properties-1.turf";
 	public static final String OK_NARY_MIXED_PROPERTIES_2_RESOURCE_NAME = "ok-nary-mixed-properties-2.turf";

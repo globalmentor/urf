@@ -1,0 +1,14 @@
+===>urf-properties:
+	space-dc = <http://purl.org/dc/elements/1.1/>
+	space-foaf = <http://xmlns.com/foaf/0.1/>
+;<
+foo = "bar"
+dc/title = "An Example Resource"
+dc/creator = "Jane Doe"
+foaf/maker = *foaf/Person:
+	foaf/firstName = "Jane"
+	foaf/lastName = "Doe"
+	foaf/homepage = <https://janedoe.example.com/>
+; 	
+!TODO bring back: dc/language = ~en-US
+dc/date = @2018

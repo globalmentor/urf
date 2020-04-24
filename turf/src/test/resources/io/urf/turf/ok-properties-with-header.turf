@@ -1,0 +1,12 @@
+===>urf<
+*:
+	foo = "bar"
+	test = 123
+	opposites = {
+		"in": "out"
+		"up": "down"
+	}
+	other = *:
+		one = true
+	;
+;
