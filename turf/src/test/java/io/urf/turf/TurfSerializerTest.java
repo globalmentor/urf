@@ -16,6 +16,7 @@
 
 package io.urf.turf;
 
+import static io.urf.turf.TurfParserTest.*;
 import static io.urf.turf.TurfTestResources.*;
 import static java.util.AbstractMap.SimpleImmutableEntry;
 import static java.util.Arrays.*;
@@ -49,34 +50,13 @@ import io.urf.model.*;
 public class TurfSerializerTest {
 
 	/**
-	 * Loads and parses the indicated TURF document resource.
-	 * @implSpec The default implementation defaults to {@link #parse(InputStream)}.
-	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
-	 * @return The list of TURF document roots parsed.
-	 */
-	protected List<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
-		try (final InputStream inputStream = TurfTestResources.class.getResourceAsStream(testResourceName)) {
-			return parse(inputStream);
-		}
-	}
-
-	/**
-	 * Loads and parses the indicated TURF document resource.
-	 * @param inputStream The input stream containing the TURF document for testing.
-	 * @return The list of TURF document roots parsed.
-	 */
-	protected List<Object> parse(@Nonnull final InputStream inputStream) throws IOException {
-		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream);
-	}
-
-	/**
 	 * Loads and parses the TURF document indicated by the given string.
 	 * @param string The string containing the TURF document for testing.
 	 * @return The list of TURF document roots parsed.
 	 */
-	protected List<Object> parse(@Nonnull final String string) throws IOException {
+	protected static List<Object> parse(@Nonnull final String string) throws IOException {
 		try (final InputStream inputStream = new ByteArrayInputStream(string.getBytes(TURF.DEFAULT_CHARSET))) {
-			return parse(inputStream);
+			return TurfParserTest.parse(inputStream, TURF.CONTENT_TYPE);
 		}
 	}
 
@@ -358,7 +338,7 @@ public class TurfSerializerTest {
 				is("|<https://example.com/fake/foo/bar/Example#foo:bar>|"));
 	}
 
-	//#handles
+	//# handles
 
 	/** @see TurfTestResources#OK_OBJECT_HANDLE_RESOURCE_NAMES */
 	@Test
@@ -388,7 +368,7 @@ public class TurfSerializerTest {
 		}
 	}
 
-	//##potentially ambiguous handles
+	//## potentially ambiguous handles
 
 	/** @see TurfTestResources#OK_HANDLE_AMBIGUOUS_PROPERTY_RESOURCE_NAME */
 	@Test
@@ -444,7 +424,7 @@ public class TurfSerializerTest {
 
 	//TODO add serializer tests for IDs
 
-	//#namespaces
+	//# namespaces
 
 	/** @see TurfTestResources#OK_NAMESPACES_RESOURCE_NAMES */
 	@Test
@@ -475,7 +455,7 @@ public class TurfSerializerTest {
 		}
 	}
 
-	//#roots
+	//# roots
 
 	/** @see TurfTestResources#OK_ROOTS_WHITESPACE_RESOURCE_NAME */
 	@Test
@@ -519,7 +499,7 @@ public class TurfSerializerTest {
 		}
 	}
 
-	//#objects
+	//# objects
 
 	/** @see TurfSerializer#serializeObjectReference(Appendable, URI, URI, boolean) */
 	@Test
@@ -609,7 +589,61 @@ public class TurfSerializerTest {
 				is("|<https://example.com/Test>|*|<https://example.com/SomeType>|"));
 	}
 
-	//#short-hand property object descriptions
+	//# properties documents
+
+	/**
+	 * Tests serializing TURF documents along with equivalent TURF Properties documents.
+	 * @see TurfTestResources#OK_PROPERTIES_RESOURCE_NAMES
+	 */
+	@Test
+	public void testProperties() throws IOException {
+		for(final String okPropertiesResourceName : OK_PROPERTIES_RESOURCE_NAMES) {
+			final UrfObject urfObject = new UrfObject();
+			urfObject.setPropertyValueByHandle("foo", "bar");
+			urfObject.setPropertyValueByHandle("test", 123L);
+			final Map<String, String> oppositesMap = new HashMap<>();
+			oppositesMap.put("in", "out");
+			oppositesMap.put("up", "down");
+			urfObject.setPropertyValueByHandle("opposites", oppositesMap);
+			final UrfObject otherObject = new UrfObject();
+			otherObject.setPropertyValueByHandle("one", true);
+			urfObject.setPropertyValueByHandle("other", otherObject);
+			for(final boolean shortPropertyObjectDescriptions : asList(false, true)) {
+				for(final boolean formatted : asList(false, true)) {
+					final TurfSerializer serializer = new TurfSerializer();
+					serializer.setShortPropertyObjectDescriptions(shortPropertyObjectDescriptions);
+					serializer.setFormatted(formatted);
+					final String serialization = serializer.serializeDocument(urfObject);
+					assertGraphsEqual(okPropertiesResourceName, parse(serialization), parseTestResource(okPropertiesResourceName));
+				}
+			}
+		}
+	}
+
+	/** Tests that serializing TURF Properties documents serializes only the bare properties. */
+	@Test
+	public void testSerializeBareProperties() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.setPropertyValueByHandle("test", 123L);
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.setFormatted(false);
+		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, urfObject);
+		assertThat(serialization, is("test=123"));
+	}
+
+	/** Tests that serializing TURF Properties documents serializes only the bare properties, but with a namespace alias declared. */
+	@Test
+	public void testSerializeBarePropertiesWithNamespaceAlias() throws IOException {
+		final UrfObject urfObject = new UrfObject();
+		urfObject.setPropertyValue(URI.create("http://purl.org/dc/elements/1.1/creator"), "Jane Doe");
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.registerNamespace(URI.create("http://purl.org/dc/elements/1.1/"), "dc");
+		turfSerializer.setFormatted(false);
+		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, urfObject);
+		assertThat(serialization, is("===>urf-properties:space-dc=<http://purl.org/dc/elements/1.1/>;<dc/creator=\"Jane Doe\""));
+	}
+
+	//# short-hand property object descriptions
 
 	/** @see TurfTestResources#OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAMES */
 	@Test
@@ -635,7 +669,7 @@ public class TurfSerializerTest {
 		}
 	}
 
-	//#n-ary properties
+	//# n-ary properties
 
 	/** @see TurfTestResources#OK_NARY_ONE_PROPERTY_ONE_VALUE_RESOURCE_NAME */
 	@Test
