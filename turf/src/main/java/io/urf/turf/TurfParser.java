@@ -377,7 +377,7 @@ public class TurfParser<R> {
 			assert c == -1 : "End of reader should have been found after body properties.";
 			getProcessor().reportRootResource(object); //register the object as a root
 		} else {
-			throw new IllegalArgumentException(); //TODO finish
+			throw new IllegalArgumentException(String.format("Unsupported body type >%s<.", partType));
 		}
 	}
 
