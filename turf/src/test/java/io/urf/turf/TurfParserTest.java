@@ -35,7 +35,6 @@ import javax.annotation.*;
 
 import org.junit.jupiter.api.*;
 
-import com.globalmentor.io.Filenames;
 import com.globalmentor.net.ContentType;
 
 import io.urf.URF;
@@ -54,21 +53,11 @@ public class TurfParserTest {
 	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
 	 * @return The list of TURF document roots parsed.
 	 * @throws IllegalArgumentException if the test resource name has no filename extension or it is for an unrecognized type.
-	 * @see TURF#CONTENT_TYPE
-	 * @see TURF#PROPERTIES_CONTENT_TYPE
 	 */
-	protected List<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
-		final ContentType contentType = Filenames.findExtension(testResourceName).map(extension -> {
-			switch(extension) {
-				case TURF.FILENAME_EXTENSION:
-					return TURF.CONTENT_TYPE;
-				case TURF.PROPERTIES_FILENAME_EXTENSION:
-					return TURF.PROPERTIES_CONTENT_TYPE;
-				default:
-					throw new IllegalArgumentException(String.format("Test resource name `%s` has unrecognized filename extension `%s`.", testResourceName, extension));
-			}
-		}).orElseThrow(() -> new IllegalArgumentException(String.format("Test resource name `%s` missing filename extension.", testResourceName)));
-		return parseTestResource(testResourceName, contentType);
+	protected static List<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
+		final TurfVariant variant = TurfVariant.findFromFilename(testResourceName)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("TURF variant could not be determined from test resource name `%s`.", testResourceName)));
+		return parseTestResource(testResourceName, variant.getMediaType());
 	}
 
 	/**
@@ -78,7 +67,7 @@ public class TurfParserTest {
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The list of TURF document roots parsed.
 	 */
-	protected List<Object> parseTestResource(@Nonnull final String testResourceName, @Nullable final ContentType contentType) throws IOException {
+	protected static List<Object> parseTestResource(@Nonnull final String testResourceName, @Nullable final ContentType contentType) throws IOException {
 		try (final InputStream inputStream = TurfTestResources.class.getResourceAsStream(testResourceName)) {
 			return parse(inputStream, contentType);
 		}
@@ -90,7 +79,7 @@ public class TurfParserTest {
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The list of TURF document roots parsed.
 	 */
-	protected List<Object> parse(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException {
+	protected static List<Object> parse(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, contentType);
 	}
 
@@ -290,7 +279,7 @@ public class TurfParserTest {
 		}
 	}
 
-	//# properties files
+	//# properties documents
 
 	/**
 	 * Tests parsing of TURF documents along with equivalent TURF Properties documents.
