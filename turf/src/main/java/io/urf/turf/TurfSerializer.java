@@ -1148,11 +1148,17 @@ public class TurfSerializer {
 							root.getClass().getName());
 					final UrfObject urfObject = (UrfObject)root;
 					discoverResourceReferences(urfObject);
+					urfObject.getTag().ifPresent(tag -> {
+						throw new IllegalArgumentException(String.format("Cannot serialize URF object with tag as TURF properties; found tag %s.", tag));
+					});
+					urfObject.getTypeTag().ifPresent(typeTag -> {
+						throw new IllegalArgumentException(String.format("Cannot serialize URF object with type as TURF properties; found type %s.", typeTag));
+					});
+					checkArgument(determineAliasForResource(urfObject) == null, "Cannot serialize TURF properties with references to root object.");
 					if(includeHeader) { //separate the header from the properties
 						formatNewLine(appendable, urfObject.hasProperties() ? 2 : 1); //add a blank line if there are properties
 					}
 					setSerialized(urfObject); //mark this resource as having been serialized
-					checkArgument(determineAliasForResource(urfObject) == null, "Cannot serialize TURF properties with references to root object.");
 					serializeSequence(appendable, urfObject.getProperties(), this::serializeProperty);
 				}));
 			} else {
