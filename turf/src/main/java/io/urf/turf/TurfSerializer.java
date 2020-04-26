@@ -1148,6 +1148,9 @@ public class TurfSerializer {
 							root.getClass().getName());
 					final UrfObject urfObject = (UrfObject)root;
 					discoverResourceReferences(urfObject);
+					if(includeHeader) { //separate the header from the properties
+						formatNewLine(appendable, urfObject.hasProperties() ? 2 : 1); //add a blank line if there are properties
+					}
 					setSerialized(urfObject); //mark this resource as having been serialized
 					checkArgument(determineAliasForResource(urfObject) == null, "Cannot serialize TURF properties with references to root object.");
 					serializeSequence(appendable, urfObject.getProperties(), this::serializeProperty);
