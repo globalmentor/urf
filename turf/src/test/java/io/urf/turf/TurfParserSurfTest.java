@@ -17,6 +17,7 @@
 package io.urf.turf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+import static com.globalmentor.util.stream.Streams.*;
 import static io.urf.surf.SurfTestResources.OK_LABELS_RESOURCE_NAME;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -41,7 +42,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 
 	@Override
 	protected Optional<Object> parseTestResource(InputStream inputStream) throws IOException {
-		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findAny(); //TODO require at most one
+		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().reduce(toFindOnly());
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class TurfParserSurfTest extends AbstractSimpleGraphSurfParserTest<UrfObj
 		try (final InputStream inputStream = SurfTestResources.class.getResourceAsStream(OK_LABELS_RESOURCE_NAME)) {
 			final SimpleGraphUrfProcessor processor = new SimpleGraphUrfProcessor();
 			final TurfParser<List<Object>> parser = new TurfParser<>(processor);
-			final UrfObject root = (UrfObject)parser.parseDocument(inputStream).stream().findAny().get(); //TODO require at most one
+			final UrfObject root = (UrfObject)parser.parseDocument(inputStream).stream().reduce(toFindOnly()).orElseThrow(AssertionError::new);
 			//|root|
 			final Optional<Object> rootAliased = processor
 					.findDeclaredObject(parser.findResourceByAlias("root").map(UrfReference.class::cast).flatMap(UrfReference::getTag).get());

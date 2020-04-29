@@ -17,16 +17,17 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2020-02-04</dd>
+			<dd>Draft 2020-04-29</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
-	<p>TURF is the text interchange format for URF. TURF emphasizes terseness and consistency while maintaining human readability, with a preference for using symbols from existing interchange formats such as JSON and programming languages such as Java and C#. TURF has several useful properties, including:</p>
+	<p>Text URF (<dfn>TURF</dfn>) is the text interchange format for URF. TURF emphasizes terseness and consistency while maintaining human readability, with a preference for using symbols from existing interchange formats such as JSON and programming languages such as Java and C#. TURF has several useful properties, including:</p>
 	<ul>
-		<li>TURF has an optional signature character sequence, <code>===&gt;urf&lt;</code>, for easy recognition.</li>
+		<li>TURF has an optional signature character sequence, <code>===&gt;urf&lt;</code>, for easy recognition and/or embedding in other formats.</li>
 		<li>TURF has an optional unambiguous end delimiter sequence <code>===</code>, allowing TURF to be embedded in existing text-based content.</li>
 		<li>Whitespace separators and comments may be removed following certain rules with no loss of semantics, resulting in an extremely compact representation.</li>
 		<li>Standard delimiters are used, such as <code>{…}</code> for sets, <code>[…]</code> for lists, <code>"…"</code> for strings, and <code>&lt;…&gt;</code> for IRIs.</li>
+		<li>A properties-only variant, TURF Properties, useful for embedded metadata in a document or storing metadata as a file sidecar.</li>
 	</ul>
 	<h3>Conventions Used in this Document</h3>
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
@@ -39,6 +40,9 @@
 		<li>TURF allows any Unicode newline character (<a href="#ref-utr13" class="ref">UTR #13</a>) to represent newlines rather than only <code>CRLF</code>.</li>
 	</ul>
 	<p>For any application-specific URF data encoded as TURF <span class="spec-should">should</span> be represented as <code>application/<var>applicationName</var>+turf</code> as a structured syntax name suffix as described in <a href="#ref-rfc6838" class="ref">RFC 6838</a> to allow the data to be recognized as such, where <code><var>applicationName</var></code> is the application-specific identifier for the URF information.</p>
+	<h2>TURF Properties Format Variant</h2>
+	<aside class="annotation float-end max-size-subordinate">A TURF Properties document is intended to serve as a rich replacement for name-value pair files such as Java Properties files.</aside>
+	<p>This specification provides for a format variant with less boilerplate than a general TURF document, suitable for serving as a description sidecar file or providing metadata embedded in some other format. The Internet media type of this <dfn>TURF Properties</dfn> format <span class="spec-must">shall</span> be <code>text/urf-properties</code>, and must adhere to all requirements for a TURF document, except for its distinct document type and the special body syntax described below.</p>
 	<h2>Document</h2>
 	<p>A TURF <dfn>document</dfn> encodes an <dfn>URF instance</dfn> (TODO reference URF) as one or more graphs of <dfn>resources</dfn> representing URF statements. A TURF document <span class="spec-may">may</span> be contain no resource representations, in which case it representing no URF statements.</p>
 	<h2>Syntax</h2>
@@ -120,13 +124,13 @@
 		<li>The <code>charset</code> parameter <span class="spec-must-not">must not</span> be present.</li>
 		<li>Immediately following the <a href="#ref-rfc6838" class="ref">RFC 6838</a> representation of the media type but before the ending media type delimiter, the document type header <span class="spec-may">may</span> contain <dfn>directives</dfn>, a sequence of name-value pairs that provide serialization details essential for parsing.</li>
 	</ul>
-	<p>A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but may provide a way to access them separately.</p>
+	<p>A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but <span class="spec-may">may</span> provide a way to access them separately.</p>
 	<ul class="spec-production">
 		<li><code class="name">directives</code> ⇒ ':' <code class="name">directive-sequence</code> ';'</li>
 		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
 	</ul>
 	<p>A directive handle <span class="spec-must-not">must not</span> include a namespace alias. <span class="note">The production rules for literals appear later in this specification.</span></p>
-	<p>Currently only document types for the <code>text/urf</code> media type are supported.</p>
+	<p>If no header is present, the document type <span class="spec-must">shall</span> default to the media type of the document. Currently only document types for the <code>text/urf</code> and the <code>text/urf-properties</code> media types are supported. A TURF Parser <span class="spec-must-not">must not</span> allow a document type that differs from any known media type for the document itself.</p>
 	<h4 id="signature">Signature</h4>
 	<p><em>This section is experimental.</em> If a header is present it functions as a <dfn>signature</dfn> to identify the document type. A TURF parser <span class="spec-must">must</span> use the bytes of the signature, or the absence of a signature, to determine the charset and byte order of the document, but only if no other indication of charset and byte order is present. A TURF parser <span class="spec-may">may</span> use the signature as a heuristic to reasonably determine that some file in fact contains a TURF document.</p>
 	<ul class="spec-production">
@@ -158,9 +162,36 @@
 		<li><code class="name">document_property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
 	</ul>
 	<h3>Body</h3>
-	<p>The document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
+	<figure class="float-end max-size-partial">
+		<figcaption>Semantically Equivalent TURF and TURF Properties documents.</figcaption>
+		<pre class="line-numbers"><code class="language-turf">===&gt;urf&lt;
+*:
+  foo = "bar"
+  example = 123
+;</code></pre>
+		<pre class="line-numbers"><code class="language-turf">===&gt;urf-properties&lt;
+foo = "bar"
+example = 123</code></pre>
+	</figure>
+	<p>The content of the document body depends on the document type.</p>
+	<h4>TURF Body</h4>
+	<p>If the document type is <code>text/urf</code>, the document body contains zero or more <dfn>resources</dfn>, which may recursively contain other resources.</p>
+	<ul class="spec-production">
+		<li><code class="name">body</code> ⇒ <code class="name">resource</code>*</li>
+	</ul>
+	<p></p>
+	<h4>TURF Properties Body</h4>
+	<p>If the document type is <code>text/urf-properties</code>, the document body contains zero or more <dfn>properties</dfn>, which are interpreted as describing an implicit, anonymous, untyped root object.</p>
+	<ul class="spec-production">
+		<li><code class="name">body</code> ⇒ <code class="name">property</code>*<br />
+		</li>
+	</ul>
+	<p></p>
+	<p></p>
+	<p></p>
+	A TURF processor <span class="spec-must">must</span> interpret a TURF Properties body as if it were a TURF body enclosed in beginning <code>*:</code> and ending <code>;</code> delimiters defining an anonymous object with no type.<br />
 	<h3>Footer</h3>
-	<aside class="annotation float-end max-size-significant">It is anticipated that a future version of this specification will allow multiple TURF documents to be serialized in a stream using the <code>===&gt;...&lt;</code> separator, potentially each identifying a different type of document, forming the basis of a message stream, for example.</aside>
+	<aside class="annotation float-end max-size-significant">It is anticipated that a future specification will allow multiple <dfn>parts</dfn> to be serialized in a stream, each using the <code>===&gt;...&lt;</code> separator and potentially identifying a different type of document, forming the basis of a message stream, for example.</aside>
 	<p><em>This section is experimental.</em> The document footer, if present, explicitly indicates the end of the TURF document.</p>
 	<ul class="spec-production">
 		<li><code class="name">footer</code> ⇒ "==="</li>

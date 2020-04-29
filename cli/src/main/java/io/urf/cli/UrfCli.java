@@ -16,6 +16,8 @@
 
 package io.urf.cli;
 
+import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.util.Optionals.*;
 import static io.urf.URF.*;
 import static java.nio.file.Files.*;
 
@@ -104,7 +106,7 @@ public class UrfCli extends BaseCliApplication {
 
 				try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {
 
-					if(Filenames.getExtension(path.getFileName().toString()).equals(TURF.FILENAME_EXTENSION)) {
+					if(isPresentAndEquals(findExtension(path.getFileName().toString()), TURF.FILENAME_EXTENSION)) {
 						final TurfParser<List<Object>> turfParser = new TurfParser<>(urfProcessor);
 						//TODO provide updates to the user during parsing and when writing
 						turfParser.parseDocument(inputStream);
