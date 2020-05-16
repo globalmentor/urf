@@ -41,7 +41,7 @@ public class TURF {
 	public static final String FILENAME_EXTENSION = "turf";
 
 	/** An extension for TURF Properties filenames. */
-	public static final String PROPERTIES_FILENAME_EXTENSION = "turf-properties";
+	public static final String PROPERTIES_FILENAME_EXTENSION = "tupr";
 
 	/** The default TURF charset. */
 	public static final Charset DEFAULT_CHARSET = UTF_8;

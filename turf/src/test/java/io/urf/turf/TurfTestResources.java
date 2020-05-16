@@ -56,15 +56,15 @@ public class TurfTestResources {
 
 	//# properties files
 	public static final String OK_PROPERTIES_RESOURCE_NAME = "ok-properties.turf";
-	public static final String OK_PROPERTIES_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties.turf-properties";
+	public static final String OK_PROPERTIES_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties.tupr";
 	public static final String OK_PROPERTIES_WITH_HEADER_RESOURCE_NAME = "ok-properties-with-header.turf";
-	public static final String OK_PROPERTIES_WITH_HEADER_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties-with-header.turf-properties";
+	public static final String OK_PROPERTIES_WITH_HEADER_TURF_PROPERTIES_RESOURCE_NAME = "ok-properties-with-header.tupr";
 
 	/** Names of TURF and TURF Properties document resources semantically equivalent to {@value #OK_PROPERTIES_RESOURCE_NAME}. */
 	public static Set<String> OK_PROPERTIES_RESOURCE_NAMES = immutableSetOf(OK_PROPERTIES_RESOURCE_NAME, OK_PROPERTIES_TURF_PROPERTIES_RESOURCE_NAME,
 			OK_PROPERTIES_WITH_HEADER_RESOURCE_NAME, OK_PROPERTIES_WITH_HEADER_TURF_PROPERTIES_RESOURCE_NAME);
 
-	public static final String OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-properties-namespaces-aliases.turf-properties";
+	public static final String OK_PROPERTIES_NAMESPACES_ALIASES_RESOURCE_NAME = "ok-properties-namespaces-aliases.tupr";
 
 	//# short-hand property object descriptions
 	public static final String OK_PROPERTY_OBJECT_DESCRIPTIONS_RESOURCE_NAME = "ok-property-object-descriptions.turf";
