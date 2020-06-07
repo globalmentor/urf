@@ -270,7 +270,7 @@ public class TurfParser<R> {
 			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> namespaceMapForDoctype = parseMediaType(reader, true);
 			final ContentType doctype = namespaceMapForDoctype.getKey();
 			if(contentType != null) {
-				checkParseIO(reader, doctype.hasBaseType(contentType.getBaseContentType()), "Doctype >%s< does not has same base type as requested content type >%s<.",
+				checkParseIO(reader, doctype.hasBaseType(contentType), "Doctype >%s< does not has same base type as requested content type >%s<.",
 						doctype, contentType);
 			} else { //autodetect
 				checkArgument(doctype.hasBaseType(TURF.CONTENT_TYPE) || doctype.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
