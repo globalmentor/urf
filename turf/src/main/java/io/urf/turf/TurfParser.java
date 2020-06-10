@@ -270,8 +270,8 @@ public class TurfParser<R> {
 			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> namespaceMapForDoctype = parseMediaType(reader, true);
 			final ContentType doctype = namespaceMapForDoctype.getKey();
 			if(contentType != null) {
-				checkParseIO(reader, doctype.hasBaseType(contentType), "Doctype >%s< does not has same base type as requested content type >%s<.",
-						doctype, contentType);
+				checkParseIO(reader, doctype.hasBaseType(contentType), "Doctype >%s< does not has same base type as requested content type >%s<.", doctype,
+						contentType);
 			} else { //autodetect
 				checkArgument(doctype.hasBaseType(TURF.CONTENT_TYPE) || doctype.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
 						"Document type >%s< not supported; must be >%s< or >%s<.", doctype, TURF.CONTENT_TYPE, TURF.PROPERTIES_CONTENT_TYPE);
@@ -299,12 +299,12 @@ public class TurfParser<R> {
 
 		//Because we checked for the header at the beginning of the document, we now need to skip vertical filler,
 		//whether or not there was a header.
-		c = skipLineBreaks(reader);
+		c = skipFiller(reader);
 
 		//document description
 		if(c == DOCUMENT_DESCRIPTION_DELIMITER) {
 			check(reader, DOCUMENT_DESCRIPTION_DELIMITER); //#
-			c = skipLineBreaks(reader);
+			c = skipFiller(reader);
 			final Map<String, URI> namespaces = new HashMap<>();
 			parseSequence(reader, DOCUMENT_DESCRIPTION_DELIMITER, r -> {
 				final String propertyHandle = parseHandle(reader);
@@ -315,16 +315,16 @@ public class TurfParser<R> {
 				} catch(final IllegalArgumentException illegalArgumentException) {
 					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
 				}
-				skipLineBreaks(reader);
+				skipFiller(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipLineBreaks(reader);
+				skipFiller(reader);
 				@SuppressWarnings("unused")
 				final UrfReference value = parseResource(reader, false);
 				//TODO make sure the resource is a literal
 				//TODO process document description
 			});
 			check(reader, DOCUMENT_DESCRIPTION_DELIMITER); //#
-			c = skipLineBreaks(reader);
+			c = skipFiller(reader);
 		}
 
 		try { //if neither a content type or a doctype was specified, assumed >text/urf< 
@@ -595,7 +595,7 @@ public class TurfParser<R> {
 					return reference; //TODO do any of the things the TURF parser keeps track of allow descriptions with the alias?
 				}
 			}
-			c = skipFiller(reader);
+			c = skip(reader, WHITESPACE_CHARACTERS);
 		}
 
 		UrfResource instanceReference = null; //we'll record whether we parse some instance reference TODO think of better name; one we can use in the specification 
@@ -687,7 +687,7 @@ public class TurfParser<R> {
 							checkParseIO(reader, !(label instanceof URI), "Object with tag label %s may not also be represented by handle %s.", label, handle);
 							checkParseIO(reader, !(label instanceof String), "Object with ID label %s may not also be represented by handle %s.", label, handle);
 							final URI handleTag = Handle.toTag(handle, getNamespaces());
-							if(skipFiller(reader) == OBJECT_BEGIN) { //handle * type
+							if(skip(reader, WHITESPACE_CHARACTERS) == OBJECT_BEGIN) { //handle * type
 								//TODO this implementation prevents (ignores) an alias for a handle reference; do we want to allow that?
 								resource = parseObject(handleTag, reader);
 							} else { //handle
@@ -726,7 +726,7 @@ public class TurfParser<R> {
 			if(!(resource instanceof Collection)) { //collections already saved the association
 				aliasedReferences.put((Alias)label, resource);
 			}
-			//aliases can refer to UrfObjects, collections, or value objects; normally we would want to ensure == for SurfObjects,
+			//aliases can refer to UrfObjects, collections, or value objects; normally we would want to ensure == for TurfObjects,
 			//but value objects are substitutable, so it's not good practice to compare them using ==
 			assert findResourceByAlias(label.toString()).isPresent();
 		}
@@ -784,7 +784,7 @@ public class TurfParser<R> {
 	protected UrfResource parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
 		//TODO add support for described types; make sure no tag is present in that case
 		check(reader, OBJECT_BEGIN); //*
-		int c = skipFiller(reader);
+		int c = skip(reader, WHITESPACE_CHARACTERS);
 		//type (optional)
 		final URI typeTag;
 		if(c >= 0 && (c == LABEL_DELIMITER || Handle.isBeginCharacter((char)c))) {
@@ -797,7 +797,7 @@ public class TurfParser<R> {
 				checkParseIO(reader, typeTag.getRawFragment() == null, "Type tag %s with fragment may not be used with additional ID %s.", typeTag, label);
 				//TODO document in the spec that TURF objects can have additional descriptions elsewhere and do not need *
 			}
-			c = skipFiller(reader);
+			c = skip(reader, WHITESPACE_CHARACTERS);
 		} else {
 			typeTag = null;
 		}
@@ -852,7 +852,7 @@ public class TurfParser<R> {
 			final URI propertyTag = parseTagReference(reader);
 			//TODO fix; do we want to declare properties? if not, what if they are described? final UrfResource property = getProcessor().declareResource(propertyTag, null); //TODO create default urf processor methods for just tags, and for handles; maybe add a createPropertyResource()
 			final UrfResource property = new SimpleUrfResource(propertyTag); //TODO decide whether to declare properties
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			final UrfReference value;
 			if(peek(reader) == DESCRIPTION_BEGIN) { //: (short-hand property object description) 
 				final URI blankTag = Tag.generateBlank();
@@ -862,7 +862,7 @@ public class TurfParser<R> {
 				value = object;
 			} else { //normal property-value association
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipLineBreaks(reader);
+				skipFiller(reader);
 				value = parseResource(reader);
 			}
 			getProcessor().processStatement(subject, property, value);
@@ -980,33 +980,33 @@ public class TurfParser<R> {
 					c = LINE_TABULATION_CHAR;
 					break;
 				case ESCAPED_UNICODE: //u Unicode
-				{
-					final String unicodeString = readRequiredCount(reader, 4); //read the four Unicode code point hex characters
-					try {
-						c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
-					} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-						throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
-					}
-					if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another Unicode escape sequence
-						check(reader, CHARACTER_ESCAPE); //\
-						check(reader, ESCAPED_UNICODE); //u
-						final String unicodeString2 = readRequiredCount(reader, 4);
-						final char c2;
+					{
+						final String unicodeString = readRequiredCount(reader, 4); //read the four Unicode code point hex characters
 						try {
-							c2 = (char)Integer.parseInt(unicodeString2, 16);
+							c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
 						} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString2 + ".", numberFormatException);
+							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
 						}
-						if(!Character.isLowSurrogate(c2)) {
-							throw new ParseIOException(reader, "Unicode high surrogate character " + Characters.getLabel(c)
-									+ " must be followed by low surrogate character; found " + Characters.getLabel(c2));
+						if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another Unicode escape sequence
+							check(reader, CHARACTER_ESCAPE); //\
+							check(reader, ESCAPED_UNICODE); //u
+							final String unicodeString2 = readRequiredCount(reader, 4);
+							final char c2;
+							try {
+								c2 = (char)Integer.parseInt(unicodeString2, 16);
+							} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
+								throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString2 + ".", numberFormatException);
+							}
+							if(!Character.isLowSurrogate(c2)) {
+								throw new ParseIOException(reader, "Unicode high surrogate character " + Characters.getLabel(c)
+										+ " must be followed by low surrogate character; found " + Characters.getLabel(c2));
+							}
+							return Character.toCodePoint(c, c2); //short-circuit and return the surrogate pair code point
 						}
-						return Character.toCodePoint(c, c2); //short-circuit and return the surrogate pair code point
+						if(Character.isLowSurrogate(c)) {
+							throw new ParseIOException(reader, "Unicode character escape sequence cannot begin with low surrogate character " + Characters.getLabel(c));
+						}
 					}
-					if(Character.isLowSurrogate(c)) {
-						throw new ParseIOException(reader, "Unicode character escape sequence cannot begin with low surrogate character " + Characters.getLabel(c));
-					}
-				}
 					break;
 				default: //if another character was escaped
 					if(c != delimiter) { //if this is not the delimiter that was escaped
@@ -1095,14 +1095,15 @@ public class TurfParser<R> {
 			case UUID_BEGIN: //&
 				iri = UUIDs.toURI(parseUuid(reader));
 				break;
-			default: {
-				final String iriString = readUntilRequired(reader, IRI_END);
-				try {
-					iri = new URI(iriString);
-				} catch(final URISyntaxException uriSyntaxException) {
-					throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+			default:
+				{
+					final String iriString = readUntilRequired(reader, IRI_END);
+					try {
+						iri = new URI(iriString);
+					} catch(final URISyntaxException uriSyntaxException) {
+						throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+					}
 				}
-			}
 				break;
 		}
 		check(reader, IRI_END);
@@ -1196,9 +1197,9 @@ public class TurfParser<R> {
 				} catch(final IllegalArgumentException illegalArgumentException) {
 					throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
 				}
-				skipLineBreaks(reader);
+				skipFiller(reader);
 				check(reader, PROPERTY_VALUE_DELIMITER); //=
-				skipLineBreaks(reader);
+				skipFiller(reader);
 				final UrfReference value = parseResource(reader, false);
 				checkParseIO(reader, value instanceof ValueUrfResource, "Media type description value `%s` must be a supported literal.", value);
 				final boolean duplicate = description.putIfAbsent(propertyTag, (ValueUrfResource<?>)value) != null; //TODO do we allow multiple definitions?
@@ -1680,9 +1681,9 @@ public class TurfParser<R> {
 			} else {
 				key = parseResource(reader, false);
 			}
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			final UrfReference value = parseResource(reader);
 			//simulate the map entry
 			final URI blankMapEntryTag = Tag.generateBlank();
@@ -1741,7 +1742,7 @@ public class TurfParser<R> {
 	 */
 	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Reader> itemParser) throws IOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty sequence is possible)
-		int c = skipLineBreaks(reader);
+		int c = skipFiller(reader);
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
 			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
@@ -1764,7 +1765,7 @@ public class TurfParser<R> {
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static Optional<Boolean> skipSequenceDelimiters(@Nonnull final Reader reader) throws IOException {
-		int c = skipFiller(reader); //skip whitespace (and comments)
+		int c = skip(reader, WHITESPACE_CHARACTERS);
 		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
 			return Optional.empty();
 		}
@@ -1774,14 +1775,17 @@ public class TurfParser<R> {
 				requireItem = true; //note we found a comma
 				check(reader, COMMA_CHAR); //skip the comma
 			}
-			c = skipLineBreaks(reader);
+			c = skipFiller(reader);
 		} while(!requireItem && c >= 0 && SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c));
 		return Optional.of(requireItem);
 	}
 
+	/** Whitespace and end-of-line characters. */
+	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
+
 	/**
-	 * Skips over TURF filler in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace character
-	 * or the end of the input stream.
+	 * Skips over TURF <dfn>filler</dfn> in a reader, which includes whitespace, line comments, and line breaks. The new position will either be the that of the
+	 * first non-filler character or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
@@ -1789,30 +1793,8 @@ public class TurfParser<R> {
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static int skipFiller(@Nonnull final Reader reader) throws IOException {
-		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
-		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
-			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
-			reach(reader, EOL_CHARACTERS); //skip to the end of the line or the end of the stream; no need to read more, because EOL characters are not whitespace
-			c = peek(reader); //see what the next character will be so we can return it			
-		}
-		return c; //return the next character to be character read
-	}
-
-	/** Whitespace and end-of-line characters. */
-	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
-
-	/**
-	 * Skips over TURF line breaks in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace and
-	 * non-EOL character; or the end of the input stream.
-	 * @param reader The reader the contents of which to be parsed.
-	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
-	 *         reached.
-	 * @throws NullPointerException if the given reader is <code>null</code>.
-	 * @throws IOException if there is an error reading from the reader.
-	 */
-	protected static int skipLineBreaks(@Nonnull final Reader reader) throws IOException {
-		int c; //we'll store the next non-line-break character here so that it can be returned
-		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
+		int c; //we'll store the next non-whitespace-newline character here so that it can be returned
+		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all non-comment fillers; if the start of a comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
 			reach(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
 		}

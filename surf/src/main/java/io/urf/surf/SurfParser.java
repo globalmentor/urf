@@ -180,11 +180,11 @@ public class SurfParser {
 	 * @throws ParseIOException if the SURF data was invalid.
 	 */
 	public Optional<Object> parse(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		if(skipLineBreaks(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
+		if(skipFiller(reader) < 0) { //skip whitespace, comments, and line breaks; if we reached the end of the stream
 			return Optional.empty(); //the SURF document is empty
 		}
 		final Object resource = parseResource(reader);
-		checkParseIO(reader, skipLineBreaks(reader) < 0, "No content allowed after root resource.");
+		checkParseIO(reader, skipFiller(reader) < 0, "No content allowed after root resource.");
 		return Optional.of(resource);
 	}
 
@@ -315,7 +315,7 @@ public class SurfParser {
 					return resource;
 				}
 			}
-			c = skipFiller(reader);
+			c = skip(reader, WHITESPACE_CHARACTERS);
 		}
 
 		final Object resource;
@@ -455,7 +455,7 @@ public class SurfParser {
 	 */
 	protected SurfObject parseObject(@Nullable Object label, @Nonnull final Reader reader) throws IOException {
 		check(reader, OBJECT_BEGIN); //*
-		int c = skipFiller(reader);
+		int c = skip(reader, WHITESPACE_CHARACTERS);
 		//type (optional)
 		final String typeHandle;
 		if(c >= 0 && Handle.isBeginCharacter((char)c)) {
@@ -467,7 +467,7 @@ public class SurfParser {
 					return objectById;
 				}
 			}
-			c = skipFiller(reader);
+			c = skip(reader, WHITESPACE_CHARACTERS);
 		} else {
 			typeHandle = null;
 		}
@@ -496,9 +496,9 @@ public class SurfParser {
 		check(reader, DESCRIPTION_BEGIN); //:
 		parseSequence(reader, DESCRIPTION_END, r -> {
 			final String propertyHandle = parseHandle(reader);
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			check(reader, PROPERTY_VALUE_DELIMITER); //=
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			final Object value = parseResource(reader);
 			final Optional<Object> oldValue = resource.setPropertyValue(propertyHandle, value);
 			checkParseIO(reader, !oldValue.isPresent(), "Resource has duplicate definition for property %s.", propertyHandle);
@@ -614,33 +614,33 @@ public class SurfParser {
 					c = LINE_TABULATION_CHAR;
 					break;
 				case ESCAPED_UNICODE: //u Unicode
-				{
-					final String unicodeString = readRequiredCount(reader, 4); //read the four Unicode code point hex characters
-					try {
-						c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
-					} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-						throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
-					}
-					if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another Unicode escape sequence
-						check(reader, CHARACTER_ESCAPE); //\
-						check(reader, ESCAPED_UNICODE); //u
-						final String unicodeString2 = readRequiredCount(reader, 4);
-						final char c2;
+					{
+						final String unicodeString = readRequiredCount(reader, 4); //read the four Unicode code point hex characters
 						try {
-							c2 = (char)Integer.parseInt(unicodeString2, 16);
+							c = (char)Integer.parseInt(unicodeString, 16); //parse the hex characters and use the resulting code point
 						} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
-							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString2 + ".", numberFormatException);
+							throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString + ".", numberFormatException);
 						}
-						if(!Character.isLowSurrogate(c2)) {
-							throw new ParseIOException(reader, "Unicode high surrogate character " + Characters.getLabel(c)
-									+ " must be followed by low surrogate character; found " + Characters.getLabel(c2));
+						if(Character.isHighSurrogate(c)) { //if this is a high surrogate, expect another Unicode escape sequence
+							check(reader, CHARACTER_ESCAPE); //\
+							check(reader, ESCAPED_UNICODE); //u
+							final String unicodeString2 = readRequiredCount(reader, 4);
+							final char c2;
+							try {
+								c2 = (char)Integer.parseInt(unicodeString2, 16);
+							} catch(final NumberFormatException numberFormatException) { //if the hex integer was not in the correct format
+								throw new ParseIOException(reader, "Invalid Unicode escape sequence " + unicodeString2 + ".", numberFormatException);
+							}
+							if(!Character.isLowSurrogate(c2)) {
+								throw new ParseIOException(reader, "Unicode high surrogate character " + Characters.getLabel(c)
+										+ " must be followed by low surrogate character; found " + Characters.getLabel(c2));
+							}
+							return Character.toCodePoint(c, c2); //short-circuit and return the surrogate pair code point
 						}
-						return Character.toCodePoint(c, c2); //short-circuit and return the surrogate pair code point
+						if(Character.isLowSurrogate(c)) {
+							throw new ParseIOException(reader, "Unicode character escape sequence cannot begin with low surrogate character " + Characters.getLabel(c));
+						}
 					}
-					if(Character.isLowSurrogate(c)) {
-						throw new ParseIOException(reader, "Unicode character escape sequence cannot begin with low surrogate character " + Characters.getLabel(c));
-					}
-				}
 					break;
 				default: //if another character was escaped
 					if(c != delimiter) { //if this is not the delimiter that was escaped
@@ -729,14 +729,15 @@ public class SurfParser {
 			case UUID_BEGIN: //&
 				iri = UUIDs.toURI(parseUuid(reader));
 				break;
-			default: {
-				final String iriString = readUntilRequired(reader, IRI_END);
-				try {
-					iri = new URI(iriString);
-				} catch(final URISyntaxException uriSyntaxException) {
-					throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+			default:
+				{
+					final String iriString = readUntilRequired(reader, IRI_END);
+					try {
+						iri = new URI(iriString);
+					} catch(final URISyntaxException uriSyntaxException) {
+						throw new ParseIOException(reader, "Invalid IRI: " + iriString, uriSyntaxException);
+					}
 				}
-			}
 				break;
 		}
 		check(reader, IRI_END); //>
@@ -1205,9 +1206,9 @@ public class SurfParser {
 			} else {
 				key = parseResource(reader, false);
 			}
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			check(reader, ENTRY_KEY_VALUE_DELIMITER); //:
-			skipLineBreaks(reader);
+			skipFiller(reader);
 			final Object value = parseResource(reader);
 			map.put(key, value); //put the value in the map, replacing any old value
 		});
@@ -1251,7 +1252,7 @@ public class SurfParser {
 	 */
 	protected static int parseSequence(@Nonnull final Reader reader, final char sequenceEnd, @Nonnull final IOConsumer<Reader> itemParser) throws IOException {
 		boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty sequence is possible)
-		int c = skipLineBreaks(reader);
+		int c = skipFiller(reader);
 		while(c >= 0 && (nextItemRequired || c != sequenceEnd)) {
 			itemParser.accept(reader); //parse the item
 			final Optional<Boolean> requireItem = skipSequenceDelimiters(reader);
@@ -1274,7 +1275,7 @@ public class SurfParser {
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static Optional<Boolean> skipSequenceDelimiters(@Nonnull final Reader reader) throws IOException {
-		int c = skipFiller(reader); //skip whitespace (and comments)
+		int c = skip(reader, WHITESPACE_CHARACTERS);
 		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
 			return Optional.empty();
 		}
@@ -1284,14 +1285,17 @@ public class SurfParser {
 				requireItem = true; //note we found a comma
 				check(reader, COMMA_CHAR); //skip the comma
 			}
-			c = skipLineBreaks(reader);
+			c = skipFiller(reader);
 		} while(!requireItem && c >= 0 && SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c));
 		return Optional.of(requireItem);
 	}
 
+	/** Whitespace and end-of-line characters. */
+	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
+
 	/**
-	 * Skips over SURF filler in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace character
-	 * or the end of the input stream.
+	 * Skips over SURF <dfn>filler</dfn> in a reader, which includes whitespace, line comments, and line breaks. The new position will either be the that of the
+	 * first non-filler character or the end of the input stream.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
@@ -1299,30 +1303,8 @@ public class SurfParser {
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static int skipFiller(@Nonnull final Reader reader) throws IOException {
-		int c = skip(reader, WHITESPACE_CHARACTERS); //skip all whitespace
-		if(c == LINE_COMMENT_BEGIN) { //if the start of a line comment was encountered
-			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
-			reach(reader, EOL_CHARACTERS); //skip to the end of the line or the end of the stream; no need to read more, because EOL characters are not whitespace
-			c = peek(reader); //see what the next character will be so we can return it			
-		}
-		return c; //return the next character to be character read
-	}
-
-	/** Whitespace and end-of-line characters. */
-	protected static final Characters WHITESPACE_EOL_CHARACTERS = WHITESPACE_CHARACTERS.add(EOL_CHARACTERS);
-
-	/**
-	 * Skips over SURF line breaks in a reader, including whitespace and line comments. The new position will either be the that of the first non-whitespace and
-	 * non-EOL character; or the end of the input stream.
-	 * @param reader The reader the contents of which to be parsed.
-	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
-	 *         reached.
-	 * @throws NullPointerException if the given reader is <code>null</code>.
-	 * @throws IOException if there is an error reading from the reader.
-	 */
-	protected static int skipLineBreaks(@Nonnull final Reader reader) throws IOException {
-		int c; //we'll store the next non-line-break character here so that it can be returned
-		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all fillers; if the start of a comment was encountered
+		int c; //we'll store the next non-whitespace-newline character here so that it can be returned
+		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all non-comment fillers; if the start of a comment was encountered
 			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
 			reach(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
 		}

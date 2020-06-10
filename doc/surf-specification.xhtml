@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2020-01-31</dd>
+			<dd>Draft 2020-06-10</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -60,6 +60,10 @@
 		<li><code class="name">nbsp</code> ⇒ <code class="name">NO-BREAK SPACE</code> (<code class="unicode">U+00A0</code>)</li>
 		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
 	</ul>
+	<p>This specification uses the <code class="name">MIDDLE DOT</code> character <code>·</code> to represent zero or more whitespace characters.</p>
+	<ul class="spec-production">
+		<li>· ⇒ <code class="name">whitespace</code>*</li>
+	</ul>
 	<h3>Line Endings</h3>
 	<p>SURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A SURF parser <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A SURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul class="spec-production">
@@ -74,25 +78,19 @@
 		<li><code class="name">line_comment</code> ⇒ '!' [^<code class="name">eol</code>]*</li>
 	</ul>
 	<h3>Filler</h3>
-	<aside class="note float-end max-size-significant">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
-	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
+	<aside class="tip float-end max-size-partial">Where indicated as such in the grammar, a parser <span class="spec-may">may</span> simply discard filler and parse the SURF document as if it were not present. <span class="warning">In a <a href="#sequence">sequence</a> line endings may be significant and not be considered filler.</span></aside>
+	<p>Some structures allow the addition of whitespace, line comments, and/or line endings; these are collectively referred to as <dfn>filler</dfn>.</p>
 	<ul class="spec-production">
-		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
-	</ul>
-	<h3>Line Breaks</h3>
-	<aside class="tip float-end max-size-significant">A parser <span class="spec-may">may</span> simply discard line comments and parse the SURF document as if they were not present.</aside>
-	<p>A <dfn>line break</dfn> is any end of line surrounded on either side by filler.</p>
-	<ul class="spec-production">
-		<li><code class="name">line_break</code> ⇒ · <code class="name">eol</code> ·</li>
+		<li><code class="name">filler</code> ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code> | <code class="name">eol</code>)*</li>
 	</ul>
 	<h3 id="sequence">Sequences</h3>
 	<p>Several SURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note float-end max-size-significant">The sequence separator is a SURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
-	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
+	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by filler; or filler with at least one line break but without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. If no <code class="name">COMMA</code> character or filler is present, an item <span class="spec-must-not">must not</span> follow. <span class="note">This means that filler <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
 	<ul class="spec-production">
-		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
-		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
-		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
+		<li><code class="name">item-sequence</code> ⇒ <code class="name">filler</code> [ <code class="name">item</code> (<code class="name">sequence_next_comma_separated</code> | <code class="name">sequence_next_break_separated</code>)* <code class="name">filler</code> ]</li>
+		<li><code class="name">sequence_next_comma_separated</code> ⇒ <code class="name">filler</code> ',' <code class="name">filler</code> <code class="name">item</code></li>
+		<li><code class="name">sequence_next_break_separated</code> ⇒ · <code class="name">line_comment</code>? <code class="name">eol</code> <code class="name">filler</code> <code class="name">item</code><code class="name"></code></li>
 	</ul>
 	<h2>Handles</h2>
 	<figure class="float-end max-size-subordinate">
@@ -127,6 +125,7 @@
 	<h2>Resources</h2>
 	<p>A SURF document <span class="spec-must">must</span> contain at most a single <dfn>resource</dfn>, which may recursively contain other resources. A resource consists of an optional <dfn>label</dfn> followed by a <dfn>resource representation</dfn>.</p>
 	<ul class="spec-production">
+		<li><code class="name">document</code> ⇒ <code class="name">filler</code> <code class="name">resource</code>* <code class="name">filler</code></li>
 		<li><code class="name">resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> | <code class="name">label</code></li>
 		<li><code class="name">described_resource</code> ⇒ <code class="name">label</code>? · <code class="name">resource_representation</code> · <code class="name">description</code>? | <code class="name">label</code></li>
 		<li><code class="name">resource_representation</code> ⇒ <code class="name">object</code> | <code class="name">literal</code> | <code class="name">collection</code></li>
@@ -152,7 +151,7 @@
 	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a SURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">resource</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">handle</code> <code class="name">filler</code> '=' <code class="name">filler</code> <code class="name">resource</code></li>
 	</ul>
 	<h3>Literals</h3>
 	<aside class="info float-end max-size-partial">Literals are a way to represent URF <dfn>lexical ID type resources</dfn>, those resources of types that can be identified by a lexical representation. TURF provides other ways of representing these resources in addition to literals.</aside>
@@ -414,7 +413,7 @@
 	<p>A SURF parser <span class="spec-should">should</span> represent a SURF map using an corresponding language construct that represents map semantics.</p>
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
-		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">value</code></li>
+		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">filler</code> ':' <code class="name">filler</code> <code class="name">value</code></li>
 		<li><code class="name">key</code> ⇒ '\' <code class="name">described_resource</code> '\' | <code class="name" id="ref-ieee754">resource</code></li>
 		<li><code class="name">value</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
