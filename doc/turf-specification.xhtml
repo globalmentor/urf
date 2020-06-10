@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2020-04-29</dd>
+			<dd>Draft 2020-06-10</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -59,6 +59,10 @@
 		<li><code class="name">nbsp</code> ⇒ <code class="name">NO-BREAK SPACE</code> (<code class="unicode">U+00A0</code>)</li>
 		<li><code class="name">zwnbspr</code> ⇒ <code class="name">ZERO WIDTH NO-BREAK SPACE</code> (<code class="unicode">U+FEFF</code>)</li>
 	</ul>
+	<p>This specification uses the <code class="name">MIDDLE DOT</code> character <code>·</code> to represent zero or more whitespace characters.</p>
+	<ul class="spec-production">
+		<li>· ⇒ <code class="name">whitespace</code>*</li>
+	</ul>
 	<h3>Line Endings</h3>
 	<p>TURF recognizes both the <code class="name">CARRIAGE RETURN (CR)</code> character (<code class="unicode">U+000D</code>), the <code class="name">LINE FEED (LF)</code> character (<code class="unicode">U+000A</code>), and any Unicode <code class="name">Line_Separator</code> (<code>Zl</code>) or <code class="name">Paragraph_Separator</code> (<code>Zp</code>) character as marking the end of a line. A TURF parser <span class="spec-must">must</span> behave as if every <code class="name">CRLF</code> sequence as well as every <code>CR</code> not followed by a <code class="name">LF</code> were normalized to a single <code class="name">LF</code>. A TURF serializer <span class="spec-should">should</span> use the conventional line ending sequence supported by the platform on which it is running if that sequence is allowed by this specification.</p>
 	<ul class="spec-production">
@@ -73,30 +77,24 @@
 		<li><code class="name">line_comment</code> ⇒ '!' [^<code class="name">eol</code>]*</li>
 	</ul>
 	<h3>Filler</h3>
-	<aside class="note float-end max-size-significant">Most instances of filler appear between items in a <a href="#sequence">sequence</a>.</aside>
-	<p>The comments and whitespace that <span class="spec-may">may</span> appear between some structures is referred to as <dfn>filler</dfn>, indicated in this specification using the <code class="name">MIDDLE DOT</code> character <code>·</code>.</p>
+	<aside class="tip float-end max-size-partial">Where indicated as such in the grammar, a parser <span class="spec-may">may</span> simply discard filler and parse the TURF document as if it were not present. <span class="warning">In a <a href="#sequence">sequence</a> line endings may be significant and not be considered filler.</span> </aside>
+	<p>Some structures allow the addition of whitespace, line comments, and/or line endings; these are collectively referred to as <dfn>filler</dfn>.</p>
 	<ul class="spec-production">
-		<li>· ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code>)*</li>
-	</ul>
-	<h3>Line Breaks</h3>
-	<aside class="tip float-end max-size-significant">A parser <span class="spec-may">may</span> simply discard line comments and parse the TURF document as if they were not present.</aside>
-	<p>A <dfn>line break</dfn> is any end of line surrounded on either side by filler.</p>
-	<ul class="spec-production">
-		<li><code class="name">line_break</code> ⇒ · <code class="name">eol</code> ·</li>
+		<li><code class="name">filler</code> ⇒ (<code class="name">whitespace</code> | <code class="name">line_comment</code> | <code class="name">eol</code>)*</li>
 	</ul>
 	<h3 id="sequence">Sequences</h3>
 	<p>Several TURF types allow components to be presented in a <dfn>sequence</dfn>. A sequence is a syntactical construct indicated by the form <code class="name"><var>item</var>-sequence</code>, where <code><var>item</var></code> is the construct that may appear zero or more times in the sequence.</p>
 	<aside class="note float-end max-size-significant">The sequence separator is a TURF innovation that allows sequences to be represented in compact form using commas in the JSON style, or in a more human-readable format separated by newlines in the YAML style.</aside>
-	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by line line breaks; or one or more line breaks without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. <span class="note">This means that one or more line breaks <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
+	<p>Any two items in a sequence are separated by a <dfn>sequence separator</dfn>, which is either a <code class="name">COMMA</code> character <code>,</code> (<code class="unicode">U+002C</code>) optionally surrounded by filler; or filler with at least one line break but without a <code class="name">COMMA</code> character. If a <code class="name">COMMA</code> character is present, an item <span class="spec-must">must</span> follow. If no <code class="name">COMMA</code> character or filler is present, an item <span class="spec-must-not">must not</span> follow. <span class="note">This means that filler <span class="spec-may">may</span> end a sequence or appear in an empty sequence.</span></p>
 	<ul class="spec-production">
-		<li><code class="name">item-sequence</code> ⇒ <code class="name">line_break</code>* [ <code class="name">item</code> [ <code class="name">sequence_separator_must</code> <code class="name">item</code> | <code class="name">sequence_separator_may</code> <code class="name">item</code>? ]* ]</li>
-		<li><code class="name">sequence_separator_must</code> ⇒ <code class="name">line_break</code>* ',' <code class="name">line_break</code>*</li>
-		<li><code class="name">sequence_separator_may</code> ⇒ <code class="name">line_break</code>+</li>
+		<li><code class="name">item-sequence</code> ⇒ <code class="name">filler</code> [ <code class="name">item</code> (<code class="name">sequence_next_comma_separated</code> | <code class="name">sequence_next_break_separated</code>)* <code class="name">filler</code> ]</li>
+		<li><code class="name">sequence_next_comma_separated</code> ⇒ <code class="name">filler</code> ',' <code class="name">filler</code> <code class="name">item</code></li>
+		<li><code class="name">sequence_next_break_separated</code> ⇒ · <code class="name">line_comment</code>? <code class="name">eol</code> <code class="name">filler</code> <code class="name">item</code><code class="name"></code></li>
 	</ul>
 	<h2>Structure</h2>
 	<p>A TURF document is divided into four sections: a <dfn>header</dfn>, a <dfn>document description</dfn>, a <dfn>body</dfn>, and a <dfn>footer</dfn>, each of which is optional. If a footer is included, a header <span class="spec-must">must</span> be included as well..</p>
 	<ul class="spec-production">
-		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">line_break</code>* <code class="name">document_description</code>? <code class="name">line_break</code>* <code class="name">body</code>? <code class="name">line_break</code>* <code class="name">footer</code>? <code class="name">line_break</code>*</li>
+		<li><code class="name">document</code> ⇒ <code class="name">header</code>? <code class="name">filler</code> <code class="name">document_description</code>? <code class="name">filler</code> <code class="name">body</code>? <code class="name">filler</code> <code class="name">footer</code>? <code class="name">filler</code></li>
 	</ul>
 	<ul class="spec-production">
 	</ul>
@@ -127,7 +125,7 @@
 	<p>A TURF parser <span class="spec-must-not">must not</span> return directives as part of the URF instance, but <span class="spec-may">may</span> provide a way to access them separately.</p>
 	<ul class="spec-production">
 		<li><code class="name">directives</code> ⇒ ':' <code class="name">directive-sequence</code> ';'</li>
-		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
+		<li><code class="name">directive</code> ⇒ <code class="name">handle</code> <code class="name">filler</code> '=' <code class="name">filler</code> <code class="name">literal</code></li>
 	</ul>
 	<p>A directive handle <span class="spec-must-not">must not</span> include a namespace alias. <span class="note">The production rules for literals appear later in this specification.</span></p>
 	<p>If no header is present, the document type <span class="spec-must">shall</span> default to the media type of the document. Currently only document types for the <code>text/urf</code> and the <code>text/urf-properties</code> media types are supported. A TURF Parser <span class="spec-must-not">must not</span> allow a document type that differs from any known media type for the document itself.</p>
@@ -159,7 +157,7 @@
 	<p><em>This section is experimental.</em> The optional document description provides a description of the document contents, separate from its serialization and independent of the represented URF graph. The document description begins and ends with the <code class="name">NUMBER SIGN</code> <code>#</code> (<code class="unicode">U+0023</code>), and contains a sequence of name-value pairs. A TURF parser <span class="spec-must-not">must not</span> return the document description as part of the URF instance graph, but <span class="spec-should">should</span> provide some means for it to be retrieved after parsing is finished.</p>
 	<ul class="spec-production">
 		<li><code class="name">document_description</code> ⇒ '#' <code class="name">document_property-sequence</code> '#'</li>
-		<li><code class="name">document_property</code> ⇒ <code class="name">handle</code> <code class="name">line_break</code>* '=' <code class="name">line_break</code>* <code class="name">literal</code></li>
+		<li><code class="name">document_property</code> ⇒ <code class="name">handle</code> <code class="name">filler</code> '=' <code class="name">filler</code> <code class="name">literal</code></li>
 	</ul>
 	<h3>Body</h3>
 	<figure class="float-end max-size-partial">
@@ -179,16 +177,11 @@ example = 123</code></pre>
 	<ul class="spec-production">
 		<li><code class="name">body</code> ⇒ <code class="name">resource</code>*</li>
 	</ul>
-	<p></p>
 	<h4>TURF Properties Body</h4>
 	<p>If the document type is <code>text/urf-properties</code>, the document body contains zero or more <dfn>properties</dfn>, which are interpreted as describing an implicit, anonymous, untyped root object.</p>
 	<ul class="spec-production">
-		<li><code class="name">body</code> ⇒ <code class="name">property</code>*<br />
-		</li>
+		<li><code class="name">body</code> ⇒ <code class="name">property</code>* </li>
 	</ul>
-	<p></p>
-	<p></p>
-	<p></p>
 	A TURF processor <span class="spec-must">must</span> interpret a TURF Properties body as if it were a TURF body enclosed in beginning <code>*:</code> and ending <code>;</code> delimiters defining an anonymous object with no type.<br />
 	<h3>Footer</h3>
 	<aside class="annotation float-end max-size-significant">It is anticipated that a future specification will allow multiple <dfn>parts</dfn> to be serialized in a stream, each using the <code>===&gt;...&lt;</code> separator and potentially identifying a different type of document, forming the basis of a message stream, for example.</aside>
@@ -231,7 +224,7 @@ example = 123</code></pre>
 	<p>A description <span class="spec-must-not">must not</span> follow any resource representation other than an object. <span class="annotation">This restriction may be lifted in a future version of TURF.</span> A description <span class="spec-must-not">must not</span> contain more than one <code class="name">property</code> with the same <code class="name">handle</code>, and a TURF parser <span class="spec-must">must</span> consider such a condition as a non-recoverable error. (TODO lift restriction here and in SURF for JSON compatibility) A TURF parser must preserve all distinct values of each n-ary property.</p>
 	<ul class="spec-production">
 		<li><code class="name">description</code> ⇒ ':' <code class="name">property-sequence</code> ';'</li>
-		<li><code class="name">property</code> ⇒ <code class="name">tag_reference</code> <code class="name">line_break</code>* ('=' <code class="name">line_break</code>* <code class="name">resource</code>) | <code class="name">description</code></li>
+		<li><code class="name">property</code> ⇒ <code class="name">tag_reference</code> <code class="name">filler</code> ('=' <code class="name">filler</code> <code class="name">resource</code>) | <code class="name">description</code></li>
 	</ul>
 	<p>A TURF parser <span class="spec-must">must</span> interpret a description appearing immediately after the property tag reference as if an object with no type appeared as the resource in the property production. For example the property <code>foo:…;</code> is the short-hand equivalent of <code>foo=*:…;</code>.</p>
 	<h3>Literals</h3>
@@ -436,7 +429,7 @@ example = 123</code></pre>
 	<p>A TURF map <span class="spec-should-not">should not</span> have entries with duplicate keys, and a TURF serializer <span class="spec-must-not">must not</span> produce a map with duplicate-key entries. A surf parser <span class="spec-must">must</span> ignore all but one of each entry with the same key. TODO revisit; this bring JSON compatibility, but could cause problems with tags if a duplicate entry is ignored; also address key equality</p>
 	<ul class="spec-production">
 		<li><code class="name">map</code> ⇒ '{' <code class="name">entry-sequence</code> '}'</li>
-		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">line_break</code>* ':' <code class="name">line_break</code>* <code class="name">value</code></li>
+		<li><code class="name">entry</code> ⇒ <code class="name">key</code> <code class="name">filler</code> ':' <code class="name">filler</code> <code class="name">value</code></li>
 		<li><code class="name">key</code> ⇒ '\' <code class="name">described_resource</code> '\' | <code class="name">resource</code></li>
 		<li><code class="name">value</code> ⇒ <code class="name">described_resource</code></li>
 	</ul>
