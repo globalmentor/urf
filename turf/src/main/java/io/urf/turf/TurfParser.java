@@ -1732,6 +1732,9 @@ public class TurfParser<R> {
 	 * {@link IOConsumer#accept(Object)} is called, passing the {@link Reader}, for the item to be parsed. The sequence ends when the sequence end delimiter or
 	 * the end of the reader is reached.
 	 * @apiNote This method will return if it encounters the end of the reader, so if the sequence end is required the caller must check the return value.
+	 * @apiNote The sequence end is provided to detect the end of the sequence after a newline. This method does not guarantee that the sequence end will be
+	 *          reached. This means the method does not consume subsequent characters that are not part of the sequence, such as the <code>bar</code> in
+	 *          <code>"foo bar"</code>, it is up to the caller to confirm that subsequent characters (which are considered "after the sequence") are as expected.
 	 * @param reader The reader containing the sequence to parse.
 	 * @param sequenceEnd The character expected to end the sequence.
 	 * @param itemParser The parser strategy, which is passed the {@link Reader} to use for parsing.
@@ -1759,14 +1762,18 @@ public class TurfParser<R> {
 	 * Skips over TURF sequence delimiters in a reader. Whitespace and comments. The new position will either be the that of the first non-whitespace and non-EOL
 	 * character; or the end of the reader.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return {@link Boolean#TRUE} if a line delimiter was encountered that requires a following item, {@link Boolean#FALSE} if a line delimiter was encountered
-	 *         for which a following item is optional, or {@link Optional#empty()} if no line ending was encountered.
+	 * @return {@link Boolean#TRUE} if a sequence delimiter was encountered that requires a following item, {@link Boolean#FALSE} if a sequence delimiter was
+	 *         encountered for which a following item is optional, or {@link Optional#empty()} if no sequence delimiter was encountered.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 */
 	protected static Optional<Boolean> skipSequenceDelimiters(@Nonnull final Reader reader) throws IOException {
-		int c = skip(reader, WHITESPACE_CHARACTERS);
-		if(c < 0 && !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //see if we encounter some sequence delimiter
+		int c = skip(reader, WHITESPACE_CHARACTERS); //skip any whitespace
+		if(c == LINE_COMMENT_BEGIN) { //skip any line comment
+			skipLineComment(reader);
+			c = peek(reader);
+		}
+		if(c < 0 || !SEQUENCE_SEPARATOR_CHARACTERS.contains((char)c)) { //if no sequence delimiter was found
 			return Optional.empty();
 		}
 		boolean requireItem = false;
@@ -1785,7 +1792,7 @@ public class TurfParser<R> {
 
 	/**
 	 * Skips over TURF <dfn>filler</dfn> in a reader, which includes whitespace, line comments, and line breaks. The new position will either be the that of the
-	 * first non-filler character or the end of the input stream.
+	 * first non-filler character or the end of the reader.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @return The next character that will be returned the reader's {@link Reader#read()} operation, or <code>-1</code> if the end of the reader has been
 	 *         reached.
@@ -1795,10 +1802,21 @@ public class TurfParser<R> {
 	protected static int skipFiller(@Nonnull final Reader reader) throws IOException {
 		int c; //we'll store the next non-whitespace-newline character here so that it can be returned
 		while((c = skip(reader, WHITESPACE_EOL_CHARACTERS)) == LINE_COMMENT_BEGIN) { //skip all non-comment fillers; if the start of a comment was encountered
-			check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
-			reach(reader, EOL_CHARACTERS); //skip to the end of the line; we'll then skip all line-break filler characters again and see if another comment starts
+			skipLineComment(reader); //skip the line comment; we'll then skip all line-break filler characters again and see if another comment starts
 		}
 		return c; //return the last character read
+	}
+
+	/**
+	 * Skips a single line comments. The current position must be that of the line comment delimiter. The new position will either be the that of the following
+	 * newline character or the end of the reader.
+	 * @param reader The reader the contents of which to be parsed.
+	 * @throws NullPointerException if the given reader is <code>null</code>.
+	 * @throws IOException if there is an error reading from the reader.
+	 */
+	protected static void skipLineComment(@Nonnull final Reader reader) throws IOException {
+		check(reader, LINE_COMMENT_BEGIN); //read the beginning comment delimiter
+		reach(reader, EOL_CHARACTERS); //skip to the end of the line
 	}
 
 }

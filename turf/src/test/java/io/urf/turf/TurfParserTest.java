@@ -22,6 +22,7 @@ import static io.urf.turf.TurfTestResources.*;
 import static java.util.Arrays.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.URI;
@@ -35,6 +36,8 @@ import javax.annotation.*;
 
 import org.junit.jupiter.api.*;
 
+import com.globalmentor.io.ParseUnexpectedDataException;
+import com.globalmentor.io.function.*;
 import com.globalmentor.net.ContentType;
 
 import io.urf.URF;
@@ -82,6 +85,67 @@ public class TurfParserTest {
 	protected static List<Object> parse(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, contentType);
 	}
+
+	//parser
+
+	/**
+	 * Invokes the {@link TurfParser#parseSequence(Reader, char, IOConsumer)} for testing.
+	 * @param <T> The type of sequence item being parsed.
+	 * @param input Test data to be parsed.
+	 * @param sequenceEnd The character expected to end the sequence.
+	 * @param itemParser The strategy for parsing each item in the sequence.
+	 * @return A list of items parsed from the sequence.
+	 * @throws IOException if there was some error reading the input.
+	 */
+	protected static <T> List<T> parseSequence(@Nonnull final String input, final char sequenceEnd, @Nonnull final IOFunction<Reader, T> itemParser)
+			throws IOException {
+		final List<T> items = new ArrayList<T>();
+		TurfParser.parseSequence(new StringReader(input), sequenceEnd, reader -> items.add(itemParser.apply(reader)));
+		return items;
+	}
+
+	@Test
+	public void testParseSequence() throws IOException {
+		assertThat(parseSequence("true}", '}', TurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true, false}", '}', TurfParser::parseBoolean), contains(true, false));
+		assertThat(parseSequence("true ", '}', TurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true\n", '}', TurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true, false", '}', TurfParser::parseBoolean), contains(true, false));
+		assertThat(parseSequence("true false}", '}', TurfParser::parseBoolean), contains(true)); //trailing data ignored
+		assertThat(parseSequence("123, 234, 345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123,234,345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123,,234,345}", '}', TurfParser::parseNumber));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123\n,\n\t\n,234,345}", '}', TurfParser::parseNumber));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123,234,\n\n\n,345}", '}', TurfParser::parseNumber));
+		assertThat(parseSequence("123\n234\n345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123,234\n345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n234,345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n\n\n234  \n\n \t\n345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n\t, \n 234 \n,345}", '}', TurfParser::parseNumber), contains(123L, 234L, 345L));
+	}
+
+	/** @see TurfParserskipSequenceDelimiters(Reader) */
+	@Test
+	public void testSkipSequenceDelimiters() throws IOException {
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("   ")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\t")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("!foo")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("!foo,")), isEmpty()); //line comment hides comma
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\t !foo")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("foo")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("foo !bar")), isEmpty());
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\n")), isPresentAndIs(false));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("   \n")), isPresentAndIs(false));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\t\n")), isPresentAndIs(false));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("!foo\n")), isPresentAndIs(false));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\t!foo\n")), isPresentAndIs(false));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader(",")), isPresentAndIs(true));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("   ,")), isPresentAndIs(true));
+		assertThat(TurfParser.skipSequenceDelimiters(new StringReader("\t,")), isPresentAndIs(true));
+	}
+
+	//documents
 
 	//# handles
 

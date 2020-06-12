@@ -17,9 +17,11 @@
 package io.urf.surf;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
+
 import static io.urf.surf.SurfTestResources.OK_LABELS_RESOURCE_NAME;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.URI;
@@ -28,6 +30,9 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.junit.jupiter.api.*;
+
+import com.globalmentor.io.ParseUnexpectedDataException;
+import com.globalmentor.io.function.*;
 
 /**
  * Tests of {@link SurfParser}.
@@ -64,6 +69,67 @@ public class SurfParserTest extends AbstractSimpleGraphSurfParserTest<SurfObject
 	public <T> Optional<T> getPropertyValue(final SurfObject surfObject, final String propertyHandle) {
 		return (Optional<T>)surfObject.getPropertyValue(propertyHandle);
 	}
+
+	//parser
+
+	/**
+	 * Invokes the {@link SurfParser#parseSequence(Reader, char, IOConsumer)} for testing.
+	 * @param <T> The type of sequence item being parsed.
+	 * @param input Test data to be parsed.
+	 * @param sequenceEnd The character expected to end the sequence.
+	 * @param itemParser The strategy for parsing each item in the sequence.
+	 * @return A list of items parsed from the sequence.
+	 * @throws IOException if there was some error reading the input.
+	 */
+	protected static <T> List<T> parseSequence(@Nonnull final String input, final char sequenceEnd, @Nonnull final IOFunction<Reader, T> itemParser)
+			throws IOException {
+		final List<T> items = new ArrayList<T>();
+		SurfParser.parseSequence(new StringReader(input), sequenceEnd, reader -> items.add(itemParser.apply(reader)));
+		return items;
+	}
+
+	@Test
+	public void testParseSequence() throws IOException {
+		assertThat(parseSequence("true}", '}', SurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true, false}", '}', SurfParser::parseBoolean), contains(true, false));
+		assertThat(parseSequence("true ", '}', SurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true\n", '}', SurfParser::parseBoolean), contains(true));
+		assertThat(parseSequence("true, false", '}', SurfParser::parseBoolean), contains(true, false));
+		assertThat(parseSequence("true false}", '}', SurfParser::parseBoolean), contains(true)); //trailing data ignored
+		assertThat(parseSequence("123, 234, 345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123,234,345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123,,234,345}", '}', SurfParser::parseNumber));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123\n,\n\t\n,234,345}", '}', SurfParser::parseNumber));
+		assertThrows(ParseUnexpectedDataException.class, () -> parseSequence("123,234,\n\n\n,345}", '}', SurfParser::parseNumber));
+		assertThat(parseSequence("123\n234\n345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123,234\n345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n234,345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n\n\n234  \n\n \t\n345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+		assertThat(parseSequence("123\n\t, \n 234 \n,345}", '}', SurfParser::parseNumber), contains(123L, 234L, 345L));
+	}
+
+	/** @see SurfParser#skipSequenceDelimiters(Reader) */
+	@Test
+	public void testSkipSequenceDelimiters() throws IOException {
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("   ")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\t")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("!foo")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("!foo,")), isEmpty()); //line comment hides comma
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\t !foo")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("foo")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("foo !bar")), isEmpty());
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\n")), isPresentAndIs(false));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("   \n")), isPresentAndIs(false));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\t\n")), isPresentAndIs(false));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("!foo\n")), isPresentAndIs(false));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\t!foo\n")), isPresentAndIs(false));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader(",")), isPresentAndIs(true));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("   ,")), isPresentAndIs(true));
+		assertThat(SurfParser.skipSequenceDelimiters(new StringReader("\t,")), isPresentAndIs(true));
+	}
+
+	//documents
 
 	//#labels
 

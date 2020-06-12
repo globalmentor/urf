@@ -517,7 +517,8 @@ public abstract class AbstractSimpleGraphSurfParserTest<SO> {
 		}
 	}
 
-	//TODO create tests for bad properties, such as double list item separators
+	//TODO create tests for bad lists, such as double list item separators
+	//TODO create tests for a bad list with no list separators
 
 	//#map
 
