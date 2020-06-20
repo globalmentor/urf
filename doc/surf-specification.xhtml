@@ -17,7 +17,7 @@
 			<dt>Author</dt>
 			<dd><a href="http://www.garretwilson.com/" class="external">Garret Wilson</a> (<a href="https://www.globalmentor.com/" class="external">GlobalMentor, Inc.</a>)</dd>
 			<dt>Version</dt>
-			<dd>Draft 2020-06-10</dd>
+			<dd>Draft 2020-06-20</dd>
 		</dl>
 	</header>
 	<h2>Introduction</h2>
@@ -45,7 +45,7 @@
 	<p>The key words “<span class="spec-must">must</span>”, “<span class="spec-must-not">must not</span>”, “<span class="spec-must">required</span>”, “<span class="spec-must">shall</span>”, “<span class="spec-must-not">shall not</span>”, “<span class="spec-should">should</span>”, “<span class="spec-should-not">should not</span>”, “<span class="spec-should">recommended</span>”, “<span class="spec-may">may</span>”, and “<span class="spec-may">optional</span>” in this document are to be interpreted as described in <a href="#ref-rfc2119" class="ref">RFC 2119</a>. Parts of this specification marked as <span class="note">notes</span> and <span class="annotation">annotations</span> are non-normative.</p>
 	<h2>Internet Media Type</h2>
 	<aside class="note float-end max-size-significant">The separate TURF format allows other encodings such as UTF-16 and UTF-32.</aside>
-	<p>The Internet media type (<a href="#ref-rfc6838" class="ref">RFC 6838</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/surf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
+	<p>The Internet media type (<a href="#ref-rfc6838" class="ref">RFC 6838</a>) of a SURF document <span class="spec-must">shall</span> be <code>text/simple-urf</code> and <span class="spec-must">must</span> be encoded in UTF-8. A SURF document <span class="spec-must-not">must not</span> begin with a so-called byte order mark (<abbr>BOM</abbr>) or UTF-8 signature.</p>
 	<h2>Structure</h2>
 	<p>The content of a SURF document encodes a graph of <dfn>resources</dfn> defined by the Uniform Resource Framework (URF) with a single resource as the root of the graph. A SURF document <span class="spec-may">may</span> be empty, representing no resources. A SURF parser or a SURF serializer <span class="spec-may">may</span> represent a SURF document as a graph of URF resources. Nevertheless, although SURF syntax maintains compliance with the URF model, the implementation and use of SURF does not require use of the URF model.</p>
 	<h3>Whitespace</h3>
