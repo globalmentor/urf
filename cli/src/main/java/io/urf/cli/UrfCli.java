@@ -101,7 +101,7 @@ public class UrfCli extends BaseCliApplication {
 			for(final Path path : paths) { //parse each file using the same processor
 				System.out.println(String.format("Converting file %s...", path.getFileName()));
 				//TODO precondition check filename
-				final String typeHandle = Filenames.getBaseFilename(path.getFileName().toString());
+				final String typeHandle = Filenames.getBase(path.getFileName().toString());
 				final URI typeTag = Handle.toTag(typeHandle);
 
 				try (final InputStream inputStream = new BufferedInputStream(newInputStream(path))) {

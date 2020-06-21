@@ -49,7 +49,7 @@ public class UrfCsvParserTest {
 	 * @return The list of URF CSV document roots parsed.
 	 */
 	protected List<Object> parseTestResource(@Nonnull final String testResourceName) throws IOException {
-		final URI subjectTypeHandle = Handle.toTag(Filenames.getBaseFilename(testResourceName));
+		final URI subjectTypeHandle = Handle.toTag(Filenames.getBase(testResourceName));
 		try (final InputStream inputStream = UrfCsvTestResources.class.getResourceAsStream(testResourceName)) {
 			return parse(inputStream, subjectTypeHandle);
 		}
