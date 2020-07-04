@@ -43,7 +43,7 @@ import picocli.CommandLine.*;
  * Command-line interface for working with URF data.
  * @author Garret Wilson
  */
-@Command(name = "urf", description = "Command-line interface for working with URF data.", versionProvider = UrfCli.MetadataProvider.class, mixinStandardHelpOptions = true)
+@Command(name = "urf", description = "Command-line interface for working with URF data.")
 public class UrfCli extends BaseCliApplication {
 
 	/**
@@ -145,10 +145,4 @@ public class UrfCli extends BaseCliApplication {
 		}
 	}
 
-	/** Strategy for providing version and other information from the configuration. */
-	static class MetadataProvider extends AbstractMetadataProvider {
-		public MetadataProvider() {
-			super(UrfCli.class);
-		}
-	}
 }
