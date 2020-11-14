@@ -38,8 +38,8 @@ import com.globalmentor.net.ContentType;
  */
 public class SURF {
 
-	/** The content type for SURF: <code>text/simple-urf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "simple-urf");
+	/** The media type for SURF: <code>text/simple-urf</code>. */
+	public static final ContentType MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "simple-urf");
 
 	/** An extension for SURF filenames. */
 	public static final String FILENAME_EXTENSION = "surf";

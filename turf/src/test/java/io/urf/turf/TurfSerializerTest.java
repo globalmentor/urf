@@ -56,7 +56,7 @@ public class TurfSerializerTest {
 	 */
 	protected static List<Object> parse(@Nonnull final String string) throws IOException {
 		try (final InputStream inputStream = new ByteArrayInputStream(string.getBytes(TURF.DEFAULT_CHARSET))) {
-			return TurfParserTest.parse(inputStream, TURF.CONTENT_TYPE);
+			return TurfParserTest.parse(inputStream, TURF.MEDIA_TYPE);
 		}
 	}
 
@@ -627,7 +627,7 @@ public class TurfSerializerTest {
 		urfObject.setPropertyValueByHandle("test", 123L);
 		final TurfSerializer turfSerializer = new TurfSerializer();
 		turfSerializer.setFormatted(false);
-		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, urfObject);
+		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_MEDIA_TYPE, urfObject);
 		assertThat(serialization, is("test=123"));
 	}
 
@@ -639,7 +639,7 @@ public class TurfSerializerTest {
 		final TurfSerializer turfSerializer = new TurfSerializer();
 		turfSerializer.registerNamespace(URI.create("http://purl.org/dc/elements/1.1/"), "dc");
 		turfSerializer.setFormatted(false);
-		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, urfObject);
+		final String serialization = turfSerializer.serializeDocument(TURF.PROPERTIES_MEDIA_TYPE, urfObject);
 		assertThat(serialization, is("===>urf-properties:space-dc=<http://purl.org/dc/elements/1.1/>;<dc/creator=\"Jane Doe\""));
 	}
 

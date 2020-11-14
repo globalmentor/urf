@@ -32,7 +32,7 @@ import com.globalmentor.net.ContentType;
  */
 public enum TurfVariant {
 
-	TURF(CONTENT_TYPE, FILENAME_EXTENSION), TURF_PROPERTIES(PROPERTIES_CONTENT_TYPE, PROPERTIES_FILENAME_EXTENSION);
+	TURF(MEDIA_TYPE, FILENAME_EXTENSION), TURF_PROPERTIES(PROPERTIES_MEDIA_TYPE, PROPERTIES_FILENAME_EXTENSION);
 
 	private final ContentType mediaType;
 
@@ -64,9 +64,9 @@ public enum TurfVariant {
 	 * @return The TURF variant, if one could be determined.
 	 */
 	public static Optional<TurfVariant> findFromMediaType(@Nonnull final ContentType mediaType) {
-		if(mediaType.hasBaseType(CONTENT_TYPE)) {
+		if(mediaType.hasBaseType(MEDIA_TYPE)) {
 			return Optional.of(TURF);
-		} else if(mediaType.hasBaseType(PROPERTIES_CONTENT_TYPE)) {
+		} else if(mediaType.hasBaseType(PROPERTIES_MEDIA_TYPE)) {
 			return Optional.of(TURF_PROPERTIES);
 		} else {
 			return Optional.empty();

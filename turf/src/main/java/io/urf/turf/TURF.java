@@ -31,11 +31,11 @@ import com.globalmentor.net.ContentType;
  */
 public class TURF {
 
-	/** The content type for TURF: <code>text/urf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf");
+	/** The media type for TURF: <code>text/urf</code>. */
+	public static final ContentType MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf");
 
-	/** The content type for TURF Properties: <code>text/urf-properties</code>. */
-	public static final ContentType PROPERTIES_CONTENT_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf-properties");
+	/** The media type for TURF Properties: <code>text/urf-properties</code>. */
+	public static final ContentType PROPERTIES_MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf-properties");
 
 	/** An extension for TURF filenames. */
 	public static final String FILENAME_EXTENSION = "turf";

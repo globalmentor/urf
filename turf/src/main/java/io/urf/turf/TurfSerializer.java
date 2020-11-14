@@ -634,14 +634,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object)} using {@link TURF#MEDIA_TYPE}.
 	 * @param root The root resource.
 	 * @throws NullPointerException if the root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graph.
 	 */
 	public String serializeDocument(@Nonnull Object root) throws IOException {
-		return serializeDocument(TURF.CONTENT_TYPE, root);
+		return serializeDocument(TURF.MEDIA_TYPE, root);
 	}
 
 	/**
@@ -649,14 +649,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param root The root resource.
 	 * @throws NullPointerException if the root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graph.
 	 */
 	public String serializePropertiesDocument(@Nonnull Object root) throws IOException {
-		return serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, root);
+		return serializeDocument(TURF.PROPERTIES_MEDIA_TYPE, root);
 	}
 
 	/**
@@ -681,14 +681,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object...)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object...)} using {@link TURF#MEDIA_TYPE}.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graphs.
 	 */
 	public String serializeDocument(@Nonnull Object... roots) throws IOException {
-		return serializeDocument(TURF.CONTENT_TYPE, roots);
+		return serializeDocument(TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -696,7 +696,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object...)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Object...)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if zero or multiple root objects were provided.
@@ -704,7 +704,7 @@ public class TurfSerializer {
 	 * @return A serialized string representation of the given resource graphs.
 	 */
 	public String serializePropertiesDocument(@Nonnull Object... roots) throws IOException {
-		return serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, roots);
+		return serializeDocument(TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -717,7 +717,7 @@ public class TurfSerializer {
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graphs.
 	 */
@@ -730,14 +730,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Iterable)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Iterable)} using {@link TURF#MEDIA_TYPE}.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots iterable and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graphs.
 	 */
 	public String serializeDocument(@Nonnull Iterable<?> roots) throws IOException {
-		return serializeDocument(TURF.CONTENT_TYPE, roots);
+		return serializeDocument(TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -745,7 +745,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Iterable)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(ContentType, Iterable)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots iterable and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if zero or multiple root objects were provided.
@@ -753,7 +753,7 @@ public class TurfSerializer {
 	 * @return A serialized string representation of the given resource graphs.
 	 */
 	public String serializePropertiesDocument(@Nonnull Iterable<?> roots) throws IOException {
-		return serializeDocument(TURF.PROPERTIES_CONTENT_TYPE, roots);
+		return serializeDocument(TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -766,7 +766,7 @@ public class TurfSerializer {
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the roots iterable and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the data.
 	 * @return A serialized string representation of the given resource graphs.
 	 */
@@ -798,14 +798,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object)} using {@link TURF#MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param root The root resource.
 	 * @throws NullPointerException if the given output stream and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object root) throws IOException {
-		serializeDocument(outputStream, TURF.CONTENT_TYPE, root);
+		serializeDocument(outputStream, TURF.MEDIA_TYPE, root);
 	}
 
 	/**
@@ -813,14 +813,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param root The root resource.
 	 * @throws NullPointerException if the given output stream and/or root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializePropertiesDocument(@Nonnull final OutputStream outputStream, @Nonnull Object root) throws IOException {
-		serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, root);
+		serializeDocument(outputStream, TURF.PROPERTIES_MEDIA_TYPE, root);
 	}
 
 	/**
@@ -844,14 +844,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object...)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object...)} using {@link TURF#MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Object... roots) throws IOException {
-		serializeDocument(outputStream, TURF.CONTENT_TYPE, roots);
+		serializeDocument(outputStream, TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -859,7 +859,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object...)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Object...)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots, and/or any root resource is <code>null</code>.
@@ -867,7 +867,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializePropertiesDocument(@Nonnull final OutputStream outputStream, @Nonnull Object... roots) throws IOException {
-		serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, roots);
+		serializeDocument(outputStream, TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -880,7 +880,7 @@ public class TurfSerializer {
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots, and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull final ContentType contentType, @Nonnull Object... roots) throws IOException {
@@ -892,14 +892,14 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Iterable)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Iterable)} using {@link TURF#MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<?> roots) throws IOException {
-		serializeDocument(outputStream, TURF.CONTENT_TYPE, roots);
+		serializeDocument(outputStream, TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -907,7 +907,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Iterable)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(OutputStream, ContentType, Iterable)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param outputStream The output stream to receive the serialized data.
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
@@ -915,7 +915,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializePropertiesDocument(@Nonnull final OutputStream outputStream, @Nonnull Iterable<?> roots) throws IOException {
-		serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, roots);
+		serializeDocument(outputStream, TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -928,7 +928,7 @@ public class TurfSerializer {
 	 * @param roots The root resources, if any.
 	 * @throws NullPointerException if the given output stream, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public void serializeDocument(@Nonnull final OutputStream outputStream, @Nonnull final ContentType contentType, @Nonnull Iterable<?> roots)
@@ -963,7 +963,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object)} using {@link TURF#MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
 	 * @return The given appendable.
@@ -971,7 +971,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull final Object root) throws IOException {
-		return serializeDocument(appendable, TURF.CONTENT_TYPE, root);
+		return serializeDocument(appendable, TURF.MEDIA_TYPE, root);
 	}
 
 	/**
@@ -980,7 +980,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param root The root resource.
 	 * @return The given appendable.
@@ -988,7 +988,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializePropertiesDocument(@Nonnull final Appendable appendable, @Nonnull final Object root) throws IOException {
-		return serializeDocument(appendable, TURF.PROPERTIES_CONTENT_TYPE, root);
+		return serializeDocument(appendable, TURF.PROPERTIES_MEDIA_TYPE, root);
 	}
 
 	/**
@@ -1016,7 +1016,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object...)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object...)} using {@link TURF#MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
 	 * @return The given appendable.
@@ -1024,7 +1024,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull final Object... roots) throws IOException {
-		return serializeDocument(appendable, TURF.CONTENT_TYPE, roots);
+		return serializeDocument(appendable, TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -1033,7 +1033,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object...)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Object...)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
 	 * @return The given appendable.
@@ -1042,7 +1042,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializePropertiesDocument(@Nonnull final Appendable appendable, @Nonnull final Object... roots) throws IOException {
-		return serializeDocument(appendable, TURF.PROPERTIES_CONTENT_TYPE, roots);
+		return serializeDocument(appendable, TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -1057,7 +1057,7 @@ public class TurfSerializer {
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots, and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType, @Nonnull final Object... roots)
@@ -1070,7 +1070,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Iterable)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Iterable)} using {@link TURF#MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
 	 * @return The given appendable.
@@ -1078,7 +1078,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull final Iterable<?> roots) throws IOException {
-		return serializeDocument(appendable, TURF.CONTENT_TYPE, roots);
+		return serializeDocument(appendable, TURF.MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -1086,7 +1086,7 @@ public class TurfSerializer {
 	 * @apiNote This method discovers resource references to that aliases may be generated as needed. This record of resource references is reset after
 	 *          serialization, but any generated aliases remain. This allows the same serializer to be used multiple times for the same graph, with the same
 	 *          aliases being used.
-	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Iterable)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #serializeDocument(Appendable, ContentType, Iterable)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param appendable The appendable to which serialized data should be appended.
 	 * @param roots The root resources, if any.
 	 * @return The given appendable.
@@ -1095,7 +1095,7 @@ public class TurfSerializer {
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializePropertiesDocument(@Nonnull final Appendable appendable, @Nonnull final Iterable<?> roots) throws IOException {
-		return serializeDocument(appendable, TURF.PROPERTIES_CONTENT_TYPE, roots);
+		return serializeDocument(appendable, TURF.PROPERTIES_MEDIA_TYPE, roots);
 	}
 
 	/**
@@ -1109,12 +1109,12 @@ public class TurfSerializer {
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given appendable, roots iterable, and/or any root resource is <code>null</code>.
 	 * @throws IllegalArgumentException if the content type is not for a known TURF variant, or if the content type has parameters.
-	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_CONTENT_TYPE} document was indicated, and zero or multiple root objects were provided.
+	 * @throws IllegalArgumentException if a {@link TURF#PROPERTIES_MEDIA_TYPE} document was indicated, and zero or multiple root objects were provided.
 	 * @throws IOException If there was an error writing the serialized data.
 	 */
 	public Appendable serializeDocument(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType, @Nonnull final Iterable<?> roots)
 			throws IOException {
-		checkArgument(contentType.hasBaseType(TURF.CONTENT_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
+		checkArgument(contentType.hasBaseType(TURF.MEDIA_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE),
 				"Media type >%s< not a recognized TURF variant.", contentType);
 		checkArgument(contentType.getParameters().isEmpty(), "TURF header does not currently support doctype >%s< with paramers.", contentType);
 
@@ -1130,7 +1130,7 @@ public class TurfSerializer {
 
 		//body
 		try {
-			if(contentType.hasBaseType(TURF.CONTENT_TYPE)) { //>text/urf<
+			if(contentType.hasBaseType(TURF.MEDIA_TYPE)) { //>text/urf<
 				int rootCount = 0;
 				for(final Object root : roots) {
 					rootCount++;
@@ -1142,7 +1142,7 @@ public class TurfSerializer {
 					}
 					serializeRoots(appendable, roots);
 				}
-			} else if(contentType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE)) { //>text/urf-properties<
+			} else if(contentType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE)) { //>text/urf-properties<
 				Iterables.findOnly(roots).ifPresent(throwingConsumer(root -> {
 					checkArgument(root instanceof UrfObject, "Can only serialize TURF properties for an URF object, not an object of type %s.",
 							root.getClass().getName());
@@ -1183,7 +1183,7 @@ public class TurfSerializer {
 	 * @see TURF#DIVISION
 	 */
 	public Appendable serializeHeader(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType) throws IOException {
-		checkArgument(contentType.hasBaseType(TURF.CONTENT_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
+		checkArgument(contentType.hasBaseType(TURF.MEDIA_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE),
 				"Media type >%s< not a recognized TURF variant.", contentType);
 		checkArgument(contentType.getParameters().isEmpty(), "TURF header does not currently support doctype >%s< with paramers.", contentType);
 		appendable.append(DIVISION).append(MEDIA_TYPE_BEGIN); //===>

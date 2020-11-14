@@ -139,27 +139,27 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF document from a string.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final String string) throws IOException, ParseIOException {
-		return parseDocument(string, TURF.CONTENT_TYPE);
+		return parseDocument(string, TURF.MEDIA_TYPE);
 	}
 
 	/**
 	 * Parses a TURF properties document from a string.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parsePropertiesDocument(@Nonnull final String string) throws IOException, ParseIOException {
-		return parseDocument(string, TURF.PROPERTIES_CONTENT_TYPE);
+		return parseDocument(string, TURF.PROPERTIES_MEDIA_TYPE);
 	}
 
 	/**
@@ -182,27 +182,27 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF resource from a TURF document input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
-		return parseDocument(inputStream, TURF.CONTENT_TYPE);
+		return parseDocument(inputStream, TURF.MEDIA_TYPE);
 	}
 
 	/**
 	 * Parses a TURF resource from a TURF properties document input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parsePropertiesDocument(@Nonnull final InputStream inputStream) throws IOException, ParseIOException {
-		return parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE);
+		return parseDocument(inputStream, TURF.PROPERTIES_MEDIA_TYPE);
 	}
 
 	/**
@@ -223,27 +223,27 @@ public class TurfParser<R> {
 	/**
 	 * Parses TURF resources from a TURF document reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parseDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		return parseDocument(reader, TURF.CONTENT_TYPE);
+		return parseDocument(reader, TURF.MEDIA_TYPE);
 	}
 
 	/**
 	 * Parses TURF resources from a TURF properties document reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#PROPERTIES_CONTENT_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	public R parsePropertiesDocument(@Nonnull final Reader reader) throws IOException, ParseIOException {
-		return parseDocument(reader, TURF.PROPERTIES_CONTENT_TYPE);
+		return parseDocument(reader, TURF.PROPERTIES_MEDIA_TYPE);
 	}
 
 	/**
@@ -258,7 +258,7 @@ public class TurfParser<R> {
 	 */
 	public R parseDocument(@Nonnull final Reader reader, @Nullable final ContentType contentType) throws IOException, ParseIOException {
 		//TODO add support for SURF?
-		checkArgument(contentType == null || contentType.hasBaseType(TURF.CONTENT_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
+		checkArgument(contentType == null || contentType.hasBaseType(TURF.MEDIA_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE),
 				"TURF parser does not support documents of type >%s<.", contentType);
 
 		//header
@@ -273,8 +273,8 @@ public class TurfParser<R> {
 				checkParseIO(reader, doctype.hasBaseType(contentType), "Doctype >%s< does not has same base type as requested content type >%s<.", doctype,
 						contentType);
 			} else { //autodetect
-				checkArgument(doctype.hasBaseType(TURF.CONTENT_TYPE) || doctype.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE),
-						"Document type >%s< not supported; must be >%s< or >%s<.", doctype, TURF.CONTENT_TYPE, TURF.PROPERTIES_CONTENT_TYPE);
+				checkArgument(doctype.hasBaseType(TURF.MEDIA_TYPE) || doctype.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE),
+						"Document type >%s< not supported; must be >%s< or >%s<.", doctype, TURF.MEDIA_TYPE, TURF.PROPERTIES_MEDIA_TYPE);
 			}
 			foundDoctype = Optional.of(doctype);
 			//TODO store the document type somewhere for later retrieval
@@ -328,7 +328,7 @@ public class TurfParser<R> {
 		}
 
 		try { //if neither a content type or a doctype was specified, assumed >text/urf< 
-			parsePartBody(reader, foundDoctype.orElseGet(() -> contentType != null ? contentType : TURF.CONTENT_TYPE));
+			parsePartBody(reader, foundDoctype.orElseGet(() -> contentType != null ? contentType : TURF.MEDIA_TYPE));
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new ParseIOException(reader, illegalArgumentException.getMessage(), illegalArgumentException);
 		}
@@ -347,7 +347,7 @@ public class TurfParser<R> {
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
 	protected void parsePartBody(@Nonnull final Reader reader, @Nonnull final ContentType partType) throws IOException, ParseIOException {
-		if(partType.hasBaseType(TURF.CONTENT_TYPE)) { //>text/urf<
+		if(partType.hasBaseType(TURF.MEDIA_TYPE)) { //>text/urf<
 			checkArgument(partType.getParameters().isEmpty(), "Body with type >%s< does not support media type parameters.", partType);
 			boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
 			boolean nextItemProhibited = false;
@@ -368,7 +368,7 @@ public class TurfParser<R> {
 					nextItemProhibited = true;
 				}
 			}
-		} else if(partType.hasBaseType(TURF.PROPERTIES_CONTENT_TYPE)) { //>text/urf-properties<
+		} else if(partType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE)) { //>text/urf-properties<
 			final URI blankTag = Tag.generateBlank();
 			final UrfResource object = new SimpleUrfResource(blankTag, (URI)null);
 			getProcessor().declareResource(blankTag);
