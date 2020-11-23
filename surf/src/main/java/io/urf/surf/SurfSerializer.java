@@ -514,13 +514,10 @@ public class SurfSerializer {
 	public String serialize(@Nonnull @Nullable Object root) throws IOException {
 		discoverResourceReferences(root);
 		try {
-			final Writer stringWriter = new StringWriter();
-			try {
+			try (final Writer stringWriter = new StringWriter()) {
 				serialize(stringWriter, root);
-			} finally {
-				stringWriter.close(); //close for completeness, not for necessity
+				return stringWriter.toString();
 			}
-			return stringWriter.toString();
 		} finally {
 			resourceHasReferenceMap.clear();
 		}

@@ -95,15 +95,12 @@ public class SurfSerializerTest implements Clogged {
 	 */
 	@Test
 	public void testSerializeOutputStream() throws IOException {
-		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		try {
+		try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 			//The SURF serializers internally may create a buffered writer which the caller does not have access to.
 			//If the serializer does not flush this writer, the caller will never see the bytes appear in the original output stream.  
 			new SurfSerializer().serialize(byteArrayOutputStream, new SurfObject());
-		} finally {
-			byteArrayOutputStream.close();
+			assertThat(byteArrayOutputStream.toString(SURF.CHARSET.name()), equalTo("*"));
 		}
-		assertThat(byteArrayOutputStream.toString(SURF.CHARSET.name()), equalTo("*"));
 	}
 
 	//#objects
