@@ -37,7 +37,7 @@ import javax.annotation.*;
 
 import com.globalmentor.io.ParseIOException;
 import com.globalmentor.io.function.IOConsumer;
-import com.globalmentor.iso.datetime.ISO8601;
+import com.globalmentor.iso.ISO8601;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
