@@ -16,12 +16,12 @@
 
 package io.urf.csv;
 
-import static com.globalmentor.net.ContentType.*;
+import static com.globalmentor.net.MediaType.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.nio.charset.Charset;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Definitions for the URF CSV document format.
@@ -34,7 +34,7 @@ import com.globalmentor.net.ContentType;
 public class URFCSV {
 
 	/** The media type for URF CSV: <code>text/urf+csv</code>. */
-	public static final ContentType MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf+csv");
+	public static final MediaType MEDIA_TYPE = MediaType.of(TEXT_PRIMARY_TYPE, "urf+csv");
 
 	/** An extension for URF CSV filenames, including the sub-extension: <code>urf.csv</code>. */
 	public static final String FILENAME_EXTENSION = "urf.csv";

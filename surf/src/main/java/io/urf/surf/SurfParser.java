@@ -42,7 +42,7 @@ import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
 
@@ -748,65 +748,65 @@ public class SurfParser {
 	 * Parses a media type. The current position must be that of the beginning media type delimiter character. The new position will be that immediately after the
 	 * ending media type delimiter character.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return An instance of {@link ContentType} representing the SURF media type parsed from the reader.
+	 * @return An instance of {@link MediaType} representing the SURF media type parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the media type is not in the correct format.
 	 * @see SURF#MEDIA_TYPE_BEGIN
 	 * @see SURF#MEDIA_TYPE_END
 	 */
-	public static ContentType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	public static MediaType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		check(reader, MEDIA_TYPE_BEGIN); //`>`
 		final String primaryType;
 		final String subType;
 		final String firstToken = parseMediaTypeRestrictedName(reader);
 		char c = peekRequired(reader);
-		if(c == ContentType.TYPE_DIVIDER) { //`/`
-			check(reader, ContentType.TYPE_DIVIDER);
+		if(c == MediaType.TYPE_DIVIDER) { //`/`
+			check(reader, MediaType.TYPE_DIVIDER);
 			primaryType = firstToken;
 			subType = parseMediaTypeRestrictedName(reader);
 			c = peekRequired(reader);
 		} else { //default to the `text` type if no type divider was found
-			primaryType = ContentType.TEXT_PRIMARY_TYPE;
+			primaryType = MediaType.TEXT_PRIMARY_TYPE;
 			subType = firstToken;
 		}
-		final Set<ContentType.Parameter> parameters;
-		if(c == ContentType.PARAMETER_DELIMITER_CHAR) { //`;`
+		final Set<MediaType.Parameter> parameters;
+		if(c == MediaType.PARAMETER_DELIMITER_CHAR) { //`;`
 			parameters = new HashSet<>();
 			do {
-				check(reader, ContentType.PARAMETER_DELIMITER_CHAR);
+				check(reader, MediaType.PARAMETER_DELIMITER_CHAR);
 				skip(reader, ABNF.WSP_CHARACTERS);
 				final String parameterName = parseMediaTypeRestrictedName(reader);
-				check(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR);
+				check(reader, MediaType.PARAMETER_ASSIGNMENT_CHAR);
 				final String parameterValue;
 				c = peekRequired(reader);
-				if(c == ContentType.STRING_QUOTE_CHAR) { //`"` (quoted value)
+				if(c == MediaType.STRING_QUOTE_CHAR) { //`"` (quoted value)
 					final StringBuilder parameterValueBuilder = new StringBuilder();
-					check(reader, ContentType.STRING_QUOTE_CHAR); //beginning quote
-					while((c = readRequired(reader)) != ContentType.STRING_QUOTE_CHAR) {
-						if(c == ContentType.STRING_ESCAPE_CHAR) { //skip the escape `\` character
+					check(reader, MediaType.STRING_QUOTE_CHAR); //beginning quote
+					while((c = readRequired(reader)) != MediaType.STRING_QUOTE_CHAR) {
+						if(c == MediaType.STRING_ESCAPE_CHAR) { //skip the escape `\` character
 							c = readRequired(reader);
 						}
 						parameterValueBuilder.append(c);
 					}
 					parameterValue = parameterValueBuilder.toString();
 				} else {
-					//Note that with the current ContentType implementation this will include any control characters;
+					//Note that with the current MediaType implementation this will include any control characters;
 					//nevertheless this will be checked when the object is constructed. 
-					parameterValue = readUntil(reader, ContentType.ILLEGAL_TOKEN_CHARACTERS);
+					parameterValue = readUntil(reader, MediaType.ILLEGAL_TOKEN_CHARACTERS);
 				}
-				parameters.add(ContentType.Parameter.of(parameterName, parameterValue));
+				parameters.add(MediaType.Parameter.of(parameterName, parameterValue));
 				c = peekRequired(reader);
-			} while(c == ContentType.PARAMETER_DELIMITER_CHAR); //`;`
+			} while(c == MediaType.PARAMETER_DELIMITER_CHAR); //`;`
 		} else {
 			parameters = emptySet();
 		}
 		check(reader, MEDIA_TYPE_END); //`<`
 		try {
-			return ContentType.of(primaryType, subType, parameters);
+			return MediaType.of(primaryType, subType, parameters);
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new ParseIOException(reader,
-					"Invalid SURF media type format and parameters: " + primaryType + ContentType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
+					"Invalid SURF media type format and parameters: " + primaryType + MediaType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
 		}
 	}
 
@@ -816,20 +816,20 @@ public class SurfParser {
 	 * @apiNote The <code>restricted-name</code> production in <a href="https://tools.ietf.org/html/rfc6838">RFC 6838</a> is used for the primary type, the
 	 *          subtype, and each parameter name.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link ContentType#RESTRICTED_NAME_PATTERN} pattern.
+	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link MediaType#RESTRICTED_NAME_PATTERN} pattern.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the restricted name is not in the correct format.
-	 * @see ContentType#RESTRICTED_NAME_PATTERN
+	 * @see MediaType#RESTRICTED_NAME_PATTERN
 	 */
 	protected static String parseMediaTypeRestrictedName(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder builder = new StringBuilder();
-		builder.append(check(reader, ContentType.RESTRICTED_NAME_FIRST_CHARACTERS));
-		readWhile(reader, ContentType.RESTRICTED_NAME_CHARACTERS, builder);
+		builder.append(check(reader, MediaType.RESTRICTED_NAME_FIRST_CHARACTERS));
+		readWhile(reader, MediaType.RESTRICTED_NAME_CHARACTERS, builder);
 		final int length = builder.length();
-		checkParseIO(reader, builder.length() <= ContentType.RESTRICTED_NAME_MAX_LENGTH,
-				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, ContentType.RESTRICTED_NAME_MAX_LENGTH);
-		assert ContentType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
+		checkParseIO(reader, builder.length() <= MediaType.RESTRICTED_NAME_MAX_LENGTH,
+				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, MediaType.RESTRICTED_NAME_MAX_LENGTH);
+		assert MediaType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
 		return builder.toString();
 	}
 

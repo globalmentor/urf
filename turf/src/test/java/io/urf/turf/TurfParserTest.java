@@ -38,7 +38,7 @@ import org.junit.jupiter.api.*;
 
 import com.globalmentor.io.ParseUnexpectedDataException;
 import com.globalmentor.io.function.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.urf.URF;
 import io.urf.model.*;
@@ -52,7 +52,7 @@ public class TurfParserTest {
 
 	/**
 	 * Loads and parses the indicated TURF document resource.
-	 * @implSpec The default implementation delegates to {@link #parseTestResource(String, ContentType)} using a media type based upon the resource extension.
+	 * @implSpec The default implementation delegates to {@link #parseTestResource(String, MediaType)} using a media type based upon the resource extension.
 	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
 	 * @return The list of TURF document roots parsed.
 	 * @throws IllegalArgumentException if the test resource name has no filename extension or it is for an unrecognized type.
@@ -65,12 +65,12 @@ public class TurfParserTest {
 
 	/**
 	 * Loads and parses the indicated TURF document resource.
-	 * @implSpec The default implementation delegates to {@link #parse(InputStream, ContentType)}.
+	 * @implSpec The default implementation delegates to {@link #parse(InputStream, MediaType)}.
 	 * @param testResourceName The name of the TURF document resource for testing, relative to {@link TurfTestResources}.
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The list of TURF document roots parsed.
 	 */
-	protected static List<Object> parseTestResource(@Nonnull final String testResourceName, @Nullable final ContentType contentType) throws IOException {
+	protected static List<Object> parseTestResource(@Nonnull final String testResourceName, @Nullable final MediaType contentType) throws IOException {
 		try (final InputStream inputStream = TurfTestResources.class.getResourceAsStream(testResourceName)) {
 			return parse(inputStream, contentType);
 		}
@@ -82,7 +82,7 @@ public class TurfParserTest {
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The list of TURF document roots parsed.
 	 */
-	protected static List<Object> parse(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException {
+	protected static List<Object> parse(@Nonnull final InputStream inputStream, @Nullable final MediaType contentType) throws IOException {
 		return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, contentType);
 	}
 

@@ -19,7 +19,7 @@ package io.urf.surf;
 import static com.globalmentor.java.Characters.*;
 
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.net.ContentType.*;
+import static com.globalmentor.net.MediaType.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Objects.*;
 
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import javax.annotation.*;
 
 import com.globalmentor.java.Characters;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Definitions for the Simple URF (SURF) document format.
@@ -39,7 +39,7 @@ import com.globalmentor.net.ContentType;
 public class SURF {
 
 	/** The media type for SURF: <code>text/simple-urf</code>. */
-	public static final ContentType MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "simple-urf");
+	public static final MediaType MEDIA_TYPE = MediaType.of(TEXT_PRIMARY_TYPE, "simple-urf");
 
 	/** An extension for SURF filenames. */
 	public static final String FILENAME_EXTENSION = "surf";

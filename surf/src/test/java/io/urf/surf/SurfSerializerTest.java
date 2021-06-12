@@ -41,7 +41,7 @@ import org.junit.jupiter.api.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.EmailAddress;
 
 import io.clogr.Clogged;
@@ -332,27 +332,27 @@ public class SurfSerializerTest implements Clogged {
 	@Test
 	public void testOkMediaTypes() throws IOException {
 		final SurfObject surfObject = new SurfObject();
-		surfObject.setPropertyValue("xml", ContentType.of("text", "xml"));
-		surfObject.setPropertyValue("textXml", ContentType.of("text", "xml"));
-		final ContentType markdownUtf8 = ContentType.of("text", "markdown", ContentType.Parameter.CHARSET_UTF_8);
+		surfObject.setPropertyValue("xml", MediaType.of("text", "xml"));
+		surfObject.setPropertyValue("textXml", MediaType.of("text", "xml"));
+		final MediaType markdownUtf8 = MediaType.of("text", "markdown", MediaType.Parameter.CHARSET_UTF_8);
 		//generate list of equivalent Markdown media types (the original test file has serialization variations)
 		surfObject.setPropertyValue("markdowns", Stream.generate(() -> markdownUtf8).limit(7).collect(toList()));
-		surfObject.setPropertyValue("json", ContentType.of("application", "json"));
-		surfObject.setPropertyValue("png", ContentType.of("image", "png"));
-		surfObject.setPropertyValue("threeParams", ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII, ContentType.Parameter.of("foo", "bar"),
-				ContentType.Parameter.of("test", "example")));
-		surfObject.setPropertyValue("duplicateNames", ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII,
-				ContentType.Parameter.of("test", "foo"), ContentType.Parameter.of("test", "bar")));
+		surfObject.setPropertyValue("json", MediaType.of("application", "json"));
+		surfObject.setPropertyValue("png", MediaType.of("image", "png"));
+		surfObject.setPropertyValue("threeParams", MediaType.of("text", "plain", MediaType.Parameter.CHARSET_US_ASCII, MediaType.Parameter.of("foo", "bar"),
+				MediaType.Parameter.of("test", "example")));
+		surfObject.setPropertyValue("duplicateNames", MediaType.of("text", "plain", MediaType.Parameter.CHARSET_US_ASCII,
+				MediaType.Parameter.of("test", "foo"), MediaType.Parameter.of("test", "bar")));
 		surfObject.setPropertyValue("special",
-				ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII, ContentType.Parameter.of("test", "(foo)<bar>@\",;:\\/[foobar]?=")));
+				MediaType.of("text", "plain", MediaType.Parameter.CHARSET_US_ASCII, MediaType.Parameter.of("test", "(foo)<bar>@\",;:\\/[foobar]?=")));
 		surfObject.setPropertyValue("escaped",
-				ContentType.of("text", "plain", ContentType.Parameter.CHARSET_US_ASCII, ContentType.Parameter.of("test", "foo\"bar\tandxmore\\stuff")));
-		surfObject.setPropertyValue("webForm", ContentType.of("application", "x-www-form-urlencoded"));
-		surfObject.setPropertyValue("docx", ContentType.of("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));
-		surfObject.setPropertyValue("odt", ContentType.of("application", "vnd.oasis.opendocument.text"));
+				MediaType.of("text", "plain", MediaType.Parameter.CHARSET_US_ASCII, MediaType.Parameter.of("test", "foo\"bar\tandxmore\\stuff")));
+		surfObject.setPropertyValue("webForm", MediaType.of("application", "x-www-form-urlencoded"));
+		surfObject.setPropertyValue("docx", MediaType.of("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"));
+		surfObject.setPropertyValue("odt", MediaType.of("application", "vnd.oasis.opendocument.text"));
 		surfObject.setPropertyValue("multipartForm",
-				ContentType.of("multipart", "form-data", ContentType.Parameter.CHARSET_UTF_8, ContentType.Parameter.of("boundary", "q1w2e3r4ty:9-5xyz")));
-		surfObject.setPropertyValue("jsonApi", ContentType.of("application", "vnd.api+json"));
+				MediaType.of("multipart", "form-data", MediaType.Parameter.CHARSET_UTF_8, MediaType.Parameter.of("boundary", "q1w2e3r4ty:9-5xyz")));
+		surfObject.setPropertyValue("jsonApi", MediaType.of("application", "vnd.api+json"));
 		assertThat(surfObject, equalTo(parseTestResource(OK_MEDIA_TYPES_RESOURCE_NAME).get())); //verify the test data
 		for(final boolean formatted : asList(false, true)) {
 			final SurfSerializer serializer = new SurfSerializer();

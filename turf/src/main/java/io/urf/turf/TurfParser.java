@@ -47,7 +47,7 @@ import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.Characters;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.*;
 import com.globalmentor.util.Optionals;
@@ -139,7 +139,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF document from a string.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(String, MediaType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -152,7 +152,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF properties document from a string.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(String, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(String, MediaType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param string The string containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -165,7 +165,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF document from a string.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This is a convenience method that delegates to {@link #parseDocument(Reader, ContentType)}.
+	 * @implSpec This is a convenience method that delegates to {@link #parseDocument(Reader, MediaType)}.
 	 * @param string The string containing TURF data.
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
@@ -173,7 +173,7 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
-	public R parseDocument(@Nonnull final String string, @Nullable final ContentType contentType) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final String string, @Nullable final MediaType contentType) throws IOException, ParseIOException {
 		try (final Reader stringReader = new StringReader(string)) {
 			return parseDocument(stringReader, contentType);
 		}
@@ -182,7 +182,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF resource from a TURF document input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, MediaType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -195,7 +195,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF resource from a TURF properties document input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(InputStream, MediaType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -208,7 +208,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses a TURF resource from an input stream.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, MediaType)}.
 	 * @param inputStream The input stream containing TURF data.
 	 * @param contentType The Internet media type of the TURF document being parsed, or <code>null</code> if the TURF variant should be automatically detected.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
@@ -216,14 +216,14 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
-	public R parseDocument(@Nonnull final InputStream inputStream, @Nullable final ContentType contentType) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final InputStream inputStream, @Nullable final MediaType contentType) throws IOException, ParseIOException {
 		return parseDocument(new LineNumberReader(new InputStreamReader(inputStream, DEFAULT_CHARSET)), contentType);
 	}
 
 	/**
 	 * Parses TURF resources from a TURF document reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, MediaType)} using {@link TURF#MEDIA_TYPE}.
 	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -236,7 +236,7 @@ public class TurfParser<R> {
 	/**
 	 * Parses TURF resources from a TURF properties document reader.
 	 * @apiNote One of the root resources is returned as a convenience. There is no guarantee which root resource will be returned.
-	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, ContentType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
+	 * @implSpec This implementation delegates to {@link #parseDocument(Reader, MediaType)} using {@link TURF#PROPERTIES_MEDIA_TYPE}.
 	 * @param reader The reader containing TURF data.
 	 * @return The result of processing; the result from {@link UrfProcessor#getResult()}.
 	 * @throws IOException If there was an error reading the TURF data.
@@ -256,19 +256,19 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
-	public R parseDocument(@Nonnull final Reader reader, @Nullable final ContentType contentType) throws IOException, ParseIOException {
+	public R parseDocument(@Nonnull final Reader reader, @Nullable final MediaType contentType) throws IOException, ParseIOException {
 		//TODO add support for SURF?
 		checkArgument(contentType == null || contentType.hasBaseType(TURF.MEDIA_TYPE) || contentType.hasBaseType(TURF.PROPERTIES_MEDIA_TYPE),
 				"TURF parser does not support documents of type >%s<.", contentType);
 
 		//header
-		final Optional<ContentType> foundDoctype;
+		final Optional<MediaType> foundDoctype;
 		int c = peek(reader); //the header has to come a the first of the document, if at all
 		final boolean hasHeader = c == DIVISION_BEGIN;
 		if(hasHeader) {
 			check(reader, DIVISION); //===
-			final Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> namespaceMapForDoctype = parseMediaType(reader, true);
-			final ContentType doctype = namespaceMapForDoctype.getKey();
+			final Map.Entry<MediaType, Optional<Map<URI, ValueUrfResource<?>>>> namespaceMapForDoctype = parseMediaType(reader, true);
+			final MediaType doctype = namespaceMapForDoctype.getKey();
 			if(contentType != null) {
 				checkParseIO(reader, doctype.hasBaseType(contentType), "Doctype >%s< does not has same base type as requested content type >%s<.", doctype,
 						contentType);
@@ -346,7 +346,7 @@ public class TurfParser<R> {
 	 * @throws IOException If there was an error reading the TURF data.
 	 * @throws ParseIOException if the TURF data was invalid.
 	 */
-	protected void parsePartBody(@Nonnull final Reader reader, @Nonnull final ContentType partType) throws IOException, ParseIOException {
+	protected void parsePartBody(@Nonnull final Reader reader, @Nonnull final MediaType partType) throws IOException, ParseIOException {
 		if(partType.hasBaseType(TURF.MEDIA_TYPE)) { //>text/urf<
 			checkArgument(partType.getParameters().isEmpty(), "Body with type >%s< does not support media type parameters.", partType);
 			boolean nextItemRequired = false; //at the beginning out there is no requirement for items (i.e. an empty document is possible)
@@ -1114,14 +1114,14 @@ public class TurfParser<R> {
 	 * Parses a media type. The current position must be that of the beginning media type delimiter character. The new position will be that immediately after the
 	 * ending media type delimiter character.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return An instance of {@link ContentType} representing the TURF media type parsed from the reader.
+	 * @return An instance of {@link MediaType} representing the TURF media type parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the media type is not in the correct format.
 	 * @see TURF#MEDIA_TYPE_BEGIN
 	 * @see TURF#MEDIA_TYPE_END
 	 */
-	public ContentType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
+	public MediaType parseMediaType(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		return parseMediaType(reader, false).getKey();
 	}
 
@@ -1131,44 +1131,44 @@ public class TurfParser<R> {
 	 * @implSpec This implementation only allows property handles and literal values in the description.
 	 * @param reader The reader the contents of which to be parsed.
 	 * @param allowDescription Whether an embedded description is recognized and allowed in the media type literal.
-	 * @return An instance of {@link ContentType} representing the TURF media type parsed from the reader.
+	 * @return An instance of {@link MediaType} representing the TURF media type parsed from the reader.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the media type is not in the correct format.
 	 * @see TURF#MEDIA_TYPE_BEGIN
 	 * @see TURF#MEDIA_TYPE_END
 	 */
-	public Map.Entry<ContentType, Optional<Map<URI, ValueUrfResource<?>>>> parseMediaType(@Nonnull final Reader reader, final boolean allowDescription)
+	public Map.Entry<MediaType, Optional<Map<URI, ValueUrfResource<?>>>> parseMediaType(@Nonnull final Reader reader, final boolean allowDescription)
 			throws IOException, ParseIOException {
 		check(reader, MEDIA_TYPE_BEGIN); //`>`
 		final String primaryType;
 		final String subType;
 		final String firstToken = parseMediaTypeRestrictedName(reader);
 		char c = peekRequired(reader);
-		if(c == ContentType.TYPE_DIVIDER) { //`/`
-			check(reader, ContentType.TYPE_DIVIDER);
+		if(c == MediaType.TYPE_DIVIDER) { //`/`
+			check(reader, MediaType.TYPE_DIVIDER);
 			primaryType = firstToken;
 			subType = parseMediaTypeRestrictedName(reader);
 			c = peekRequired(reader);
 		} else { //default to the `text` type if no type divider was found
-			primaryType = ContentType.TEXT_PRIMARY_TYPE;
+			primaryType = MediaType.TEXT_PRIMARY_TYPE;
 			subType = firstToken;
 		}
-		final Set<ContentType.Parameter> parameters;
-		if(c == ContentType.PARAMETER_DELIMITER_CHAR) { //`;` parameters
+		final Set<MediaType.Parameter> parameters;
+		if(c == MediaType.PARAMETER_DELIMITER_CHAR) { //`;` parameters
 			parameters = new HashSet<>();
 			do {
-				check(reader, ContentType.PARAMETER_DELIMITER_CHAR);
+				check(reader, MediaType.PARAMETER_DELIMITER_CHAR);
 				skip(reader, ABNF.WSP_CHARACTERS);
 				final String parameterName = parseMediaTypeRestrictedName(reader);
-				check(reader, ContentType.PARAMETER_ASSIGNMENT_CHAR);
+				check(reader, MediaType.PARAMETER_ASSIGNMENT_CHAR);
 				final String parameterValue;
 				c = peekRequired(reader);
-				if(c == ContentType.STRING_QUOTE_CHAR) { //`"` (quoted value)
+				if(c == MediaType.STRING_QUOTE_CHAR) { //`"` (quoted value)
 					final StringBuilder parameterValueBuilder = new StringBuilder();
-					check(reader, ContentType.STRING_QUOTE_CHAR); //beginning quote
-					while((c = readRequired(reader)) != ContentType.STRING_QUOTE_CHAR) {
-						if(c == ContentType.STRING_ESCAPE_CHAR) { //skip the escape `\` character
+					check(reader, MediaType.STRING_QUOTE_CHAR); //beginning quote
+					while((c = readRequired(reader)) != MediaType.STRING_QUOTE_CHAR) {
+						if(c == MediaType.STRING_ESCAPE_CHAR) { //skip the escape `\` character
 							c = readRequired(reader);
 						}
 						parameterValueBuilder.append(c);
@@ -1177,11 +1177,11 @@ public class TurfParser<R> {
 				} else {
 					//Note that with the current ContentType implementation this will include any control characters;
 					//nevertheless this will be checked when the object is constructed. 
-					parameterValue = readUntil(reader, ContentType.ILLEGAL_TOKEN_CHARACTERS);
+					parameterValue = readUntil(reader, MediaType.ILLEGAL_TOKEN_CHARACTERS);
 				}
-				parameters.add(ContentType.Parameter.of(parameterName, parameterValue));
+				parameters.add(MediaType.Parameter.of(parameterName, parameterValue));
 				c = peekRequired(reader);
-			} while(c == ContentType.PARAMETER_DELIMITER_CHAR); //`;`
+			} while(c == MediaType.PARAMETER_DELIMITER_CHAR); //`;`
 		} else {
 			parameters = emptySet();
 		}
@@ -1211,10 +1211,10 @@ public class TurfParser<R> {
 		}
 		check(reader, MEDIA_TYPE_END); //`<`
 		try {
-			return new AbstractMap.SimpleImmutableEntry<>(ContentType.of(primaryType, subType, parameters), Optional.ofNullable(description));
+			return new AbstractMap.SimpleImmutableEntry<>(MediaType.of(primaryType, subType, parameters), Optional.ofNullable(description));
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new ParseIOException(reader,
-					"Invalid TURF media type format and parameters: " + primaryType + ContentType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
+					"Invalid TURF media type format and parameters: " + primaryType + MediaType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
 		}
 	}
 
@@ -1224,20 +1224,20 @@ public class TurfParser<R> {
 	 * @apiNote The <code>restricted-name</code> production in <a href="https://tools.ietf.org/html/rfc6838">RFC 6838</a> is used for the primary type, the
 	 *          subtype, and each parameter name.
 	 * @param reader The reader the contents of which to be parsed.
-	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link ContentType#RESTRICTED_NAME_PATTERN} pattern.
+	 * @return A media type restricted name parsed from the reader. The value is guaranteed to match the {@link MediaType#RESTRICTED_NAME_PATTERN} pattern.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error reading from the reader.
 	 * @throws ParseIOException if the restricted name is not in the correct format.
-	 * @see ContentType#RESTRICTED_NAME_PATTERN
+	 * @see MediaType#RESTRICTED_NAME_PATTERN
 	 */
 	protected static String parseMediaTypeRestrictedName(@Nonnull final Reader reader) throws IOException, ParseIOException {
 		final StringBuilder builder = new StringBuilder();
-		builder.append(check(reader, ContentType.RESTRICTED_NAME_FIRST_CHARACTERS));
-		readWhile(reader, ContentType.RESTRICTED_NAME_CHARACTERS, builder);
+		builder.append(check(reader, MediaType.RESTRICTED_NAME_FIRST_CHARACTERS));
+		readWhile(reader, MediaType.RESTRICTED_NAME_CHARACTERS, builder);
 		final int length = builder.length();
-		checkParseIO(reader, builder.length() <= ContentType.RESTRICTED_NAME_MAX_LENGTH,
-				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, ContentType.RESTRICTED_NAME_MAX_LENGTH);
-		assert ContentType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
+		checkParseIO(reader, builder.length() <= MediaType.RESTRICTED_NAME_MAX_LENGTH,
+				"Media type restricted name `%s` of length %d is longer than the maximum length %d.", builder, length, MediaType.RESTRICTED_NAME_MAX_LENGTH);
+		assert MediaType.RESTRICTED_NAME_PATTERN.matcher(builder).matches();
 		return builder.toString();
 	}
 

@@ -17,13 +17,13 @@
 package io.urf.turf;
 
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.net.ContentType.*;
+import static com.globalmentor.net.MediaType.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.nio.charset.Charset;
 
 import com.globalmentor.java.Characters;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Definitions for the Text URF (TURF) document format.
@@ -32,10 +32,10 @@ import com.globalmentor.net.ContentType;
 public class TURF {
 
 	/** The media type for TURF: <code>text/urf</code>. */
-	public static final ContentType MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf");
+	public static final MediaType MEDIA_TYPE = MediaType.of(TEXT_PRIMARY_TYPE, "urf");
 
 	/** The media type for TURF Properties: <code>text/urf-properties</code>. */
-	public static final ContentType PROPERTIES_MEDIA_TYPE = ContentType.of(TEXT_PRIMARY_TYPE, "urf-properties");
+	public static final MediaType PROPERTIES_MEDIA_TYPE = MediaType.of(TEXT_PRIMARY_TYPE, "urf-properties");
 
 	/** An extension for TURF filenames. */
 	public static final String FILENAME_EXTENSION = "turf";

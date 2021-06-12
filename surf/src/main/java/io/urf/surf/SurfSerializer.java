@@ -41,7 +41,7 @@ import com.globalmentor.io.function.IOBiConsumer;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.java.CodePointCharacter;
 import com.globalmentor.model.UUIDs;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ASCII;
 
@@ -80,7 +80,7 @@ import com.globalmentor.text.ASCII;
  * </ul>
  * <h3>media type</h3>
  * <ul>
- * <li>{@link ContentType}</li>
+ * <li>{@link MediaType}</li>
  * </ul>
  * <h3>number</h3>
  * <ul>
@@ -149,7 +149,6 @@ public class SurfSerializer {
 	private final static String BYTE_ARRAY_CLASS_NAME = "[B";
 	private final static String CHARACTER_CLASS_NAME = "java.lang.Character";
 	private final static String CODE_POINT_CHARACTER_CLASS_NAME = "com.globalmentor.java.CodePointCharacter";
-	private final static String CONTENT_TYPE_CLASS_NAME = "com.globalmentor.net.ContentType";
 	private final static String DATE_CLASS_NAME = "java.util.Date";
 	private final static String DOUBLE_CLASS_NAME = "java.lang.Double";
 	private final static String EMAIL_ADDRESS_CLASS_NAME = "com.globalmentor.net.EmailAddress";
@@ -165,6 +164,7 @@ public class SurfSerializer {
 	private final static String LOCAL_DATE_TIME_CLASS_NAME = "java.time.LocalDateTime";
 	private final static String LOCAL_TIME_CLASS_NAME = "java.time.LocalTime";
 	private final static String LONG_CLASS_NAME = "java.lang.Long";
+	private final static String MEDIA_TYPE_CLASS_NAME = "com.globalmentor.net.MediaType";
 	private final static String MONTH_DAY_CLASS_NAME = "java.time.MonthDay";
 	private final static String OFFSET_DATE_TIME_CLASS_NAME = "java.time.OffsetDateTime";
 	private final static String OFFSET_TIME_CLASS_NAME = "java.time.OffsetTime";
@@ -178,7 +178,7 @@ public class SurfSerializer {
 	private final static String URI_CLASS_NAME = "java.net.URI";
 	private final static String URL_CLASS_NAME = "java.net.URL";
 	private final static String UUID_CLASS_NAME = "java.util.UUID";
-	private final static String YEAR__CLASS_NAME = "java.time.Year";
+	private final static String YEAR_CLASS_NAME = "java.time.Year";
 	private final static String YEAR_MONTH_CLASS_NAME = "java.time.YearMonth";
 	private final static String ZONED_DATE_TIME_CLASS_NAME = "java.time.ZonedDateTime";
 
@@ -615,8 +615,8 @@ public class SurfSerializer {
 				}
 				break;
 			//##media type
-			case CONTENT_TYPE_CLASS_NAME:
-				serializeMediaType(appendable, (ContentType)resource);
+			case MEDIA_TYPE_CLASS_NAME:
+				serializeMediaType(appendable, (MediaType)resource);
 				break;
 			//##number
 			case BIG_DECIMAL_CLASS_NAME:
@@ -654,7 +654,7 @@ public class SurfSerializer {
 				//TODO consider supporting OffsetDate; see e.g. http://stackoverflow.com/q/7788267/421049
 			case OFFSET_DATE_TIME_CLASS_NAME:
 			case OFFSET_TIME_CLASS_NAME:
-			case YEAR__CLASS_NAME:
+			case YEAR_CLASS_NAME:
 			case YEAR_MONTH_CLASS_NAME:
 			case ZONED_DATE_TIME_CLASS_NAME:
 				serializeTemporal(appendable, (TemporalAccessor)resource);
@@ -975,15 +975,15 @@ public class SurfSerializer {
 	/**
 	 * Serializes a media type along with its delimiters.
 	 * @param appendable The appendable to which serialized data should be appended.
-	 * @param contentType The information to be serialized as a media type.
+	 * @param mediaType The information to be serialized as a media type.
 	 * @return The given appendable.
 	 * @throws NullPointerException if the given reader is <code>null</code>.
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see SURF#MEDIA_TYPE_BEGIN
 	 * @see SURF#MEDIA_TYPE_END
 	 */
-	public static Appendable serializeMediaType(@Nonnull final Appendable appendable, @Nonnull final ContentType contentType) throws IOException {
-		return appendable.append(MEDIA_TYPE_BEGIN).append(contentType.toString()).append(MEDIA_TYPE_END);
+	public static Appendable serializeMediaType(@Nonnull final Appendable appendable, @Nonnull final MediaType mediaType) throws IOException {
+		return appendable.append(MEDIA_TYPE_BEGIN).append(mediaType.toString()).append(MEDIA_TYPE_END);
 	}
 
 	/**

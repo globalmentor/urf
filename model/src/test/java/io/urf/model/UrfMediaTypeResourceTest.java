@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Tests of {@link UrfMediaTypeResource}.
@@ -29,17 +29,17 @@ import com.globalmentor.net.ContentType;
  */
 public class UrfMediaTypeResourceTest {
 
-	/** @see UrfMediaTypeResource#toLexicalId(ContentType) */
+	/** @see UrfMediaTypeResource#toLexicalId(MediaType) */
 	@Test
 	public void testLexicalIdParametersOrdered() {
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/plain")), is("text/plain"));
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/html; charset=UTF-8")), is("text/html;charset=utf-8"));
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/html; charset=UTF-8; test=foo")), is("text/html;charset=utf-8;test=foo"));
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/html; charset=UTF-8; test=foo; apple=berry")),
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/plain")), is("text/plain"));
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/html; charset=UTF-8")), is("text/html;charset=utf-8"));
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/html; charset=UTF-8; test=foo")), is("text/html;charset=utf-8;test=foo"));
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/html; charset=UTF-8; test=foo; apple=berry")),
 				is("text/html;apple=berry;charset=utf-8;test=foo"));
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/html; charset=UTF-8; test=foo; apple=berry; test=bar")),
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/html; charset=UTF-8; test=foo; apple=berry; test=bar")),
 				is("text/html;apple=berry;charset=utf-8;test=bar;test=foo"));
-		assertThat(UrfMediaTypeResource.toLexicalId(ContentType.parse("text/html; charset=UTF-8; test=foo; apple=berry; test=bar; foo=bar")),
+		assertThat(UrfMediaTypeResource.toLexicalId(MediaType.parse("text/html; charset=UTF-8; test=foo; apple=berry; test=bar; foo=bar")),
 				is("text/html;apple=berry;charset=utf-8;foo=bar;test=bar;test=foo"));
 	}
 

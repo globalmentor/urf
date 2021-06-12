@@ -24,7 +24,7 @@ import java.util.Optional;
 import javax.annotation.*;
 
 import com.globalmentor.io.Filenames;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Useful enumeration of possible variants of a TURF file.
@@ -34,10 +34,10 @@ public enum TurfVariant {
 
 	TURF(MEDIA_TYPE, FILENAME_EXTENSION), TURF_PROPERTIES(PROPERTIES_MEDIA_TYPE, PROPERTIES_FILENAME_EXTENSION);
 
-	private final ContentType mediaType;
+	private final MediaType mediaType;
 
 	/** @return The base Internet media type of the variant. */
-	public ContentType getMediaType() {
+	public MediaType getMediaType() {
 		return mediaType;
 	}
 
@@ -53,7 +53,7 @@ public enum TurfVariant {
 	 * @param mediaType The base Internet media type of the variant.
 	 * @param filenameExention The default extension to be used for filenames.
 	 */
-	private TurfVariant(@Nonnull final ContentType mediaType, @Nonnull final String filenameExention) {
+	private TurfVariant(@Nonnull final MediaType mediaType, @Nonnull final String filenameExention) {
 		this.mediaType = requireNonNull(mediaType);
 		this.filenameExtension = requireNonNull(filenameExention);
 	}
@@ -63,7 +63,7 @@ public enum TurfVariant {
 	 * @param mediaType The Internet media type from which to determine the TURF variant.
 	 * @return The TURF variant, if one could be determined.
 	 */
-	public static Optional<TurfVariant> findFromMediaType(@Nonnull final ContentType mediaType) {
+	public static Optional<TurfVariant> findFromMediaType(@Nonnull final MediaType mediaType) {
 		if(mediaType.hasBaseType(MEDIA_TYPE)) {
 			return Optional.of(TURF);
 		} else if(mediaType.hasBaseType(PROPERTIES_MEDIA_TYPE)) {
