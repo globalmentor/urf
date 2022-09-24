@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.6.0</version>
+		<artifactId>globalmentor-base</artifactId>
+		<version>0.7.2</version>
 	</parent>
 
 	<groupId>io.urf</groupId>
@@ -13,22 +13,22 @@
 	<version>0.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>URF Aggregate</name>
-	<description>Aggregate parent POM of all URF Java projects.</description>
+	<name>URF BOM</name>
+	<description>Aggregate parent POM and bill of materials of all URF Java projects.</description>
 	<url>https://urf.io/</url>
 	<inceptionYear>2007</inceptionYear>
 
 	<licenses>
 		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<organization>
 		<name>GlobalMentor, Inc.</name>
-		<url>http://www.globalmentor.com/</url>
+		<url>https://www.globalmentor.com/</url>
 	</organization>
 
 	<developers>
@@ -36,7 +36,7 @@
 			<name>Garret Wilson</name>
 			<email>garret@globalmentor.com</email>
 			<organization>GlobalMentor, Inc.</organization>
-			<organizationUrl>http://www.globalmentor.com/</organizationUrl>
+			<organizationUrl>https://www.globalmentor.com/</organizationUrl>
 		</developer>
 	</developers>
 
@@ -45,10 +45,6 @@
 		<developerConnection>scm:git:https://bitbucket.org/globalmentor/urf.git</developerConnection>
 		<url>https://bitbucket.org/globalmentor/urf</url>
 	</scm>
-
-	<properties>
-		<globalmentor-web.version>0.6.5</globalmentor-web.version>
-	</properties>
 
 	<modules>
 		<module>cli</module>
@@ -80,13 +76,33 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-vocab</artifactId>
-				<version>${globalmentor-web.version}</version>
+				<version>0.6.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-bom</artifactId>
+				<version>0.7.3</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>com.univocity</groupId>
 				<artifactId>univocity-parsers</artifactId>
 				<version>2.9.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr</artifactId>
+				<version>0.8.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>urf-cli</artifactId>
+				<version>0.5.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -115,14 +131,27 @@
 
 			<dependency>
 				<groupId>io.urf</groupId>
+				<artifactId>urf-model</artifactId>
+				<version>0.5.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
 				<artifactId>urf-spec</artifactId>
 				<version>0.5.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.urf</groupId>
-				<artifactId>urf-model</artifactId>
+				<artifactId>surf</artifactId>
 				<version>0.5.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>surf</artifactId>
+				<version>0.5.0-SNAPSHOT</version>
+				<type>test-jar</type>
 			</dependency>
 
 			<dependency>
@@ -133,9 +162,8 @@
 
 			<dependency>
 				<groupId>io.urf</groupId>
-				<artifactId>surf</artifactId>
+				<artifactId>urf-vocab-content</artifactId>
 				<version>0.5.0-SNAPSHOT</version>
-				<type>test-jar</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
