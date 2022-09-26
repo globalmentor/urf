@@ -90,6 +90,8 @@ public class Content {
 		 * @return A tag for the given charset.
 		 * @see Content#CHARSET_CLASS_TAG
 		 * @see Charset#name()
+		 * @deprecated to be removed; as the charset is now normally part of the {@link Content#TYPE_PROPERTY_TAG} property, it is unclear whether a separate
+		 *             property adds any value.
 		 */
 		@Deprecated
 		public static URI fromCharset(@Nonnull final Charset charset) {
@@ -102,6 +104,8 @@ public class Content {
 		 * @return The tag indicated charset.
 		 * @throws IllegalArgumentException if the given tag does not represent a valid charset.
 		 * @see Content#CHARSET_CLASS_TAG
+		 * @deprecated to be removed; as the charset is now normally part of the {@link Content#TYPE_PROPERTY_TAG} property, it is unclear whether a separate
+		 *             property adds any value.
 		 */
 		@Deprecated
 		public static Charset toCharset(@Nonnull final URI tag) throws IllegalArgumentException {

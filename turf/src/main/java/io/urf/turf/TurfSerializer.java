@@ -1810,6 +1810,7 @@ public class TurfSerializer {
 	 * @throws IOException if there is an error appending to the appendable.
 	 * @see TURF#IRI_BEGIN
 	 */
+	@SuppressWarnings("fallthrough")
 	public static Appendable serializeIri(@Nonnull final Appendable appendable, @Nonnull final URI iri) throws IOException {
 		checkAbsolute(iri);
 		appendable.append(IRI_BEGIN);

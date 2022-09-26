@@ -32,7 +32,10 @@ import com.globalmentor.net.MediaType;
  */
 public enum TurfVariant {
 
-	TURF(MEDIA_TYPE, FILENAME_EXTENSION), TURF_PROPERTIES(PROPERTIES_MEDIA_TYPE, PROPERTIES_FILENAME_EXTENSION);
+	/** A classic Turf file. */
+	TURF(MEDIA_TYPE, FILENAME_EXTENSION),
+	/** A Turf Properties file. */
+	TURF_PROPERTIES(PROPERTIES_MEDIA_TYPE, PROPERTIES_FILENAME_EXTENSION);
 
 	private final MediaType mediaType;
 

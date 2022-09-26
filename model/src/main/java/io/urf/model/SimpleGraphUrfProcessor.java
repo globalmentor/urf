@@ -298,17 +298,18 @@ public class SimpleGraphUrfProcessor extends AbstractUrfProcessor<List<Object>> 
 		inferencer.processStatement(this, subject, property, object); //let the inferencer make inferences as appropriate
 	}
 
+	//TODO delete; history forgotten	
 	//TODO document; basically this says that we trust the source to provide value objects
-	@Deprecated
-	protected Optional<Object> asValueObject(UrfReference resource) { //TODO refactor to use ValueSupport
-		if(requireNonNull(resource) instanceof ObjectUrfResource) {
-			final Object object = ((ObjectUrfResource<?>)resource).getObject();
-			if(!(object instanceof Collection) && !(object instanceof Map)) {
-				return Optional.of(object);
-			}
-		}
-		return Optional.empty();
-	}
+	//	@Deprecated
+	//	protected Optional<Object> asValueObject(UrfReference resource) { //TODO refactor to use ValueSupport
+	//		if(requireNonNull(resource) instanceof ObjectUrfResource) {
+	//			final Object object = ((ObjectUrfResource<?>)resource).getObject();
+	//			if(!(object instanceof Collection) && !(object instanceof Map)) {
+	//				return Optional.of(object);
+	//			}
+	//		}
+	//		return Optional.empty();
+	//	}
 
 	/**
 	 * {@inheritDoc}

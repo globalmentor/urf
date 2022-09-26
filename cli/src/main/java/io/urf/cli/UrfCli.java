@@ -62,6 +62,12 @@ public class UrfCli extends BaseCliApplication {
 		Application.start(new UrfCli(args));
 	}
 
+	/**
+	 * Converts one or more files to some URF file format.
+	 * @param schemaPath Indicates a schema file for validation and making inferences.
+	 * @param outputPath The output path.
+	 * @param paths The paths to convert.
+	 */
 	@Command(description = "Converts one or more files to some URF file format.")
 	public void convert(
 			@Option(names = {"--schema", "-s"}, description = "Indicates a schema file for validation and making inferences.") @Nonnull final Path schemaPath,

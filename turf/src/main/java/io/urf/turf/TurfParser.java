@@ -716,11 +716,10 @@ public class TurfParser<R> {
 		//check and associate with the label as needed
 		if(label instanceof URI) { //tag
 			checkParseIO(reader, resource instanceof UrfResource, "Tag |%s| cannot be used with this resource.", label);
-			assert label.equals(((UrfResource)resource).getTag().orElse(null));
+			assert label.equals(resource.getTag().orElse(null));
 		} else if(label instanceof String) { //ID
 			checkParseIO(reader, resource instanceof UrfResource, "ID |%s| cannot be used with this resource.", label);
-			final UrfResource urfResource = (UrfResource)resource;
-			assert urfResource.getTag().isPresent() : String.format("Object with ID %s should have been given a tag when parsing.", label);
+			assert resource.getTag().isPresent() : String.format("Object with ID %s should have been given a tag when parsing.", label);
 		} else if(label instanceof Alias) { //alias
 			checkParseIO(reader, resource != null, "Cannot use alias |%s| with null.", label);
 			if(!(resource instanceof Collection)) { //collections already saved the association
@@ -1213,8 +1212,8 @@ public class TurfParser<R> {
 		try {
 			return new AbstractMap.SimpleImmutableEntry<>(MediaType.of(primaryType, subType, parameters), Optional.ofNullable(description));
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new ParseIOException(reader,
-					"Invalid TURF media type format and parameters: " + primaryType + MediaType.TYPE_DIVIDER + subType + " " + parameters, illegalArgumentException);
+			throw new ParseIOException(reader, "Invalid TURF media type format and parameters: " + primaryType + MediaType.TYPE_DIVIDER + subType + " " + parameters,
+					illegalArgumentException);
 		}
 	}
 

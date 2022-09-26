@@ -100,13 +100,20 @@ public class SURF {
 			CARRIAGE_RETURN_CHAR, CHARACTER_TABULATION_CHAR, LINE_TABULATION_CHAR);
 	/** Additional characters that may be escaped as characters or in strings. */
 	public static Characters CHARACTER_OPTIONAL_ESCAPED_CHARACTERS = Characters.of(SOLIDUS_CHAR);
-	//escaped forms of characters
+
+	/** Escaped backspace specifier. */
 	public static final char ESCAPED_BACKSPACE = 'b'; //b backspace
+	/** Escaped form feed specifier. */
 	public static final char ESCAPED_FORM_FEED = 'f'; //f form feed
+	/** Escaped line feed specifier. */
 	public static final char ESCAPED_LINE_FEED = 'n'; //n line feed
+	/** Escaped carriage return specifier. */
 	public static final char ESCAPED_CARRIAGE_RETURN = 'r'; //r carriage return
+	/** Escaped tab specifier. */
 	public static final char ESCAPED_TAB = 't'; //t tab
+	/** Escaped vertical tab specifier. */
 	public static final char ESCAPED_VERTICAL_TAB = 'v'; //v vertical tab
+	/** Escaped Unicode specifier. */
 	public static final char ESCAPED_UNICODE = 'u'; //u Unicode
 
 	/** The delimiter that begins email address literal values. */

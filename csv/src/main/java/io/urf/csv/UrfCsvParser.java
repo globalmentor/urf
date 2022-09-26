@@ -159,7 +159,7 @@ public class UrfCsvParser<R> implements Clogged {
 			return columns[columnIndex];
 		}
 
-		protected Optional<Column> idColumn = null;
+		private Optional<Column> idColumn = null;
 
 		/**
 		 * @return The column designated as representing the ID of each resource, if a column was designated as an ID.
@@ -386,7 +386,7 @@ public class UrfCsvParser<R> implements Clogged {
 	}
 
 	//TODO document
-	protected interface Column {
+	private interface Column {
 
 		/** @return The index of the column. */
 		public int getIndex();
@@ -412,7 +412,7 @@ public class UrfCsvParser<R> implements Clogged {
 
 	}
 
-	protected static abstract class AbstractColumn implements Column {
+	private static abstract class AbstractColumn implements Column {
 
 		private final int index;
 
@@ -449,7 +449,7 @@ public class UrfCsvParser<R> implements Clogged {
 	 * </p>
 	 * @author Garret Wilson
 	 */
-	protected static class IgnoredColumn extends AbstractColumn {
+	private static class IgnoredColumn extends AbstractColumn {
 
 		/**
 		 * Constructor.
@@ -481,7 +481,7 @@ public class UrfCsvParser<R> implements Clogged {
 	}
 
 	//TODO document
-	protected static abstract class BaseColumn extends AbstractColumn {
+	private static abstract class BaseColumn extends AbstractColumn {
 
 		private final Optional<UrfReference> property;
 
@@ -515,7 +515,7 @@ public class UrfCsvParser<R> implements Clogged {
 	}
 
 	//TODO document
-	protected static class DefaultColumn extends BaseColumn {
+	private static class DefaultColumn extends BaseColumn {
 
 		private final IOFunction<String, UrfReference> parseStrategy;
 

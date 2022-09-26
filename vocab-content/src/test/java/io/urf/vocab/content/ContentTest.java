@@ -25,8 +25,6 @@ import java.nio.charset.Charset;
 
 import org.junit.jupiter.api.*;
 
-import io.urf.vocab.content.Content;
-
 /**
  * Tests of the {@link Content} vocabulary.
  * @author Garret Wilson
@@ -38,6 +36,7 @@ public class ContentTest {
 
 	/** @see Content.Tag#fromCharset(Charset) */
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testTagFromCharset() {
 		assertThat(Content.Tag.fromCharset(US_ASCII), is(Content.NAMESPACE.resolve("Charset#US-ASCII")));
 		assertThat(Content.Tag.fromCharset(ISO_8859_1), is(Content.NAMESPACE.resolve("Charset#ISO-8859-1")));
@@ -46,6 +45,7 @@ public class ContentTest {
 
 	/** @see Content.Tag#toCharset(URI) */
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testTagToCharset() {
 		assertThat(Content.Tag.toCharset(Content.NAMESPACE.resolve("Charset#US-ASCII")), is(US_ASCII));
 		assertThat(Content.Tag.toCharset(Content.NAMESPACE.resolve("Charset#ISO-8859-1")), is(ISO_8859_1));
