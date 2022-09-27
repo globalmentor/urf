@@ -492,7 +492,7 @@ public class TurfSerializerTest {
 		for(final boolean formatted : asList(false, true)) {
 			final TurfSerializer serializer = new TurfSerializer();
 			serializer.setFormatted(formatted);
-			final String serialization = serializer.serializeDocument(object1, object2, object3, object4, object5, object6, string, object7);
+			final String serialization = serializer.serializeDocumentHavingRoots(object1, object2, object3, object4, object5, object6, string, object7);
 			for(final String okObjectNoPropertiesResourceName : asList(OK_ROOTS_WHITESPACE_RESOURCE_NAME)) { //TODO add non-whitespace variation
 				assertGraphsEqual(okObjectNoPropertiesResourceName, parse(serialization), parseTestResource(okObjectNoPropertiesResourceName));
 			}
