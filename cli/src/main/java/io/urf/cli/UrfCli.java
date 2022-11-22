@@ -75,6 +75,8 @@ public class UrfCli extends BaseCliApplication {
 		//TODO precondition paths length check
 		//TODO detect a glob as the first path, for shells that don't enumerate the file automatically
 
+		logAppInfo();
+
 		try {
 
 			//load schema if requested

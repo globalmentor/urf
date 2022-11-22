@@ -4,8 +4,9 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-base</artifactId>
-		<version>0.7.2</version>
+		<artifactId>globalmentor-root</artifactId>
+		<version>0.8.15</version>
+		<relativePath />
 	</parent>
 
 	<groupId>io.urf</groupId>
@@ -64,13 +65,19 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-application</artifactId>
-				<version>0.7.8-SNAPSHOT</version>
+				<version>0.7.9</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-core</artifactId>
+				<version>0.7.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-itu</artifactId>
-				<version>0.6.0</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
@@ -88,7 +95,7 @@
 			<dependency>
 				<groupId>io.confound</groupId>
 				<artifactId>confound-bom</artifactId>
-				<version>0.7.3</version>
+				<version>0.7.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -96,7 +103,7 @@
 			<dependency>
 				<groupId>io.clogr</groupId>
 				<artifactId>clogr</artifactId>
-				<version>0.8.3</version>
+				<version>0.8.4</version>
 			</dependency>
 
 			<dependency>
